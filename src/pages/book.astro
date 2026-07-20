@@ -1,0 +1,29 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import BookingCalendar from '../components/BookingCalendar.astro';
+import { siteConfig } from '../config/site.js';
+
+const pageTitle = `Book Your Consultation | ${siteConfig.name}`;
+const pageDescription = `Schedule your appointment at ${siteConfig.name} in KK Nagar, Chennai. Select your preferred date and time for a specialized evaluation.`;
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+  <section class="bg-brand-900 text-white py-16 px-6 text-center">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Book Your Appointment</h1>
+      <p class="text-xl text-brand-200">Select an available time slot below to secure your consultation.</p>
+    </div>
+  </section>
+
+  <section class="py-16 px-6 bg-champagne-50 relative -mt-8">
+    <BookingCalendar />
+  </section>
+
+  <section class="py-12 px-6 max-w-4xl mx-auto text-center border-t border-champagne-200">
+    <h3 class="text-xl font-bold text-brand-900 mb-2">Have questions before booking?</h3>
+    <p class="text-slate-600 mb-4">Call us directly and our team will help you choose the right specialist and appointment slot.</p>
+    <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="inline-block bg-brand-100 text-brand-800 font-bold px-6 py-3 rounded-lg hover:bg-brand-200 transition">
+      Call {siteConfig.contact.phone}
+    </a>
+  </section>
+</MainLayout>

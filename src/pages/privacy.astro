@@ -1,0 +1,122 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { siteConfig } from '../config/site.js';
+
+const pageTitle = "Privacy Policy";
+const pageDescription = `How ${siteConfig.name} collects, uses, and protects your personal information.`;
+
+const lastUpdated = "June 2026";
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+  <div class="max-w-3xl mx-auto py-16 px-6">
+    <h1 class="text-4xl font-extrabold text-brand-900 mb-2">Privacy Policy</h1>
+    <p class="text-sm text-slate-500 mb-10">Last updated: {lastUpdated}</p>
+
+    <div class="prose prose-slate max-w-none space-y-8 text-slate-700 leading-relaxed">
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">1. Introduction</h2>
+        <p>
+          {siteConfig.name} ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your personal information when you visit our website ({siteConfig.url}) or use our appointment request and booking features.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">2. Information We Collect</h2>
+        <p class="mb-3">When you submit an appointment request or booking through our website, we may collect:</p>
+        <ul class="list-disc pl-6 space-y-1">
+          <li>Your full name</li>
+          <li>Your mobile phone number</li>
+          <li>The service or consultation type you are interested in</li>
+          <li>Your preferred appointment date (if provided)</li>
+          <li>Any additional notes you choose to share with us</li>
+        </ul>
+        <p class="mt-3">
+          We do not collect sensitive medical history, diagnostic information, or treatment records through this website. Any such information is collected and stored only through our clinic's secure, in-person patient record systems once you become a patient.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">3. How We Use Your Information</h2>
+        <p class="mb-3">We use the information you provide solely to:</p>
+        <ul class="list-disc pl-6 space-y-1">
+          <li>Contact you to confirm, reschedule, or discuss your appointment request</li>
+          <li>Respond to inquiries you submit through our contact or booking forms</li>
+          <li>Send appointment-related communication via phone call or WhatsApp</li>
+        </ul>
+        <p class="mt-3">We do not sell, rent, or share your personal information with third parties for marketing purposes.</p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">4. How We Store Your Information</h2>
+        <p class="mb-3">
+          Appointment requests submitted through our contact and booking forms are processed using <strong>Netlify Forms</strong>, a third-party form-handling service, and are also sent via email notification to our clinic staff. Netlify's handling of this data is governed by their own privacy policy and security practices.
+        </p>
+        <p>
+          Our website also uses <strong>Google Firebase</strong> (Firestore) as part of our backend infrastructure for appointment and patient record management. Where this system is in active use, submitted information may be stored on Google Cloud's servers, subject to appropriate access controls limiting visibility to authorized clinic staff only.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">5. Analytics & Cookies</h2>
+        <p>
+          We use <strong>Google Analytics</strong> to understand how visitors use our website -- such as which pages are viewed and how long visitors stay -- so we can improve our content and services. Google Analytics may use cookies to collect this information in aggregate and anonymized form. We do not use this data to identify individual visitors.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">6. Data Sharing</h2>
+        <p>
+          We do not sell or rent your personal information to any third party. Information you submit is accessible only to authorized staff at {siteConfig.name} for the purpose of contacting you regarding your appointment request, and to the service providers (Netlify, Google Firebase, Google Analytics) that power our website's technical functionality, strictly as needed to operate those services.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">7. Your Rights</h2>
+        <p class="mb-3">Under the Digital Personal Data Protection Act, 2023 (India), you have the right to:</p>
+        <ul class="list-disc pl-6 space-y-1">
+          <li>Request access to the personal information we hold about you</li>
+          <li>Request correction of inaccurate or outdated information</li>
+          <li>Request deletion of your information, where applicable and not in conflict with our legal or medical record-keeping obligations</li>
+          <li>Withdraw consent for non-essential communication at any time</li>
+        </ul>
+        <p class="mt-3">
+          To exercise any of these rights, please contact us using the details below.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">8. Data Retention</h2>
+        <p>
+          We retain appointment request information only as long as necessary to fulfill the purpose for which it was collected, or as required by applicable Indian medical record-keeping regulations once you become a registered patient of the clinic.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">9. Children's Privacy</h2>
+        <p>
+          Our website is not directed at children. If you are submitting an appointment request on behalf of a minor (for example, for a paediatric dermatology evaluation), please ensure you are the parent or legal guardian providing consent on the child's behalf.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">10. Changes to This Policy</h2>
+        <p>
+          We may update this Privacy Policy from time to time to reflect changes in our practices or for legal, operational, or regulatory reasons. The "Last updated" date at the top of this page will reflect the most recent revision.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">11. Contact Us</h2>
+        <p class="mb-3">If you have questions about this Privacy Policy or how your information is handled, please contact us:</p>
+        <ul class="list-none space-y-1">
+          <li><strong>Phone:</strong> <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="text-brand-600 hover:underline">{siteConfig.contact.phone}</a></li>
+          <li><strong>Email:</strong> <a href={`mailto:${siteConfig.contact.email}`} class="text-brand-600 hover:underline">{siteConfig.contact.email}</a></li>
+          <li><strong>Address:</strong> {siteConfig.contact.address.street}, {siteConfig.contact.address.locality}, {siteConfig.contact.address.city} - {siteConfig.contact.address.postalCode}</li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+</MainLayout>
