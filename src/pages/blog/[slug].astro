@@ -29,7 +29,7 @@ const relatedService = entry.data.service
     <div class="mb-8">
       <h1 class="text-4xl font-extrabold text-brand-900 mb-4">{entry.data.title}</h1>
       <p class="text-slate-500 font-medium">
-        By {entry.data.author || siteConfig.doctor.name} 
+        By {entry.data.author || `The ${siteConfig.name} Team`} 
         {entry.data.pubDate && ` • ${new Date(entry.data.pubDate).toDateString()}`}
       </p>
     </div>
