@@ -5,32 +5,42 @@
 // earlier pages like Cataract/LASIK), and a standardized
 // "patient concern -> response" structure (used going forward) for
 // consistency across pages while content stays page-specific.
+//
+// This is a first-person attributed quote, so the speaking doctor
+// must be passed explicitly per page via doctorSlug (matching a slug
+// in siteConfig.doctors) -- it intentionally does NOT fall back to
+// any single doctor by default, since this is a 3-doctor equal
+// partnership and no individual should be the silent default author
+// of every quote across the site. Pick whichever doctor's specialty
+// actually fits the page's topic.
 import { siteConfig } from '../../config/site.js';
 
 interface Props {
   perspective?: string;
   patientConcern?: string;
   response?: string;
+  doctorSlug: string;
 }
 
-const { perspective, patientConcern, response } = Astro.props;
+const { perspective, patientConcern, response, doctorSlug } = Astro.props;
+const doctor = siteConfig.doctors.find((d) => d.slug === doctorSlug) || siteConfig.doctors[0];
 ---
 
-<section class="py-12 px-6 bg-gradient-to-br from-brand-50 to-white border-t border-slate-100">
+<section class="py-12 px-6 bg-gradient-to-br from-brand-50 to-white border-t border-champagne-200">
   <div class="max-w-2xl mx-auto">
     <div class="bg-white rounded-3xl shadow-sm border border-brand-100 p-6 md:p-8">
       <div class="flex items-center gap-3 mb-4">
         <img
-          src="/images/hero-doctor.jpg"
-          alt={siteConfig.doctor.name}
+          src={`/images/doctors/${doctor.slug}.jpg`}
+          alt={doctor.name}
           class="w-12 h-12 rounded-full object-cover border-2 border-brand-100"
-          onerror="this.src='https://placehold.co/100x100/EAF0EC/234B3A?text=Dr'"
+          onerror={`this.onerror=null;this.src='https://placehold.co/100x100/EAF0EC/234B3A?text=${encodeURIComponent(doctor.name)}'`}
         />
         <div>
           <p class="font-bold text-slate-900 text-sm">
-            {patientConcern ? "What I Commonly Hear From Patients" : `${siteConfig.doctor.name}'s Perspective`}
+            {patientConcern ? "What I Commonly Hear From Patients" : `${doctor.name}'s Perspective`}
           </p>
-          <p class="text-xs text-brand-600 font-semibold uppercase tracking-wide">{siteConfig.doctor.specialization}</p>
+          <p class="text-xs text-brand-600 font-semibold uppercase tracking-wide">{doctor.designation}</p>
         </div>
       </div>
 
