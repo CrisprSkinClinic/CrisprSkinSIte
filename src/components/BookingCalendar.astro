@@ -6,26 +6,26 @@ const { defaultService } = Astro.props;
 <div
   id="bookingCalendarRoot"
   data-default-service={defaultService || ''}
-  class="max-w-5xl mx-auto p-8 md:p-12 bg-white border border-stone-400/15 flex flex-col md:flex-row gap-10 md:gap-12"
+  class="max-w-5xl mx-auto p-8 bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl flex flex-col md:flex-row gap-8"
 >
 
-  <div class="md:w-1/2 space-y-4 pb-8 md:pb-0 md:pr-12 border-b md:border-b-0 md:border-r border-stone-400/15">
-    <h3 class="font-display text-2xl font-medium text-ink mb-6">Patient Details</h3>
+  <div class="md:w-1/2 space-y-5 pr-0 md:pr-8 border-b md:border-b-0 md:border-r border-slate-200/60 pb-8 md:pb-0">
+    <h3 class="text-2xl font-bold text-brand-900 mb-6">Patient Details</h3>
 
     <div class="flex gap-3">
-      <select id="prefix" class="p-3 bg-white border border-stone-400/30 focus:border-ink outline-none w-1/4 text-sm">
+      <select id="prefix" class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-1/4">
         <option value="Mr.">Mr.</option>
         <option value="Ms.">Ms.</option>
         <option value="Mrs.">Mrs.</option>
         <option value="Dr.">Dr.</option>
       </select>
-      <input type="text" id="firstName" placeholder="First Name" required class="p-3 bg-white border border-stone-400/30 focus:border-ink outline-none w-3/4 text-sm" />
+      <input type="text" id="firstName" placeholder="First Name" required class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-3/4" />
     </div>
 
-    <input type="text" id="lastName" placeholder="Last Name" required class="w-full p-3 bg-white border border-stone-400/30 focus:border-ink outline-none text-sm" />
-    <input type="tel" id="phone" placeholder="Mobile Number (+91...)" required class="w-full p-3 bg-white border border-stone-400/30 focus:border-ink outline-none text-sm" />
+    <input type="text" id="lastName" placeholder="Last Name" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+    <input type="tel" id="phone" placeholder="Mobile Number (+91...)" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
 
-    <select id="service" class="w-full p-3 bg-white border border-stone-400/30 focus:border-ink outline-none text-sm">
+    <select id="service" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
       <option value="" disabled>Select Service...</option>
       <option value="General Consultation">General Dermatology Consultation</option>
       <optgroup label="Hair">
@@ -67,23 +67,23 @@ const { defaultService } = Astro.props;
   </div>
 
   <div class="md:w-1/2 flex flex-col">
-    <h3 class="font-display text-2xl font-medium text-ink mb-6">Select Slot</h3>
+    <h3 class="text-2xl font-bold text-brand-900 mb-6">Select Slot</h3>
 
-    <input type="date" id="date" required class="w-full p-3 mb-6 bg-white border border-stone-400/30 focus:border-ink outline-none text-sm" />
+    <input type="date" id="date" required class="w-full p-3 mb-6 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
 
     <div id="slotsContainer" class="grid grid-cols-2 gap-3 mb-8">
-      <p class="col-span-2 text-stone-500 text-sm">Select a date to see available times.</p>
+      <p class="col-span-2 text-slate-400 text-sm">Select a date to see available times.</p>
     </div>
 
-    <button id="confirmBtn" class="mt-auto w-full py-4 bg-ink text-white text-sm hover:bg-brand-600 transition-colors disabled:opacity-50">
+    <button id="confirmBtn" class="mt-auto w-full py-4 bg-brand-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-800 transition disabled:opacity-50">
       Confirm Appointment
     </button>
 
-    <div id="successMessage" class="hidden mt-4 text-center p-3 bg-brand-50 text-brand-700 text-sm border border-brand-200">
+    <div id="successMessage" class="hidden mt-4 text-center p-3 bg-green-100 text-green-800 rounded-lg font-medium">
       Appointment confirmed successfully!
     </div>
 
-    <div id="errorMessage" class="hidden mt-4 text-center p-3 bg-red-50 text-red-700 text-sm border border-red-200"></div>
+    <div id="errorMessage" class="hidden mt-4 text-center p-3 bg-red-100 text-red-800 rounded-lg font-medium"></div>
   </div>
 </div>
 
@@ -127,19 +127,19 @@ const { defaultService } = Astro.props;
     function renderSlots(displayTimes) {
       selectedTime = "";
       if (displayTimes.length === 0) {
-        slotsContainer.innerHTML = '<p class="col-span-2 text-stone-500 text-sm">No slots available on this date. Please try another day, or call us directly.</p>';
+        slotsContainer.innerHTML = '<p class="col-span-2 text-slate-500 text-sm">No slots available on this date. Please try another day, or call us directly.</p>';
         return;
       }
       slotsContainer.innerHTML = '';
       displayTimes.forEach((time, index) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'time-slot py-3 border border-stone-400/30 text-ink hover:border-ink transition-colors text-sm';
+        btn.className = 'time-slot py-3 border border-brand-200 rounded-lg text-brand-800 hover:bg-brand-50 transition font-medium';
         btn.textContent = time;
         btn.dataset.time = time;
         btn.addEventListener('click', () => {
-          document.querySelectorAll('.time-slot').forEach((b) => b.classList.remove('bg-ink', 'text-white', 'border-ink'));
-          btn.classList.add('bg-ink', 'text-white', 'border-ink');
+          document.querySelectorAll('.time-slot').forEach((b) => b.classList.remove('bg-brand-600', 'text-white'));
+          btn.classList.add('bg-brand-600', 'text-white');
           selectedTime = time;
         });
         slotsContainer.appendChild(btn);
@@ -147,7 +147,7 @@ const { defaultService } = Astro.props;
         // Auto-select the first available slot, while still letting
         // the user click a different one afterward.
         if (index === 0) {
-          btn.classList.add('bg-ink', 'text-white', 'border-ink');
+          btn.classList.add('bg-brand-600', 'text-white');
           selectedTime = time;
         }
       });
@@ -159,7 +159,7 @@ const { defaultService } = Astro.props;
     // replacing the old direct queries against eye-clinic-site's own,
     // now-stale schedule_sessions/blocked_dates/blocked_slots tables.
     async function loadAvailableSlots(dateStr) {
-      slotsContainer.innerHTML = '<p class="col-span-2 text-stone-500 text-sm">Checking availability...</p>';
+      slotsContainer.innerHTML = '<p class="col-span-2 text-slate-400 text-sm">Checking availability...</p>';
       errorMessage?.classList.add('hidden');
 
       try {
@@ -171,7 +171,7 @@ const { defaultService } = Astro.props;
         }
 
         if (data.reason) {
-          slotsContainer.innerHTML = `<p class="col-span-2 text-stone-500 text-sm">${data.reason}</p>`;
+          slotsContainer.innerHTML = `<p class="col-span-2 text-slate-500 text-sm">${data.reason}</p>`;
           return;
         }
 
@@ -179,7 +179,7 @@ const { defaultService } = Astro.props;
         renderSlots(displayTimes);
       } catch (err) {
         console.error("Error loading availability:", err);
-        slotsContainer.innerHTML = '<p class="col-span-2 text-red-600 text-sm">Could not load availability. Please try again.</p>';
+        slotsContainer.innerHTML = '<p class="col-span-2 text-red-500 text-sm">Could not load availability. Please try again.</p>';
       }
     }
 
