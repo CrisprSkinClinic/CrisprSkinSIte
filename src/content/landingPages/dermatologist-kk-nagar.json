@@ -1,0 +1,36 @@
+{
+  "headline": "Dermatologist in KK Nagar, Chennai",
+  "subheadline": "AIIMS-trained consultant dermatologists offering complete skin, hair, and cosmetic care under one roof.",
+  "urgent": false,
+  "metaDescription": "Dermatologist in KK Nagar, Chennai. Three AIIMS-trained consultant dermatologists offering hair, skin, and cosmetic care. Book a consultation.",
+
+  "whyPatientsChoose": [
+    { "title": "Three Consultant Dermatologists", "description": "Hair transplantation, paediatric dermatology, and dermatosurgery expertise all under one clinic." },
+    { "title": "Complete Care, One Location", "description": "From acne to hair transplant to pediatric skin concerns -- no need to be referred elsewhere for common conditions." }
+  ],
+
+  "showSymptomCheck": false,
+
+  "showServicesGrid": true,
+  "showLocalArea": true,
+
+  "doctorsPerspectiveStructured": {
+    "patientConcern": "How do I know which doctor to see for my concern?",
+    "response": "Our front desk can help match you to the right doctor based on your concern when you call or book -- whether that's hair, general skin, or a paediatric issue.",
+    "doctorSlug": "dr-karthik-l"
+  },
+
+  "processSteps": [
+    { "title": "Book", "description": "Call or book online, and we'll help match you to the right doctor for your concern." },
+    { "title": "Evaluation", "description": "A thorough consultation addressing your specific skin, hair, or cosmetic concern." },
+    { "title": "Treatment Plan", "description": "A plan built around your specific diagnosis and goals, not a generic package." }
+  ],
+
+  "landingFaqs": [
+    { "question": "What conditions do you treat?", "answer": "We treat the full range of skin, hair, and nail conditions, plus cosmetic dermatology and paediatric dermatology -- see our services page for the complete list." },
+    { "question": "Do I need to know which doctor to book with?", "answer": "No -- our front desk can help match you to the right doctor for your specific concern." },
+    { "question": "Where exactly are you located?", "answer": "39/2, RK Shanmugam Salai, KK Nagar, Chennai - 600078, convenient to Ashok Nagar, Vadapalani, Virugambakkam, and Ramapuram." }
+  ],
+
+  "defaultService": "General Consultation"
+}

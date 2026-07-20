@@ -1,0 +1,59 @@
+{
+  "headline": "Acne Treatment in Chennai -- Dermatologist-Guided Care",
+  "subheadline": "A treatment plan matched to your specific acne type and severity, not a generic skincare routine.",
+  "urgent": false,
+  "metaDescription": "Acne treatment in KK Nagar, Chennai from AIIMS-trained dermatologists. Evidence-based treatment for teenage and adult acne. Book a consultation.",
+
+  "whyPatientsChoose": [
+    { "title": "Acne-Type-Specific Treatment", "description": "Comedonal, inflammatory, and cystic acne all need different approaches -- we match treatment to your specific presentation." },
+    { "title": "Scar Prevention Focus", "description": "Addressing active acne promptly is the best way to reduce the risk of scarring -- we prioritize this from your first visit." }
+  ],
+
+  "showSymptomCheck": true,
+  "symptoms": [
+    "Persistent breakouts despite over-the-counter products",
+    "Cystic or painful acne",
+    "Acne along the jawline or chin",
+    "Acne that's leaving marks or scars"
+  ],
+
+  "showServicesGrid": false,
+  "showLocalArea": true,
+
+  "educationalInsight": {
+    "title": "Why the Right Treatment Depends on Your Acne Type",
+    "body": "Acne has several distinct underlying mechanisms -- excess oil, clogged pores, bacterial overgrowth, and inflammation. Using the wrong approach for months can mean prolonged breakouts and, often, permanent scarring.",
+    "pathway": {
+      "steps": [
+        "Skin examination and acne severity grading",
+        "Review of current skincare routine",
+        "Assessment for hormonal or other contributing factors"
+      ]
+    }
+  },
+
+  "doctorsPerspectiveStructured": {
+    "patientConcern": "I've tried so many products and nothing seems to work.",
+    "response": "Most regimens need six to eight weeks of consistent use before real improvement shows -- switching products every couple of weeks often means nothing gets a fair chance. Let's find the right approach for your specific acne type and stick with it.",
+    "doctorSlug": "dr-karthik-l"
+  },
+
+  "processSteps": [
+    { "title": "Evaluation", "description": "Skin examination, severity grading, and history to identify your specific acne pattern." },
+    { "title": "Treatment Plan", "description": "Topical, oral, or procedural treatment matched to your acne type and severity." },
+    { "title": "Follow-Up", "description": "Progress review at the appropriate interval, with adjustments as needed." }
+  ],
+
+  "landingFaqs": [
+    { "question": "How soon will I see results?", "answer": "Most regimens need six to eight weeks of consistent use before real improvement is visible -- we set this expectation clearly upfront." },
+    { "question": "Do you treat adult acne differently from teenage acne?", "answer": "Yes -- adult-onset acne often presents differently, commonly along the jawline, and needs a different treatment approach." },
+    { "question": "Can you help even if my acne has already scarred?", "answer": "Yes -- we treat active acne and can discuss acne scar treatment as a separate, later step once breakouts are controlled." }
+  ],
+
+  "learnMoreLink": {
+    "text": "Learn more about our approach to acne treatment",
+    "url": "/services/acne"
+  },
+
+  "defaultService": "Acne"
+}

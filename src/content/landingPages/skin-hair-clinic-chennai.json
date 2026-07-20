@@ -1,0 +1,36 @@
+{
+  "headline": "Skin & Hair Clinic in Chennai",
+  "subheadline": "Evidence-based dermatology and hair care -- no unnecessary procedures, just what's clinically right for you.",
+  "urgent": false,
+  "metaDescription": "Skin and hair clinic in Chennai. AIIMS-trained dermatologists for hair transplant, acne, pigmentation, and cosmetic dermatology. Book a consultation.",
+
+  "whyPatientsChoose": [
+    { "title": "Evidence-Based, Not Sales-Driven", "description": "Recommendations are made because they're clinically right for you, never to fill a schedule or upsell a package." },
+    { "title": "Convenient KK Nagar Location", "description": "Easy to reach from across Chennai, with flexible evening and weekend hours." }
+  ],
+
+  "showSymptomCheck": false,
+
+  "showServicesGrid": true,
+  "showLocalArea": true,
+
+  "doctorsPerspectiveStructured": {
+    "patientConcern": "I've been to clinics before that seemed more interested in selling packages than treating me.",
+    "response": "That's exactly the approach we push back against. Every recommendation we make is because it's clinically appropriate for your specific situation, and we're just as comfortable telling you a treatment isn't necessary as we are recommending one.",
+    "doctorSlug": "dr-narayanan-b"
+  },
+
+  "processSteps": [
+    { "title": "Book a Consultation", "description": "Call or book online at a time that works for you, including evenings and Sundays." },
+    { "title": "Thorough Evaluation", "description": "A real evaluation of your concern, not a rushed visit aimed at a quick upsell." },
+    { "title": "Honest Treatment Plan", "description": "A plan built around what you actually need, explained clearly." }
+  ],
+
+  "landingFaqs": [
+    { "question": "What are your clinic hours?", "answer": "Monday to Saturday, 4:00-9:00 PM, and Sunday 9:00 AM-1:00 PM and 4:00-9:00 PM." },
+    { "question": "Do I need a referral to book?", "answer": "No, you can book directly for any of our services -- hair, skin, or cosmetic dermatology." },
+    { "question": "Is parking or accessibility an issue at your location?", "answer": "Our KK Nagar location is easily accessible from across Chennai, including Ashok Nagar, Vadapalani, Virugambakkam, and Ramapuram." }
+  ],
+
+  "defaultService": "General Consultation"
+}
