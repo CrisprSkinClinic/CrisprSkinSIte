@@ -30,15 +30,15 @@ const schema = {
 
 <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
-<nav aria-label="Breadcrumb" class="max-w-4xl mx-auto px-6 pt-6 text-sm leading-none">
-  <ol class="flex items-center flex-wrap gap-1 text-slate-500 leading-none">
+<nav aria-label="Breadcrumb" class="max-w-4xl mx-auto px-6 pt-8 text-sm leading-none">
+  <ol class="flex items-center flex-wrap gap-1 text-stone-500 leading-none">
     {allItems.map((item, index) => (
       <li class="flex items-center gap-1 leading-none">
-        {index > 0 && <span class="mx-1 text-slate-300">/</span>}
+        {index > 0 && <span class="mx-1 text-stone-400">/</span>}
         {index === allItems.length - 1 ? (
-          <span class="font-semibold text-slate-700 leading-none">{item.name}</span>
+          <span class="text-ink leading-none">{item.name}</span>
         ) : (
-          <a href={item.url} class="hover:text-brand-600 transition-colors inline-block leading-none">{item.name}</a>
+          <a href={item.url} class="hover:text-ink transition-colors inline-block leading-none">{item.name}</a>
         )}
       </li>
     ))}
