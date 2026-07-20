@@ -1,0 +1,273 @@
+---
+import { ViewTransitions } from 'astro:transitions'; 
+import FloatingContact from '../components/FloatingContact.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { siteConfig } from '../config/site.js';
+import '../styles/global.css';
+
+// Accept SEO properties from individual pages, with safe fallbacks
+const { 
+  title, 
+  description = siteConfig.description,
+  image = '/images/hero-doctor.jpg', // Default fallback image for link sharing
+  type = 'website'
+} = Astro.props;
+
+// Automatically generate the exact canonical URL for the current page
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    
+    <ViewTransitions />
+    
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <title>{title} | {siteConfig.name}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={`${title} | ${siteConfig.name}`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.site || siteConfig.url)} />
+
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={`${title} | ${siteConfig.name}`} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(image, Astro.site || siteConfig.url)} />
+
+    <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+    <!-- TODO: replace with a new GA4 property for crisprdermatology.com -- this ID is still the eye-care site's -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-GR0G04EY1M"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-GR0G04EY1M');
+    </script>
+
+    <script type="application/ld+json" set:html={JSON.stringify({ 
+      "@context": "https://schema.org", 
+      "@type": "MedicalBusiness", 
+      "name": siteConfig.name, 
+      "url": siteConfig.url, 
+      "description": siteConfig.description, 
+      "image": new URL('/images/hero-doctor.jpg', siteConfig.url).toString(),
+      "telephone": siteConfig.contact.phone, 
+      "priceRange": "₹₹",
+      "address": { 
+        "@type": "PostalAddress", 
+        "streetAddress": siteConfig.contact.address.street, 
+        "addressLocality": siteConfig.contact.address.locality, 
+        "addressRegion": siteConfig.contact.address.state, 
+        "postalCode": siteConfig.contact.address.postalCode, 
+        "addressCountry": siteConfig.contact.address.country 
+      }, 
+      "geo": { 
+        "@type": "GeoCoordinates", 
+        "latitude": siteConfig.contact.geo?.latitude, 
+        "longitude": siteConfig.contact.geo?.longitude 
+      }, 
+      "openingHours": siteConfig.contact.workingHours, 
+      "areaServed": { "@type": "City", "name": "Chennai" } 
+    })} /> 
+
+    <script type="application/ld+json" set:html={JSON.stringify({ 
+      "@context": "https://schema.org", 
+      "@type": "Physician", 
+      "name": siteConfig.doctor.name, 
+      "medicalSpecialty": "Dermatology", 
+      "image": new URL('/images/hero-doctor.jpg', siteConfig.url).toString(),
+      "telephone": siteConfig.contact.phone,
+      "priceRange": "₹₹",
+      "worksFor": { "@type": "MedicalBusiness", "name": siteConfig.name }, 
+      "address": { 
+        "@type": "PostalAddress", 
+        "streetAddress": siteConfig.contact.address.street,
+        "addressLocality": siteConfig.contact.address.locality, 
+        "addressRegion": siteConfig.contact.address.state, 
+        "postalCode": siteConfig.contact.address.postalCode,
+        "addressCountry": "India" 
+      } 
+    })} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+
+  <body class="bg-warmwhite text-charcoal antialiased selection:bg-brand-200 selection:text-brand-900 flex flex-col min-h-screen">
+    
+    <div class="bg-brand-900 text-white text-xs sm:text-sm py-2 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-0 relative z-50 text-center sm:text-left">
+      <span>{siteConfig.contact.workingHoursDisplay}</span>
+      <div class="flex flex-col sm:flex-row sm:space-x-4 items-center">
+        <span>Call: {siteConfig.contact.phone}</span>
+        <a href={`mailto:${siteConfig.contact.email}`} class="hover:underline hidden sm:inline">{siteConfig.contact.email}</a>
+      </div>
+    </div>
+    
+    <Navbar />
+    
+    <main class="flex-grow overflow-hidden">
+      <slot />
+    </main>
+    
+    <Footer />
+
+    <FloatingContact />
+
+    <script>
+      // GA4 conversion tracking via event delegation -- a single
+      // document-level click listener catches phone, WhatsApp, and
+      // directions links anywhere on the site (including ones added
+      // later) without needing to wire each link individually.
+      // Booking click/completion are tracked separately: click via
+      // data-track="booking-click" on Book Now buttons/links, and
+      // completion fires directly from BookingCalendar.astro's
+      // confirm handler once public-book-appointment.js succeeds.
+      document.addEventListener('astro:page-load', () => {
+        document.addEventListener('click', (e) => {
+          if (typeof gtag !== 'function') return;
+
+          const link = e.target.closest('a');
+          if (!link) return;
+
+          const href = link.getAttribute('href') || '';
+
+          if (href.startsWith('tel:')) {
+            gtag('event', 'phone_call_click', {
+              event_category: 'engagement',
+              event_label: href.replace('tel:', ''),
+            });
+            return;
+          }
+
+          if (href.includes('wa.me') || href.includes('whatsapp.com')) {
+            gtag('event', 'whatsapp_click', {
+              event_category: 'engagement',
+              event_label: 'whatsapp_button',
+            });
+            return;
+          }
+
+          if (href.includes('google.com/maps') || href.includes('goo.gl/maps')) {
+            gtag('event', 'directions_click', {
+              event_category: 'engagement',
+              event_label: 'get_directions',
+            });
+            return;
+          }
+
+          if (link.dataset.track === 'booking-click') {
+            gtag('event', 'booking_click', {
+              event_category: 'engagement',
+              event_label: link.dataset.trackLabel || 'book_now_button',
+            });
+          }
+        });
+      });
+
+      // Scroll depth tracking: fires once each at 50% and 90% of
+      // total page height. Reset per navigation (ViewTransitions
+      // swaps content without a full reload) so depth re-fires on
+      // every new page rather than only the first.
+      document.addEventListener('astro:page-load', () => {
+        let firedDepths = { 50: false, 90: false };
+
+        function checkScrollDepth() {
+          if (typeof gtag !== 'function') return;
+
+          const scrollTop = window.scrollY;
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          if (docHeight <= 0) return;
+
+          const percentScrolled = (scrollTop / docHeight) * 100;
+
+          if (!firedDepths[50] && percentScrolled >= 50) {
+            firedDepths[50] = true;
+            gtag('event', 'scroll_depth_50', {
+              event_category: 'engagement',
+              event_label: window.location.pathname,
+            });
+          }
+          if (!firedDepths[90] && percentScrolled >= 90) {
+            firedDepths[90] = true;
+            gtag('event', 'scroll_depth_90', {
+              event_category: 'engagement',
+              event_label: window.location.pathname,
+            });
+          }
+        }
+
+        window.addEventListener('scroll', checkScrollDepth, { passive: true });
+      });
+
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15 
+      };
+
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('opacity-100', 'translate-y-0');
+            entry.target.classList.remove('opacity-0', 'translate-y-12');
+            observer.unobserve(entry.target); 
+          }
+        });
+      }, observerOptions);
+
+      // Listen to 'astro:page-load' instead of 'DOMContentLoaded' to work perfectly with ViewTransitions
+      document.addEventListener('astro:page-load', () => {
+        // Only apply the scroll-reveal animation on the homepage --
+        // applying it sitewide caused content (like blog post grids)
+        // to appear blank until scrolled into view on other pages.
+        if (window.location.pathname !== '/') return;
+
+        const elements = document.querySelectorAll('main section > div');
+        elements.forEach((el) => {
+          el.classList.add('transition-all', 'duration-[1200ms]', 'ease-out', 'opacity-0', 'translate-y-12');
+          observer.observe(el);
+        });
+      });
+    </script>
+    
+    <style is:global>
+      /* Enforce the new premium font globally */
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      
+      /* Premium Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f8fafc; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1; 
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8; 
+      }
+
+      /* Tighter letter spacing for a modern, clinical look */
+      h1, h2, h3, h4, h5, h6 {
+        letter-spacing: -0.02em; 
+      }
+    </style>
+  </body>
+</html>
