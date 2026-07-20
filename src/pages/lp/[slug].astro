@@ -1,1 +1,129 @@
+---
+import { getCollection } from 'astro:content';
+import LandingPageLayout from '../../layouts/LandingPageLayout.astro';
+import LandingHero from '../../components/LandingPageSections/LandingHero.astro';
+import ServicesOverviewGrid from '../../components/ServicesOverviewGrid.astro';
+import LocalAreaSection from '../../components/LandingPageSections/LocalAreaSection.astro';
+import WhyPatientsChooseCrispr from '../../components/LandingPageSections/WhyPatientsChooseCrispr.astro';
+import ConvenienceSection from '../../components/LandingPageSections/ConvenienceSection.astro';
+import QuickCTA from '../../components/LandingPageSections/QuickCTA.astro';
+import SymptomRecognition from '../../components/LandingPageSections/SymptomRecognition.astro';
+import DoctorSection from '../../components/LandingPageSections/DoctorSection.astro';
+import EducationalInsightSection from '../../components/LandingPageSections/EducationalInsightSection.astro';
+import CauseExploration from '../../components/LandingPageSections/CauseExploration.astro';
+import AfterEvaluation from '../../components/LandingPageSections/AfterEvaluation.astro';
+import SurgicalDecisionSupport from '../../components/LandingPageSections/SurgicalDecisionSupport.astro';
+import DoctorsPerspective from '../../components/LandingPageSections/DoctorsPerspective.astro';
+import WhatHappensNext from '../../components/LandingPageSections/WhatHappensNext.astro';
+import MidPageCTA from '../../components/LandingPageSections/MidPageCTA.astro';
+import ObjectionFAQ from '../../components/LandingPageSections/ObjectionFAQ.astro';
+import ClinicPhotoStrip from '../../components/LandingPageSections/ClinicPhotoStrip.astro';
+import LearnMoreLink from '../../components/LandingPageSections/LearnMoreLink.astro';
+import BookingSection from '../../components/LandingPageSections/BookingSection.astro';
 
+export async function getStaticPaths() {
+  const landingPages = await getCollection('landingPages');
+  return landingPages.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const data = entry.data;
+---
+
+<LandingPageLayout title={data.headline} description={data.metaDescription}>
+  <LandingHero headline={data.headline} subheadline={data.subheadline} urgent={data.urgent} />
+
+  <WhyPatientsChooseCrispr pageSpecific={data.whyPatientsChoose} />
+
+  <ConvenienceSection />
+
+  {data.showLocalArea && <LocalAreaSection />}
+
+  <QuickCTA />
+
+  {data.showSymptomCheck && data.symptoms && data.symptoms.length > 0 && (
+    <SymptomRecognition items={data.symptoms} />
+  )}
+
+  <DoctorSection />
+
+  {data.showServicesGrid && <ServicesOverviewGrid />}
+
+  {data.educationalInsight && (
+    <EducationalInsightSection
+      title={data.educationalInsight.title}
+      body={data.educationalInsight.body}
+      pathway={data.educationalInsight.pathway}
+      prioritizeIf={data.educationalInsight.prioritizeIf}
+    />
+  )}
+
+  {data.causeExploration && (
+    <CauseExploration
+      title={data.causeExploration.title}
+      causesIntro={data.causeExploration.causesIntro}
+      commonCauses={data.causeExploration.commonCauses}
+      causesOutro={data.causeExploration.causesOutro}
+      urgentTitle={data.causeExploration.urgentTitle}
+      urgentIntro={data.causeExploration.urgentIntro}
+      urgentScenarios={data.causeExploration.urgentScenarios}
+    />
+  )}
+
+  {data.afterEvaluation && data.afterEvaluation.length > 0 && (
+    <AfterEvaluation pathways={data.afterEvaluation} />
+  )}
+
+  {data.decisionSupport && (
+    <SurgicalDecisionSupport
+      suitabilityTitle={data.decisionSupport.suitabilityTitle}
+      suitabilityIntro={data.decisionSupport.suitabilityIntro}
+      evaluationSteps={data.decisionSupport.evaluationSteps}
+      notSuitableTitle={data.decisionSupport.notSuitableTitle}
+      notSuitableReasons={data.decisionSupport.notSuitableReasons}
+    />
+  )}
+
+  <!-- Single, consolidated Doctor's Perspective call site -- previously
+       this rendered twice on pages like LASIK/Cataract because it was
+       called once after EducationalInsightSection/CauseExploration AND
+       again after SurgicalDecisionSupport. Now it fires exactly once
+       per page, landing in the right visual position for whichever
+       psychology-specific block preceded it. -->
+  {data.doctorsPerspectiveStructured ? (
+    <DoctorsPerspective
+      patientConcern={data.doctorsPerspectiveStructured.patientConcern}
+      response={data.doctorsPerspectiveStructured.response}
+    />
+  ) : data.doctorsPerspective && (
+    <DoctorsPerspective perspective={data.doctorsPerspective} />
+  )}
+
+  {data.decisionSupport?.lensOptions && data.decisionSupport.lensOptions.length > 0 && (
+    <SurgicalDecisionSupport
+      lensOptions={data.decisionSupport.lensOptions}
+      onlyLensTable={true}
+    />
+  )}
+
+  <WhatHappensNext steps={data.processSteps} />
+
+  <MidPageCTA />
+
+  {/* Reviews intentionally omitted until real, consented testimonials replace placeholder content */}
+
+  {data.landingFaqs && data.landingFaqs.length > 0 && (
+    <ObjectionFAQ faqs={data.landingFaqs} />
+  )}
+
+  {data.learnMoreLink && (
+    <LearnMoreLink text={data.learnMoreLink.text} url={data.learnMoreLink.url} />
+  )}
+
+  <ClinicPhotoStrip />
+
+  <BookingSection defaultService={data.defaultService} />
+</LandingPageLayout>
