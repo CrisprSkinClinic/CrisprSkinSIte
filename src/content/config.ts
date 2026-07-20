@@ -118,11 +118,13 @@ const landingPageCollection = defineCollection({
       urgentScenarios: z.array(z.string()),
     }).optional(),
 
-    // Personal, first-person framing from Dr. Rajeswari -- the one thing
-    // a corporate hospital chain cannot replicate at scale. Used by
-    // earlier pages (Cataract, LASIK) as free-form prose. Kept alongside
-    // doctorsPerspectiveStructured below for backward compatibility.
+    // Personal, first-person framing from one of the clinic's doctors --
+    // the one thing a corporate hospital chain cannot replicate at scale.
+    // doctorSlug is required (must match a slug in siteConfig.doctors)
+    // so the quote is explicitly attributed per page rather than
+    // defaulting to any single doctor across the whole site.
     doctorsPerspective: z.string().optional(),
+    doctorsPerspectiveDoctorSlug: z.string().optional(),
 
     // Decision-support: "what happens after evaluation" pathways,
     // mapped by possible finding -> next step. Replaces vague
@@ -152,10 +154,12 @@ const landingPageCollection = defineCollection({
     // Standardized structure for doctorsPerspective, replacing the
     // free-form string for NEW pages going forward. Keeps a consistent
     // "patient concern -> doctor response" shape across pages while
-    // content stays page-specific.
+    // content stays page-specific. doctorSlug identifies which of the
+    // clinic's doctors is speaking (matches siteConfig.doctors[].slug).
     doctorsPerspectiveStructured: z.object({
       patientConcern: z.string(),
       response: z.string(),
+      doctorSlug: z.string().optional(),
     }).optional(),
 
     // Surgical decision-support, distinct from CauseExploration and
