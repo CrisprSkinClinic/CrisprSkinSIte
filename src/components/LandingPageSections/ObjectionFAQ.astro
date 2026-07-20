@@ -9,36 +9,36 @@
 // instead of objection-handling ones.
 
 interface FAQ {
-  question: string;
-  answer: string;
+ question: string;
+ answer: string;
 }
 
 interface Props {
-  faqs: FAQ[];
+ faqs: FAQ[];
 }
 
 const { faqs } = Astro.props;
 ---
 
 {faqs && faqs.length > 0 && (
-  <section class="py-12 px-6 bg-white border-t border-slate-100">
-    <div class="max-w-2xl mx-auto">
-      <h2 class="text-xl md:text-2xl font-bold text-brand-900 mb-6 text-center">A Few Common Questions</h2>
-      <div class="space-y-3">
-        {faqs.map((faq: FAQ) => (
-          <details class="group bg-champagne-50 rounded-lg border border-slate-200">
-            <summary class="flex items-center justify-between cursor-pointer p-4 font-semibold text-slate-900 group-hover:text-brand-600 transition text-sm">
-              {faq.question}
-              <span class="transition group-open:rotate-180 shrink-0 ml-3">
-                <svg fill="none" height="18" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="18"><path d="M6 9l6 6 6-6"></path></svg>
-              </span>
-            </summary>
-            <div class="p-4 pt-0 text-slate-600 text-sm leading-relaxed border-t border-slate-100 mt-2">
-              {faq.answer}
-            </div>
-          </details>
-        ))}
+ <section class="py-12 px-6 bg-white border-t border-stone-400/15">
+  <div class="max-w-2xl mx-auto">
+   <h2 class="text-xl md:text-2xl font-medium text-ink mb-6 text-center">A Few Common Questions</h2>
+   <div class="space-y-3">
+    {faqs.map((faq: FAQ) => (
+     <details class="group bg-paper-50 border border-stone-400/15">
+      <summary class="flex items-center justify-between cursor-pointer p-4 font-semibold text-ink group-hover:text-brand-600 transition text-sm">
+       {faq.question}
+       <span class="transition group-open:rotate-180 shrink-0 ml-3">
+        <svg fill="none" height="18" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="18"><path d="M6 9l6 6 6-6"></path></svg>
+       </span>
+      </summary>
+      <div class="p-4 pt-0 text-stone-600 text-sm leading-relaxed border-t border-stone-400/15 mt-2">
+       {faq.answer}
       </div>
-    </div>
-  </section>
+     </details>
+    ))}
+   </div>
+  </div>
+ </section>
 )}

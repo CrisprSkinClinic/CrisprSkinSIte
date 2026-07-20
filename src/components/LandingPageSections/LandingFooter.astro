@@ -4,13 +4,13 @@ import { siteConfig } from '../../config/site.js';
 const currentYear = new Date().getFullYear();
 ---
 
-<footer class="bg-slate-900 text-slate-400 py-8 px-6 text-center text-sm">
-  <p class="mb-1">
-    {siteConfig.contact.address.street}, {siteConfig.contact.address.locality}, {siteConfig.contact.address.city} - {siteConfig.contact.address.postalCode}
-  </p>
-  <p>
-    <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="hover:text-white transition-colors">{siteConfig.contact.phone}</a>
-    &middot;
-    &copy; {currentYear} {siteConfig.name}
-  </p>
+<footer class="bg-ink text-stone-400 py-8 px-6 text-center text-sm">
+ <p class="mb-1">
+  {siteConfig.contact.address.street}, {siteConfig.contact.address.locality}, {siteConfig.contact.address.city} - {siteConfig.contact.address.postalCode}
+ </p>
+ <p>
+  <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="hover:text-white transition-colors">{siteConfig.contact.phone}</a>
+  &middot;
+  &copy; {currentYear} {siteConfig.name}
+ </p>
 </footer>
