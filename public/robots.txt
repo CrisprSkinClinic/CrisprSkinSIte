@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://crispreyecare.com/sitemap-index.xml
