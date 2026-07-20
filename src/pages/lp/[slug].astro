@@ -97,9 +97,10 @@ const data = entry.data;
     <DoctorsPerspective
       patientConcern={data.doctorsPerspectiveStructured.patientConcern}
       response={data.doctorsPerspectiveStructured.response}
+      doctorSlug={data.doctorsPerspectiveStructured.doctorSlug || data.doctorsPerspectiveDoctorSlug}
     />
   ) : data.doctorsPerspective && (
-    <DoctorsPerspective perspective={data.doctorsPerspective} />
+    <DoctorsPerspective perspective={data.doctorsPerspective} doctorSlug={data.doctorsPerspectiveDoctorSlug} />
   )}
 
   {data.decisionSupport?.lensOptions && data.decisionSupport.lensOptions.length > 0 && (
