@@ -8,33 +8,33 @@ const pageDescription = `Meet the AIIMS-trained consultant dermatologists at ${s
 ---
 
 <MainLayout title={pageTitle} description={pageDescription}>
-  <Breadcrumbs items={[{ name: "Our Doctors", url: "/our-doctors" }]} />
+ <Breadcrumbs items={[{ name: "Our Doctors", url: "/our-doctors" }]} />
 
-  <div class="bg-brand-900 text-white py-16 px-6 text-center">
-    <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Our Doctors</h1>
-    <p class="text-lg text-brand-200 max-w-2xl mx-auto">Three AIIMS-trained consultant dermatologists, each bringing distinct expertise in hair restoration, medical dermatology, paediatric skin care, and dermatosurgery.</p>
-  </div>
+ <div class="bg-paper-50 border-b border-stone-400/15 pt-8 pb-16 md:pb-24 px-6 text-center">
+  <h1 class="font-display text-4xl md:text-5xl font-medium mb-4 text-ink">Our Doctors</h1>
+  <p class="text-lg text-stone-600 max-w-2xl mx-auto">Three AIIMS-trained consultant dermatologists, each bringing distinct expertise in hair restoration, medical dermatology, paediatric skin care, and dermatosurgery.</p>
+ </div>
 
-  <div class="max-w-6xl mx-auto py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-    {siteConfig.doctors.map((doctor) => (
-      <a href={`/our-doctors/${doctor.slug}`} class="bg-white rounded-2xl shadow-sm border border-champagne-200 overflow-hidden hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col">
-        <div class="aspect-[3/4] bg-champagne-100 overflow-hidden">
-          <img
-            src={`/images/doctors/${doctor.slug}.jpg`}
-            alt={doctor.name}
-            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            onerror={`this.onerror=null;this.src='https://placehold.co/400x533/EAF0EC/234B3A?text=${encodeURIComponent(doctor.name)}'`}
-          />
-        </div>
-        <div class="p-6 flex flex-col flex-grow">
-          <h2 class="text-xl font-bold text-brand-900 mb-1">{doctor.name}</h2>
-          <p class="text-sm text-brand-600 font-semibold mb-1">{doctor.designation}</p>
-          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-4">{doctor.qualificationsShort}</p>
-          <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
-            View Profile <span aria-hidden="true">&rarr;</span>
-          </span>
-        </div>
-      </a>
-    ))}
-  </div>
+ <div class="max-w-6xl mx-auto py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+  {siteConfig.doctors.map((doctor) => (
+   <a href={`/our-doctors/${doctor.slug}`} class="bg-white border border-stone-400/20 overflow-hidden hover:border-brand-200 transition-all duration-300 group flex flex-col">
+    <div class="aspect-[3/4] bg-paper-200 overflow-hidden">
+     <img
+      src={`/images/doctors/${doctor.slug}.jpg`}
+      alt={doctor.name}
+      class="w-full h-full object-cover transition-duration-700 group-"
+      onerror={`this.onerror=null;this.src='https://placehold.co/400x533/EAF0EC/234B3A?text=${encodeURIComponent(doctor.name)}'`}
+     />
+    </div>
+    <div class="p-6 flex flex-col flex-grow">
+     <h2 class="text-xl font-medium text-ink mb-1">{doctor.name}</h2>
+     <p class="text-sm text-brand-600 font-semibold mb-1">{doctor.designation}</p>
+     <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-4">{doctor.qualificationsShort}</p>
+     <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
+      View Profile <span aria-hidden="true">&rarr;</span>
+     </span>
+    </div>
+   </a>
+  ))}
+ </div>
 </MainLayout>
