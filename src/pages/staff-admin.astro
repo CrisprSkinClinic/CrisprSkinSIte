@@ -3,713 +3,713 @@ import MainLayout from '../layouts/MainLayout.astro';
 ---
 
 <MainLayout title="Staff Admin" description="Internal content management">
-  <div class="max-w-5xl mx-auto py-16 px-6">
-    <h1 class="text-3xl font-extrabold text-brand-900 mb-2">Staff Admin</h1>
-    <p class="text-slate-600 mb-10">Manage blog posts, FAQs, bookings, and clinic schedule.</p>
+ <div class="max-w-5xl mx-auto py-16 px-6">
+  <h1 class="text-3xl font-extrabold text-ink mb-2">Staff Admin</h1>
+  <p class="text-slate-600 mb-10">Manage blog posts, FAQs, bookings, and clinic schedule.</p>
 
-    <div id="passwordGate" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 max-w-md">
-      <label class="block text-sm font-medium text-slate-700 mb-2">Admin Password</label>
-      <input type="password" id="passwordInput" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-brand-500 focus:border-brand-500 mb-4" />
-      <button id="unlockBtn" class="w-full bg-brand-600 text-white font-bold py-2.5 rounded-md hover:bg-brand-700 transition">Unlock</button>
-      <p id="unlockError" class="hidden text-red-600 text-sm mt-3"></p>
-    </div>
-
-    <div id="adminPanel" class="hidden space-y-10">
-
-      <div class="flex gap-3 border-b border-slate-200 flex-wrap">
-        <button id="tabBlog" class="px-4 py-2 font-semibold text-brand-600 border-b-2 border-brand-600">Blog Posts</button>
-        <button id="tabFaq" class="px-4 py-2 font-semibold text-slate-500">FAQs</button>
-        <button id="tabBookings" class="px-4 py-2 font-semibold text-slate-500">Bookings &amp; Schedule</button>         
-        <button id="tabLandingPages" class="px-4 py-2 font-semibold text-slate-500">Landing Pages</button>
-      </div>
-
-      <!-- BLOG SECTION -->
-      <div id="blogSection">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-slate-900">Existing Blog Posts</h2>
-          <button id="newBlogBtn" class="bg-brand-900 text-white font-semibold px-4 py-2 rounded-md hover:bg-brand-800 transition text-sm">+ New Blog Post</button>
-        </div>
-        <div id="blogList" class="space-y-2 mb-8"><p class="text-slate-400 text-sm">Loading...</p></div>
-
-        <form id="blogForm" class="hidden space-y-4 bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-          <input type="hidden" name="_filePath" />
-          <input type="hidden" name="_sha" />
-          <div><label class="block text-sm font-medium text-slate-700 mb-1">Title *</label><input type="text" name="title" required class="w-full px-4 py-2 border border-slate-300 rounded-md" /></div>
-          <div><label class="block text-sm font-medium text-slate-700 mb-1">Description (SEO meta) *</label><textarea name="description" required rows="2" class="w-full px-4 py-2 border border-slate-300 rounded-md"></textarea></div>
-          <div><label class="block text-sm font-medium text-slate-700 mb-1">Publish Date *</label><input type="date" name="pubDate" required class="w-full px-4 py-2 border border-slate-300 rounded-md" /></div>
-          <div><label class="block text-sm font-medium text-slate-700 mb-1">Author</label><input type="text" name="author" placeholder="Dr. Karthik L" class="w-full px-4 py-2 border border-slate-300 rounded-md" /></div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Tags</label>
-            <div class="flex gap-2 mb-2">
-              <input type="text" id="blogTagInput" placeholder="Type a tag and press Add" class="flex-grow px-4 py-2 border border-slate-300 rounded-md" />
-              <button type="button" id="blogTagAddBtn" class="bg-slate-700 text-white font-semibold px-4 py-2 rounded-md hover:bg-slate-800 transition">Add</button>
-            </div>
-            <div id="blogTagChips" class="flex flex-wrap gap-2"></div>
-          </div>
-          <div><label class="block text-sm font-medium text-slate-700 mb-1">Body (Markdown) *</label><textarea name="body" required rows="12" class="w-full px-4 py-2 border border-slate-300 rounded-md font-mono text-sm"></textarea></div>
-          <div class="flex gap-3">
-            <button type="submit" class="bg-brand-900 text-white font-bold px-6 py-3 rounded-md hover:bg-brand-800 transition">Save (Create Pull Request)</button>
-            <button type="button" id="cancelBlogBtn" class="bg-slate-100 text-slate-700 font-semibold px-6 py-3 rounded-md hover:bg-slate-200 transition">Cancel</button>
-            <button type="button" id="deleteBlogBtn" class="hidden bg-red-50 text-red-600 font-semibold px-6 py-3 rounded-md hover:bg-red-100 transition ml-auto">Delete This Post</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- FAQ SECTION -->
-      <div id="faqSection" class="hidden">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-slate-900">Existing FAQs</h2>
-          <button id="newFaqBtn" class="bg-brand-900 text-white font-semibold px-4 py-2 rounded-md hover:bg-brand-800 transition text-sm">+ New FAQ</button>
-        </div>
-        <div id="faqList" class="space-y-2 mb-8"><p class="text-slate-400 text-sm">Loading...</p></div>
-
-        <form id="faqForm" class="hidden space-y-4 bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-          <input type="hidden" name="_filePath" />
-          <input type="hidden" name="_sha" />
-          <div><label class="block text-sm font-medium text-slate-700 mb-1">Question *</label><input type="text" name="question" required class="w-full px-4 py-2 border border-slate-300 rounded-md" /></div>
-          <div><label class="block text-sm font-medium text-slate-700 mb-1">Display Order</label><input type="number" name="order" placeholder="1" class="w-full px-4 py-2 border border-slate-300 rounded-md" /></div>
-          <div><label class="block text-sm font-medium text-slate-700 mb-1">Answer (Markdown) *</label><textarea name="body" required rows="8" class="w-full px-4 py-2 border border-slate-300 rounded-md font-mono text-sm"></textarea></div>
-          <div class="flex gap-3">
-            <button type="submit" class="bg-brand-900 text-white font-bold px-6 py-3 rounded-md hover:bg-brand-800 transition">Save (Create Pull Request)</button>
-            <button type="button" id="cancelFaqBtn" class="bg-slate-100 text-slate-700 font-semibold px-6 py-3 rounded-md hover:bg-slate-200 transition">Cancel</button>
-            <button type="button" id="deleteFaqBtn" class="hidden bg-red-50 text-red-600 font-semibold px-6 py-3 rounded-md hover:bg-red-100 transition ml-auto">Delete This FAQ</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- BOOKINGS & SCHEDULE SECTION -->
-      <div id="bookingsSection" class="hidden space-y-12">
-
-        <div>
-          <h2 class="text-xl font-bold text-slate-900 mb-4">Upcoming Appointments</h2>
-          <div id="appointmentsList" class="space-y-2">
-            <p class="text-slate-400 text-sm">Loading...</p>
-          </div>
-        </div>
-
-        <!-- Schedule sessions: opening/closing time + slot duration -->
-        <div>
-          <h2 class="text-xl font-bold text-slate-900 mb-2">Weekly Schedule</h2>
-          <p class="text-sm text-slate-500 mb-4">Define opening and closing times per day, and how long each appointment slot should be. Individual booking times are generated automatically.</p>
-
-          <div class="flex flex-wrap gap-3 mb-4 bg-white rounded-xl border border-slate-100 p-4 items-end">
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">Day</label>
-              <select id="newSessionDay" class="px-4 py-2 border border-slate-300 rounded-md">
-                <option value="1">Monday</option>
-                <option value="2">Tuesday</option>
-                <option value="3">Wednesday</option>
-                <option value="4">Thursday</option>
-                <option value="5">Friday</option>
-                <option value="6">Saturday</option>
-                <option value="0">Sunday</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">Opening Time</label>
-              <input type="time" id="newSessionStart" class="px-4 py-2 border border-slate-300 rounded-md" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">Closing Time</label>
-              <input type="time" id="newSessionEnd" class="px-4 py-2 border border-slate-300 rounded-md" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">Slot Duration</label>
-              <select id="newSessionDuration" class="px-4 py-2 border border-slate-300 rounded-md">
-                <option value="15">15 min</option>
-                <option value="20">20 min</option>
-                <option value="30" selected>30 min</option>
-                <option value="45">45 min</option>
-                <option value="60">60 min</option>
-              </select>
-            </div>
-            <button id="addSessionBtn" class="bg-brand-900 text-white font-semibold px-4 py-2 rounded-md hover:bg-brand-800 transition">Add Session</button>
-          </div>
-
-          <div id="sessionsByDay" class="space-y-3">
-            <p class="text-slate-400 text-sm">Loading...</p>
-          </div>
-        </div>
-
-        <!-- Blocked dates -->
-        <div>
-          <h2 class="text-xl font-bold text-slate-900 mb-2">Holidays &amp; Leave Days</h2>
-          <p class="text-sm text-slate-500 mb-4">Block an entire date (clinic fully closed).</p>
-          <div class="flex flex-wrap gap-3 mb-4 bg-white rounded-xl border border-slate-100 p-4">
-            <input type="date" id="newBlockedDateInput" class="px-4 py-2 border border-slate-300 rounded-md" />
-            <input type="text" id="newBlockedDateReason" placeholder="Reason (optional)" class="px-4 py-2 border border-slate-300 rounded-md flex-grow" />
-            <button id="addBlockedDateBtn" class="bg-red-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-red-700 transition">Block This Date</button>
-          </div>
-          <div id="blockedDatesList" class="space-y-2">
-            <p class="text-slate-400 text-sm">Loading...</p>
-          </div>
-        </div>
-
-        <!-- Blocked slots -->
-        <div>
-          <h2 class="text-xl font-bold text-slate-900 mb-2">Block a Specific Time Slot</h2>
-          <p class="text-sm text-slate-500 mb-4">Block just one time on a specific date, without closing the whole day. Type the exact time as it appears to patients (e.g. "10:00 AM").</p>
-          <div class="flex flex-wrap gap-3 mb-4 bg-white rounded-xl border border-slate-100 p-4">
-            <input type="date" id="newBlockedSlotDate" class="px-4 py-2 border border-slate-300 rounded-md" />
-            <input type="text" id="newBlockedSlotTime" placeholder="e.g. 10:00 AM" class="px-4 py-2 border border-slate-300 rounded-md" />
-            <input type="text" id="newBlockedSlotReason" placeholder="Reason (optional)" class="px-4 py-2 border border-slate-300 rounded-md flex-grow" />
-            <button id="addBlockedSlotBtn" class="bg-red-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-red-700 transition">Block This Slot</button>
-          </div>
-          <div id="blockedSlotsList" class="space-y-2">
-            <p class="text-slate-400 text-sm">Loading...</p>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- LANDING PAGES SECTION -->
-      <div id="landingPagesSection" class="hidden">
-        <h2 class="text-xl font-bold text-slate-900 mb-4">Landing Pages (Google Ads)</h2>
-        <p class="text-sm text-slate-500 mb-6">These pages are not linked anywhere on the site and are excluded from search engines -- use these links to preview them, or paste as Final URLs in Google Ads campaigns.</p>
-
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-3">Service-Intent Pages</h3>
-            <div class="space-y-2">
-              <a href="/lp/lasik-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">LASIK Surgery (Chennai)</a>
-              <a href="/lp/cataract-surgery-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Cataract Surgery (Chennai)</a>
-              <a href="/lp/retina-diabetic-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Retina / Diabetic Eye Care</a>
-              <a href="/lp/glaucoma-screening-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Glaucoma Screening</a>
-              <a href="/lp/squint-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Squint Treatment</a>
-              <a href="/lp/neuro-ophthalmology-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Neuro-Ophthalmology</a>
-              <a href="/lp/comprehensive-eye-checkup-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Comprehensive Eye Checkup (Chennai)</a>
-              <a href="/lp/cataract-surgeon-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Cataract Surgeon (Chennai)</a>
-              <a href="/lp/pediatric-eye-doctor-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Pediatric Eye Doctor (Chennai)</a>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-3">Local-Intent Pages (KK Nagar)</h3>
-            <div class="space-y-2">
-              <a href="/lp/eye-clinic-kk-nagar" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Eye Clinic KK Nagar</a>
-              <a href="/lp/eye-doctor-kk-nagar" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Eye Doctor KK Nagar</a>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-3">Symptom-Intent Pages</h3>
-            <div class="space-y-2">
-              <a href="/lp/blurred-vision-doctor-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Blurred Vision</a>
-              <a href="/lp/eye-pain-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Eye Pain</a>
-              <a href="/lp/sudden-vision-loss-chennai" target="_blank" class="block bg-red-50 border border-red-200 rounded-lg px-4 py-3 hover:border-red-300 hover:bg-red-100 transition-colors text-sm font-medium text-red-800">Sudden Vision Loss (Urgent styling)</a>
-              <a href="/lp/double-vision-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Double Vision</a>
-              <a href="/lp/diabetic-eye-checkup-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Diabetic Eye Checkup</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="resultBox" class="hidden p-6 rounded-xl"></div>
-    </div>
+  <div id="passwordGate" class="bg-white border border-slate-100 p-8 max-w-md">
+   <label class="block text-sm font-medium text-slate-700 mb-2">Admin Password</label>
+   <input type="password" id="passwordInput" class="w-full px-4 py-2 border border-slate-300 focus:ring-brand-500 focus:border-brand-500 mb-4" />
+   <button id="unlockBtn" class="w-full bg-brand-600 text-white font-medium py-2.5 hover:bg-brand-700 transition">Unlock</button>
+   <p id="unlockError" class="hidden text-red-600 text-sm mt-3"></p>
   </div>
+
+  <div id="adminPanel" class="hidden space-y-10">
+
+   <div class="flex gap-3 border-b border-slate-200 flex-wrap">
+    <button id="tabBlog" class="px-4 py-2 font-semibold text-brand-600 border-b-2 border-brand-600">Blog Posts</button>
+    <button id="tabFaq" class="px-4 py-2 font-semibold text-slate-500">FAQs</button>
+    <button id="tabBookings" class="px-4 py-2 font-semibold text-slate-500">Bookings &amp; Schedule</button>     
+    <button id="tabLandingPages" class="px-4 py-2 font-semibold text-slate-500">Landing Pages</button>
+   </div>
+
+   <!-- BLOG SECTION -->
+   <div id="blogSection">
+    <div class="flex justify-between items-center mb-4">
+     <h2 class="text-xl font-medium text-slate-900">Existing Blog Posts</h2>
+     <button id="newBlogBtn" class="bg-brand-900 text-white font-semibold px-4 py-2 hover:bg-brand-800 transition text-sm">+ New Blog Post</button>
+    </div>
+    <div id="blogList" class="space-y-2 mb-8"><p class="text-slate-400 text-sm">Loading...</p></div>
+
+    <form id="blogForm" class="hidden space-y-4 bg-white border border-slate-100 p-8">
+     <input type="hidden" name="_filePath" />
+     <input type="hidden" name="_sha" />
+     <div><label class="block text-sm font-medium text-slate-700 mb-1">Title *</label><input type="text" name="title" required class="w-full px-4 py-2 border border-slate-300" /></div>
+     <div><label class="block text-sm font-medium text-slate-700 mb-1">Description (SEO meta) *</label><textarea name="description" required rows="2" class="w-full px-4 py-2 border border-slate-300"></textarea></div>
+     <div><label class="block text-sm font-medium text-slate-700 mb-1">Publish Date *</label><input type="date" name="pubDate" required class="w-full px-4 py-2 border border-slate-300" /></div>
+     <div><label class="block text-sm font-medium text-slate-700 mb-1">Author</label><input type="text" name="author" placeholder="Dr. Karthik L" class="w-full px-4 py-2 border border-slate-300" /></div>
+     <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Tags</label>
+      <div class="flex gap-2 mb-2">
+       <input type="text" id="blogTagInput" placeholder="Type a tag and press Add" class="flex-grow px-4 py-2 border border-slate-300" />
+       <button type="button" id="blogTagAddBtn" class="bg-slate-700 text-white font-semibold px-4 py-2 hover:bg-slate-800 transition">Add</button>
+      </div>
+      <div id="blogTagChips" class="flex flex-wrap gap-2"></div>
+     </div>
+     <div><label class="block text-sm font-medium text-slate-700 mb-1">Body (Markdown) *</label><textarea name="body" required rows="12" class="w-full px-4 py-2 border border-slate-300 font-mono text-sm"></textarea></div>
+     <div class="flex gap-3">
+      <button type="submit" class="bg-brand-900 text-white font-medium px-6 py-3 hover:bg-brand-800 transition">Save (Create Pull Request)</button>
+      <button type="button" id="cancelBlogBtn" class="bg-slate-100 text-slate-700 font-semibold px-6 py-3 hover:bg-slate-200 transition">Cancel</button>
+      <button type="button" id="deleteBlogBtn" class="hidden bg-red-50 text-red-600 font-semibold px-6 py-3 hover:bg-red-100 transition ml-auto">Delete This Post</button>
+     </div>
+    </form>
+   </div>
+
+   <!-- FAQ SECTION -->
+   <div id="faqSection" class="hidden">
+    <div class="flex justify-between items-center mb-4">
+     <h2 class="text-xl font-medium text-slate-900">Existing FAQs</h2>
+     <button id="newFaqBtn" class="bg-brand-900 text-white font-semibold px-4 py-2 hover:bg-brand-800 transition text-sm">+ New FAQ</button>
+    </div>
+    <div id="faqList" class="space-y-2 mb-8"><p class="text-slate-400 text-sm">Loading...</p></div>
+
+    <form id="faqForm" class="hidden space-y-4 bg-white border border-slate-100 p-8">
+     <input type="hidden" name="_filePath" />
+     <input type="hidden" name="_sha" />
+     <div><label class="block text-sm font-medium text-slate-700 mb-1">Question *</label><input type="text" name="question" required class="w-full px-4 py-2 border border-slate-300" /></div>
+     <div><label class="block text-sm font-medium text-slate-700 mb-1">Display Order</label><input type="number" name="order" placeholder="1" class="w-full px-4 py-2 border border-slate-300" /></div>
+     <div><label class="block text-sm font-medium text-slate-700 mb-1">Answer (Markdown) *</label><textarea name="body" required rows="8" class="w-full px-4 py-2 border border-slate-300 font-mono text-sm"></textarea></div>
+     <div class="flex gap-3">
+      <button type="submit" class="bg-brand-900 text-white font-medium px-6 py-3 hover:bg-brand-800 transition">Save (Create Pull Request)</button>
+      <button type="button" id="cancelFaqBtn" class="bg-slate-100 text-slate-700 font-semibold px-6 py-3 hover:bg-slate-200 transition">Cancel</button>
+      <button type="button" id="deleteFaqBtn" class="hidden bg-red-50 text-red-600 font-semibold px-6 py-3 hover:bg-red-100 transition ml-auto">Delete This FAQ</button>
+     </div>
+    </form>
+   </div>
+
+   <!-- BOOKINGS & SCHEDULE SECTION -->
+   <div id="bookingsSection" class="hidden space-y-12">
+
+    <div>
+     <h2 class="text-xl font-medium text-slate-900 mb-4">Upcoming Appointments</h2>
+     <div id="appointmentsList" class="space-y-2">
+      <p class="text-slate-400 text-sm">Loading...</p>
+     </div>
+    </div>
+
+    <!-- Schedule sessions: opening/closing time + slot duration -->
+    <div>
+     <h2 class="text-xl font-medium text-slate-900 mb-2">Weekly Schedule</h2>
+     <p class="text-sm text-slate-500 mb-4">Define opening and closing times per day, and how long each appointment slot should be. Individual booking times are generated automatically.</p>
+
+     <div class="flex flex-wrap gap-3 mb-4 bg-white border border-slate-100 p-4 items-end">
+      <div>
+       <label class="block text-xs font-semibold text-slate-500 mb-1">Day</label>
+       <select id="newSessionDay" class="px-4 py-2 border border-slate-300">
+        <option value="1">Monday</option>
+        <option value="2">Tuesday</option>
+        <option value="3">Wednesday</option>
+        <option value="4">Thursday</option>
+        <option value="5">Friday</option>
+        <option value="6">Saturday</option>
+        <option value="0">Sunday</option>
+       </select>
+      </div>
+      <div>
+       <label class="block text-xs font-semibold text-slate-500 mb-1">Opening Time</label>
+       <input type="time" id="newSessionStart" class="px-4 py-2 border border-slate-300" />
+      </div>
+      <div>
+       <label class="block text-xs font-semibold text-slate-500 mb-1">Closing Time</label>
+       <input type="time" id="newSessionEnd" class="px-4 py-2 border border-slate-300" />
+      </div>
+      <div>
+       <label class="block text-xs font-semibold text-slate-500 mb-1">Slot Duration</label>
+       <select id="newSessionDuration" class="px-4 py-2 border border-slate-300">
+        <option value="15">15 min</option>
+        <option value="20">20 min</option>
+        <option value="30" selected>30 min</option>
+        <option value="45">45 min</option>
+        <option value="60">60 min</option>
+       </select>
+      </div>
+      <button id="addSessionBtn" class="bg-brand-900 text-white font-semibold px-4 py-2 hover:bg-brand-800 transition">Add Session</button>
+     </div>
+
+     <div id="sessionsByDay" class="space-y-3">
+      <p class="text-slate-400 text-sm">Loading...</p>
+     </div>
+    </div>
+
+    <!-- Blocked dates -->
+    <div>
+     <h2 class="text-xl font-medium text-slate-900 mb-2">Holidays &amp; Leave Days</h2>
+     <p class="text-sm text-slate-500 mb-4">Block an entire date (clinic fully closed).</p>
+     <div class="flex flex-wrap gap-3 mb-4 bg-white border border-slate-100 p-4">
+      <input type="date" id="newBlockedDateInput" class="px-4 py-2 border border-slate-300" />
+      <input type="text" id="newBlockedDateReason" placeholder="Reason (optional)" class="px-4 py-2 border border-slate-300 flex-grow" />
+      <button id="addBlockedDateBtn" class="bg-red-600 text-white font-semibold px-4 py-2 hover:bg-red-700 transition">Block This Date</button>
+     </div>
+     <div id="blockedDatesList" class="space-y-2">
+      <p class="text-slate-400 text-sm">Loading...</p>
+     </div>
+    </div>
+
+    <!-- Blocked slots -->
+    <div>
+     <h2 class="text-xl font-medium text-slate-900 mb-2">Block a Specific Time Slot</h2>
+     <p class="text-sm text-slate-500 mb-4">Block just one time on a specific date, without closing the whole day. Type the exact time as it appears to patients (e.g. "10:00 AM").</p>
+     <div class="flex flex-wrap gap-3 mb-4 bg-white border border-slate-100 p-4">
+      <input type="date" id="newBlockedSlotDate" class="px-4 py-2 border border-slate-300" />
+      <input type="text" id="newBlockedSlotTime" placeholder="e.g. 10:00 AM" class="px-4 py-2 border border-slate-300" />
+      <input type="text" id="newBlockedSlotReason" placeholder="Reason (optional)" class="px-4 py-2 border border-slate-300 flex-grow" />
+      <button id="addBlockedSlotBtn" class="bg-red-600 text-white font-semibold px-4 py-2 hover:bg-red-700 transition">Block This Slot</button>
+     </div>
+     <div id="blockedSlotsList" class="space-y-2">
+      <p class="text-slate-400 text-sm">Loading...</p>
+     </div>
+    </div>
+
+   </div>
+
+   <!-- LANDING PAGES SECTION -->
+   <div id="landingPagesSection" class="hidden">
+    <h2 class="text-xl font-medium text-slate-900 mb-4">Landing Pages (Google Ads)</h2>
+    <p class="text-sm text-slate-500 mb-6">These pages are not linked anywhere on the site and are excluded from search engines -- use these links to preview them, or paste as Final URLs in Google Ads campaigns.</p>
+
+    <div class="space-y-6">
+     <div>
+      <h3 class="text-sm font-medium text-ink uppercase tracking-wider mb-3">Service-Intent Pages</h3>
+      <div class="space-y-2">
+       <a href="/lp/lasik-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">LASIK Surgery (Chennai)</a>
+       <a href="/lp/cataract-surgery-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Cataract Surgery (Chennai)</a>
+       <a href="/lp/retina-diabetic-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Retina / Diabetic Eye Care</a>
+       <a href="/lp/glaucoma-screening-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Glaucoma Screening</a>
+       <a href="/lp/squint-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Squint Treatment</a>
+       <a href="/lp/neuro-ophthalmology-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Neuro-Ophthalmology</a>
+       <a href="/lp/comprehensive-eye-checkup-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Comprehensive Eye Checkup (Chennai)</a>
+       <a href="/lp/cataract-surgeon-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Cataract Surgeon (Chennai)</a>
+       <a href="/lp/pediatric-eye-doctor-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Pediatric Eye Doctor (Chennai)</a>
+      </div>
+     </div>
+
+     <div>
+      <h3 class="text-sm font-medium text-ink uppercase tracking-wider mb-3">Local-Intent Pages (KK Nagar)</h3>
+      <div class="space-y-2">
+       <a href="/lp/eye-clinic-kk-nagar" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Eye Clinic KK Nagar</a>
+       <a href="/lp/eye-doctor-kk-nagar" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Eye Doctor KK Nagar</a>
+      </div>
+     </div>
+
+     <div>
+      <h3 class="text-sm font-medium text-ink uppercase tracking-wider mb-3">Symptom-Intent Pages</h3>
+      <div class="space-y-2">
+       <a href="/lp/blurred-vision-doctor-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Blurred Vision</a>
+       <a href="/lp/eye-pain-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Eye Pain</a>
+       <a href="/lp/sudden-vision-loss-chennai" target="_blank" class="block bg-red-50 border border-red-200 px-4 py-3 hover:border-red-300 hover:bg-red-100 transition-colors text-sm font-medium text-red-800">Sudden Vision Loss (Urgent styling)</a>
+       <a href="/lp/double-vision-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Double Vision</a>
+       <a href="/lp/diabetic-eye-checkup-chennai" target="_blank" class="block bg-white border border-slate-200 px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Diabetic Eye Checkup</a>
+      </div>
+     </div>
+    </div>
+   </div>
+
+   <div id="resultBox" class="hidden p-6"></div>
+  </div>
+ </div>
 </MainLayout>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
-    let adminPassword = '';
-    let blogTags: string[] = [];
+ document.addEventListener('astro:page-load', () => {
+  let adminPassword = '';
+  let blogTags: string[] = [];
 
-    const passwordGate = document.getElementById('passwordGate');
-    const adminPanel = document.getElementById('adminPanel');
-    const passwordInput = document.getElementById('passwordInput') as HTMLInputElement;
-    const unlockBtn = document.getElementById('unlockBtn');
-    const unlockError = document.getElementById('unlockError');
+  const passwordGate = document.getElementById('passwordGate');
+  const adminPanel = document.getElementById('adminPanel');
+  const passwordInput = document.getElementById('passwordInput') as HTMLInputElement;
+  const unlockBtn = document.getElementById('unlockBtn');
+  const unlockError = document.getElementById('unlockError');
 
 const tabBlog = document.getElementById('tabBlog');
-    const tabFaq = document.getElementById('tabFaq');
-    const tabBookings = document.getElementById('tabBookings');
-    const tabLandingPages = document.getElementById('tabLandingPages');
-    const blogSection = document.getElementById('blogSection');
-    const faqSection = document.getElementById('faqSection');
-    const bookingsSection = document.getElementById('bookingsSection');
-    const landingPagesSection = document.getElementById('landingPagesSection');
+  const tabFaq = document.getElementById('tabFaq');
+  const tabBookings = document.getElementById('tabBookings');
+  const tabLandingPages = document.getElementById('tabLandingPages');
+  const blogSection = document.getElementById('blogSection');
+  const faqSection = document.getElementById('faqSection');
+  const bookingsSection = document.getElementById('bookingsSection');
+  const landingPagesSection = document.getElementById('landingPagesSection');
 
-    const blogList = document.getElementById('blogList');
-    const faqList = document.getElementById('faqList');
-    const blogForm = document.getElementById('blogForm') as HTMLFormElement;
-    const faqForm = document.getElementById('faqForm') as HTMLFormElement;
+  const blogList = document.getElementById('blogList');
+  const faqList = document.getElementById('faqList');
+  const blogForm = document.getElementById('blogForm') as HTMLFormElement;
+  const faqForm = document.getElementById('faqForm') as HTMLFormElement;
 
-    const newBlogBtn = document.getElementById('newBlogBtn');
-    const newFaqBtn = document.getElementById('newFaqBtn');
-    const cancelBlogBtn = document.getElementById('cancelBlogBtn');
-    const cancelFaqBtn = document.getElementById('cancelFaqBtn');
-    const deleteBlogBtn = document.getElementById('deleteBlogBtn');
-    const deleteFaqBtn = document.getElementById('deleteFaqBtn');
+  const newBlogBtn = document.getElementById('newBlogBtn');
+  const newFaqBtn = document.getElementById('newFaqBtn');
+  const cancelBlogBtn = document.getElementById('cancelBlogBtn');
+  const cancelFaqBtn = document.getElementById('cancelFaqBtn');
+  const deleteBlogBtn = document.getElementById('deleteBlogBtn');
+  const deleteFaqBtn = document.getElementById('deleteFaqBtn');
 
-    const blogTagInput = document.getElementById('blogTagInput') as HTMLInputElement;
-    const blogTagAddBtn = document.getElementById('blogTagAddBtn');
-    const blogTagChips = document.getElementById('blogTagChips');
+  const blogTagInput = document.getElementById('blogTagInput') as HTMLInputElement;
+  const blogTagAddBtn = document.getElementById('blogTagAddBtn');
+  const blogTagChips = document.getElementById('blogTagChips');
 
-    const resultBox = document.getElementById('resultBox');
+  const resultBox = document.getElementById('resultBox');
 
-    const appointmentsList = document.getElementById('appointmentsList');
-    const sessionsByDay = document.getElementById('sessionsByDay');
-    const newSessionDay = document.getElementById('newSessionDay') as HTMLSelectElement;
-    const newSessionStart = document.getElementById('newSessionStart') as HTMLInputElement;
-    const newSessionEnd = document.getElementById('newSessionEnd') as HTMLInputElement;
-    const newSessionDuration = document.getElementById('newSessionDuration') as HTMLSelectElement;
-    const addSessionBtn = document.getElementById('addSessionBtn');
+  const appointmentsList = document.getElementById('appointmentsList');
+  const sessionsByDay = document.getElementById('sessionsByDay');
+  const newSessionDay = document.getElementById('newSessionDay') as HTMLSelectElement;
+  const newSessionStart = document.getElementById('newSessionStart') as HTMLInputElement;
+  const newSessionEnd = document.getElementById('newSessionEnd') as HTMLInputElement;
+  const newSessionDuration = document.getElementById('newSessionDuration') as HTMLSelectElement;
+  const addSessionBtn = document.getElementById('addSessionBtn');
 
-    const blockedDatesList = document.getElementById('blockedDatesList');
-    const blockedSlotsList = document.getElementById('blockedSlotsList');
-    const newBlockedDateInput = document.getElementById('newBlockedDateInput') as HTMLInputElement;
-    const newBlockedDateReason = document.getElementById('newBlockedDateReason') as HTMLInputElement;
-    const addBlockedDateBtn = document.getElementById('addBlockedDateBtn');
-    const newBlockedSlotDate = document.getElementById('newBlockedSlotDate') as HTMLInputElement;
-    const newBlockedSlotTime = document.getElementById('newBlockedSlotTime') as HTMLInputElement;
-    const newBlockedSlotReason = document.getElementById('newBlockedSlotReason') as HTMLInputElement;
-    const addBlockedSlotBtn = document.getElementById('addBlockedSlotBtn');
+  const blockedDatesList = document.getElementById('blockedDatesList');
+  const blockedSlotsList = document.getElementById('blockedSlotsList');
+  const newBlockedDateInput = document.getElementById('newBlockedDateInput') as HTMLInputElement;
+  const newBlockedDateReason = document.getElementById('newBlockedDateReason') as HTMLInputElement;
+  const addBlockedDateBtn = document.getElementById('addBlockedDateBtn');
+  const newBlockedSlotDate = document.getElementById('newBlockedSlotDate') as HTMLInputElement;
+  const newBlockedSlotTime = document.getElementById('newBlockedSlotTime') as HTMLInputElement;
+  const newBlockedSlotReason = document.getElementById('newBlockedSlotReason') as HTMLInputElement;
+  const addBlockedSlotBtn = document.getElementById('addBlockedSlotBtn');
 
-    const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-    function showResult(message: string, isError = false) {
-      resultBox?.classList.remove('hidden', 'bg-red-50', 'bg-green-50', 'bg-slate-100');
-      resultBox?.classList.add(isError ? 'bg-red-50' : 'bg-green-50');
-      resultBox.innerHTML = message;
-    }
+  function showResult(message: string, isError = false) {
+   resultBox?.classList.remove('hidden', 'bg-red-50', 'bg-green-50', 'bg-slate-100');
+   resultBox?.classList.add(isError ? 'bg-red-50' : 'bg-green-50');
+   resultBox.innerHTML = message;
+  }
 
-    async function callBookingFunction(action: string, data: any = {}) {
-      const response = await fetch('/.netlify/functions/manage-bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPassword, action, data }),
-      });
-      const rawText = await response.text();
-      let result: any;
-      try {
-        result = JSON.parse(rawText);
-      } catch {
-        throw new Error(`Unexpected response (status ${response.status}): ${rawText.slice(0, 200)}`);
-      }
-      if (!response.ok) throw new Error(result.error || 'Something went wrong');
-      return result;
-    }
+  async function callBookingFunction(action: string, data: any = {}) {
+   const response = await fetch('/.netlify/functions/manage-bookings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: adminPassword, action, data }),
+   });
+   const rawText = await response.text();
+   let result: any;
+   try {
+    result = JSON.parse(rawText);
+   } catch {
+    throw new Error(`Unexpected response (status ${response.status}): ${rawText.slice(0, 200)}`);
+   }
+   if (!response.ok) throw new Error(result.error || 'Something went wrong');
+   return result;
+  }
 
-    function formatTime12h(time24: string): string {
-      const [h, m] = time24.split(':').map(Number);
-      const period = h >= 12 ? 'PM' : 'AM';
-      const h12 = h % 12 === 0 ? 12 : h % 12;
-      return `${String(h12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${period}`;
-    }
+  function formatTime12h(time24: string): string {
+   const [h, m] = time24.split(':').map(Number);
+   const period = h >= 12 ? 'PM' : 'AM';
+   const h12 = h % 12 === 0 ? 12 : h % 12;
+   return `${String(h12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${period}`;
+  }
 
-    // ---- Tag chip UI ----
-    function renderTagChips() {
-      if (!blogTagChips) return;
-      blogTagChips.innerHTML = '';
-      blogTags.forEach((tag, index) => {
-        const chip = document.createElement('span');
-        chip.className = 'inline-flex items-center gap-2 bg-brand-50 text-brand-800 text-sm font-semibold px-3 py-1.5 rounded-full';
-        chip.innerHTML = `${tag} <button type="button" class="text-brand-400 hover:text-brand-700 font-bold" aria-label="Remove">&times;</button>`;
-        chip.querySelector('button')?.addEventListener('click', () => {
-          blogTags.splice(index, 1);
-          renderTagChips();
-        });
-        blogTagChips.appendChild(chip);
-      });
-    }
-    function addTagFromInput() {
-      const value = blogTagInput.value.trim();
-      if (value.length === 0) return;
-      if (!blogTags.includes(value)) blogTags.push(value);
-      blogTagInput.value = '';
-      renderTagChips();
-    }
-    blogTagAddBtn?.addEventListener('click', addTagFromInput);
-    blogTagInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTagFromInput(); } });
-
-    // ---- Unlock ----
-    unlockBtn?.addEventListener('click', async () => {
-      if (!passwordInput.value) {
-        unlockError.textContent = 'Please enter a password.';
-        unlockError.classList.remove('hidden');
-        return;
-      }
-      adminPassword = passwordInput.value;
-      passwordGate?.classList.add('hidden');
-      adminPanel?.classList.remove('hidden');
-      await loadList('blog');
-      await loadList('faq');
+  // ---- Tag chip UI ----
+  function renderTagChips() {
+   if (!blogTagChips) return;
+   blogTagChips.innerHTML = '';
+   blogTags.forEach((tag, index) => {
+    const chip = document.createElement('span');
+    chip.className = 'inline-flex items-center gap-2 bg-brand-50 text-brand-800 text-sm font-semibold px-3 py-1.5';
+    chip.innerHTML = `${tag} <button type="button" class="text-brand-400 hover:text-brand-700 font-medium" aria-label="Remove">&times;</button>`;
+    chip.querySelector('button')?.addEventListener('click', () => {
+     blogTags.splice(index, 1);
+     renderTagChips();
     });
+    blogTagChips.appendChild(chip);
+   });
+  }
+  function addTagFromInput() {
+   const value = blogTagInput.value.trim();
+   if (value.length === 0) return;
+   if (!blogTags.includes(value)) blogTags.push(value);
+   blogTagInput.value = '';
+   renderTagChips();
+  }
+  blogTagAddBtn?.addEventListener('click', addTagFromInput);
+  blogTagInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTagFromInput(); } });
 
-    // ---- Tabs ----
-    function activateTab(tab: 'blog' | 'faq' | 'bookings' | 'landingPages') {
-      blogSection?.classList.toggle('hidden', tab !== 'blog');
-      faqSection?.classList.toggle('hidden', tab !== 'faq');
-      bookingsSection?.classList.toggle('hidden', tab !== 'bookings');
-      landingPagesSection?.classList.toggle('hidden', tab !== 'landingPages');
+  // ---- Unlock ----
+  unlockBtn?.addEventListener('click', async () => {
+   if (!passwordInput.value) {
+    unlockError.textContent = 'Please enter a password.';
+    unlockError.classList.remove('hidden');
+    return;
+   }
+   adminPassword = passwordInput.value;
+   passwordGate?.classList.add('hidden');
+   adminPanel?.classList.remove('hidden');
+   await loadList('blog');
+   await loadList('faq');
+  });
 
-      [tabBlog, tabFaq, tabBookings, tabLandingPages].forEach((btn) => {
-        btn?.classList.remove('text-brand-600', 'border-b-2', 'border-brand-600');
-        btn?.classList.add('text-slate-500');
-      });
-      const activeBtn = tab === 'blog' ? tabBlog : tab === 'faq' ? tabFaq : tab === 'bookings' ? tabBookings : tabLandingPages;
-      activeBtn?.classList.add('text-brand-600', 'border-b-2', 'border-brand-600');
-      activeBtn?.classList.remove('text-slate-500');
-    }
+  // ---- Tabs ----
+  function activateTab(tab: 'blog' | 'faq' | 'bookings' | 'landingPages') {
+   blogSection?.classList.toggle('hidden', tab !== 'blog');
+   faqSection?.classList.toggle('hidden', tab !== 'faq');
+   bookingsSection?.classList.toggle('hidden', tab !== 'bookings');
+   landingPagesSection?.classList.toggle('hidden', tab !== 'landingPages');
+
+   [tabBlog, tabFaq, tabBookings, tabLandingPages].forEach((btn) => {
+    btn?.classList.remove('text-brand-600', 'border-b-2', 'border-brand-600');
+    btn?.classList.add('text-slate-500');
+   });
+   const activeBtn = tab === 'blog' ? tabBlog : tab === 'faq' ? tabFaq : tab === 'bookings' ? tabBookings : tabLandingPages;
+   activeBtn?.classList.add('text-brand-600', 'border-b-2', 'border-brand-600');
+   activeBtn?.classList.remove('text-slate-500');
+  }
 
 tabBlog?.addEventListener('click', () => activateTab('blog'));
-    tabFaq?.addEventListener('click', () => activateTab('faq'));
-    tabLandingPages?.addEventListener('click', () => activateTab('landingPages'));
-    tabBookings?.addEventListener('click', async () => {
-      activateTab('bookings');
-      await loadAppointments();
-      await loadSessions();
-      await loadBlockedDates();
-      await loadBlockedSlots();
-    });
-
-    // ---- Blog/FAQ (GitHub-based, unchanged) ----
-    async function loadList(contentType: 'blog' | 'faq') {
-      const listEl = contentType === 'blog' ? blogList : faqList;
-      try {
-        const response = await fetch('/.netlify/functions/list-content', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: adminPassword, contentType, action: 'list' }),
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          const debugInfo = data.debug ? ` [${JSON.stringify(data.debug)}]` : '';
-          throw new Error((data.error || 'Failed to load list') + debugInfo);
-        }
-
-        if (data.items.length === 0) {
-          listEl.innerHTML = '<p class="text-slate-400 text-sm">No items yet.</p>';
-          return;
-        }
-
-        listEl.innerHTML = '';
-        data.items.forEach((item: { name: string; path: string }) => {
-          const row = document.createElement('div');
-          row.className = 'flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-3';
-          row.innerHTML = `<span class="text-sm font-medium text-slate-800">${item.name}</span><button class="text-brand-600 text-sm font-semibold hover:underline">Edit</button>`;
-          row.querySelector('button')?.addEventListener('click', () => openForEdit(contentType, item.path));
-          listEl.appendChild(row);
-        });
-      } catch (error: any) {
-        listEl.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
-      }
-    }
-
-    newBlogBtn?.addEventListener('click', () => {
-      blogForm.reset();
-      (blogForm.querySelector('[name="_filePath"]') as HTMLInputElement).value = '';
-      (blogForm.querySelector('[name="_sha"]') as HTMLInputElement).value = '';
-      blogTags = [];
-      renderTagChips();
-      deleteBlogBtn?.classList.add('hidden');
-      blogForm.classList.remove('hidden');
-    });
-    newFaqBtn?.addEventListener('click', () => {
-      faqForm.reset();
-      (faqForm.querySelector('[name="_filePath"]') as HTMLInputElement).value = '';
-      (faqForm.querySelector('[name="_sha"]') as HTMLInputElement).value = '';
-      deleteFaqBtn?.classList.add('hidden');
-      faqForm.classList.remove('hidden');
-    });
-    cancelBlogBtn?.addEventListener('click', () => blogForm.classList.add('hidden'));
-    cancelFaqBtn?.addEventListener('click', () => faqForm.classList.add('hidden'));
-
-    async function openForEdit(contentType: 'blog' | 'faq', filePath: string) {
-      try {
-        const response = await fetch('/.netlify/functions/list-content', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: adminPassword, contentType, action: 'get', filePath }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Failed to load item');
-
-        const { frontmatter, body } = parseFrontmatter(data.content);
-        const form = contentType === 'blog' ? blogForm : faqForm;
-        const deleteBtn = contentType === 'blog' ? deleteBlogBtn : deleteFaqBtn;
-
-        form.reset();
-        if (contentType === 'blog') {
-          blogTags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
-          renderTagChips();
-        }
-        Object.entries(frontmatter).forEach(([key, value]) => {
-          if (key === 'tags') return;
-          const field = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
-          if (field) field.value = String(value);
-        });
-        (form.querySelector('[name="body"]') as HTMLTextAreaElement).value = body;
-        (form.querySelector('[name="_filePath"]') as HTMLInputElement).value = filePath;
-        (form.querySelector('[name="_sha"]') as HTMLInputElement).value = data.sha;
-
-        deleteBtn?.classList.remove('hidden');
-        form.classList.remove('hidden');
-        form.scrollIntoView({ behavior: 'smooth' });
-      } catch (error: any) {
-        showResult(`❌ ${error.message}`, true);
-      }
-    }
-
-    function parseFrontmatter(raw: string) {
-      const match = raw.match(/^---\n([\s\S]*?)\n---\n*([\s\S]*)$/);
-      if (!match) return { frontmatter: {}, body: raw };
-      const [, fm, body] = match;
-      const frontmatter: Record<string, any> = {};
-      fm.split('\n').forEach((line) => {
-        const idx = line.indexOf(':');
-        if (idx === -1) return;
-        const key = line.slice(0, idx).trim();
-        let rawValue = line.slice(idx + 1).trim();
-        if (rawValue.startsWith('[') && rawValue.endsWith(']')) {
-          try { frontmatter[key] = JSON.parse(rawValue); } catch { frontmatter[key] = []; }
-        } else if (rawValue.startsWith('"') && rawValue.endsWith('"')) {
-          try { frontmatter[key] = JSON.parse(rawValue); } catch { frontmatter[key] = rawValue.slice(1, -1); }
-        } else {
-          frontmatter[key] = rawValue;
-        }
-      });
-      return { frontmatter, body: body.trim() };
-    }
-
-    async function submitContent(contentType: 'blog' | 'faq', form: HTMLFormElement) {
-      const formData = new FormData(form);
-      const filePath = formData.get('_filePath') as string;
-      const sha = formData.get('_sha') as string;
-      formData.delete('_filePath');
-      formData.delete('_sha');
-      const fields: Record<string, any> = {};
-      formData.forEach((value, key) => { fields[key] = value.toString(); });
-      if (contentType === 'blog') fields.tags = blogTags;
-
-      showResult('Validating and creating pull request...');
-      try {
-        const response = await fetch('/.netlify/functions/create-content', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: adminPassword, contentType, fields, action: filePath ? 'edit' : 'create', filePath: filePath || undefined, sha: sha || undefined }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Something went wrong');
-        showResult(`✅ Pull request created! <a href="${data.prUrl}" target="_blank" class="text-brand-600 font-bold underline">Review and merge it here</a>`);
-        form.classList.add('hidden');
-      } catch (error: any) {
-        showResult(`❌ ${error.message}`, true);
-      }
-    }
-    blogForm?.addEventListener('submit', (e) => { e.preventDefault(); submitContent('blog', blogForm); });
-    faqForm?.addEventListener('submit', (e) => { e.preventDefault(); submitContent('faq', faqForm); });
-
-    async function deleteItem(contentType: 'blog' | 'faq', form: HTMLFormElement) {
-      const filePath = (form.querySelector('[name="_filePath"]') as HTMLInputElement).value;
-      const sha = (form.querySelector('[name="_sha"]') as HTMLInputElement).value;
-      if (!filePath || !sha) return;
-      if (!confirm('Are you sure you want to delete this? This will create a Pull Request to remove it.')) return;
-      showResult('Creating deletion pull request...');
-      try {
-        const response = await fetch('/.netlify/functions/create-content', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: adminPassword, contentType, action: 'delete', filePath, sha }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Something went wrong');
-        showResult(`✅ Deletion pull request created! <a href="${data.prUrl}" target="_blank" class="text-brand-600 font-bold underline">Review and merge it here</a>`);
-        form.classList.add('hidden');
-      } catch (error: any) {
-        showResult(`❌ ${error.message}`, true);
-      }
-    }
-    deleteBlogBtn?.addEventListener('click', () => deleteItem('blog', blogForm));
-    deleteFaqBtn?.addEventListener('click', () => deleteItem('faq', faqForm));
-
-    // ---- Appointments ----
-    async function loadAppointments() {
-      appointmentsList.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
-      try {
-        const { appointments } = await callBookingFunction('list_appointments');
-        const upcoming = appointments.filter((a: any) => a.status !== 'cancelled');
-        if (upcoming.length === 0) {
-          appointmentsList.innerHTML = '<p class="text-slate-400 text-sm">No appointments yet.</p>';
-          return;
-        }
-        appointmentsList.innerHTML = '';
-        upcoming.forEach((appt: any) => {
-          const row = document.createElement('div');
-          row.className = 'flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-3';
-          row.innerHTML = `
-            <div>
-              <p class="font-semibold text-slate-800">${appt.prefix || ''} ${appt.first_name} ${appt.last_name || ''} -- ${appt.service_type}</p>
-              <p class="text-sm text-slate-500">${appt.appointment_date} at ${appt.appointment_time} &middot; ${appt.phone} &middot; <span class="${appt.status === 'cancelled' ? 'text-red-500' : 'text-green-600'}">${appt.status}</span></p>
-            </div>
-            <button class="text-red-600 text-sm font-semibold hover:underline">Cancel</button>
-          `;
-          row.querySelector('button')?.addEventListener('click', async () => {
-            if (!confirm(`Cancel the appointment for ${appt.first_name}?`)) return;
-            try {
-              await callBookingFunction('cancel_appointment', { id: appt.id });
-              await loadAppointments();
-            } catch (error: any) {
-              showResult(`❌ ${error.message}`, true);
-            }
-          });
-          appointmentsList.appendChild(row);
-        });
-      } catch (error: any) {
-        appointmentsList.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
-      }
-    }
-
-    // ---- Schedule sessions ----
-    async function loadSessions() {
-      sessionsByDay.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
-      try {
-        const { sessions } = await callBookingFunction('list_schedule_sessions');
-        const byDay: Record<number, any[]> = {};
-        sessions.forEach((s: any) => {
-          if (!byDay[s.day_of_week]) byDay[s.day_of_week] = [];
-          byDay[s.day_of_week].push(s);
-        });
-
-        sessionsByDay.innerHTML = '';
-        for (let day = 0; day <= 6; day++) {
-          const dayBox = document.createElement('div');
-          dayBox.className = 'bg-white border border-slate-200 rounded-lg p-4';
-          const daySessions = byDay[day] || [];
-          dayBox.innerHTML = `<p class="font-semibold text-slate-800 mb-2">${DAY_NAMES[day]}</p><div class="space-y-2" data-day="${day}"></div>`;
-          const container = dayBox.querySelector(`[data-day="${day}"]`);
-
-          if (daySessions.length === 0) {
-            container.innerHTML = '<span class="text-sm text-slate-400">Closed -- no sessions configured</span>';
-          } else {
-            daySessions.forEach((session: any) => {
-              const row = document.createElement('div');
-              row.className = `flex justify-between items-center px-3 py-2 rounded-lg ${session.is_active ? 'bg-green-50' : 'bg-champagne-50'}`;
-              row.innerHTML = `
-                <span class="text-sm font-medium ${session.is_active ? 'text-green-800' : 'text-slate-400 line-through'}">
-                  ${formatTime12h(session.start_time)} -- ${formatTime12h(session.end_time)} (${session.slot_duration_minutes} min slots)
-                </span>
-                <div class="flex gap-3">
-                  <button class="text-xs font-semibold text-brand-600 hover:underline" data-action="toggle">${session.is_active ? 'Disable' : 'Enable'}</button>
-                  <button class="text-xs font-semibold text-red-600 hover:underline" data-action="delete">Delete</button>
-                </div>
-              `;
-              row.querySelector('[data-action="toggle"]')?.addEventListener('click', async () => {
-                await callBookingFunction('toggle_schedule_session', { id: session.id, is_active: !session.is_active });
-                await loadSessions();
-              });
-              row.querySelector('[data-action="delete"]')?.addEventListener('click', async () => {
-                if (!confirm('Delete this session entirely?')) return;
-                await callBookingFunction('delete_schedule_session', { id: session.id });
-                await loadSessions();
-              });
-              container?.appendChild(row);
-            });
-          }
-          sessionsByDay.appendChild(dayBox);
-        }
-      } catch (error: any) {
-        sessionsByDay.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
-      }
-    }
-
-    addSessionBtn?.addEventListener('click', async () => {
-      if (!newSessionStart.value || !newSessionEnd.value) {
-        showResult('❌ Please set both opening and closing time.', true);
-        return;
-      }
-      if (newSessionStart.value >= newSessionEnd.value) {
-        showResult('❌ Closing time must be after opening time.', true);
-        return;
-      }
-      try {
-        await callBookingFunction('add_schedule_session', {
-          day_of_week: Number(newSessionDay.value),
-          start_time: newSessionStart.value,
-          end_time: newSessionEnd.value,
-          slot_duration_minutes: Number(newSessionDuration.value),
-        });
-        newSessionStart.value = '';
-        newSessionEnd.value = '';
-        await loadSessions();
-      } catch (error: any) {
-        showResult(`❌ ${error.message}`, true);
-      }
-    });
-
-    // ---- Blocked dates ----
-    async function loadBlockedDates() {
-      blockedDatesList.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
-      try {
-        const { blockedDates } = await callBookingFunction('list_blocked_dates');
-        if (blockedDates.length === 0) {
-          blockedDatesList.innerHTML = '<p class="text-slate-400 text-sm">No blocked dates.</p>';
-          return;
-        }
-        blockedDatesList.innerHTML = '';
-        blockedDates.forEach((bd: any) => {
-          const row = document.createElement('div');
-          row.className = 'flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-3';
-          row.innerHTML = `<span class="text-sm font-medium text-slate-800">${bd.blocked_date}${bd.reason ? ` -- ${bd.reason}` : ''}</span><button class="text-red-600 text-sm font-semibold hover:underline">Remove</button>`;
-          row.querySelector('button')?.addEventListener('click', async () => {
-            await callBookingFunction('remove_blocked_date', { id: bd.id });
-            await loadBlockedDates();
-          });
-          blockedDatesList.appendChild(row);
-        });
-      } catch (error: any) {
-        blockedDatesList.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
-      }
-    }
-
-    addBlockedDateBtn?.addEventListener('click', async () => {
-      if (!newBlockedDateInput.value) return;
-      try {
-        await callBookingFunction('add_blocked_date', { blocked_date: newBlockedDateInput.value, reason: newBlockedDateReason.value });
-        newBlockedDateInput.value = '';
-        newBlockedDateReason.value = '';
-        await loadBlockedDates();
-      } catch (error: any) {
-        showResult(`❌ ${error.message}`, true);
-      }
-    });
-
-    // ---- Blocked slots ----
-    async function loadBlockedSlots() {
-      blockedSlotsList.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
-      try {
-        const { blockedSlots } = await callBookingFunction('list_blocked_slots');
-        if (blockedSlots.length === 0) {
-          blockedSlotsList.innerHTML = '<p class="text-slate-400 text-sm">No blocked slots.</p>';
-          return;
-        }
-        blockedSlotsList.innerHTML = '';
-        blockedSlots.forEach((bs: any) => {
-          const row = document.createElement('div');
-          row.className = 'flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-3';
-          row.innerHTML = `<span class="text-sm font-medium text-slate-800">${bs.blocked_date} at ${bs.time_slot}${bs.reason ? ` -- ${bs.reason}` : ''}</span><button class="text-red-600 text-sm font-semibold hover:underline">Remove</button>`;
-          row.querySelector('button')?.addEventListener('click', async () => {
-            await callBookingFunction('remove_blocked_slot', { id: bs.id });
-            await loadBlockedSlots();
-          });
-          blockedSlotsList.appendChild(row);
-        });
-      } catch (error: any) {
-        blockedSlotsList.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
-      }
-    }
-
-    addBlockedSlotBtn?.addEventListener('click', async () => {
-      if (!newBlockedSlotDate.value || !newBlockedSlotTime.value) return;
-      try {
-        await callBookingFunction('add_blocked_slot', { blocked_date: newBlockedSlotDate.value, time_slot: newBlockedSlotTime.value, reason: newBlockedSlotReason.value });
-        newBlockedSlotDate.value = '';
-        newBlockedSlotTime.value = '';
-        newBlockedSlotReason.value = '';
-        await loadBlockedSlots();
-      } catch (error: any) {
-        showResult(`❌ ${error.message}`, true);
-      }
-    });
+  tabFaq?.addEventListener('click', () => activateTab('faq'));
+  tabLandingPages?.addEventListener('click', () => activateTab('landingPages'));
+  tabBookings?.addEventListener('click', async () => {
+   activateTab('bookings');
+   await loadAppointments();
+   await loadSessions();
+   await loadBlockedDates();
+   await loadBlockedSlots();
   });
+
+  // ---- Blog/FAQ (GitHub-based, unchanged) ----
+  async function loadList(contentType: 'blog' | 'faq') {
+   const listEl = contentType === 'blog' ? blogList : faqList;
+   try {
+    const response = await fetch('/.netlify/functions/list-content', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ password: adminPassword, contentType, action: 'list' }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+     const debugInfo = data.debug ? ` [${JSON.stringify(data.debug)}]` : '';
+     throw new Error((data.error || 'Failed to load list') + debugInfo);
+    }
+
+    if (data.items.length === 0) {
+     listEl.innerHTML = '<p class="text-slate-400 text-sm">No items yet.</p>';
+     return;
+    }
+
+    listEl.innerHTML = '';
+    data.items.forEach((item: { name: string; path: string }) => {
+     const row = document.createElement('div');
+     row.className = 'flex justify-between items-center bg-white border border-slate-200 px-4 py-3';
+     row.innerHTML = `<span class="text-sm font-medium text-slate-800">${item.name}</span><button class="text-brand-600 text-sm font-semibold hover:underline">Edit</button>`;
+     row.querySelector('button')?.addEventListener('click', () => openForEdit(contentType, item.path));
+     listEl.appendChild(row);
+    });
+   } catch (error: any) {
+    listEl.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
+   }
+  }
+
+  newBlogBtn?.addEventListener('click', () => {
+   blogForm.reset();
+   (blogForm.querySelector('[name="_filePath"]') as HTMLInputElement).value = '';
+   (blogForm.querySelector('[name="_sha"]') as HTMLInputElement).value = '';
+   blogTags = [];
+   renderTagChips();
+   deleteBlogBtn?.classList.add('hidden');
+   blogForm.classList.remove('hidden');
+  });
+  newFaqBtn?.addEventListener('click', () => {
+   faqForm.reset();
+   (faqForm.querySelector('[name="_filePath"]') as HTMLInputElement).value = '';
+   (faqForm.querySelector('[name="_sha"]') as HTMLInputElement).value = '';
+   deleteFaqBtn?.classList.add('hidden');
+   faqForm.classList.remove('hidden');
+  });
+  cancelBlogBtn?.addEventListener('click', () => blogForm.classList.add('hidden'));
+  cancelFaqBtn?.addEventListener('click', () => faqForm.classList.add('hidden'));
+
+  async function openForEdit(contentType: 'blog' | 'faq', filePath: string) {
+   try {
+    const response = await fetch('/.netlify/functions/list-content', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ password: adminPassword, contentType, action: 'get', filePath }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to load item');
+
+    const { frontmatter, body } = parseFrontmatter(data.content);
+    const form = contentType === 'blog' ? blogForm : faqForm;
+    const deleteBtn = contentType === 'blog' ? deleteBlogBtn : deleteFaqBtn;
+
+    form.reset();
+    if (contentType === 'blog') {
+     blogTags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
+     renderTagChips();
+    }
+    Object.entries(frontmatter).forEach(([key, value]) => {
+     if (key === 'tags') return;
+     const field = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+     if (field) field.value = String(value);
+    });
+    (form.querySelector('[name="body"]') as HTMLTextAreaElement).value = body;
+    (form.querySelector('[name="_filePath"]') as HTMLInputElement).value = filePath;
+    (form.querySelector('[name="_sha"]') as HTMLInputElement).value = data.sha;
+
+    deleteBtn?.classList.remove('hidden');
+    form.classList.remove('hidden');
+    form.scrollIntoView({ behavior: 'smooth' });
+   } catch (error: any) {
+    showResult(`❌ ${error.message}`, true);
+   }
+  }
+
+  function parseFrontmatter(raw: string) {
+   const match = raw.match(/^---\n([\s\S]*?)\n---\n*([\s\S]*)$/);
+   if (!match) return { frontmatter: {}, body: raw };
+   const [, fm, body] = match;
+   const frontmatter: Record<string, any> = {};
+   fm.split('\n').forEach((line) => {
+    const idx = line.indexOf(':');
+    if (idx === -1) return;
+    const key = line.slice(0, idx).trim();
+    let rawValue = line.slice(idx + 1).trim();
+    if (rawValue.startsWith('[') && rawValue.endsWith(']')) {
+     try { frontmatter[key] = JSON.parse(rawValue); } catch { frontmatter[key] = []; }
+    } else if (rawValue.startsWith('"') && rawValue.endsWith('"')) {
+     try { frontmatter[key] = JSON.parse(rawValue); } catch { frontmatter[key] = rawValue.slice(1, -1); }
+    } else {
+     frontmatter[key] = rawValue;
+    }
+   });
+   return { frontmatter, body: body.trim() };
+  }
+
+  async function submitContent(contentType: 'blog' | 'faq', form: HTMLFormElement) {
+   const formData = new FormData(form);
+   const filePath = formData.get('_filePath') as string;
+   const sha = formData.get('_sha') as string;
+   formData.delete('_filePath');
+   formData.delete('_sha');
+   const fields: Record<string, any> = {};
+   formData.forEach((value, key) => { fields[key] = value.toString(); });
+   if (contentType === 'blog') fields.tags = blogTags;
+
+   showResult('Validating and creating pull request...');
+   try {
+    const response = await fetch('/.netlify/functions/create-content', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ password: adminPassword, contentType, fields, action: filePath ? 'edit' : 'create', filePath: filePath || undefined, sha: sha || undefined }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Something went wrong');
+    showResult(`✅ Pull request created! <a href="${data.prUrl}" target="_blank" class="text-brand-600 font-medium underline">Review and merge it here</a>`);
+    form.classList.add('hidden');
+   } catch (error: any) {
+    showResult(`❌ ${error.message}`, true);
+   }
+  }
+  blogForm?.addEventListener('submit', (e) => { e.preventDefault(); submitContent('blog', blogForm); });
+  faqForm?.addEventListener('submit', (e) => { e.preventDefault(); submitContent('faq', faqForm); });
+
+  async function deleteItem(contentType: 'blog' | 'faq', form: HTMLFormElement) {
+   const filePath = (form.querySelector('[name="_filePath"]') as HTMLInputElement).value;
+   const sha = (form.querySelector('[name="_sha"]') as HTMLInputElement).value;
+   if (!filePath || !sha) return;
+   if (!confirm('Are you sure you want to delete this? This will create a Pull Request to remove it.')) return;
+   showResult('Creating deletion pull request...');
+   try {
+    const response = await fetch('/.netlify/functions/create-content', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ password: adminPassword, contentType, action: 'delete', filePath, sha }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Something went wrong');
+    showResult(`✅ Deletion pull request created! <a href="${data.prUrl}" target="_blank" class="text-brand-600 font-medium underline">Review and merge it here</a>`);
+    form.classList.add('hidden');
+   } catch (error: any) {
+    showResult(`❌ ${error.message}`, true);
+   }
+  }
+  deleteBlogBtn?.addEventListener('click', () => deleteItem('blog', blogForm));
+  deleteFaqBtn?.addEventListener('click', () => deleteItem('faq', faqForm));
+
+  // ---- Appointments ----
+  async function loadAppointments() {
+   appointmentsList.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
+   try {
+    const { appointments } = await callBookingFunction('list_appointments');
+    const upcoming = appointments.filter((a: any) => a.status !== 'cancelled');
+    if (upcoming.length === 0) {
+     appointmentsList.innerHTML = '<p class="text-slate-400 text-sm">No appointments yet.</p>';
+     return;
+    }
+    appointmentsList.innerHTML = '';
+    upcoming.forEach((appt: any) => {
+     const row = document.createElement('div');
+     row.className = 'flex justify-between items-center bg-white border border-slate-200 px-4 py-3';
+     row.innerHTML = `
+      <div>
+       <p class="font-semibold text-slate-800">${appt.prefix || ''} ${appt.first_name} ${appt.last_name || ''} -- ${appt.service_type}</p>
+       <p class="text-sm text-slate-500">${appt.appointment_date} at ${appt.appointment_time} &middot; ${appt.phone} &middot; <span class="${appt.status === 'cancelled' ? 'text-red-500' : 'text-green-600'}">${appt.status}</span></p>
+      </div>
+      <button class="text-red-600 text-sm font-semibold hover:underline">Cancel</button>
+     `;
+     row.querySelector('button')?.addEventListener('click', async () => {
+      if (!confirm(`Cancel the appointment for ${appt.first_name}?`)) return;
+      try {
+       await callBookingFunction('cancel_appointment', { id: appt.id });
+       await loadAppointments();
+      } catch (error: any) {
+       showResult(`❌ ${error.message}`, true);
+      }
+     });
+     appointmentsList.appendChild(row);
+    });
+   } catch (error: any) {
+    appointmentsList.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
+   }
+  }
+
+  // ---- Schedule sessions ----
+  async function loadSessions() {
+   sessionsByDay.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
+   try {
+    const { sessions } = await callBookingFunction('list_schedule_sessions');
+    const byDay: Record<number, any[]> = {};
+    sessions.forEach((s: any) => {
+     if (!byDay[s.day_of_week]) byDay[s.day_of_week] = [];
+     byDay[s.day_of_week].push(s);
+    });
+
+    sessionsByDay.innerHTML = '';
+    for (let day = 0; day <= 6; day++) {
+     const dayBox = document.createElement('div');
+     dayBox.className = 'bg-white border border-slate-200 p-4';
+     const daySessions = byDay[day] || [];
+     dayBox.innerHTML = `<p class="font-semibold text-slate-800 mb-2">${DAY_NAMES[day]}</p><div class="space-y-2" data-day="${day}"></div>`;
+     const container = dayBox.querySelector(`[data-day="${day}"]`);
+
+     if (daySessions.length === 0) {
+      container.innerHTML = '<span class="text-sm text-slate-400">Closed -- no sessions configured</span>';
+     } else {
+      daySessions.forEach((session: any) => {
+       const row = document.createElement('div');
+       row.className = `flex justify-between items-center px-3 py-2 ${session.is_active ? 'bg-green-50' : 'bg-paper-50'}`;
+       row.innerHTML = `
+        <span class="text-sm font-medium ${session.is_active ? 'text-green-800' : 'text-slate-400 line-through'}">
+         ${formatTime12h(session.start_time)} -- ${formatTime12h(session.end_time)} (${session.slot_duration_minutes} min slots)
+        </span>
+        <div class="flex gap-3">
+         <button class="text-xs font-semibold text-brand-600 hover:underline" data-action="toggle">${session.is_active ? 'Disable' : 'Enable'}</button>
+         <button class="text-xs font-semibold text-red-600 hover:underline" data-action="delete">Delete</button>
+        </div>
+       `;
+       row.querySelector('[data-action="toggle"]')?.addEventListener('click', async () => {
+        await callBookingFunction('toggle_schedule_session', { id: session.id, is_active: !session.is_active });
+        await loadSessions();
+       });
+       row.querySelector('[data-action="delete"]')?.addEventListener('click', async () => {
+        if (!confirm('Delete this session entirely?')) return;
+        await callBookingFunction('delete_schedule_session', { id: session.id });
+        await loadSessions();
+       });
+       container?.appendChild(row);
+      });
+     }
+     sessionsByDay.appendChild(dayBox);
+    }
+   } catch (error: any) {
+    sessionsByDay.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
+   }
+  }
+
+  addSessionBtn?.addEventListener('click', async () => {
+   if (!newSessionStart.value || !newSessionEnd.value) {
+    showResult('❌ Please set both opening and closing time.', true);
+    return;
+   }
+   if (newSessionStart.value >= newSessionEnd.value) {
+    showResult('❌ Closing time must be after opening time.', true);
+    return;
+   }
+   try {
+    await callBookingFunction('add_schedule_session', {
+     day_of_week: Number(newSessionDay.value),
+     start_time: newSessionStart.value,
+     end_time: newSessionEnd.value,
+     slot_duration_minutes: Number(newSessionDuration.value),
+    });
+    newSessionStart.value = '';
+    newSessionEnd.value = '';
+    await loadSessions();
+   } catch (error: any) {
+    showResult(`❌ ${error.message}`, true);
+   }
+  });
+
+  // ---- Blocked dates ----
+  async function loadBlockedDates() {
+   blockedDatesList.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
+   try {
+    const { blockedDates } = await callBookingFunction('list_blocked_dates');
+    if (blockedDates.length === 0) {
+     blockedDatesList.innerHTML = '<p class="text-slate-400 text-sm">No blocked dates.</p>';
+     return;
+    }
+    blockedDatesList.innerHTML = '';
+    blockedDates.forEach((bd: any) => {
+     const row = document.createElement('div');
+     row.className = 'flex justify-between items-center bg-white border border-slate-200 px-4 py-3';
+     row.innerHTML = `<span class="text-sm font-medium text-slate-800">${bd.blocked_date}${bd.reason ? ` -- ${bd.reason}` : ''}</span><button class="text-red-600 text-sm font-semibold hover:underline">Remove</button>`;
+     row.querySelector('button')?.addEventListener('click', async () => {
+      await callBookingFunction('remove_blocked_date', { id: bd.id });
+      await loadBlockedDates();
+     });
+     blockedDatesList.appendChild(row);
+    });
+   } catch (error: any) {
+    blockedDatesList.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
+   }
+  }
+
+  addBlockedDateBtn?.addEventListener('click', async () => {
+   if (!newBlockedDateInput.value) return;
+   try {
+    await callBookingFunction('add_blocked_date', { blocked_date: newBlockedDateInput.value, reason: newBlockedDateReason.value });
+    newBlockedDateInput.value = '';
+    newBlockedDateReason.value = '';
+    await loadBlockedDates();
+   } catch (error: any) {
+    showResult(`❌ ${error.message}`, true);
+   }
+  });
+
+  // ---- Blocked slots ----
+  async function loadBlockedSlots() {
+   blockedSlotsList.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
+   try {
+    const { blockedSlots } = await callBookingFunction('list_blocked_slots');
+    if (blockedSlots.length === 0) {
+     blockedSlotsList.innerHTML = '<p class="text-slate-400 text-sm">No blocked slots.</p>';
+     return;
+    }
+    blockedSlotsList.innerHTML = '';
+    blockedSlots.forEach((bs: any) => {
+     const row = document.createElement('div');
+     row.className = 'flex justify-between items-center bg-white border border-slate-200 px-4 py-3';
+     row.innerHTML = `<span class="text-sm font-medium text-slate-800">${bs.blocked_date} at ${bs.time_slot}${bs.reason ? ` -- ${bs.reason}` : ''}</span><button class="text-red-600 text-sm font-semibold hover:underline">Remove</button>`;
+     row.querySelector('button')?.addEventListener('click', async () => {
+      await callBookingFunction('remove_blocked_slot', { id: bs.id });
+      await loadBlockedSlots();
+     });
+     blockedSlotsList.appendChild(row);
+    });
+   } catch (error: any) {
+    blockedSlotsList.innerHTML = `<p class="text-red-600 text-sm">${error.message}</p>`;
+   }
+  }
+
+  addBlockedSlotBtn?.addEventListener('click', async () => {
+   if (!newBlockedSlotDate.value || !newBlockedSlotTime.value) return;
+   try {
+    await callBookingFunction('add_blocked_slot', { blocked_date: newBlockedSlotDate.value, time_slot: newBlockedSlotTime.value, reason: newBlockedSlotReason.value });
+    newBlockedSlotDate.value = '';
+    newBlockedSlotTime.value = '';
+    newBlockedSlotReason.value = '';
+    await loadBlockedSlots();
+   } catch (error: any) {
+    showResult(`❌ ${error.message}`, true);
+   }
+  });
+ });
 </script>
