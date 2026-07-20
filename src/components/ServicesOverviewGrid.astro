@@ -1,0 +1,37 @@
+---
+// Services overview grid for broad/local-intent landing pages that
+// have no single condition to anchor a psychology-specific block
+// around. Reuses ServiceCard (now plain <img>-based with placeholder
+// fallback, since dermatology service photography doesn't exist yet).
+import ServiceCard from './ServiceCard.astro';
+
+const overviewServices = [
+  { image: '/images/services/hair-transplant-fue.jpg', alt: 'Hair transplant procedure', title: 'Hair Transplant (FUE)', description: 'Natural, permanent hair restoration through advanced Follicular Unit Extraction.', link: '/services/hair-transplant-fue' },
+  { image: '/images/services/hair-loss.jpg', alt: 'Hair loss consultation', title: 'Hair Loss Treatment', description: 'Diagnosis and management of hair thinning and hair loss in men and women.', link: '/services/hair-loss' },
+  { image: '/images/services/acne.jpg', alt: 'Acne treatment', title: 'Acne & Acne Scars', description: 'Evidence-based treatment for active acne and post-acne scarring.', link: '/services/acne' },
+  { image: '/images/services/pigmentation.jpg', alt: 'Pigmentation treatment', title: 'Pigmentation & Melasma', description: 'Targeted care for stubborn pigmentation and melasma.', link: '/services/pigmentation' },
+  { image: '/images/services/vitiligo.jpg', alt: 'Vitiligo treatment', title: 'Vitiligo', description: 'Comprehensive, honest management of vitiligo for all skin types.', link: '/services/vitiligo' },
+  { image: '/images/services/psoriasis.jpg', alt: 'Psoriasis and eczema treatment', title: 'Psoriasis & Eczema', description: 'Long-term management of chronic inflammatory skin conditions.', link: '/services/psoriasis' },
+  { image: '/images/services/botox.jpg', alt: 'Cosmetic dermatology', title: 'Botox & Fillers', description: 'Natural-looking anti-ageing treatments from trained dermatologists.', link: '/services/botox' },
+  { image: '/images/services/pediatric-dermatology.jpg', alt: 'Pediatric dermatology', title: 'Pediatric Dermatology', description: "Child-friendly care for eczema, birthmarks, and children's skin conditions.", link: '/services/pediatric-dermatology' },
+];
+---
+
+<section class="py-16 px-6 max-w-7xl mx-auto" id="services">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-4">Complete Skin & Hair Care Under One Roof</h2>
+    <p class="text-lg text-slate-600 max-w-2xl mx-auto">From hair restoration to clinical and cosmetic dermatology -- evidence-based care for every member of your family, right here in KK Nagar.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {overviewServices.map((service) => (
+      <ServiceCard
+        image={service.image}
+        alt={service.alt}
+        title={service.title}
+        description={service.description}
+        link={service.link}
+      />
+    ))}
+  </div>
+</section>

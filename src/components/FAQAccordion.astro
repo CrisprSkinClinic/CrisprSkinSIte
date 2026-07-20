@@ -1,0 +1,50 @@
+---
+// Reusable accordion for service/condition pages. Unlike FAQ.astro
+// (which reads the global faqs collection directly with a limit prop),
+// this takes already-resolved { question, answer } entries -- so it
+// can render content sourced from faqIds (central repo) as well as
+// any inline-written FAQs, with identical markup either way.
+//
+// `entries`: Array<{ question: string, answer: string }>
+// `title`: optional heading override (defaults to "Frequently Asked Questions")
+const { entries, title = "Frequently Asked Questions" } = Astro.props;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": entries.map((faq) => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer,
+    },
+  })),
+};
+---
+
+{entries && entries.length > 0 && (
+  <>
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
+      <h2 class="text-2xl font-bold text-brand-900 mb-6">{title}</h2>
+
+      <div class="space-y-4">
+        {entries.map((faq) => (
+          <details class="group bg-champagne-50 rounded-lg border border-slate-200 overflow-hidden">
+            <summary class="flex items-center justify-between cursor-pointer p-6 font-bold text-lg text-slate-900 group-hover:text-brand-600 transition">
+              {faq.question}
+              <span class="transition group-open:rotate-180">
+                <svg fill="none" height="24" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+              </span>
+            </summary>
+            <div class="p-6 pt-0 text-slate-600 leading-relaxed border-t border-slate-100 mt-2">
+              {faq.answer}
+            </div>
+          </details>
+        ))}
+      </div>
+    </section>
+  </>
+)}

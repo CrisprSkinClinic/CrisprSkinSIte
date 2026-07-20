@@ -1,0 +1,83 @@
+---
+// src/components/RequestForm.astro
+---
+
+<div class="max-w-2xl mx-auto p-8 md:p-10 bg-white rounded-3xl shadow-xl border border-slate-100">
+
+  <form
+    name="appointment-request"
+    method="POST"
+    data-netlify="true"
+    action="/success"
+    class="space-y-5"
+  >
+    <!-- Required hidden field so Netlify's build-time form detection picks this up -->
+    <input type="hidden" name="form-name" value="appointment-request" />
+
+    <div class="flex gap-3">
+      <select name="prefix" class="p-3 rounded-xl bg-champagne-50 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-1/4">
+        <option value="Mr.">Mr.</option>
+        <option value="Ms.">Ms.</option>
+        <option value="Mrs.">Mrs.</option>
+        <option value="Dr.">Dr.</option>
+      </select>
+      <input
+        type="text"
+        name="fullName"
+        placeholder="Full Name"
+        required
+        class="p-3 rounded-xl bg-champagne-50 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-3/4"
+      />
+    </div>
+
+    <input
+      type="tel"
+      name="phone"
+      placeholder="Mobile Number (+91...)"
+      required
+      class="w-full p-3 rounded-xl bg-champagne-50 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none"
+    />
+
+    <select
+      name="service"
+      required
+      class="w-full p-3 rounded-xl bg-champagne-50 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none"
+    >
+      <option value="" disabled selected>Select Service...</option>
+      <option value="General Consultation">General Dermatology Consultation</option>
+      <option value="Hair Transplant (FUE)">Hair Transplant (FUE)</option>
+      <option value="Hair Loss">Hair Loss Treatment</option>
+      <option value="Acne">Acne Treatment</option>
+      <option value="Pigmentation">Pigmentation / Melasma</option>
+      <option value="Vitiligo">Vitiligo</option>
+      <option value="Psoriasis / Eczema">Psoriasis / Eczema</option>
+      <option value="Cosmetic Dermatology">Cosmetic Dermatology (Botox/Fillers/Peels)</option>
+      <option value="Pediatric Dermatology">Pediatric Dermatology</option>
+      <option value="Other / Not Sure">Other / Not Sure</option>
+    </select>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-600 mb-1">Preferred Date (optional)</label>
+      <input
+        type="date"
+        name="preferredDate"
+        class="w-full p-3 rounded-xl bg-champagne-50 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none"
+      />
+    </div>
+
+    <textarea
+      name="notes"
+      placeholder="Anything you'd like us to know (optional)"
+      rows="3"
+      class="w-full p-3 rounded-xl bg-champagne-50 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none resize-none"
+    ></textarea>
+
+    <button
+      type="submit"
+      class="w-full py-4 bg-brand-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-800 transition"
+    >
+      Send Appointment Request
+    </button>
+  </form>
+
+</div>
