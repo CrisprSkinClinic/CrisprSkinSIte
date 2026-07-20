@@ -1,0 +1,42 @@
+---
+// src/components/ClinicGallery.astro
+// Clinic interior photos, sourced from public/images/clinic/ once real
+// photography is available. Uses plain <img> with onerror fallback
+// (rather than eye-care site's astro:assets Image imports of files
+// that don't exist for this clinic) so the site builds cleanly before
+// photos are supplied -- swap to Image imports once real files land.
+import { siteConfig } from '../config/site.js';
+
+const photos = [
+  { src: '/images/clinic/consultation-room.jpg', alt: `Consultation room at ${siteConfig.name}` },
+  { src: '/images/clinic/reception.jpg', alt: `Reception area at ${siteConfig.name}` },
+  { src: '/images/clinic/waiting-area.jpg', alt: `Patient waiting area at ${siteConfig.name}` },
+  { src: '/images/clinic/procedure-room.jpg', alt: `Procedure room at ${siteConfig.name}` },
+  { src: '/images/clinic/hair-transplant-suite.jpg', alt: `Hair transplant suite at ${siteConfig.name}` },
+  { src: '/images/clinic/laser-room.jpg', alt: `Laser & aesthetic treatment room at ${siteConfig.name}` },
+  { src: '/images/clinic/hallway.jpg', alt: `Clinic interior at ${siteConfig.name}` },
+];
+---
+
+<section class="py-16 px-6 bg-white border-t border-champagne-200">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-3 tracking-tight">Visit Our Clinic</h2>
+      <p class="text-lg text-slate-600">A look inside {siteConfig.name}, KK Nagar.</p>
+    </div>
+
+    <div class="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth -mx-6 px-6 md:mx-0 md:px-0">
+      {photos.map((photo) => (
+        <div class="shrink-0 w-72 sm:w-80 snap-start">
+          <img
+            src={photo.src}
+            alt={photo.alt}
+            class="w-full h-56 object-cover rounded-2xl shadow-md border border-champagne-200 bg-champagne-50"
+            loading="lazy"
+            onerror={`this.onerror=null;this.src='https://placehold.co/480x360/E9DDCF/223154?text=${encodeURIComponent(siteConfig.name)}'`}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

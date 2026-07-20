@@ -1,0 +1,262 @@
+---
+// src/components/BookingCalendar.astro
+const { defaultService } = Astro.props;
+---
+
+<div
+  id="bookingCalendarRoot"
+  data-default-service={defaultService || ''}
+  class="max-w-5xl mx-auto p-8 bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl flex flex-col md:flex-row gap-8"
+>
+
+  <div class="md:w-1/2 space-y-5 pr-0 md:pr-8 border-b md:border-b-0 md:border-r border-slate-200/60 pb-8 md:pb-0">
+    <h3 class="text-2xl font-bold text-brand-900 mb-6">Patient Details</h3>
+
+    <div class="flex gap-3">
+      <select id="prefix" class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-1/4">
+        <option value="Mr.">Mr.</option>
+        <option value="Ms.">Ms.</option>
+        <option value="Mrs.">Mrs.</option>
+        <option value="Dr.">Dr.</option>
+      </select>
+      <input type="text" id="firstName" placeholder="First Name" required class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-3/4" />
+    </div>
+
+    <input type="text" id="lastName" placeholder="Last Name" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+    <input type="tel" id="phone" placeholder="Mobile Number (+91...)" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+
+    <select id="service" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
+      <option value="" disabled>Select Service...</option>
+      <option value="General Consultation">General Dermatology Consultation</option>
+      <optgroup label="Hair">
+        <option value="Hair Transplant (FUE)">Hair Transplant (FUE)</option>
+        <option value="Hair Loss">Hair Loss</option>
+        <option value="Female Hair Loss">Female Hair Loss</option>
+        <option value="Alopecia Areata">Alopecia Areata</option>
+        <option value="Dandruff">Dandruff</option>
+      </optgroup>
+      <optgroup label="Skin">
+        <option value="Acne">Acne</option>
+        <option value="Acne Scars">Acne Scars</option>
+        <option value="Pigmentation">Pigmentation</option>
+        <option value="Melasma">Melasma</option>
+        <option value="Vitiligo">Vitiligo</option>
+        <option value="Psoriasis">Psoriasis</option>
+        <option value="Eczema">Eczema</option>
+        <option value="Urticaria">Urticaria</option>
+        <option value="Skin Allergy">Skin Allergy</option>
+        <option value="Fungal Infections">Fungal Infections</option>
+        <option value="Warts, Moles & Skin Tags">Warts, Moles & Skin Tags</option>
+        <option value="Nail Disorders">Nail Disorders</option>
+      </optgroup>
+      <optgroup label="Cosmetic">
+        <option value="Chemical Peels">Chemical Peels</option>
+        <option value="Botox">Botox</option>
+        <option value="Fillers">Fillers</option>
+        <option value="Laser Hair Reduction">Laser Hair Reduction</option>
+        <option value="Anti-ageing">Anti-ageing</option>
+        <option value="Skin Rejuvenation">Skin Rejuvenation</option>
+      </optgroup>
+      <optgroup label="Pediatric">
+        <option value="Pediatric Dermatology">Pediatric Dermatology</option>
+        <option value="Birthmarks">Birthmarks</option>
+        <option value="Atopic Dermatitis">Atopic Dermatitis</option>
+        <option value="Viral Skin Infections">Viral Skin Infections</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div class="md:w-1/2 flex flex-col">
+    <h3 class="text-2xl font-bold text-brand-900 mb-6">Select Slot</h3>
+
+    <input type="date" id="date" required class="w-full p-3 mb-6 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+
+    <div id="slotsContainer" class="grid grid-cols-2 gap-3 mb-8">
+      <p class="col-span-2 text-slate-400 text-sm">Select a date to see available times.</p>
+    </div>
+
+    <button id="confirmBtn" class="mt-auto w-full py-4 bg-brand-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-800 transition disabled:opacity-50">
+      Confirm Appointment
+    </button>
+
+    <div id="successMessage" class="hidden mt-4 text-center p-3 bg-green-100 text-green-800 rounded-lg font-medium">
+      Appointment confirmed successfully!
+    </div>
+
+    <div id="errorMessage" class="hidden mt-4 text-center p-3 bg-red-100 text-red-800 rounded-lg font-medium"></div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    let selectedTime = "";
+
+    const root = document.getElementById('bookingCalendarRoot');
+    const dateInput = document.getElementById('date');
+    const slotsContainer = document.getElementById('slotsContainer');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const serviceSelect = document.getElementById('service');
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (dateInput) {
+      dateInput.min = todayStr;
+      dateInput.value = todayStr;
+    }
+
+    // Pre-select the service based on which landing page (or service
+    // page) this booking form is embedded in, read from the
+    // data-default-service attribute set in the frontmatter above.
+    // Falls back to the placeholder if the value doesn't match any option.
+    const defaultService = root?.dataset.defaultService;
+    if (serviceSelect && defaultService) {
+      const matchingOption = Array.from(serviceSelect.options).find(
+        (opt) => opt.value === defaultService
+      );
+      if (matchingOption) {
+        serviceSelect.value = defaultService;
+      }
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage?.classList.remove('hidden');
+    }
+
+    function renderSlots(displayTimes) {
+      selectedTime = "";
+      if (displayTimes.length === 0) {
+        slotsContainer.innerHTML = '<p class="col-span-2 text-slate-500 text-sm">No slots available on this date. Please try another day, or call us directly.</p>';
+        return;
+      }
+      slotsContainer.innerHTML = '';
+      displayTimes.forEach((time, index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'time-slot py-3 border border-brand-200 rounded-lg text-brand-800 hover:bg-brand-50 transition font-medium';
+        btn.textContent = time;
+        btn.dataset.time = time;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.time-slot').forEach((b) => b.classList.remove('bg-brand-600', 'text-white'));
+          btn.classList.add('bg-brand-600', 'text-white');
+          selectedTime = time;
+        });
+        slotsContainer.appendChild(btn);
+
+        // Auto-select the first available slot, while still letting
+        // the user click a different one afterward.
+        if (index === 0) {
+          btn.classList.add('bg-brand-600', 'text-white');
+          selectedTime = time;
+        }
+      });
+    }
+
+    // Fetches available slots from the public-available-slots Netlify
+    // Function, which computes availability against AppointmentManager's
+    // real slot_templates/schedule_overrides/appointments tables --
+    // replacing the old direct queries against eye-clinic-site's own,
+    // now-stale schedule_sessions/blocked_dates/blocked_slots tables.
+    async function loadAvailableSlots(dateStr) {
+      slotsContainer.innerHTML = '<p class="col-span-2 text-slate-400 text-sm">Checking availability...</p>';
+      errorMessage?.classList.add('hidden');
+
+      try {
+        const response = await fetch(`/.netlify/functions/public-available-slots?date=${encodeURIComponent(dateStr)}`);
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error || 'Could not load availability.');
+        }
+
+        if (data.reason) {
+          slotsContainer.innerHTML = `<p class="col-span-2 text-slate-500 text-sm">${data.reason}</p>`;
+          return;
+        }
+
+        const displayTimes = (data.slots || []).map((s) => s.display);
+        renderSlots(displayTimes);
+      } catch (err) {
+        console.error("Error loading availability:", err);
+        slotsContainer.innerHTML = '<p class="col-span-2 text-red-500 text-sm">Could not load availability. Please try again.</p>';
+      }
+    }
+
+    dateInput?.addEventListener('change', (e) => {
+      const selectedDate = e.target.value;
+      if (selectedDate) loadAvailableSlots(selectedDate);
+    });
+
+    // Load today's slots immediately on page load, since the date is
+    // pre-populated rather than waiting for the user to pick one.
+    if (dateInput?.value) {
+      loadAvailableSlots(dateInput.value);
+    }
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        const prefix = document.getElementById('prefix').value;
+        const fName = document.getElementById('firstName').value;
+        const lName = document.getElementById('lastName').value;
+        const phone = document.getElementById('phone').value;
+        const service = document.getElementById('service').value;
+        const date = dateInput.value;
+
+        errorMessage?.classList.add('hidden');
+
+        if (!fName || !phone || !service || !date || !selectedTime) {
+          showError("Please fill in all details and select an available time slot.");
+          return;
+        }
+
+        // patients.name in AppointmentManager is a single text column,
+        // so prefix/first/last are concatenated here -- the split-name
+        // concept ends at this form layer.
+        const name = `${prefix} ${fName} ${lName}`.trim();
+
+        try {
+          confirmBtn.innerText = "Securing Slot...";
+          confirmBtn.disabled = true;
+
+          const response = await fetch('/.netlify/functions/public-book-appointment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name,
+              phone,
+              service,
+              date,
+              time: selectedTime,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result.success) {
+            throw new Error(result.error || "Could not complete your booking. Please try again or call us directly.");
+          }
+
+          // Temporary diagnostic -- remove once booking_completed is
+          // confirmed showing up correctly in GA4 Realtime.
+          console.log('Booking success block reached, about to fire gtag');
+          window.gtag?.('event', 'booking_test');
+
+          window.gtag?.('event', 'booking_completed', {
+            event_category: 'conversion',
+            event_label: service,
+          });
+
+          successMessage?.classList.remove('hidden');
+          confirmBtn.style.display = 'none';
+
+        } catch (err) {
+          console.error("Error booking:", err);
+          showError(err.message || "Could not complete your booking. Please try again or call us directly.");
+          confirmBtn.innerText = "Confirm Appointment";
+          confirmBtn.disabled = false;
+        }
+      });
+    }
+  });
+</script>

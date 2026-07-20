@@ -1,0 +1,207 @@
+---
+import { siteConfig } from '../config/site.js';
+---
+<header class="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/85 border-b border-slate-200/50 shadow-sm transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+
+    <a href="/" class="flex flex-col justify-center group">
+      <span class="text-2xl font-extrabold text-brand-900 tracking-tight leading-none group-hover:text-brand-700 transition-colors">{siteConfig.name}</span>
+      <span class="text-[0.65rem] font-bold text-slate-500 uppercase tracking-widest mt-1">Dermatology &middot; Hair &middot; Aesthetics</span>
+    </a>
+
+    <nav class="hidden lg:flex space-x-6 items-center">
+      <a href="/" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Home</a>
+
+      <div class="relative group">
+        <button class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors flex items-center gap-1">
+          Services
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 hidden group-hover:block">
+          <div class="bg-white rounded-xl shadow-xl border border-champagne-200 py-6 px-6 w-[720px] grid grid-cols-4 gap-6">
+            <div>
+              <a href="/hair" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Hair</a>
+              <div class="flex flex-col gap-2">
+                <a href="/services/hair-transplant-fue" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Hair Transplant (FUE)</a>
+                <a href="/services/hair-loss" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Hair Loss</a>
+                <a href="/services/female-hair-loss" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Female Hair Loss</a>
+                <a href="/services/alopecia-areata" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Alopecia Areata</a>
+                <a href="/services/dandruff" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Dandruff</a>
+              </div>
+            </div>
+            <div>
+              <a href="/skin" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Skin</a>
+              <div class="flex flex-col gap-2">
+                <a href="/services/acne" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Acne</a>
+                <a href="/services/acne-scars" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Acne Scars</a>
+                <a href="/services/pigmentation" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Pigmentation</a>
+                <a href="/services/melasma" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Melasma</a>
+                <a href="/services/vitiligo" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Vitiligo</a>
+                <a href="/services/psoriasis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Psoriasis</a>
+                <a href="/services/eczema" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Eczema</a>
+                <a href="/services/urticaria" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Urticaria</a>
+                <a href="/services/skin-allergy" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Skin Allergy</a>
+                <a href="/services/fungal-infections" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Fungal Infections</a>
+                <a href="/services/warts-moles-skin-tags" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Warts, Moles & Skin Tags</a>
+                <a href="/services/nail-disorders" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Nail Disorders</a>
+              </div>
+            </div>
+            <div>
+              <a href="/cosmetic" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Cosmetic</a>
+              <div class="flex flex-col gap-2">
+                <a href="/services/chemical-peels" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Chemical Peels</a>
+                <a href="/services/botox" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Botox</a>
+                <a href="/services/fillers" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Fillers</a>
+                <a href="/services/laser-hair-reduction" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Laser Hair Reduction</a>
+                <a href="/services/anti-ageing" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Anti-ageing</a>
+                <a href="/services/skin-rejuvenation" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Skin Rejuvenation</a>
+              </div>
+            </div>
+            <div>
+              <a href="/pediatric" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Pediatric</a>
+              <div class="flex flex-col gap-2">
+                <a href="/services/pediatric-dermatology" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Pediatric Dermatology</a>
+                <a href="/services/birthmarks" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Birthmarks</a>
+                <a href="/services/atopic-dermatitis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Atopic Dermatitis</a>
+                <a href="/services/viral-skin-infections" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Viral Skin Infections</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a href="/our-doctors" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Our Doctors</a>
+      <a href="/faq" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">FAQ</a>
+      <a href="/blog" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Blog</a>
+      <a href="/contact" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Contact</a>
+    </nav>
+
+    <a href="/book" data-track="booking-click" class="hidden lg:inline-block bg-gold-500 text-brand-900 text-sm font-bold px-6 py-2.5 rounded-full shadow-md hover:bg-gold-600 hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+      Book Now
+    </a>
+
+    <button id="mobileMenuBtn" class="lg:hidden p-2 text-slate-600 hover:text-brand-600 transition-colors" aria-label="Toggle Menu" aria-expanded="false">
+      <svg id="menuIconOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg id="menuIconClose" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile menu panel -->
+  <div id="mobileMenuPanel" class="hidden lg:hidden border-t border-slate-200 bg-white max-h-[calc(100vh-5rem)] overflow-y-auto">
+    <nav class="px-6 py-4 flex flex-col gap-1">
+      <a href="/" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Home</a>
+
+      <button id="mobileServicesToggle" class="w-full flex items-center justify-between py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors" aria-expanded="false">
+        <span>Services</span>
+        <svg id="mobileServicesChevron" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="mobileServicesSubmenu" class="hidden flex-col gap-4 pl-4 border-l border-champagne-200 ml-1">
+        <div>
+          <a href="/hair" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Hair</a>
+          <div class="flex flex-col gap-1">
+            <a href="/services/hair-transplant-fue" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Hair Transplant (FUE)</a>
+            <a href="/services/hair-loss" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Hair Loss</a>
+            <a href="/services/female-hair-loss" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Female Hair Loss</a>
+            <a href="/services/alopecia-areata" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Alopecia Areata</a>
+            <a href="/services/dandruff" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Dandruff</a>
+          </div>
+        </div>
+        <div>
+          <a href="/skin" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Skin</a>
+          <div class="flex flex-col gap-1">
+            <a href="/services/acne" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Acne</a>
+            <a href="/services/acne-scars" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Acne Scars</a>
+            <a href="/services/pigmentation" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Pigmentation</a>
+            <a href="/services/melasma" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Melasma</a>
+            <a href="/services/vitiligo" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Vitiligo</a>
+            <a href="/services/psoriasis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Psoriasis</a>
+            <a href="/services/eczema" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Eczema</a>
+            <a href="/services/urticaria" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Urticaria</a>
+            <a href="/services/skin-allergy" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Skin Allergy</a>
+            <a href="/services/fungal-infections" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Fungal Infections</a>
+            <a href="/services/warts-moles-skin-tags" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Warts, Moles & Skin Tags</a>
+            <a href="/services/nail-disorders" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Nail Disorders</a>
+          </div>
+        </div>
+        <div>
+          <a href="/cosmetic" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Cosmetic</a>
+          <div class="flex flex-col gap-1">
+            <a href="/services/chemical-peels" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Chemical Peels</a>
+            <a href="/services/botox" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Botox</a>
+            <a href="/services/fillers" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Fillers</a>
+            <a href="/services/laser-hair-reduction" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Laser Hair Reduction</a>
+            <a href="/services/anti-ageing" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Anti-ageing</a>
+            <a href="/services/skin-rejuvenation" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Skin Rejuvenation</a>
+          </div>
+        </div>
+        <div>
+          <a href="/pediatric" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Pediatric</a>
+          <div class="flex flex-col gap-1">
+            <a href="/services/pediatric-dermatology" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Pediatric Dermatology</a>
+            <a href="/services/birthmarks" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Birthmarks</a>
+            <a href="/services/atopic-dermatitis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Atopic Dermatitis</a>
+            <a href="/services/viral-skin-infections" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Viral Skin Infections</a>
+          </div>
+        </div>
+      </div>
+
+      <a href="/our-doctors" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Our Doctors</a>
+      <a href="/faq" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">FAQ</a>
+      <a href="/blog" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Blog</a>
+      <a href="/contact" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Contact</a>
+      <a href="/book" data-track="booking-click" class="mt-3 bg-gold-500 text-brand-900 text-sm font-bold px-6 py-3 rounded-full text-center shadow-md hover:bg-gold-600 transition-colors">Book Now</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const btn = document.getElementById('mobileMenuBtn');
+    const panel = document.getElementById('mobileMenuPanel');
+    const iconOpen = document.getElementById('menuIconOpen');
+    const iconClose = document.getElementById('menuIconClose');
+
+    if (!btn || !panel || !iconOpen || !iconClose) return;
+
+    btn.addEventListener('click', () => {
+      const isHidden = panel.classList.contains('hidden');
+      panel.classList.toggle('hidden');
+      iconOpen.classList.toggle('hidden');
+      iconClose.classList.toggle('hidden');
+      btn.setAttribute('aria-expanded', String(isHidden));
+    });
+
+    // Close menu when a top-level link inside it is tapped
+    // (excludes the Services toggle button itself, and excludes links
+    // inside the services submenu, which are handled separately below
+    // so tapping a service link closes the WHOLE mobile menu, not just
+    // the submenu).
+    panel.querySelectorAll('nav > a, #mobileServicesSubmenu a').forEach((link) => {
+      link.addEventListener('click', () => {
+        panel.classList.add('hidden');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // Services submenu tap-to-expand
+    const servicesToggle = document.getElementById('mobileServicesToggle');
+    const servicesSubmenu = document.getElementById('mobileServicesSubmenu');
+    const servicesChevron = document.getElementById('mobileServicesChevron');
+
+    if (servicesToggle && servicesSubmenu && servicesChevron) {
+      servicesToggle.addEventListener('click', () => {
+        const isHidden = servicesSubmenu.classList.contains('hidden');
+        servicesSubmenu.classList.toggle('hidden');
+        servicesSubmenu.classList.toggle('flex');
+        servicesChevron.classList.toggle('rotate-180');
+        servicesToggle.setAttribute('aria-expanded', String(isHidden));
+      });
+    }
+  });
+</script>

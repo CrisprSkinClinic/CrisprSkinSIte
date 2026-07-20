@@ -1,0 +1,46 @@
+---
+// src/components/Breadcrumbs.astro
+//
+// Renders both a visible breadcrumb trail AND BreadcrumbList JSON-LD schema.
+// Usage: <Breadcrumbs items={[{ name: "Services", url: "/services" }, { name: "Cataract Surgery", url: "/services/cataract" }]} />
+// "Home" is always prepended automatically -- don't include it in items.
+
+import { siteConfig } from '../config/site.js';
+
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+const { items = [] } = Astro.props as { items: BreadcrumbItem[] };
+
+const allItems = [{ name: "Home", url: "/" }, ...items];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": allItems.map((item, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": item.name,
+    "item": new URL(item.url, siteConfig.url).toString(),
+  })),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+<nav aria-label="Breadcrumb" class="max-w-4xl mx-auto px-6 pt-6 text-sm leading-none">
+  <ol class="flex items-center flex-wrap gap-1 text-slate-500 leading-none">
+    {allItems.map((item, index) => (
+      <li class="flex items-center gap-1 leading-none">
+        {index > 0 && <span class="mx-1 text-slate-300">/</span>}
+        {index === allItems.length - 1 ? (
+          <span class="font-semibold text-slate-700 leading-none">{item.name}</span>
+        ) : (
+          <a href={item.url} class="hover:text-brand-600 transition-colors inline-block leading-none">{item.name}</a>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>

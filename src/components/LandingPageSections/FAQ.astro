@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+
+const { limit } = Astro.props;
+
+const allFaqs = await getCollection('faqs');
+const sortedAll = allFaqs.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+const sortedFaqs = limit ? sortedAll.slice(0, limit) : sortedAll;
+
+// This creates the invisible SEO code for Google
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": sortedFaqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.data.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.body // This pulls the Markdown content
+    }
+  }))
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+<section class="py-20 px-6 bg-white border-t border-slate-200">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold text-brand-900 mb-10 text-center">Frequently Asked Questions</h2>
+    
+    <div class="space-y-4">
+      {sortedFaqs.map((faq) => (
+        <details class="group bg-champagne-50 rounded-lg border border-slate-200 overflow-hidden">
+          <summary class="flex items-center justify-between cursor-pointer p-6 font-bold text-lg text-slate-900 group-hover:text-brand-600 transition">
+            {faq.data.question}
+            <span class="transition group-open:rotate-180">
+              <svg fill="none" height="24" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+            </span>
+          </summary>
+          <div class="p-6 pt-0 text-slate-600 leading-relaxed border-t border-slate-100 mt-2">
+            {faq.body}
+          </div>
+        </details>
+      ))}
+    </div>
+
+    {limit && allFaqs.length > limit && (
+      <div class="text-center mt-8">
+        <a href="/faq" class="inline-flex items-center gap-1 text-brand-600 font-bold hover:underline">
+          View All FAQs <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    )}
+  </div>
+</section>
