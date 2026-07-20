@@ -4,46 +4,51 @@ export default {
   theme: {
     extend: {
       colors: {
-        // "Warm Luxury" brand palette for CRISPR Skin and Hair Clinic.
-        // `brand` (deep forest green) replaces the eye-care site's `blue`
-        // usage 1:1 -- same shade numbers (600/700/900 etc.) so existing
-        // component classes like `blue-900` can be mechanically swapped
-        // to `brand-900` without redesigning each component's contrast.
+        // "Medically Authentic" palette for CRISPR Skin and Hair Clinic.
+        // Deep Plum accent ties back to the clinic's existing logo, kept
+        // to ONE accent color -- executed flat (hairline borders, no
+        // shadows, no soft rounded corners) rather than the soft/rounded
+        // "beauty clinic" treatment the same plum is often paired with.
+        // The user was explicit: authentic and medical, not a spa.
+        // `brand` keeps its name so existing component classes
+        // (brand-600, brand-900, etc.) resolve unchanged.
         brand: {
-          50: '#EAF0EC',
-          100: '#D2E0D7',
-          200: '#A8C4B1',
-          300: '#7EA88B',
-          400: '#4E8064',
-          500: '#345E48',
-          600: '#2A5140',
-          700: '#234B3A', // primary -- Deep Forest Green
-          800: '#1C3C2E',
-          900: '#152D23',
-          950: '#0D1D16',
+          50: '#F3F0F6',
+          100: '#E4DCEB',
+          200: '#C7B4D6',
+          300: '#A587BD',
+          400: '#8768A3',
+          500: '#6B4A8F', // primary accent -- Deep Plum
+          600: '#5A3D78',
+          700: '#4A3263',
+          800: '#3A274E',
+          900: '#1A1D1F', // near-black ink, cool undertone -- doubles as darkest brand shade
+          950: '#0F1112',
         },
-        // Champagne Beige -- secondary surfaces, subtle backgrounds
-        champagne: {
-          50: '#FDFCFA',
-          100: '#F7F2EB',
-          200: '#E9DDCF', // secondary
-          300: '#DBC9B3',
-          400: '#CCB496',
+        // Warm paper -- neutral section-alternation background.
+        paper: {
+          DEFAULT: '#F5F4F1',
+          50: '#FAF9F7',
+          100: '#F5F4F1',
+          200: '#EAE7E2',
         },
-        // Warm White -- page background (replaces slate-50)
-        warmwhite: '#FAF8F5',
-        // Charcoal -- body text (replaces slate-800/900 for text)
-        charcoal: '#2F2F2F',
-        // Soft Gold -- accents, CTAs, highlights, hover states
-        gold: {
-          50: '#FAF6EC',
-          100: '#F1E7CC',
-          300: '#D4BE8C',
-          400: '#C4AC77',
-          500: '#B89B5E', // accent -- Soft Gold
-          600: '#A08549',
-          700: '#856D3B',
+        // Warm grey -- secondary text, hairline borders, quiet UI.
+        stone: {
+          400: '#A6A199',
+          500: '#8A8578',
+          600: '#6B675D',
         },
+        ink: '#1A1D1F', // primary text color -- cool near-black, not warm charcoal
+      },
+      fontFamily: {
+        // Display: a real serif with character, used only for headlines
+        // -- not the same grotesk as the body. Fraunces is distinctive,
+        // has a soft/warm optical feel appropriate to skin & hair care,
+        // and is not the generic "premium serif" default (Playfair).
+        display: ['"Fraunces"', 'ui-serif', 'Georgia', 'serif'],
+        // Body/UI: a clean, slightly narrow grotesk for readability and
+        // a calm clinical tone.
+        sans: ['"Inter"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

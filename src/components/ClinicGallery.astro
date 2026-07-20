@@ -18,11 +18,11 @@ const photos = [
 ];
 ---
 
-<section class="py-16 px-6 bg-white border-t border-champagne-200">
+<section class="py-24 px-6 bg-white border-t border-stone-400/15">
   <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-10">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-3 tracking-tight">Visit Our Clinic</h2>
-      <p class="text-lg text-slate-600">A look inside {siteConfig.name}, KK Nagar.</p>
+    <div class="text-center mb-12">
+      <h2 class="font-display text-3xl md:text-4xl font-medium text-ink mb-3 tracking-tight">Visit Our Clinic</h2>
+      <p class="text-lg text-stone-600">A look inside {siteConfig.name}, KK Nagar.</p>
     </div>
 
     <div class="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth -mx-6 px-6 md:mx-0 md:px-0">
@@ -31,9 +31,9 @@ const photos = [
           <img
             src={photo.src}
             alt={photo.alt}
-            class="w-full h-56 object-cover rounded-2xl shadow-md border border-champagne-200 bg-champagne-50"
+            class="w-full h-56 object-cover border border-stone-400/15 bg-paper-50"
             loading="lazy"
-            onerror={`this.onerror=null;this.src='https://placehold.co/480x360/E9DDCF/234B3A?text=${encodeURIComponent(siteConfig.name)}'`}
+            onerror={`this.onerror=null;this.src='https://placehold.co/480x360/F3F0F6/1A1D1F?text=${encodeURIComponent(siteConfig.name)}'`}
           />
         </div>
       ))}

@@ -16,12 +16,12 @@ import { siteConfig } from '../config/site.js';
 // Swap to optimized Image imports once real photography lands in
 // public/images/services/.
 const featuredServices = [
-  { image: '/images/services/hair-transplant-fue.jpg', alt: 'Hair transplant procedure', title: 'Hair Transplant (FUE)', description: 'Advanced Follicular Unit Extraction for natural, permanent hair restoration performed by a dedicated hair transplant surgeon.', link: '/services/hair-transplant-fue' },
-  { image: '/images/services/acne.jpg', alt: 'Acne treatment consultation', title: 'Acne & Acne Scars', description: 'Evidence-based treatment for active acne and the scarring it leaves behind, tailored to your skin type.', link: '/services/acne' },
-  { image: '/images/services/pigmentation.jpg', alt: 'Skin pigmentation treatment', title: 'Pigmentation & Melasma', description: 'Targeted treatment for stubborn pigmentation and melasma using dermatologist-guided regimens.', link: '/services/pigmentation' },
-  { image: '/images/services/vitiligo.jpg', alt: 'Vitiligo treatment', title: 'Vitiligo', description: 'Comprehensive evaluation and long-term management of vitiligo with realistic, honest expectations.', link: '/services/vitiligo' },
-  { image: '/images/services/botox.jpg', alt: 'Cosmetic dermatology treatment', title: 'Botox & Fillers', description: 'Subtle, natural-looking anti-ageing and rejuvenation treatments administered by trained dermatologists.', link: '/services/botox' },
-  { image: '/images/services/pediatric-dermatology.jpg', alt: 'Pediatric dermatology consultation', title: 'Pediatric Dermatology', description: "A child-friendly approach to eczema, birthmarks, and other skin conditions in infants and children.", link: '/services/pediatric-dermatology' },
+ { image: '/images/services/hair-transplant-fue.jpg', alt: 'Hair transplant procedure', title: 'Hair Transplant (FUE)', description: 'Advanced Follicular Unit Extraction for natural, permanent hair restoration performed by a dedicated hair transplant surgeon.', link: '/services/hair-transplant-fue' },
+ { image: '/images/services/acne.jpg', alt: 'Acne treatment consultation', title: 'Acne & Acne Scars', description: 'Evidence-based treatment for active acne and the scarring it leaves behind, tailored to your skin type.', link: '/services/acne' },
+ { image: '/images/services/pigmentation.jpg', alt: 'Skin pigmentation treatment', title: 'Pigmentation & Melasma', description: 'Targeted treatment for stubborn pigmentation and melasma using dermatologist-guided regimens.', link: '/services/pigmentation' },
+ { image: '/images/services/vitiligo.jpg', alt: 'Vitiligo treatment', title: 'Vitiligo', description: 'Comprehensive evaluation and long-term management of vitiligo with realistic, honest expectations.', link: '/services/vitiligo' },
+ { image: '/images/services/botox.jpg', alt: 'Cosmetic dermatology treatment', title: 'Botox & Fillers', description: 'Subtle, natural-looking anti-ageing and rejuvenation treatments administered by trained dermatologists.', link: '/services/botox' },
+ { image: '/images/services/pediatric-dermatology.jpg', alt: 'Pediatric dermatology consultation', title: 'Pediatric Dermatology', description: "A child-friendly approach to eczema, birthmarks, and other skin conditions in infants and children.", link: '/services/pediatric-dermatology' },
 ];
 
 // SEO Optimized Meta Data (Ranking Booster)
@@ -31,134 +31,138 @@ const pageDescription = siteConfig.description;
 // SAFE FETCH: Get posts, but default to an empty array if none exist to prevent crashes
 const allPosts = await getCollection('blog') || [];
 const latestPosts = allPosts
-  .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf())
-  .slice(0, 3);
+ .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf())
+ .slice(0, 3);
 ---
 
 <MainLayout title={pageTitle} description={pageDescription}>
-  <Hero 
-    title="Skin, Hair & Aesthetic Dermatology Specialists" 
-    subtitle="AIIMS-trained dermatologists in KK Nagar, Chennai offering hair transplantation, medical dermatology, and cosmetic treatments. Evidence-based care, no unnecessary procedures."
-    doctor={siteConfig.doctor.name}
-    credentials="AIIMS-trained dermatology team"
-    ctaText="Book Consultation"
-    whatsappText="Chat on WhatsApp"
-  />
+ <Hero 
+  title="Skin, Hair & Aesthetic Dermatology Specialists" 
+  subtitle="AIIMS-trained dermatologists in KK Nagar, Chennai offering hair transplantation, medical dermatology, and cosmetic treatments. Evidence-based care, no unnecessary procedures."
+  eyebrow={siteConfig.name}
+  credentials="AIIMS-trained dermatology team"
+  ctaText="Book Consultation"
+  whatsappText="Chat on WhatsApp"
+ />
 
-  <section class="py-16 px-6 max-w-7xl mx-auto" id="services">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-4">Complete Skin & Hair Care Under One Roof</h2>
-      <p class="text-lg text-slate-600 max-w-2xl mx-auto">From hair restoration to clinical and cosmetic dermatology -- evidence-based care for every member of your family, right here in KK Nagar.</p>
+ <section class="py-24 px-6 max-w-7xl mx-auto" id="services">
+  <div class="text-center mb-14">
+   <h2 class="font-display text-3xl md:text-4xl font-medium text-ink mb-4">Complete Skin & Hair Care Under One Roof</h2>
+   <p class="text-lg text-stone-600 max-w-2xl mx-auto">From hair restoration to clinical and cosmetic dermatology -- evidence-based care for every member of your family, right here in KK Nagar.</p>
+  </div>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+   {featuredServices.map((service) => (
+    <ServiceCard 
+     image={service.image}
+     alt={service.alt}
+     title={service.title} 
+     description={service.description}
+     link={service.link}
+    />
+   ))}
+  </div>
+
+  <div class="text-center mt-14">
+   <a href="/services" class="text-sm text-ink border-b border-ink hover:text-brand-600 hover:border-brand-500 transition-colors">View all services &rarr;</a>
+  </div>
+ </section>
+
+ <section class="bg-paper-100 py-20 px-6 border-y border-stone-400/15">
+  <div class="max-w-4xl mx-auto text-center">
+   <h2 class="font-display text-3xl font-medium mb-8 text-ink">Dealing With a Skin or Hair Concern?</h2>
+   <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-10 text-stone-600">
+    <span>Hair Fall</span>
+    <span class="text-stone-300">&middot;</span>
+    <span>Persistent Acne</span>
+    <span class="text-stone-300">&middot;</span>
+    <span>Pigmentation</span>
+    <span class="text-stone-300">&middot;</span>
+    <span>Itchy or Scaly Skin</span>
+    <span class="text-stone-300">&middot;</span>
+    <span>Skin Allergies</span>
+   </div>
+   <p class="text-lg text-stone-600 mb-6">Early diagnosis leads to simpler, more effective treatment.</p>
+   <a href="/book" class="text-sm text-ink border-b border-ink hover:text-brand-600 hover:border-brand-500 transition-colors">Contact us now &rarr;</a>
+  </div>
+ </section>
+
+ <section class="py-24 px-6 max-w-3xl mx-auto text-center">
+  <h2 class="font-display text-3xl font-medium mb-6 text-ink">About Our Team</h2>
+  <p class="text-lg text-stone-600 mb-8 leading-relaxed">
+   Three AIIMS-trained consultant dermatologists with expertise spanning hair transplantation, clinical and cosmetic dermatology, and paediatric skin care. We are committed to providing ethical, evidence-based treatment, prioritizing your long-term skin and hair health over high-volume transactions.
+  </p>
+  <a href="/our-doctors" class="text-sm text-ink border-b border-ink hover:text-brand-600 hover:border-brand-500 transition-colors">Meet Our Doctors &rarr;</a>
+ </section>
+
+ <Testimonials />
+
+ {latestPosts.length > 0 && (
+  <section class="bg-paper-50 py-24 px-6 border-t border-stone-400/15">
+   <div class="max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row justify-between items-center md:items-end mb-14 gap-4 text-center md:text-left">
+     <div>
+      <h2 class="font-display text-3xl font-medium text-ink mb-2">Skin & Hair Health Blog</h2>
+      <p class="text-lg text-stone-600">Patient guides and clinical insights from our doctors.</p>
+     </div>
+     <a href="/blog" class="text-sm text-ink border-b border-ink hover:text-brand-600 hover:border-brand-500 transition-colors hidden md:block">
+      View all posts &rarr;
+     </a>
     </div>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {featuredServices.map((service) => (
-        <ServiceCard 
-          image={service.image}
-          alt={service.alt}
-          title={service.title} 
-          description={service.description}
-          link={service.link}
-        />
-      ))}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+     {latestPosts.map((post) => (
+      <a href={`/blog/${post.slug}`} class="group flex flex-col h-full pt-6 border-t border-stone-400/15">
+       <p class="text-xs text-brand-500 mb-3 uppercase tracking-[0.1em]">
+        {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        {post.data.tags && post.data.tags.length > 0 && (
+         <span class="text-stone-400"> &middot; {post.data.tags[0]}</span>
+        )}
+       </p>
+       <h3 class="font-display text-xl font-medium text-ink mb-3 group-hover:text-brand-600 transition-colors line-clamp-2">
+        {post.data.title}
+       </h3>
+       <p class="text-stone-600 text-sm mb-6 line-clamp-3 flex-grow leading-relaxed">
+        {post.data.description}
+       </p>
+       <span class="text-sm text-ink inline-flex items-center gap-1.5 w-fit">
+        <span class="border-b border-ink group-hover:border-brand-500 group-hover:text-brand-500 transition-colors">Read article</span>
+        <span aria-hidden="true" class="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+       </span>
+      </a>
+     ))}
     </div>
-
-    <div class="text-center mt-10">
-      <a href="/services" class="inline-block text-brand-700 font-bold hover:underline">View all services &rarr;</a>
+    
+    <div class="mt-12 text-center md:hidden">
+      <a href="/blog" class="inline-block border border-ink text-ink text-sm px-8 py-3 w-full hover:bg-ink hover:text-white transition-colors duration-300">View All Posts</a>
     </div>
+   </div>
   </section>
+ )}
 
-  <section class="bg-white py-16 px-6 border-y border-champagne-200">
-    <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl font-bold mb-8 text-brand-900">Dealing With a Skin or Hair Concern?</h2>
-      <div class="flex flex-wrap justify-center gap-4 mb-8">
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Hair Fall</span>
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Persistent Acne</span>
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Pigmentation</span>
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Itchy or Scaly Skin</span>
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Skin Allergies</span>
-      </div>
-      <p class="text-lg text-slate-600 mb-6">Early diagnosis leads to simpler, more effective treatment.</p>
-      <a href="/book" class="text-brand-600 font-bold hover:underline">Contact us now →</a>
-    </div>
-  </section>
-
-  <section class="py-16 px-6 max-w-4xl mx-auto text-center">
-    <h2 class="text-3xl font-bold mb-6 text-brand-900">About Our Team</h2>
-    <p class="text-lg text-slate-700 mb-6 leading-relaxed">
-      Three AIIMS-trained consultant dermatologists with expertise spanning hair transplantation, clinical and cosmetic dermatology, and paediatric skin care. We are committed to providing ethical, evidence-based treatment, prioritizing your long-term skin and hair health over high-volume transactions.
-    </p>
-    <a href="/our-doctors" class="inline-block bg-brand-100 text-brand-800 px-6 py-2 rounded-md font-semibold hover:bg-brand-200 transition">Meet Our Doctors</a>
-  </section>
-
-  <Testimonials />
-
-  {latestPosts.length > 0 && (
-    <section class="bg-champagne-50 py-20 px-6 border-t border-champagne-200">
-      <div class="max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 gap-4 text-center md:text-left">
-          <div>
-            <h2 class="text-3xl font-bold text-brand-900 mb-2">Skin & Hair Health Blog</h2>
-            <p class="text-lg text-slate-600">Patient guides and clinical insights from our doctors.</p>
-          </div>
-          <a href="/blog" class="text-brand-600 font-bold hover:underline flex items-center gap-1 hidden md:flex">
-            View All Posts <span aria-hidden="true">→</span>
-          </a>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {latestPosts.map((post) => (
-            <a href={`/blog/${post.slug}`} class="bg-white rounded-2xl shadow-sm border border-champagne-200 hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full p-6 md:p-8 relative overflow-hidden">
-              <div class="absolute top-0 left-0 w-1.5 h-full bg-brand-600 group-hover:bg-brand-700 transition-colors"></div>
-              <p class="text-xs text-brand-600 mb-3 font-bold uppercase tracking-wider">
-                {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                {post.data.tags && post.data.tags.length > 0 && (
-                  <span class="text-slate-400"> &middot; {post.data.tags[0]}</span>
-                )}
-              </p>
-              <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-brand-600 transition-colors line-clamp-2">
-                {post.data.title}
-              </h3>
-              <p class="text-slate-600 text-sm mb-6 line-clamp-3 flex-grow leading-relaxed">
-                {post.data.description}
-              </p>
-              <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
-                Read Article <span aria-hidden="true">→</span>
-              </span>
-            </a>
-          ))}
-        </div>
-        
-        <div class="mt-10 text-center md:hidden">
-           <a href="/blog" class="inline-block bg-white text-brand-600 font-bold px-8 py-3 rounded-md shadow-sm border border-champagne-200 w-full">View All Posts</a>
-        </div>
-      </div>
-    </section>
-  )}
-
-  <FAQ limit={5} />
+ <FAQ limit={5} />
 
  <ClinicGallery />
 
-  <section class="py-16 px-6 max-w-7xl mx-auto">
-    <div class="text-center mb-10">
-      <h2 class="text-3xl font-bold text-brand-900 mb-4">Find Us in KK Nagar</h2>
-      <p class="text-lg text-slate-600">Conveniently located for patients in Ashok Nagar, Vadapalani, Virugambakkam, and Ramapuram.</p>
-    </div>
-    
-    <div class="w-full aspect-video md:aspect-[21/9] rounded-2xl overflow-hidden shadow-lg border border-champagne-200">
-      <iframe 
-        title={`Google Maps Location for ${siteConfig.name}`}
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.974836067086!2d80.2017997!3d13.0397028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5266cb2eb18fbb%3A0xc6fbef0f8eee3a3f!2s39%2F2%2C%20RK%20Shanmugam%20Salai%2C%20Goutham%20Colony%2C%20K.%20K.%20Nagar%2C%20Chennai%2C%20Tamil%20Nadu%20600078!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
-        width="100%" 
-        height="100%" 
-        style="border:0;" 
-        allowfullscreen="" 
-        loading="lazy" 
-        referrerpolicy="no-referrer-when-downgrade">
-      </iframe>
-    </div>
-  </section>
+ <section class="py-24 px-6 max-w-7xl mx-auto">
+  <div class="text-center mb-12">
+   <h2 class="font-display text-3xl font-medium text-ink mb-4">Find Us in KK Nagar</h2>
+   <p class="text-lg text-stone-600">Conveniently located for patients in Ashok Nagar, Vadapalani, Virugambakkam, and Ramapuram.</p>
+  </div>
+  
+  <div class="w-full aspect-video md:aspect-[21/9] border border-stone-400/15">
+   <iframe 
+    title={`Google Maps Location for ${siteConfig.name}`}
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.974836067086!2d80.2017997!3d13.0397028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5266cb2eb18fbb%3A0xc6fbef0f8eee3a3f!2s39%2F2%2C%20RK%20Shanmugam%20Salai%2C%20Goutham%20Colony%2C%20K.%20K.%20Nagar%2C%20Chennai%2C%20Tamil%20Nadu%20600078!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+    width="100%" 
+    height="100%" 
+    style="border:0;" 
+    allowfullscreen="" 
+    loading="lazy" 
+    referrerpolicy="no-referrer-when-downgrade">
+   </iframe>
+  </div>
+ </section>
 
-  <BookingSection defaultService="General Consultation" />
+ <BookingSection defaultService="General Consultation" />
 </MainLayout>

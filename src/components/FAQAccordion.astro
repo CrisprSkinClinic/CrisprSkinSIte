@@ -27,19 +27,19 @@ const schema = {
   <>
     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
-    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
-      <h2 class="text-2xl font-bold text-brand-900 mb-6">{title}</h2>
+    <section class="py-16 px-6 max-w-3xl mx-auto border-t border-stone-400/15">
+      <h2 class="font-display text-2xl font-medium text-ink mb-8">{title}</h2>
 
-      <div class="space-y-4">
+      <div class="divide-y divide-stone-400/15 border-t border-stone-400/15">
         {entries.map((faq) => (
-          <details class="group bg-champagne-50 rounded-lg border border-slate-200 overflow-hidden">
-            <summary class="flex items-center justify-between cursor-pointer p-6 font-bold text-lg text-slate-900 group-hover:text-brand-600 transition">
+          <details class="group py-6">
+            <summary class="flex items-center justify-between gap-6 cursor-pointer text-base text-ink font-medium list-none">
               {faq.question}
-              <span class="transition group-open:rotate-180">
-                <svg fill="none" height="24" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+              <span class="shrink-0 transition-transform duration-300 group-open:rotate-45 text-brand-500">
+                <svg fill="none" height="18" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="18"><path d="M12 5v14M5 12h14"></path></svg>
               </span>
             </summary>
-            <div class="p-6 pt-0 text-slate-600 leading-relaxed border-t border-slate-100 mt-2">
+            <div class="pt-4 text-stone-600 leading-relaxed">
               {faq.answer}
             </div>
           </details>

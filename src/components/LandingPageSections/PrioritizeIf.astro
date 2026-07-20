@@ -6,22 +6,22 @@
 // should act soon, without fear-based language.
 
 interface Props {
-  reasons: string[];
+ reasons: string[];
 }
 
 const { reasons } = Astro.props;
 ---
 
-<section class="py-10 px-6 bg-white border-t border-slate-100">
-  <div class="max-w-xl mx-auto">
-    <h3 class="text-lg font-bold text-brand-900 mb-5 text-center">You Should Prioritize an Eye Examination If:</h3>
-    <div class="space-y-2">
-      {reasons.map((reason: string) => (
-        <div class="flex items-start gap-2 bg-brand-50 rounded-lg px-4 py-3">
-          <span class="text-brand-500 mt-0.5">•</span>
-          <span class="text-sm text-slate-700 font-medium">{reason}</span>
-        </div>
-      ))}
+<section class="py-10 px-6 bg-white border-t border-stone-400/15">
+ <div class="max-w-xl mx-auto">
+  <h3 class="text-lg font-medium text-ink mb-5 text-center">You Should Prioritize an Eye Examination If:</h3>
+  <div class="space-y-2">
+   {reasons.map((reason: string) => (
+    <div class="flex items-start gap-2 bg-brand-50 px-4 py-3">
+     <span class="text-brand-500 mt-0.5">•</span>
+     <span class="text-sm text-stone-600 font-medium">{reason}</span>
     </div>
+   ))}
   </div>
+ </div>
 </section>

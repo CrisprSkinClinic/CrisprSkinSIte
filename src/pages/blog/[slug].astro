@@ -5,11 +5,11 @@ import { siteConfig } from '../../config/site.js';
 
 // 1. Generate a new path for every collection entry
 export async function getStaticPaths() {
-  const blogEntries = await getCollection('blog');
-  return blogEntries.map(entry => ({
-    params: { slug: entry.slug }, 
-    props: { entry },
-  }));
+ const blogEntries = await getCollection('blog');
+ return blogEntries.map(entry => ({
+  params: { slug: entry.slug }, 
+  props: { entry },
+ }));
 }
 
 // 2. For your template, you can get the entry directly from the prop
@@ -17,46 +17,46 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 
 const relatedCondition = entry.data.condition
-  ? await getEntry('conditions', entry.data.condition)
-  : null;
+ ? await getEntry('conditions', entry.data.condition)
+ : null;
 const relatedService = entry.data.service
-  ? await getEntry('services', entry.data.service)
-  : null;
+ ? await getEntry('services', entry.data.service)
+ : null;
 ---
 
 <MainLayout title={entry.data.title} description={entry.data.description}>
-  <article class="max-w-3xl mx-auto py-16 px-6">
-    <div class="mb-8">
-      <h1 class="text-4xl font-extrabold text-brand-900 mb-4">{entry.data.title}</h1>
-      <p class="text-slate-500 font-medium">
-        By {entry.data.author || siteConfig.doctor.name} 
-        {entry.data.pubDate && ` • ${new Date(entry.data.pubDate).toDateString()}`}
-      </p>
-    </div>
-    
-    <div class="prose prose-slate prose-brand max-w-none">
-      <Content />
-    </div>
+ <article class="max-w-3xl mx-auto py-20 px-6">
+  <div class="mb-10">
+   <h1 class="font-display text-4xl font-medium text-ink mb-4 leading-tight">{entry.data.title}</h1>
+   <p class="text-stone-500 text-sm">
+    By {entry.data.author || `The ${siteConfig.name} Team`} 
+    {entry.data.pubDate && ` • ${new Date(entry.data.pubDate).toDateString()}`}
+   </p>
+  </div>
+  
+  <div class="prose prose-lg max-w-none text-stone-700 prose-headings:font-display prose-headings:font-medium prose-headings:text-ink prose-a:text-brand-600">
+   <Content />
+  </div>
 
-    {(relatedCondition || relatedService) && (
-      <div class="mt-12 pt-8 border-t border-champagne-200">
-        <h2 class="text-lg font-bold text-brand-900 mb-4">Related Reading</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {relatedCondition && (
-            <a href={`/conditions/${relatedCondition.slug}`} class="block p-5 rounded-xl bg-champagne-50 hover:bg-champagne-100 transition-colors">
-              <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Condition</p>
-              <p class="font-semibold text-slate-900">{relatedCondition.data.title}</p>
-            </a>
-          )}
-          {relatedService && (
-            <a href={`/services/${relatedService.slug}`} class="block p-5 rounded-xl bg-brand-50 hover:bg-brand-100 transition-colors">
-              <p class="text-xs text-brand-600 font-bold uppercase tracking-wider mb-1">Service</p>
-              <p class="font-semibold text-slate-900">{relatedService.data.title}</p>
-            </a>
-          )}
-        </div>
-      </div>
-    )}
-  </article>
+  {(relatedCondition || relatedService) && (
+   <div class="mt-16 pt-10 border-t border-stone-400/15">
+    <h2 class="font-display text-lg font-medium text-ink mb-6">Related Reading</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-stone-400/15 border border-stone-400/15">
+     {relatedCondition && (
+      <a href={`/conditions/${relatedCondition.slug}`} class="block p-5 bg-white hover:bg-paper-50 transition-colors">
+       <p class="text-xs text-stone-500 uppercase tracking-[0.1em] mb-1">Condition</p>
+       <p class="text-ink font-medium">{relatedCondition.data.title}</p>
+      </a>
+     )}
+     {relatedService && (
+      <a href={`/services/${relatedService.slug}`} class="block p-5 bg-white hover:bg-paper-50 transition-colors">
+       <p class="text-xs text-brand-500 uppercase tracking-[0.1em] mb-1">Service</p>
+       <p class="text-ink font-medium">{relatedService.data.title}</p>
+      </a>
+     )}
+    </div>
+   </div>
+  )}
+ </article>
 </MainLayout>
 

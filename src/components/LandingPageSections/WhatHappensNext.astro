@@ -6,25 +6,25 @@
 // to THEM, not how the procedure works medically.
 
 const { steps = [
-  { title: "You Reach Out", description: "Call, WhatsApp, or book online -- whichever is easiest for you." },
-  { title: "Honest Evaluation", description: "A thorough exam and a clear conversation about what's actually going on." },
-  { title: "A Plan That Fits You", description: "Only what's clinically needed -- explained clearly, no pressure." },
+ { title: "You Reach Out", description: "Call, WhatsApp, or book online -- whichever is easiest for you." },
+ { title: "Honest Evaluation", description: "A thorough exam and a clear conversation about what's actually going on." },
+ { title: "A Plan That Fits You", description: "Only what's clinically needed -- explained clearly, no pressure." },
 ] } = Astro.props;
 ---
 
-<section class="py-14 px-6 bg-champagne-50 border-t border-slate-200">
-  <div class="max-w-3xl mx-auto">
-    <h2 class="text-2xl md:text-3xl font-extrabold text-brand-900 mb-8 text-center tracking-tight">What Happens Next</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-      {steps.map((step: { title: string; description: string }, index: number) => (
-        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
-          <div class="w-9 h-9 mx-auto rounded-full bg-brand-900 text-white font-extrabold flex items-center justify-center mb-3">
-            {index + 1}
-          </div>
-          <h3 class="font-bold text-slate-900 mb-1">{step.title}</h3>
-          <p class="text-sm text-slate-600 leading-relaxed">{step.description}</p>
-        </div>
-      ))}
+<section class="py-14 px-6 bg-paper-50 border-t border-stone-400/15">
+ <div class="max-w-3xl mx-auto">
+  <h2 class="text-2xl md:text-3xl font-medium text-ink mb-8 text-center tracking-tight">What Happens Next</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+   {steps.map((step: { title: string; description: string }, index: number) => (
+    <div class="bg-white p-5 border border-stone-400/15 text-center">
+     <div class="w-9 h-9 mx-auto bg-brand-900 text-white font-medium flex items-center justify-center mb-3">
+      {index + 1}
+     </div>
+     <h3 class="font-medium text-ink mb-1">{step.title}</h3>
+     <p class="text-sm text-stone-600 leading-relaxed">{step.description}</p>
     </div>
+   ))}
   </div>
+ </div>
 </section>
