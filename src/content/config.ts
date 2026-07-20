@@ -120,9 +120,10 @@ const landingPageCollection = defineCollection({
 
     // Personal, first-person framing from one of the clinic's doctors --
     // the one thing a corporate hospital chain cannot replicate at scale.
-    // doctorSlug is required (must match a slug in siteConfig.doctors)
-    // so the quote is explicitly attributed per page rather than
-    // defaulting to any single doctor across the whole site.
+    // doctorSlug identifies which of the clinic's doctors is speaking
+    // (matches siteConfig.doctors[].slug) so the quote is explicitly
+    // attributed per page rather than defaulting to any single doctor
+    // across the whole site.
     doctorsPerspective: z.string().optional(),
     doctorsPerspectiveDoctorSlug: z.string().optional(),
 
