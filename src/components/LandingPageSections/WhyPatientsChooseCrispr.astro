@@ -1,0 +1,45 @@
+---
+// src/components/LandingPageSections/WhyPatientsChooseCrispr.astro
+//
+// Three universal cards are always shown; 1-2 page-specific
+// differentiators come from props. Capped at 5 total to keep this
+// section disciplined -- do not let future additions dilute it.
+import { siteConfig } from '../../config/site.js';
+
+interface Differentiator {
+  title: string;
+  description: string;
+}
+
+const { pageSpecific = [] as Differentiator[] } = Astro.props;
+
+const universal: Differentiator[] = [
+  { title: "Consultant Dermatologists, Not Technicians", description: "Every consultation and procedure is led by an AIIMS-trained consultant dermatologist -- not delegated to junior staff." },
+  { title: "Time to Ask Questions", description: "We believe patients deserve time to understand their diagnosis, treatment options, and next steps -- not a rushed consultation." },
+  { title: "Recommendations Based on Need", description: "Treatment is suggested because it's clinically right for you -- never to fill a schedule." },
+  { title: "Convenient Follow-Up, Close to Home", description: "No traveling across the city for routine visits -- your doctor and your records are right here." },
+];
+
+const points = [...universal, ...pageSpecific].slice(0, 5);
+---
+
+<section class="py-14 px-6 bg-white">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-2xl md:text-3xl font-extrabold text-brand-900 mb-8 text-center tracking-tight">
+      Why Patients Choose {siteConfig.name}
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      {points.map((point) => (
+        <div class="flex gap-3 items-start p-5 rounded-2xl bg-champagne-50 border border-slate-100">
+          <div class="shrink-0 bg-brand-600 text-white rounded-full p-1.5 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 mb-1">{point.title}</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">{point.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,27 @@
+---
+// src/components/LandingPageSections/DoctorSection.astro
+import { siteConfig } from '../../config/site.js';
+---
+
+<section class="py-16 px-6 bg-white">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex flex-col md:flex-row items-center gap-10 bg-gradient-to-br from-brand-50 to-white rounded-3xl border border-brand-100 shadow-sm p-8 md:p-12">
+      <img
+        src="/images/hero-doctor.jpg"
+        alt={siteConfig.doctor.name}
+        class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-md shrink-0"
+        onerror="this.src='https://placehold.co/200x200/EAF0EC/234B3A?text=Dr'"
+      />
+      <div class="text-center md:text-left">
+        <h3 class="text-2xl md:text-3xl font-extrabold text-brand-900 tracking-tight">{siteConfig.doctor.name}</h3>
+        <p class="text-sm text-brand-600 font-bold uppercase tracking-widest mb-4">{siteConfig.doctor.specialization} &middot; AIIMS-Trained</p>
+        <p class="text-slate-700 leading-relaxed mb-4">
+          {siteConfig.doctors.find(d => d.name === siteConfig.doctor.name)?.bio || `AIIMS-trained dermatologist with deep expertise in skin and hair disorders. ${siteConfig.doctor.name} is committed to providing ethical, evidence-based care, prioritizing your long-term skin and hair health over high-volume transactions.`}
+        </p>
+        <a href="/our-doctors" target="_blank" class="inline-block bg-brand-100 text-brand-800 px-6 py-2.5 rounded-lg font-semibold hover:bg-brand-200 transition text-sm">
+          View Full Credentials
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

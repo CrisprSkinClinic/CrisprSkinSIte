@@ -1,0 +1,47 @@
+---
+// src/components/LandingPageSections/DoctorsPerspective.astro
+//
+// Supports two formats: a free-form perspective string (used by
+// earlier pages like Cataract/LASIK), and a standardized
+// "patient concern -> response" structure (used going forward) for
+// consistency across pages while content stays page-specific.
+import { siteConfig } from '../../config/site.js';
+
+interface Props {
+  perspective?: string;
+  patientConcern?: string;
+  response?: string;
+}
+
+const { perspective, patientConcern, response } = Astro.props;
+---
+
+<section class="py-12 px-6 bg-gradient-to-br from-brand-50 to-white border-t border-slate-100">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-3xl shadow-sm border border-brand-100 p-6 md:p-8">
+      <div class="flex items-center gap-3 mb-4">
+        <img
+          src="/images/hero-doctor.jpg"
+          alt={siteConfig.doctor.name}
+          class="w-12 h-12 rounded-full object-cover border-2 border-brand-100"
+          onerror="this.src='https://placehold.co/100x100/EAF0EC/234B3A?text=Dr'"
+        />
+        <div>
+          <p class="font-bold text-slate-900 text-sm">
+            {patientConcern ? "What I Commonly Hear From Patients" : `${siteConfig.doctor.name}'s Perspective`}
+          </p>
+          <p class="text-xs text-brand-600 font-semibold uppercase tracking-wide">{siteConfig.doctor.specialization}</p>
+        </div>
+      </div>
+
+      {patientConcern ? (
+        <>
+          <p class="text-slate-900 font-semibold italic mb-3">"{patientConcern}"</p>
+          <p class="text-slate-700 leading-relaxed">{response}</p>
+        </>
+      ) : (
+        <p class="text-slate-700 leading-relaxed italic">"{perspective}"</p>
+      )}
+    </div>
+  </div>
+</section>

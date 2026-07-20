@@ -1,0 +1,28 @@
+---
+// src/components/LandingPageSections/QuickCTA.astro
+//
+// Lightweight "ready to schedule?" strip placed early, right after
+// Convenience -- ensures PPC visitors don't have to scroll far to
+// take action even before meeting the doctor or reading further.
+import { siteConfig } from '../../config/site.js';
+
+const phoneHref = `tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`;
+const whatsappHref = siteConfig.contact.whatsapp;
+---
+
+<section class="py-8 px-6 bg-white border-y border-slate-100">
+  <div class="max-w-2xl mx-auto text-center">
+    <p class="text-slate-700 font-bold mb-4">Ready to schedule?</p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <a href={phoneHref} class="w-full sm:w-auto bg-brand-600 text-white font-bold px-6 py-3 rounded-xl shadow hover:bg-brand-700 transition-all text-center">
+        Call
+      </a>
+      <a href={whatsappHref} target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl shadow hover:bg-emerald-600 transition-all text-center">
+        WhatsApp
+      </a>
+      <a href="#book" class="w-full sm:w-auto bg-brand-900 text-white font-bold px-6 py-3 rounded-xl shadow hover:bg-brand-800 transition-all text-center">
+        Book Appointment
+      </a>
+    </div>
+  </div>
+</section>

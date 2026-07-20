@@ -1,0 +1,14 @@
+---
+import BookingCalendar from '../BookingCalendar.astro';
+const { defaultService } = Astro.props;
+---
+
+<section id="book" class="py-16 px-6 bg-brand-900">
+  <div class="max-w-2xl mx-auto text-center mb-8">
+    <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">Book Your Appointment</h2>
+    <p class="text-brand-200">Select an available time slot below to secure your consultation.</p>
+  </div>
+  <div class="bg-white rounded-3xl p-1 shadow-2xl max-w-5xl mx-auto">
+    <BookingCalendar defaultService={defaultService} />
+  </div>
+</section>

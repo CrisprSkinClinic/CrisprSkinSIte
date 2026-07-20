@@ -1,0 +1,28 @@
+---
+// A single, deliberate card linking to a deeper content-cluster page
+// (service or condition), for ad visitors who want to learn more
+// before booking. Sits after the conversion-focused sections
+// (Hero through MidPageCTA/ObjectionFAQ) but before ClinicPhotoStrip
+// -- visually present, matching WhyPatientsChoose's card weight, but
+// never competing with the booking flow that follows.
+const { text, url } = Astro.props;
+---
+
+{text && url && (
+  <section class="py-10 px-6 max-w-4xl mx-auto">
+    <a
+      href={url}
+      class="block bg-brand-50 border border-brand-100 rounded-xl p-6 sm:p-8 hover:bg-brand-100 hover:border-brand-200 transition-colors group"
+    >
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-xs text-brand-600 font-bold uppercase tracking-wider mb-2">Want to Learn More?</p>
+          <p class="text-lg sm:text-xl font-bold text-brand-900">{text}</p>
+        </div>
+        <span class="text-brand-600 text-2xl group-hover:translate-x-1 transition-transform flex-shrink-0" aria-hidden="true">
+          &rarr;
+        </span>
+      </div>
+    </a>
+  </section>
+)}
