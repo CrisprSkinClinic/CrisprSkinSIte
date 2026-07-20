@@ -6,15 +6,10 @@ export const siteConfig = {
 
   description: "Leading skin, hair & aesthetic dermatology clinic in KK Nagar, Chennai. AIIMS-trained dermatologists offering hair transplant, acne, psoriasis, vitiligo, pediatric dermatology and cosmetic treatments with evidence-based care.",
 
-  // Primary/lead doctor -- used by shared landing-page components (DoctorSection,
-  // DoctorsPerspective, LandingHero) and the single-physician JSON-LD block in
-  // MainLayout, which only support one doctor at a time.
-  doctor: {
-    name: "Dr. Karthik L",
-    specialization: "Consultant Dermatologist, Dermatosurgeon & Hair Transplant Surgeon"
-  },
-
-  // Full clinical team -- used on the team/about page and individual bio pages.
+  // Full clinical team -- all shared components reference this array (or
+  // siteConfig.name / a generic "our doctors" framing) rather than any
+  // single doctor, since the clinic is a 3-doctor equal partnership with
+  // no single "face" of the practice.
   doctors: [
     {
       slug: "dr-karthik-l",
