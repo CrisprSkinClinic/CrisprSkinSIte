@@ -1,11 +1,11 @@
 ---
 import { siteConfig } from '../config/site.js';
-const { title, address, phone, doctorName = siteConfig.doctor.name } = Astro.props;
+const { title, address, phone, doctorName } = Astro.props;
 ---
 <section class="py-20 px-6 bg-brand-900 text-white text-center">
   <div class="max-w-4xl mx-auto">
     <h2 class="text-3xl md:text-4xl font-extrabold mb-6">{title}</h2>
-    <p class="text-xl text-brand-200 mb-10 leading-relaxed">Schedule a comprehensive evaluation with {doctorName}. Choose your preferred time and secure your slot instantly.</p>
+    <p class="text-xl text-brand-200 mb-10 leading-relaxed">Schedule a comprehensive evaluation {doctorName ? `with ${doctorName}` : `at ${siteConfig.name}`}. Choose your preferred time and secure your slot instantly.</p>
     
     <a href="/book" class="inline-block bg-white text-brand-900 text-lg font-bold px-10 py-4 rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
       Open Booking Calendar
