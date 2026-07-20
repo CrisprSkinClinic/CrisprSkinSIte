@@ -7,16 +7,16 @@
 // alarmism or clinical staging language.
 
 interface Props {
- title: string;
- body: string;
+  title: string;
+  body: string;
 }
 
 const { title, body } = Astro.props;
 ---
 
-<section class="py-12 px-6 bg-gradient-to-br from-brand-50 to-white border-t border-stone-400/15">
- <div class="max-w-2xl mx-auto text-center">
-  <h2 class="text-2xl md:text-3xl font-medium text-ink mb-5 tracking-tight">{title}</h2>
-  <p class="text-stone-600 leading-relaxed text-left sm:text-center">{body}</p>
- </div>
+<section class="py-12 px-6 bg-gradient-to-br from-brand-50 to-white border-t border-slate-100">
+  <div class="max-w-2xl mx-auto text-center">
+    <h2 class="text-2xl md:text-3xl font-extrabold text-brand-900 mb-5 tracking-tight">{title}</h2>
+    <p class="text-slate-700 leading-relaxed text-left sm:text-center">{body}</p>
+  </div>
 </section>

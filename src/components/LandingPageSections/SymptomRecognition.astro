@@ -9,16 +9,16 @@ const { items = [] } = Astro.props;
 ---
 
 {items.length > 0 && (
- <section class="py-10 px-6 bg-white border-t border-stone-400/15">
-  <div class="max-w-2xl mx-auto text-center">
-   <h2 class="text-xl md:text-2xl font-medium text-ink mb-5">Does This Sound Like You?</h2>
-   <div class="flex flex-wrap justify-center gap-3">
-    {items.slice(0, 5).map((item: string) => (
-     <span class="inline-flex items-center gap-2 bg-brand-50 text-brand-800 px-4 py-2 text-sm font-semibold">
-      <span class="text-brand-500">✓</span> {item}
-     </span>
-    ))}
-   </div>
-  </div>
- </section>
+  <section class="py-10 px-6 bg-white border-t border-slate-100">
+    <div class="max-w-2xl mx-auto text-center">
+      <h2 class="text-xl md:text-2xl font-bold text-brand-900 mb-5">Does This Sound Like You?</h2>
+      <div class="flex flex-wrap justify-center gap-3">
+        {items.slice(0, 5).map((item: string) => (
+          <span class="inline-flex items-center gap-2 bg-brand-50 text-brand-800 px-4 py-2 rounded-full text-sm font-semibold">
+            <span class="text-brand-500">✓</span> {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  </section>
 )}

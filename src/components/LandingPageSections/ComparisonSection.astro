@@ -6,31 +6,31 @@
 // objection directly, the way the homepage's "About Our Team" section does.
 
 const {
- title = "Why Patients Choose Us",
- points = [
-  { title: "No Unnecessary Procedures", description: "You'll only be recommended treatment that's clinically justified -- never upsold on procedures you don't need." },
-  { title: "AIIMS-Trained Expertise", description: "Every doctor on our team trained at AIIMS, New Delhi -- one of India's most rigorous medical institutions -- bringing that same standard to every consultation." },
-  { title: "Time to Ask Questions", description: "Consultations are thorough, not rushed -- you'll understand your diagnosis and options clearly before any decision." },
-  { title: "Continuity of Care", description: "You see the same doctor for evaluation, treatment, and follow-up -- not a different specialist every visit." },
- ],
+  title = "Why Patients Choose Us",
+  points = [
+    { title: "No Unnecessary Procedures", description: "You'll only be recommended treatment that's clinically justified -- never upsold on procedures you don't need." },
+    { title: "AIIMS-Trained Expertise", description: "Every doctor on our team trained at AIIMS, New Delhi -- one of India's most rigorous medical institutions -- bringing that same standard to every consultation." },
+    { title: "Time to Ask Questions", description: "Consultations are thorough, not rushed -- you'll understand your diagnosis and options clearly before any decision." },
+    { title: "Continuity of Care", description: "You see the same doctor for evaluation, treatment, and follow-up -- not a different specialist every visit." },
+  ],
 } = Astro.props;
 ---
 
 <section class="py-16 px-6 bg-white">
- <div class="max-w-5xl mx-auto">
-  <h2 class="text-3xl md:text-4xl font-medium text-ink mb-12 text-center tracking-tight">{title}</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-   {points.map((point: { title: string; description: string }) => (
-    <div class="flex gap-4 items-start p-6 bg-paper-50 border border-stone-400/15">
-     <div class="shrink-0 bg-brand-600 text-white p-2 mt-0.5">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-     </div>
-     <div>
-      <h3 class="font-medium text-ink text-lg mb-1">{point.title}</h3>
-      <p class="text-stone-600 leading-relaxed">{point.description}</p>
-     </div>
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-12 text-center tracking-tight">{title}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {points.map((point: { title: string; description: string }) => (
+        <div class="flex gap-4 items-start p-6 rounded-2xl bg-champagne-50 border border-slate-100">
+          <div class="shrink-0 bg-brand-600 text-white rounded-full p-2 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-lg mb-1">{point.title}</h3>
+            <p class="text-slate-600 leading-relaxed">{point.description}</p>
+          </div>
+        </div>
+      ))}
     </div>
-   ))}
   </div>
- </div>
 </section>
