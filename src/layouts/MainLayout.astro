@@ -82,24 +82,26 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
       "areaServed": { "@type": "City", "name": "Chennai" } 
     })} /> 
 
-    <script type="application/ld+json" set:html={JSON.stringify({ 
-      "@context": "https://schema.org", 
-      "@type": "Physician", 
-      "name": siteConfig.doctor.name, 
-      "medicalSpecialty": "Dermatology", 
-      "image": new URL('/images/hero-doctor.jpg', siteConfig.url).toString(),
-      "telephone": siteConfig.contact.phone,
-      "priceRange": "₹₹",
-      "worksFor": { "@type": "MedicalBusiness", "name": siteConfig.name }, 
-      "address": { 
-        "@type": "PostalAddress", 
-        "streetAddress": siteConfig.contact.address.street,
-        "addressLocality": siteConfig.contact.address.locality, 
-        "addressRegion": siteConfig.contact.address.state, 
-        "postalCode": siteConfig.contact.address.postalCode,
-        "addressCountry": "India" 
-      } 
-    })} />
+    {siteConfig.doctors.map((doc) => (
+      <script type="application/ld+json" set:html={JSON.stringify({ 
+        "@context": "https://schema.org", 
+        "@type": "Physician", 
+        "name": doc.name, 
+        "medicalSpecialty": "Dermatology", 
+        "image": new URL(`/images/doctors/${doc.slug}.jpg`, siteConfig.url).toString(),
+        "telephone": siteConfig.contact.phone,
+        "priceRange": "₹₹",
+        "worksFor": { "@type": "MedicalBusiness", "name": siteConfig.name }, 
+        "address": { 
+          "@type": "PostalAddress", 
+          "streetAddress": siteConfig.contact.address.street,
+          "addressLocality": siteConfig.contact.address.locality, 
+          "addressRegion": siteConfig.contact.address.state, 
+          "postalCode": siteConfig.contact.address.postalCode,
+          "addressCountry": "India" 
+        } 
+      })} />
+    ))}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
