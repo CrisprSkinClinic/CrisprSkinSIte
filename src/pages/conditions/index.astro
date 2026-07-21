@@ -1,0 +1,67 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection, getEntry } from 'astro:content';
+import { siteConfig } from '../../config/site.js';
+
+const pageTitle = "All Conditions";
+const pageDescription = `Complete list of skin, hair, and paediatric dermatology conditions treated at ${siteConfig.name}, KK Nagar, Chennai.`;
+
+const allConditions = await getCollection('conditions');
+const allServices = await getCollection('services');
+const serviceCategoryBySlug = Object.fromEntries(allServices.map((s) => [s.slug, s.data.category]));
+
+const categoryLabels = {
+  hair: 'Hair',
+  skin: 'Skin',
+  cosmetic: 'Cosmetic',
+  pediatric: 'Pediatric',
+};
+
+const categoryOrder = ['hair', 'skin', 'cosmetic', 'pediatric'];
+
+// Conditions don't carry their own category -- each one links to a
+// parentService, and that service's category is what places the
+// condition in the right group here (mirrors services/index.astro's
+// grouping, one level removed).
+const conditionsByCategory = categoryOrder.map((cat) => ({
+  category: cat,
+  label: categoryLabels[cat],
+  conditions: allConditions
+    .filter((c) => serviceCategoryBySlug[c.data.parentService] === cat)
+    .sort((a, b) => a.data.title.localeCompare(b.data.title)),
+}));
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+  <Breadcrumbs items={[{ name: "Conditions", url: "/conditions" }]} />
+
+  <div class="bg-brand-900 text-white py-16 px-6 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-4">All Conditions</h1>
+    <p class="text-lg text-brand-200 max-w-2xl mx-auto">Learn about the skin, hair, and paediatric dermatology conditions we diagnose and treat at {siteConfig.name}.</p>
+  </div>
+
+  <div class="max-w-6xl mx-auto py-16 px-6">
+    {conditionsByCategory.map(({ category, label, conditions }) => (
+      conditions.length > 0 && (
+        <section class="mb-16 last:mb-0">
+          <div class="flex items-center gap-4 mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-brand-900">{label}</h2>
+            <a href={`/${category}`} class="text-sm text-brand-600 font-semibold hover:underline">View {label} services &rarr;</a>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {conditions.map((condition) => (
+              <a
+                href={`/conditions/${condition.slug}`}
+                class="bg-white rounded-xl border border-champagne-200 p-5 hover:shadow-lg hover:border-brand-200 transition-all duration-300 group flex items-center justify-between"
+              >
+                <span class="font-semibold text-slate-800 group-hover:text-brand-700 transition-colors">{condition.data.title}</span>
+                <span aria-hidden="true" class="text-brand-500 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    ))}
+  </div>
+</MainLayout>
