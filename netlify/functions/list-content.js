@@ -3,8 +3,8 @@
 // Lists existing blog posts or FAQs, and fetches one file's full content
 // for editing. Read-only.
 
-const GITHUB_OWNER = "drkarthiklaxmanai";
-const GITHUB_REPO = "eye-clinic-site";
+const GITHUB_OWNER = "CrisprSkinClinic";
+const GITHUB_REPO = "CrisprSkinSIte";
 const BASE_BRANCH = "main";
 
 exports.handler = async (event) => {
@@ -22,23 +22,7 @@ exports.handler = async (event) => {
   const { password, contentType, action, filePath } = payload;
 
   if (!password || password !== process.env.ADMIN_PASSWORD) {
-    // TEMPORARY DEBUG: lengths and char codes let us spot invisible
-    // characters or encoding mismatches without ever exposing the
-    // actual password value in the response.
-    const received = password || "";
-    const expected = process.env.ADMIN_PASSWORD || "";
-    return {
-      statusCode: 401,
-      body: JSON.stringify({
-        error: "Incorrect password",
-        debug: {
-          receivedLength: received.length,
-          expectedLength: expected.length,
-          receivedCodes: received.split('').map(c => c.charCodeAt(0)),
-          expectedCodes: expected.split('').map(c => c.charCodeAt(0)),
-        },
-      }),
-    };
+    return { statusCode: 401, body: JSON.stringify({ error: "Incorrect password" }) };
   }
 
   const token = process.env.GITHUB_TOKEN;
@@ -46,11 +30,14 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: JSON.stringify({ error: "Server is not configured correctly." }) };
   }
 
-  if (contentType !== "blog" && contentType !== "faq") {
+  if (contentType !== "blog" && contentType !== "faq" && contentType !== "testimonial") {
     return { statusCode: 400, body: JSON.stringify({ error: "Unknown content type" }) };
   }
 
-  const folder = contentType === "blog" ? "src/content/blog" : "src/content/faqs";
+  const folder =
+    contentType === "blog" ? "src/content/blog"
+    : contentType === "faq" ? "src/content/faqs"
+    : "src/content/testimonials";
 
   try {
     if (action === "list") {
