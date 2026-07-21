@@ -5,8 +5,8 @@
 // committing directly to main. Validates generated YAML frontmatter
 // before ever sending it to GitHub, to catch malformed content early.
 
-const GITHUB_OWNER = "drkarthiklaxmanai";
-const GITHUB_REPO = "eye-clinic-site";
+const GITHUB_OWNER = "CrisprSkinClinic";
+const GITHUB_REPO = "CrisprSkinSIte";
 const BASE_BRANCH = "main";
 
 exports.handler = async (event) => {
@@ -32,7 +32,7 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: JSON.stringify({ error: "Server is not configured correctly. Contact developer." }) };
   }
 
-  if (contentType !== "blog" && contentType !== "faq") {
+  if (contentType !== "blog" && contentType !== "faq" && contentType !== "testimonial") {
     return { statusCode: 400, body: JSON.stringify({ error: "Unknown content type" }) };
   }
 
@@ -69,7 +69,7 @@ exports.handler = async (event) => {
       if (Array.isArray(tags) && tags.length > 0) frontmatterObj.tags = tags;
 
       prTitle = isEdit ? `Update blog post: ${title}` : `New blog post: ${title}`;
-    } else {
+    } else if (contentType === "faq") {
       const { question, order, body: faqBody } = fields;
       if (!question || !faqBody) {
         return { statusCode: 400, body: JSON.stringify({ error: "Missing required FAQ fields (question and answer are both required)" }) };
@@ -87,6 +87,41 @@ exports.handler = async (event) => {
       }
 
       prTitle = isEdit ? `Update FAQ: ${question}` : `New FAQ: ${question}`;
+    } else {
+      const { name, rating, doctorSlug, doctorName, active, order, body: testimonialBody } = fields;
+      if (!name || !testimonialBody) {
+        return { statusCode: 400, body: JSON.stringify({ error: "Missing required testimonial fields (patient name and review text are both required)" }) };
+      }
+      // File path is stable once created (based on name + doctor, not
+      // rating/active/etc.) so editing a testimonial doesn't change its
+      // slug and orphan the old file.
+      filePath = isEdit ? existingFilePath : `src/content/testimonials/${slugify(`${name}-${doctorSlug || 'general'}`)}.md`;
+      body = testimonialBody;
+
+      frontmatterObj = { name };
+      const ratingNum = rating !== undefined && rating !== null && String(rating).trim().length > 0 ? Number(rating) : 5;
+      if (Number.isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+        return { statusCode: 400, body: JSON.stringify({ error: "Rating must be a number between 1 and 5" }) };
+      }
+      frontmatterObj.rating = ratingNum;
+
+      if (doctorSlug && doctorSlug.trim().length > 0) frontmatterObj.doctorSlug = doctorSlug.trim();
+      if (doctorName && doctorName.trim().length > 0) frontmatterObj.doctorName = doctorName.trim();
+
+      // active defaults to true unless explicitly set to false -- lets
+      // staff deactivate a testimonial (hide it) without deleting the
+      // file, so it can be re-enabled later.
+      frontmatterObj.active = active === false || active === "false" ? false : true;
+
+      if (order !== undefined && order !== null && String(order).trim().length > 0) {
+        const orderNum = Number(order);
+        if (Number.isNaN(orderNum)) {
+          return { statusCode: 400, body: JSON.stringify({ error: "Display Order must be a number" }) };
+        }
+        frontmatterObj.order = orderNum;
+      }
+
+      prTitle = isEdit ? `Update testimonial: ${name}` : `New testimonial: ${name}`;
     }
 
     const fileContent = buildMarkdownFile(frontmatterObj, body);
@@ -126,6 +161,11 @@ function buildMarkdownFile(frontmatterObj, body) {
     if (Array.isArray(value)) {
       const arrayStr = "[" + value.map((v) => JSON.stringify(String(v))).join(", ") + "]";
       lines.push(`${key}: ${arrayStr}`);
+    } else if (typeof value === "boolean") {
+      // Written unquoted (true / false), matching YAML boolean syntax --
+      // writing it as a quoted string like "true" would fail z.boolean()
+      // schema validation for fields like testimonials' `active`.
+      lines.push(`${key}: ${value}`);
     } else if (typeof value === "number") {
       lines.push(`${key}: ${value}`);
     } else if (key === "pubDate") {
