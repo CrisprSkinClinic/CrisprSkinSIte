@@ -12,37 +12,44 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '../config/site.js';
 
-const categoryContent = {
-  hair: {
-    label: 'Hair',
-    headline: 'Hair Care Services',
-    subheadline: 'From surgical restoration to medical management of hair loss and scalp conditions, evaluated and treated by AIIMS-trained dermatologists.',
-  },
-  skin: {
-    label: 'Skin',
-    headline: 'Skin Care Services',
-    subheadline: 'Evidence-based diagnosis and treatment for acne, pigmentation, chronic skin conditions, infections, and more.',
-  },
-  cosmetic: {
-    label: 'Cosmetic',
-    headline: 'Cosmetic Dermatology Services',
-    subheadline: 'Conservative, natural-looking cosmetic treatments administered by trained consultant dermatologists -- never a one-size-fits-all package.',
-  },
-  pediatric: {
-    label: 'Pediatric',
-    headline: 'Pediatric Dermatology Services',
-    subheadline: 'Child-friendly, age-appropriate care for skin, hair, and nail concerns in infants and children.',
-  },
-};
-
 export async function getStaticPaths() {
+  // Defined inside getStaticPaths (not as an outer const) because Astro
+  // runs this function in an isolated scope during static route
+  // generation -- it does not close over top-level frontmatter variables
+  // the way the render body below it does. Referencing an outer const
+  // here fails the build with "categoryContent is not defined" even
+  // though the same reference works fine in the page body.
+  const categoryContent = {
+    hair: {
+      label: 'Hair',
+      headline: 'Hair Care Services',
+      subheadline: 'From surgical restoration to medical management of hair loss and scalp conditions, evaluated and treated by AIIMS-trained dermatologists.',
+    },
+    skin: {
+      label: 'Skin',
+      headline: 'Skin Care Services',
+      subheadline: 'Evidence-based diagnosis and treatment for acne, pigmentation, chronic skin conditions, infections, and more.',
+    },
+    cosmetic: {
+      label: 'Cosmetic',
+      headline: 'Cosmetic Dermatology Services',
+      subheadline: 'Conservative, natural-looking cosmetic treatments administered by trained consultant dermatologists -- never a one-size-fits-all package.',
+    },
+    pediatric: {
+      label: 'Pediatric',
+      headline: 'Pediatric Dermatology Services',
+      subheadline: 'Child-friendly, age-appropriate care for skin, hair, and nail concerns in infants and children.',
+    },
+  };
+
   return Object.keys(categoryContent).map((category) => ({
     params: { category },
+    props: { content: categoryContent[category] },
   }));
 }
 
 const { category } = Astro.params;
-const content = categoryContent[category];
+const { content } = Astro.props;
 
 const allServices = await getCollection('services');
 const services = allServices
