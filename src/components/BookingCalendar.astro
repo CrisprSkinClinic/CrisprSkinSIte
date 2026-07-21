@@ -32,6 +32,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
       {siteConfig.doctors.map((doc) => (
         <option value={doc.dbId}>{doc.name} -- {doc.designation}</option>
       ))}
+      <option value="any">No preference -- show me all available times</option>
     </select>
 
     <select id="service" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
@@ -99,6 +100,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
 <script>
   document.addEventListener('astro:page-load', () => {
     let selectedTime = "";
+    let selectedSlotDoctorIds = null; // set when booking without a doctor preference
 
     const root = document.getElementById('bookingCalendarRoot');
     const dateInput = document.getElementById('date');
@@ -113,6 +115,27 @@ const { defaultService, defaultDoctorId } = Astro.props;
     if (dateInput) {
       dateInput.min = todayStr;
       dateInput.value = todayStr;
+    }
+
+    // Randomize the doctor dropdown order on each page load, so no doctor
+    // is positioned first by default (this runs before the defaultDoctorId
+    // pre-selection below, so a page that intentionally pre-selects a
+    // specific doctor, e.g. pediatric-dermatology -> Narayanan A, still
+    // works correctly regardless of the shuffled order).
+    if (doctorSelect) {
+      const placeholderOption = doctorSelect.querySelector('option[value=""]');
+      const noPreferenceOption = doctorSelect.querySelector('option[value="any"]');
+      const doctorOptions = Array.from(doctorSelect.options).filter(
+        (opt) => opt.value !== '' && opt.value !== 'any'
+      );
+      for (let i = doctorOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [doctorOptions[i], doctorOptions[j]] = [doctorOptions[j], doctorOptions[i]];
+      }
+      doctorSelect.innerHTML = '';
+      if (placeholderOption) doctorSelect.appendChild(placeholderOption);
+      doctorOptions.forEach((opt) => doctorSelect.appendChild(opt));
+      if (noPreferenceOption) doctorSelect.appendChild(noPreferenceOption);
     }
 
     // Pre-select the doctor when this booking form is embedded on a
@@ -147,23 +170,25 @@ const { defaultService, defaultDoctorId } = Astro.props;
       errorMessage?.classList.remove('hidden');
     }
 
-    function renderSlots(displayTimes) {
+    function renderSlots(slots) {
       selectedTime = "";
-      if (displayTimes.length === 0) {
+      selectedSlotDoctorIds = null;
+      if (slots.length === 0) {
         slotsContainer.innerHTML = '<p class="col-span-2 text-slate-500 text-sm">No slots available on this date. Please try another day, or call us directly.</p>';
         return;
       }
       slotsContainer.innerHTML = '';
-      displayTimes.forEach((time, index) => {
+      slots.forEach((slot, index) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'time-slot py-3 border border-brand-200 rounded-lg text-brand-800 hover:bg-brand-50 transition font-medium';
-        btn.textContent = time;
-        btn.dataset.time = time;
+        btn.textContent = slot.display;
+        btn.dataset.time = slot.display;
         btn.addEventListener('click', () => {
           document.querySelectorAll('.time-slot').forEach((b) => b.classList.remove('bg-brand-600', 'text-white'));
           btn.classList.add('bg-brand-600', 'text-white');
-          selectedTime = time;
+          selectedTime = slot.display;
+          selectedSlotDoctorIds = slot.doctorIds || null;
         });
         slotsContainer.appendChild(btn);
 
@@ -171,7 +196,8 @@ const { defaultService, defaultDoctorId } = Astro.props;
         // the user click a different one afterward.
         if (index === 0) {
           btn.classList.add('bg-brand-600', 'text-white');
-          selectedTime = time;
+          selectedTime = slot.display;
+          selectedSlotDoctorIds = slot.doctorIds || null;
         }
       });
     }
@@ -192,7 +218,10 @@ const { defaultService, defaultDoctorId } = Astro.props;
       errorMessage?.classList.add('hidden');
 
       try {
-        const response = await fetch(`/.netlify/functions/public-available-slots?date=${encodeURIComponent(dateStr)}&doctorId=${encodeURIComponent(doctorId)}`);
+        // "any" means no preference -- omit doctorId so the function
+        // fans out across all three doctors and returns merged slots.
+        const doctorParam = doctorId === 'any' ? '' : `&doctorId=${encodeURIComponent(doctorId)}`;
+        const response = await fetch(`/.netlify/functions/public-available-slots?date=${encodeURIComponent(dateStr)}${doctorParam}`);
         const data = await response.json();
 
         if (!response.ok || data.error) {
@@ -204,8 +233,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
           return;
         }
 
-        const displayTimes = (data.slots || []).map((s) => s.display);
-        renderSlots(displayTimes);
+        renderSlots(data.slots || []);
       } catch (err) {
         console.error("Error loading availability:", err);
         slotsContainer.innerHTML = '<p class="col-span-2 text-red-500 text-sm">Could not load availability. Please try again.</p>';
@@ -245,6 +273,16 @@ const { defaultService, defaultDoctorId } = Astro.props;
           return;
         }
 
+        // "any" (no preference) bookings don't have a single doctorId --
+        // they carry the list of doctors actually free at the selected
+        // time, and the server picks one at random and re-verifies
+        // availability before committing.
+        const isNoPreference = doctorId === 'any';
+        if (isNoPreference && (!selectedSlotDoctorIds || selectedSlotDoctorIds.length === 0)) {
+          showError("That time slot's doctor information is missing. Please reselect a time.");
+          return;
+        }
+
         // patients.name in AppointmentManager is a single text column,
         // so prefix/first/last are concatenated here -- the split-name
         // concept ends at this form layer.
@@ -260,7 +298,9 @@ const { defaultService, defaultDoctorId } = Astro.props;
             body: JSON.stringify({
               name,
               phone,
-              doctorId,
+              ...(isNoPreference
+                ? { candidateDoctorIds: selectedSlotDoctorIds }
+                : { doctorId }),
               service,
               date,
               time: selectedTime,
