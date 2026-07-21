@@ -7,6 +7,7 @@ heroSubheadline: "Most birthmarks are harmless and need no treatment -- an evalu
 heroImage: "birthmarks"
 category: "pediatric"
 defaultService: "Birthmarks"
+defaultDoctorId: "d5372165-fc7e-47e8-aee6-ce02e7fefc71"
 
 twoPaths:
   screeningTitle: "Noticed a birthmark on your newborn or infant?"

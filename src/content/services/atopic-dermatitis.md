@@ -7,6 +7,7 @@ heroSubheadline: "A sustainable, family-friendly management plan for childhood e
 heroImage: "atopic-dermatitis"
 category: "pediatric"
 defaultService: "Atopic Dermatitis"
+defaultDoctorId: "d5372165-fc7e-47e8-aee6-ce02e7fefc71"
 
 twoPaths:
   screeningTitle: "Noticed dry, itchy, or recurring patches on your child?"

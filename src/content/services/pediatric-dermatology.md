@@ -7,6 +7,7 @@ heroSubheadline: "A child-friendly, patient approach to skin, hair, and nail con
 heroImage: "pediatric-dermatology"
 category: "pediatric"
 defaultService: "Pediatric Dermatology"
+defaultDoctorId: "d5372165-fc7e-47e8-aee6-ce02e7fefc71"
 
 twoPaths:
   screeningTitle: "Noticed a new rash, mark, or skin change in your child?"

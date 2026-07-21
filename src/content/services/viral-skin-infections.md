@@ -7,6 +7,7 @@ heroSubheadline: "Common, generally harmless, and usually self-limiting -- but a
 heroImage: "viral-skin-infections"
 category: "pediatric"
 defaultService: "Viral Skin Infections"
+defaultDoctorId: "d5372165-fc7e-47e8-aee6-ce02e7fefc71"
 
 twoPaths:
   screeningTitle: "Noticed new bumps or growths on your child's skin?"
