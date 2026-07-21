@@ -50,7 +50,12 @@ const reviews = [
   <div class="max-w-7xl mx-auto">
     <div class="text-center mb-16">
       <h2 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-4">Patient Stories</h2>
-      <p class="text-lg text-slate-600 max-w-2xl mx-auto">Read about the experiences of patients who trusted CRISPR Skin and Hair Clinic with their care.</p>
+      <p class="text-lg text-slate-600 max-w-2xl mx-auto mb-4">Read about the experiences of patients who trusted CRISPR Skin and Hair Clinic with their care.</p>
+      <div id="liveGoogleRating" class="hidden inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-champagne-200 shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        <span id="liveGoogleRatingText" class="font-bold text-slate-900 text-sm"></span>
+        <a id="liveGoogleRatingLink" href="https://share.google/VOkSEAUYVlRCSgVgT" target="_blank" rel="noopener noreferrer" class="text-sm text-brand-600 font-semibold hover:underline">on Google</a>
+      </div>
     </div>
     
     <div id="testimonialsTrack" class="flex md:grid md:grid-cols-3 gap-6 md:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-smooth pb-4 -mx-6 px-6 md:mx-0 md:px-0">
@@ -109,5 +114,37 @@ const reviews = [
       [cards[i], cards[j]] = [cards[j], cards[i]];
     }
     cards.forEach((card) => track.appendChild(card));
+  });
+
+  // Fetch the clinic's live overall Google rating (server-side, via
+  // get-google-reviews.js -- the API key never reaches the browser).
+  // This only shows the aggregate rating/count/link, not Google's raw
+  // review text -- the curated, doctor-attributed reviews above remain
+  // the primary content; this badge is a lightweight trust signal that
+  // stays current without a redeploy.
+  document.addEventListener('astro:page-load', async () => {
+    const badge = document.getElementById('liveGoogleRating');
+    const ratingText = document.getElementById('liveGoogleRatingText');
+    const ratingLink = document.getElementById('liveGoogleRatingLink');
+    if (!badge || !ratingText) return;
+
+    try {
+      const response = await fetch('/.netlify/functions/get-google-reviews');
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!data.overallRating) return;
+
+      const count = data.totalReviewCount ? ` (${data.totalReviewCount} reviews)` : '';
+      ratingText.textContent = `${data.overallRating.toFixed(1)}${count}`;
+      if (data.mapsUrl && ratingLink) {
+        ratingLink.href = data.mapsUrl;
+      }
+      badge.classList.remove('hidden');
+    } catch (err) {
+      // Fails silently -- the curated reviews above are the primary
+      // content, so a failed live-rating fetch shouldn't show an error
+      // to visitors, just leave the badge hidden.
+      console.error('Could not load live Google rating:', err);
+    }
   });
 </script>
