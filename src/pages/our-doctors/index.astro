@@ -15,7 +15,7 @@ const pageDescription = `Meet the AIIMS-trained consultant dermatologists at ${s
     <p class="text-lg text-brand-200 max-w-2xl mx-auto">Three AIIMS-trained consultant dermatologists, each bringing distinct expertise in hair restoration, medical dermatology, paediatric skin care, and dermatosurgery.</p>
   </div>
 
-  <div class="max-w-6xl mx-auto py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+  <div id="doctorGrid" class="max-w-6xl mx-auto py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
     {siteConfig.doctors.map((doctor) => (
       <a href={`/our-doctors/${doctor.slug}`} class="bg-white rounded-2xl shadow-sm border border-champagne-200 overflow-hidden hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col">
         <div class="aspect-[3/4] bg-champagne-100 overflow-hidden">
@@ -38,3 +38,21 @@ const pageDescription = `Meet the AIIMS-trained consultant dermatologists at ${s
     ))}
   </div>
 </MainLayout>
+
+<script>
+  // Astro renders this page statically at build time, so a shuffle done
+  // in frontmatter would give every visitor the same order until the
+  // next deploy. Shuffling client-side here means each page load (and
+  // each visitor) sees the three doctors in a genuinely random order --
+  // no single doctor is positioned first by default.
+  document.addEventListener('astro:page-load', () => {
+    const grid = document.getElementById('doctorGrid');
+    if (!grid) return;
+    const cards = Array.from(grid.children);
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    cards.forEach((card) => grid.appendChild(card));
+  });
+</script>
