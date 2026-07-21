@@ -246,6 +246,12 @@ const { defaultService, defaultDoctorId } = Astro.props;
     });
 
     doctorSelect?.addEventListener('change', () => {
+      if (doctorSelect.value) {
+        window.gtag?.('event', 'doctor_selected', {
+          event_category: 'engagement',
+          event_label: doctorSelect.value === 'any' ? 'no_preference' : 'specific_doctor',
+        });
+      }
       if (dateInput?.value) loadAvailableSlots(dateInput.value);
     });
 
@@ -310,17 +316,19 @@ const { defaultService, defaultDoctorId } = Astro.props;
           const result = await response.json();
 
           if (!response.ok || !result.success) {
+            window.gtag?.('event', 'booking_failed', {
+              event_category: 'engagement',
+              event_label: service,
+              error_message: result.error || 'unknown_error',
+            });
             throw new Error(result.error || "Could not complete your booking. Please try again or call us directly.");
           }
-
-          // Temporary diagnostic -- remove once booking_completed is
-          // confirmed showing up correctly in GA4 Realtime.
-          console.log('Booking success block reached, about to fire gtag');
-          window.gtag?.('event', 'booking_test');
 
           window.gtag?.('event', 'booking_completed', {
             event_category: 'conversion',
             event_label: service,
+            doctor_preference: isNoPreference ? 'no_preference' : 'specific_doctor',
+            doctor_id: isNoPreference ? undefined : doctorId,
           });
 
           successMessage?.classList.remove('hidden');
