@@ -1,0 +1,87 @@
+---
+// src/pages/[category].astro
+//
+// One reusable page per top-level service category (Hair, Skin, Cosmetic,
+// Pediatric) -- matches the 4 category values in the services content
+// schema, and is what the Navbar mega-menu's category headers link to
+// (/hair, /skin, /cosmetic, /pediatric). Built as a single dynamic router
+// rather than 4 near-identical files, since the only thing that differs
+// between them is which services get filtered in and the page copy.
+import MainLayout from '../layouts/MainLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+import { siteConfig } from '../config/site.js';
+
+const categoryContent = {
+  hair: {
+    label: 'Hair',
+    headline: 'Hair Care Services',
+    subheadline: 'From surgical restoration to medical management of hair loss and scalp conditions, evaluated and treated by AIIMS-trained dermatologists.',
+  },
+  skin: {
+    label: 'Skin',
+    headline: 'Skin Care Services',
+    subheadline: 'Evidence-based diagnosis and treatment for acne, pigmentation, chronic skin conditions, infections, and more.',
+  },
+  cosmetic: {
+    label: 'Cosmetic',
+    headline: 'Cosmetic Dermatology Services',
+    subheadline: 'Conservative, natural-looking cosmetic treatments administered by trained consultant dermatologists -- never a one-size-fits-all package.',
+  },
+  pediatric: {
+    label: 'Pediatric',
+    headline: 'Pediatric Dermatology Services',
+    subheadline: 'Child-friendly, age-appropriate care for skin, hair, and nail concerns in infants and children.',
+  },
+};
+
+export async function getStaticPaths() {
+  return Object.keys(categoryContent).map((category) => ({
+    params: { category },
+  }));
+}
+
+const { category } = Astro.params;
+const content = categoryContent[category];
+
+const allServices = await getCollection('services');
+const services = allServices
+  .filter((s) => s.data.category === category)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+const pageTitle = content.headline;
+const pageDescription = `${content.subheadline} Available at ${siteConfig.name}, KK Nagar, Chennai.`;
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+  <Breadcrumbs items={[
+    { name: "Services", url: "/services" },
+    { name: content.label, url: `/${category}` }
+  ]} />
+
+  <div class="bg-brand-900 text-white py-16 px-6 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-4">{content.headline}</h1>
+    <p class="text-lg text-brand-200 max-w-2xl mx-auto">{content.subheadline}</p>
+  </div>
+
+  <div class="max-w-6xl mx-auto py-16 px-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {services.map((service) => (
+        <a
+          href={`/services/${service.slug}`}
+          class="bg-white rounded-2xl border border-champagne-200 p-6 hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full"
+        >
+          <h2 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-brand-700 transition-colors">{service.data.title}</h2>
+          <p class="text-sm text-slate-600 leading-relaxed mb-4 flex-grow">{service.data.heroSubheadline}</p>
+          <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
+            Learn More <span aria-hidden="true">&rarr;</span>
+          </span>
+        </a>
+      ))}
+    </div>
+
+    <div class="text-center mt-12">
+      <a href="/services" class="inline-block text-brand-700 font-bold hover:underline">View all services &rarr;</a>
+    </div>
+  </div>
+</MainLayout>
