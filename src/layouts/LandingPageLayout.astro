@@ -42,13 +42,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(image, Astro.site || siteConfig.url)} />
 
-    <!-- TODO: replace with a new GA4 property for crisprdermatology.com -- this ID is still the eye-care site's -->
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-GR0G04EY1M"></script>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-6JTEB0S8T0"></script>
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-GR0G04EY1M');
+      gtag('config', 'G-6JTEB0S8T0');
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
