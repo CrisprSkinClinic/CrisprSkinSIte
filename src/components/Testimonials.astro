@@ -1,49 +1,22 @@
 ---
-// Real Google reviews, curated 2-per-doctor from CRISPR_Google_Reviews_Compiled.xlsx.
-// Names shown as written on Google, formatted to consistent title case.
-// Quotes are trimmed to a representative excerpt of the original review
-// (full text is longer in most cases) -- trimmed for card length, not
-// reworded, per the user's explicit instruction to keep them real
-// excerpts rather than paraphrase.
+// Testimonials now live in src/content/testimonials/ (managed via
+// /staff-admin -> "Testimonials" tab) rather than hardcoded here, so
+// staff can add/remove/reorder which reviews are featured without a
+// code change. Only entries with active: true are shown, sorted by
+// the optional `order` field (undefined orders sort last).
+import { getCollection } from 'astro:content';
 
-const reviews = [
-  {
-    name: "Varun Shenoy",
-    doctorSlug: "dr-karthik-l",
-    doctorName: "Dr. Karthik L",
-    quote: "I have undergone hair transplant surgery performed by Dr Karthik L & Dr Narayanan B. The surgery was done to their fullest effort and great expertise. I had no swelling post surgery. Trustworthy and highly recommended."
-  },
-  {
-    name: "Soundarya Balaji",
-    doctorSlug: "dr-karthik-l",
-    doctorName: "Dr. Karthik L",
-    quote: "Dr. Karthik performed wart removal on our little one. He was very patient in addressing the issue to us and explained the process beforehand. He was smooth and quick during the procedure."
-  },
-  {
-    name: "Sakthivel Kanakavelu",
-    doctorSlug: "dr-narayanan-a",
-    doctorName: "Dr. Narayanan A",
-    quote: "His kindness, focused listening, and thorough analysis of my skin condition stood out from the very beginning. Thanks to his accurate diagnosis and prompt treatment, my skin issues were resolved in the shortest possible time."
-  },
-  {
-    name: "Balasubramanian S.N.",
-    doctorSlug: "dr-narayanan-a",
-    doctorName: "Dr. Narayanan A",
-    quote: "The Doctor is mild mannered, and very amiable in nature. He inspected the affected portions and gave positive diagnosis... would willingly suggest and recommend his name for anything concerned with hair and skin."
-  },
-  {
-    name: "VVP Comps",
-    doctorSlug: "dr-narayanan-b",
-    doctorName: "Dr. Narayanan B",
-    quote: "The way of communicating with the patients is inspiring. His detailed analysis is very attractive. He doesn't unnecessarily prescribe extra medicines. I am seeing a good result in my treatment."
-  },
-  {
-    name: "Varun Shenoy",
-    doctorSlug: "dr-narayanan-b",
-    doctorName: "Dr. Narayanan B",
-    quote: "The surgery was done to their fullest effort and great expertise. Pre and post surgical care was great and I am extremely satisfied. Trustworthy and highly recommended."
-  },
-];
+const allTestimonials = await getCollection('testimonials');
+const reviews = allTestimonials
+  .filter((t) => t.data.active)
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+  .map((t) => ({
+    name: t.data.name,
+    rating: t.data.rating,
+    doctorSlug: t.data.doctorSlug,
+    doctorName: t.data.doctorName,
+    quote: t.body.trim(),
+  }));
 ---
 
 <section class="bg-brand-50/50 py-20 px-6 border-y border-champagne-200">
@@ -66,9 +39,9 @@ const reviews = [
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
           </div>
           
-          <!-- 5-Star Rating -->
+          <!-- Star Rating -->
           <div class="flex gap-1 mb-6 text-amber-400">
-            {[...Array(5)].map(() => (
+            {[...Array(review.rating || 5)].map(() => (
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
             ))}
           </div>
