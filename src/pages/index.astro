@@ -5,7 +5,7 @@ import ServiceCard from '../components/ServiceCard.astro';
 import Testimonials from '../components/Testimonials.astro';
 import FAQ from '../components/FAQ.astro';
 import CTA from '../components/CTA.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import ClinicGallery from '../components/ClinicGallery.astro';
 import BookingSection from '../components/LandingPageSections/BookingSection.astro';
 import { siteConfig } from '../config/site.js';
@@ -23,6 +23,22 @@ const featuredServices = [
   { image: '/images/services/botox.jpg', alt: 'Cosmetic dermatology treatment', title: 'Botox & Fillers', description: 'Subtle, natural-looking anti-ageing and rejuvenation treatments administered by trained dermatologists.', link: '/services/botox' },
   { image: '/images/services/pediatric-dermatology.jpg', alt: 'Pediatric dermatology consultation', title: 'Pediatric Dermatology', description: "A child-friendly approach to eczema, birthmarks, and other skin conditions in infants and children.", link: '/services/pediatric-dermatology' },
 ];
+
+// A representative spread of conditions across categories (Hair, Skin,
+// Cosmetic-adjacent, Pediatric), pulled from the real conditions
+// collection by slug -- title/description come from the actual content
+// files, not hardcoded copy, so this stays correct if those files change.
+const featuredConditionSlugs = [
+  'androgenetic-alopecia',
+  'melasma',
+  'vitiligo',
+  'plaque-psoriasis',
+  'hormonal-acne',
+  'childhood-atopic-dermatitis',
+];
+const featuredConditions = (
+  await Promise.all(featuredConditionSlugs.map((slug) => getEntry('conditions', slug)))
+).filter(Boolean);
 
 // SEO Optimized Meta Data (Ranking Booster)
 const pageTitle = "Best Skin & Hair Clinic in KK Nagar, Chennai";
@@ -65,6 +81,29 @@ const latestPosts = allPosts
 
     <div class="text-center mt-10">
       <a href="/services" class="inline-block text-brand-700 font-bold hover:underline">View all services &rarr;</a>
+    </div>
+  </section>
+
+  <section class="py-16 px-6 max-w-7xl mx-auto bg-champagne-50 rounded-3xl" id="conditions">
+    <div class="text-center mb-12 pt-4">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-4">Conditions We Treat</h2>
+      <p class="text-lg text-slate-600 max-w-2xl mx-auto">A closer look at the specific hair, skin, and paediatric conditions our doctors diagnose and manage every day.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-2 pb-4">
+      {featuredConditions.map((condition) => (
+        <a href={`/conditions/${condition.slug}`} class="bg-white rounded-2xl border border-champagne-200 p-6 hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full">
+          <h3 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-brand-700 transition-colors">{condition.data.title}</h3>
+          <p class="text-sm text-slate-600 leading-relaxed mb-4 flex-grow">{condition.data.heroSubheadline}</p>
+          <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
+            Learn More <span aria-hidden="true">&rarr;</span>
+          </span>
+        </a>
+      ))}
+    </div>
+
+    <div class="text-center pb-4">
+      <a href="/conditions" class="inline-block text-brand-700 font-bold hover:underline">View all conditions &rarr;</a>
     </div>
   </section>
 
