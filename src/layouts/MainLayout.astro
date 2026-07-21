@@ -11,7 +11,11 @@ const {
   title, 
   description = siteConfig.description,
   image = '/images/hero-doctor.jpg', // Default fallback image for link sharing
-  type = 'website'
+  type = 'website',
+  // Defaults to indexed (false) -- only internal/non-public pages like
+  // /staff-admin should pass true here. Ad landing pages use their own
+  // LandingPageLayout, which already handles noindex separately.
+  noindex = false,
 } = Astro.props;
 
 // Automatically generate the exact canonical URL for the current page
@@ -32,6 +36,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
     <title>{title} | {siteConfig.name}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonicalURL} />
@@ -165,6 +170,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
             gtag('event', 'directions_click', {
               event_category: 'engagement',
               event_label: 'get_directions',
+            });
+            return;
+          }
+
+          if (href.startsWith('mailto:')) {
+            gtag('event', 'email_click', {
+              event_category: 'engagement',
+              event_label: href.replace('mailto:', ''),
             });
             return;
           }
