@@ -52,9 +52,52 @@ if (data.faqIds && data.faqIds.length > 0) {
     .filter(Boolean)
     .map((f) => ({ question: f.data.question, answer: f.body }));
 }
+
+// Structured data (JSON-LD) for search engines. FAQPage schema mirrors
+// the same faqEntries already resolved above for the visible accordion
+// -- reusing that data rather than re-deriving it, so the two can never
+// drift out of sync. MedicalWebPage identifies this as patient-facing
+// medical content and folds in the treatments already listed on the
+// page as MedicalTherapy sub-entities.
+const pageUrl = new URL(`/services/${entry.slug}`, siteConfig.url).toString();
+
+const faqSchema = faqEntries.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqEntries.map((f) => ({
+    "@type": "Question",
+    "name": f.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": f.answer,
+    },
+  })),
+} : null;
+
+const medicalWebPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "MedicalWebPage",
+  "name": data.title,
+  "description": data.metaDescription,
+  "url": pageUrl,
+  "medicalAudience": {
+    "@type": "MedicalAudience",
+    "audienceType": "Patient",
+  },
+  ...(data.treatments && data.treatments.length > 0 && {
+    "about": data.treatments.map((t) => ({
+      "@type": "MedicalTherapy",
+      "name": t.name,
+      "description": t.description,
+    })),
+  }),
+};
 ---
 
 <MainLayout title={data.title} description={data.metaDescription}>
+  <script type="application/ld+json" set:html={JSON.stringify(medicalWebPageSchema)} />
+  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
+
   <Breadcrumbs items={[
     { name: "Services", url: "/services" },
     { name: data.title, url: `/services/${entry.slug}` }
