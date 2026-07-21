@@ -19,6 +19,7 @@ import MainLayout from '../layouts/MainLayout.astro';
       <div class="flex gap-3 border-b border-slate-200 flex-wrap">
         <button id="tabBlog" class="px-4 py-2 font-semibold text-brand-600 border-b-2 border-brand-600">Blog Posts</button>
         <button id="tabFaq" class="px-4 py-2 font-semibold text-slate-500">FAQs</button>
+        <button id="tabTestimonials" class="px-4 py-2 font-semibold text-slate-500">Testimonials</button>
         <button id="tabBookings" class="px-4 py-2 font-semibold text-slate-500">Bookings &amp; Schedule</button>         
         <button id="tabLandingPages" class="px-4 py-2 font-semibold text-slate-500">Landing Pages</button>
       </div>
@@ -73,6 +74,43 @@ import MainLayout from '../layouts/MainLayout.astro';
             <button type="submit" class="bg-brand-900 text-white font-bold px-6 py-3 rounded-md hover:bg-brand-800 transition">Save (Create Pull Request)</button>
             <button type="button" id="cancelFaqBtn" class="bg-slate-100 text-slate-700 font-semibold px-6 py-3 rounded-md hover:bg-slate-200 transition">Cancel</button>
             <button type="button" id="deleteFaqBtn" class="hidden bg-red-50 text-red-600 font-semibold px-6 py-3 rounded-md hover:bg-red-100 transition ml-auto">Delete This FAQ</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TESTIMONIALS SECTION -->
+      <div id="testimonialsSection" class="hidden">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-slate-900">Existing Testimonials</h2>
+          <button id="newTestimonialBtn" class="bg-brand-900 text-white font-semibold px-4 py-2 rounded-md hover:bg-brand-800 transition text-sm">+ New Testimonial</button>
+        </div>
+        <p class="text-sm text-slate-500 mb-4">Only testimonials marked "Active" are shown on the site. Deactivate one to hide it without deleting it.</p>
+        <div id="testimonialList" class="space-y-2 mb-8"><p class="text-slate-400 text-sm">Loading...</p></div>
+
+        <form id="testimonialForm" class="hidden space-y-4 bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+          <input type="hidden" name="_filePath" />
+          <input type="hidden" name="_sha" />
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Patient Name *</label><input type="text" name="name" required placeholder="Varun Shenoy" class="w-full px-4 py-2 border border-slate-300 rounded-md" /></div>
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Rating (1-5)</label><input type="number" name="rating" min="1" max="5" placeholder="5" class="w-full px-4 py-2 border border-slate-300 rounded-md" /></div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Doctor</label>
+            <select name="doctorSlug" id="testimonialDoctorSelect" class="w-full px-4 py-2 border border-slate-300 rounded-md">
+              <option value="">Not specified / general</option>
+              <option value="dr-karthik-l">Dr. Karthik L</option>
+              <option value="dr-narayanan-a">Dr. Narayanan A</option>
+              <option value="dr-narayanan-b">Dr. Narayanan B</option>
+            </select>
+          </div>
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Display Order</label><input type="number" name="order" placeholder="1" class="w-full px-4 py-2 border border-slate-300 rounded-md" /></div>
+          <div class="flex items-center gap-2">
+            <input type="checkbox" name="active" id="testimonialActiveCheckbox" checked class="w-4 h-4" />
+            <label for="testimonialActiveCheckbox" class="text-sm font-medium text-slate-700">Active (visible on site)</label>
+          </div>
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Review Text *</label><textarea name="body" required rows="6" placeholder="Paste or type the review text here..." class="w-full px-4 py-2 border border-slate-300 rounded-md"></textarea></div>
+          <div class="flex gap-3">
+            <button type="submit" class="bg-brand-900 text-white font-bold px-6 py-3 rounded-md hover:bg-brand-800 transition">Save (Create Pull Request)</button>
+            <button type="button" id="cancelTestimonialBtn" class="bg-slate-100 text-slate-700 font-semibold px-6 py-3 rounded-md hover:bg-slate-200 transition">Cancel</button>
+            <button type="button" id="deleteTestimonialBtn" class="hidden bg-red-50 text-red-600 font-semibold px-6 py-3 rounded-md hover:bg-red-100 transition ml-auto">Delete This Testimonial</button>
           </div>
         </form>
       </div>
@@ -222,24 +260,31 @@ import MainLayout from '../layouts/MainLayout.astro';
 
 const tabBlog = document.getElementById('tabBlog');
     const tabFaq = document.getElementById('tabFaq');
+    const tabTestimonials = document.getElementById('tabTestimonials');
     const tabBookings = document.getElementById('tabBookings');
     const tabLandingPages = document.getElementById('tabLandingPages');
     const blogSection = document.getElementById('blogSection');
     const faqSection = document.getElementById('faqSection');
+    const testimonialsSection = document.getElementById('testimonialsSection');
     const bookingsSection = document.getElementById('bookingsSection');
     const landingPagesSection = document.getElementById('landingPagesSection');
 
     const blogList = document.getElementById('blogList');
     const faqList = document.getElementById('faqList');
+    const testimonialList = document.getElementById('testimonialList');
     const blogForm = document.getElementById('blogForm') as HTMLFormElement;
     const faqForm = document.getElementById('faqForm') as HTMLFormElement;
+    const testimonialForm = document.getElementById('testimonialForm') as HTMLFormElement;
 
     const newBlogBtn = document.getElementById('newBlogBtn');
     const newFaqBtn = document.getElementById('newFaqBtn');
+    const newTestimonialBtn = document.getElementById('newTestimonialBtn');
     const cancelBlogBtn = document.getElementById('cancelBlogBtn');
     const cancelFaqBtn = document.getElementById('cancelFaqBtn');
+    const cancelTestimonialBtn = document.getElementById('cancelTestimonialBtn');
     const deleteBlogBtn = document.getElementById('deleteBlogBtn');
     const deleteFaqBtn = document.getElementById('deleteFaqBtn');
+    const deleteTestimonialBtn = document.getElementById('deleteTestimonialBtn');
 
     const blogTagInput = document.getElementById('blogTagInput') as HTMLInputElement;
     const blogTagAddBtn = document.getElementById('blogTagAddBtn');
@@ -334,26 +379,29 @@ const tabBlog = document.getElementById('tabBlog');
       adminPanel?.classList.remove('hidden');
       await loadList('blog');
       await loadList('faq');
+      await loadList('testimonial');
     });
 
     // ---- Tabs ----
-    function activateTab(tab: 'blog' | 'faq' | 'bookings' | 'landingPages') {
+    function activateTab(tab: 'blog' | 'faq' | 'testimonials' | 'bookings' | 'landingPages') {
       blogSection?.classList.toggle('hidden', tab !== 'blog');
       faqSection?.classList.toggle('hidden', tab !== 'faq');
+      testimonialsSection?.classList.toggle('hidden', tab !== 'testimonials');
       bookingsSection?.classList.toggle('hidden', tab !== 'bookings');
       landingPagesSection?.classList.toggle('hidden', tab !== 'landingPages');
 
-      [tabBlog, tabFaq, tabBookings, tabLandingPages].forEach((btn) => {
+      [tabBlog, tabFaq, tabTestimonials, tabBookings, tabLandingPages].forEach((btn) => {
         btn?.classList.remove('text-brand-600', 'border-b-2', 'border-brand-600');
         btn?.classList.add('text-slate-500');
       });
-      const activeBtn = tab === 'blog' ? tabBlog : tab === 'faq' ? tabFaq : tab === 'bookings' ? tabBookings : tabLandingPages;
+      const activeBtn = tab === 'blog' ? tabBlog : tab === 'faq' ? tabFaq : tab === 'testimonials' ? tabTestimonials : tab === 'bookings' ? tabBookings : tabLandingPages;
       activeBtn?.classList.add('text-brand-600', 'border-b-2', 'border-brand-600');
       activeBtn?.classList.remove('text-slate-500');
     }
 
 tabBlog?.addEventListener('click', () => activateTab('blog'));
     tabFaq?.addEventListener('click', () => activateTab('faq'));
+    tabTestimonials?.addEventListener('click', () => activateTab('testimonials'));
     tabLandingPages?.addEventListener('click', () => activateTab('landingPages'));
     tabBookings?.addEventListener('click', async () => {
       activateTab('bookings');
@@ -363,9 +411,9 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
       await loadBlockedSlots();
     });
 
-    // ---- Blog/FAQ (GitHub-based, unchanged) ----
-    async function loadList(contentType: 'blog' | 'faq') {
-      const listEl = contentType === 'blog' ? blogList : faqList;
+    // ---- Blog/FAQ/Testimonials (GitHub-based, unchanged mechanism) ----
+    async function loadList(contentType: 'blog' | 'faq' | 'testimonial') {
+      const listEl = contentType === 'blog' ? blogList : contentType === 'faq' ? faqList : testimonialList;
       try {
         const response = await fetch('/.netlify/functions/list-content', {
           method: 'POST',
@@ -414,8 +462,17 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     });
     cancelBlogBtn?.addEventListener('click', () => blogForm.classList.add('hidden'));
     cancelFaqBtn?.addEventListener('click', () => faqForm.classList.add('hidden'));
+    newTestimonialBtn?.addEventListener('click', () => {
+      testimonialForm.reset();
+      (testimonialForm.querySelector('[name="_filePath"]') as HTMLInputElement).value = '';
+      (testimonialForm.querySelector('[name="_sha"]') as HTMLInputElement).value = '';
+      (testimonialForm.querySelector('[name="active"]') as HTMLInputElement).checked = true;
+      deleteTestimonialBtn?.classList.add('hidden');
+      testimonialForm.classList.remove('hidden');
+    });
+    cancelTestimonialBtn?.addEventListener('click', () => testimonialForm.classList.add('hidden'));
 
-    async function openForEdit(contentType: 'blog' | 'faq', filePath: string) {
+    async function openForEdit(contentType: 'blog' | 'faq' | 'testimonial', filePath: string) {
       try {
         const response = await fetch('/.netlify/functions/list-content', {
           method: 'POST',
@@ -426,8 +483,8 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
         if (!response.ok) throw new Error(data.error || 'Failed to load item');
 
         const { frontmatter, body } = parseFrontmatter(data.content);
-        const form = contentType === 'blog' ? blogForm : faqForm;
-        const deleteBtn = contentType === 'blog' ? deleteBlogBtn : deleteFaqBtn;
+        const form = contentType === 'blog' ? blogForm : contentType === 'faq' ? faqForm : testimonialForm;
+        const deleteBtn = contentType === 'blog' ? deleteBlogBtn : contentType === 'faq' ? deleteFaqBtn : deleteTestimonialBtn;
 
         form.reset();
         if (contentType === 'blog') {
@@ -437,8 +494,27 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
         Object.entries(frontmatter).forEach(([key, value]) => {
           if (key === 'tags') return;
           const field = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
-          if (field) field.value = String(value);
+          if (!field) return;
+          // Checkboxes are set via .checked, not .value -- setting .value
+          // on a checkbox has no visible effect, which would otherwise
+          // mean an existing testimonial's active/inactive state is never
+          // reflected when reopening it for edit (always shows whatever
+          // the browser's default unchecked/checked state happens to be).
+          if (field.type === 'checkbox') {
+            field.checked = value === true || value === 'true';
+          } else {
+            field.value = String(value);
+          }
         });
+        // testimonials' `active` defaults to true in the schema and is
+        // therefore often omitted from the file entirely when true --
+        // Object.entries above only sets the checkbox if the key is
+        // present in frontmatter, so an omitted key needs an explicit
+        // default here (checked), matching the schema's own default.
+        if (contentType === 'testimonial' && !('active' in frontmatter)) {
+          const activeField = form.querySelector('[name="active"]') as HTMLInputElement;
+          if (activeField) activeField.checked = true;
+        }
         (form.querySelector('[name="body"]') as HTMLTextAreaElement).value = body;
         (form.querySelector('[name="_filePath"]') as HTMLInputElement).value = filePath;
         (form.querySelector('[name="_sha"]') as HTMLInputElement).value = data.sha;
@@ -472,7 +548,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
       return { frontmatter, body: body.trim() };
     }
 
-    async function submitContent(contentType: 'blog' | 'faq', form: HTMLFormElement) {
+    async function submitContent(contentType: 'blog' | 'faq' | 'testimonial', form: HTMLFormElement) {
       const formData = new FormData(form);
       const filePath = formData.get('_filePath') as string;
       const sha = formData.get('_sha') as string;
@@ -481,6 +557,16 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
       const fields: Record<string, any> = {};
       formData.forEach((value, key) => { fields[key] = value.toString(); });
       if (contentType === 'blog') fields.tags = blogTags;
+      if (contentType === 'testimonial') {
+        // A checkbox's field is simply absent from FormData when
+        // unchecked (rather than present with value "false") -- reading
+        // formData.forEach alone means unchecking "Active" would never
+        // actually get sent, and the backend's default-to-true behavior
+        // would silently keep the testimonial visible. Read the
+        // checkbox's real .checked state explicitly instead.
+        const activeCheckbox = form.querySelector('[name="active"]') as HTMLInputElement;
+        fields.active = activeCheckbox?.checked ?? true;
+      }
 
       showResult('Validating and creating pull request...');
       try {
@@ -499,8 +585,9 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     }
     blogForm?.addEventListener('submit', (e) => { e.preventDefault(); submitContent('blog', blogForm); });
     faqForm?.addEventListener('submit', (e) => { e.preventDefault(); submitContent('faq', faqForm); });
+    testimonialForm?.addEventListener('submit', (e) => { e.preventDefault(); submitContent('testimonial', testimonialForm); });
 
-    async function deleteItem(contentType: 'blog' | 'faq', form: HTMLFormElement) {
+    async function deleteItem(contentType: 'blog' | 'faq' | 'testimonial', form: HTMLFormElement) {
       const filePath = (form.querySelector('[name="_filePath"]') as HTMLInputElement).value;
       const sha = (form.querySelector('[name="_sha"]') as HTMLInputElement).value;
       if (!filePath || !sha) return;
@@ -522,6 +609,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     }
     deleteBlogBtn?.addEventListener('click', () => deleteItem('blog', blogForm));
     deleteFaqBtn?.addEventListener('click', () => deleteItem('faq', faqForm));
+    deleteTestimonialBtn?.addEventListener('click', () => deleteItem('testimonial', testimonialForm));
 
     // ---- Appointments ----
     async function loadAppointments() {
