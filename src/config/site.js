@@ -13,6 +13,9 @@ export const siteConfig = {
   doctors: [
     {
       slug: "dr-karthik-l",
+      // AppointmentManager Supabase `doctors.id` -- used by BookingCalendar
+      // to let patients pick this doctor when booking online.
+      dbId: "514ff136-ee45-4d49-89b5-d128d96aef62",
       name: "Dr. Karthik L",
       designation: "Consultant Dermatologist, Dermatosurgeon & Hair Transplant Surgeon",
       qualifications: "MBBS, MD (Dermatology) - AIIMS New Delhi, DNB (Dermatology), MRCP (SCE), UK",
@@ -33,6 +36,7 @@ export const siteConfig = {
     },
     {
       slug: "dr-narayanan-a",
+      dbId: "d5372165-fc7e-47e8-aee6-ce02e7fefc71",
       name: "Dr. Narayanan A",
       designation: "Consultant Dermatologist & Paediatric Dermatologist",
       qualifications: "MBBS, MD (Dermatology) - AIIMS New Delhi, DNB (Dermatology), MNAMS, PDCC (Paediatric Dermatology) - JIPMER Puducherry, MRCP (SCE), UK",
@@ -52,6 +56,7 @@ export const siteConfig = {
     },
     {
       slug: "dr-narayanan-b",
+      dbId: "519dbd89-d3d9-4ee9-8923-5fabbe51cf2e",
       name: "Dr. Narayanan B",
       designation: "Consultant Dermatologist & Dermatosurgeon",
       qualifications: "MBBS, MD (Dermatology) - AIIMS New Delhi",
