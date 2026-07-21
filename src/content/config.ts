@@ -33,6 +33,30 @@ const blogCollection = defineCollection({
   }),
 });
 
+// Curated patient testimonials, shown on Testimonials.astro. Content
+// lives here (not hardcoded in the component) specifically so staff can
+// add/edit/remove them via /staff-admin without a code change or
+// redeploy request -- see create-content.js's "testimonial" contentType.
+const testimonialCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    // Patient name as it should display -- full name as written on
+    // Google, or a shortened form, per whatever the staff member enters.
+    name: z.string(),
+    rating: z.number().min(1).max(5).default(5),
+    // Optional: which doctor this testimonial is attributed to, for
+    // internal reference/filtering. Not required -- some reviews (e.g.
+    // ones that don't name a specific doctor) can omit this.
+    doctorSlug: z.string().optional(),
+    doctorName: z.string().optional(),
+    // Whether this testimonial is currently shown on the site. Lets
+    // staff deactivate one without deleting it (e.g. to swap which 5-6
+    // are featured) rather than losing the content entirely.
+    active: z.boolean().default(true),
+    order: z.number().optional(),
+  }),
+});
+
 // Ad / Google Ads landing pages -- one entry per campaign/ad group.
 const landingPageCollection = defineCollection({
   type: 'data',
@@ -93,6 +117,15 @@ const landingPageCollection = defineCollection({
     // silently ignored (falls back to the unselected placeholder).
     defaultService: z.string().optional(),
 
+    // Pre-selects a doctor in the booking form's dropdown, for services
+    // with an obvious single-doctor match (e.g. pediatric-dermatology ->
+    // Narayanan A). Must match one of siteConfig.doctors[].dbId exactly.
+    // Left unset for services without a natural single-doctor fit, so the
+    // patient picks -- this deliberately does NOT default to any one
+    // doctor when omitted (see the doctor-neutrality fix elsewhere in
+    // this codebase).
+    defaultDoctorId: z.string().optional(),
+
     // Renders ServicesOverviewGrid (full 8-service grid, reusing
     // ServiceCard) in place of a single psychology-specific block, for
     // broad/local-intent pages (e.g. "Eye Clinic KK Nagar") that have
@@ -120,9 +153,10 @@ const landingPageCollection = defineCollection({
 
     // Personal, first-person framing from one of the clinic's doctors --
     // the one thing a corporate hospital chain cannot replicate at scale.
-    // doctorSlug is required (must match a slug in siteConfig.doctors)
-    // so the quote is explicitly attributed per page rather than
-    // defaulting to any single doctor across the whole site.
+    // doctorSlug identifies which of the clinic's doctors is speaking
+    // (matches siteConfig.doctors[].slug) so the quote is explicitly
+    // attributed per page rather than defaulting to any single doctor
+    // across the whole site.
     doctorsPerspective: z.string().optional(),
     doctorsPerspectiveDoctorSlug: z.string().optional(),
 
@@ -288,4 +322,5 @@ export const collections = {
   'landingPages': landingPageCollection,
   'services': serviceCollection,
   'conditions': conditionCollection,
+  'testimonials': testimonialCollection,
 };
