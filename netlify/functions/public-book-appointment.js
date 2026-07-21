@@ -21,11 +21,15 @@ try {
 
 const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 
-// Fallback only -- used if a caller doesn't pass doctorId, preserving
-// behavior for any existing integration that predates doctor selection.
-// CRISPR Skin and Hair Clinic's BookingCalendar always passes an explicit
-// doctorId for one of Karthik L / Narayanan A / Narayanan B.
-const DEFAULT_DOCTOR_ID = "5523d5a2-855c-46a5-9bda-04a1f1563d38";
+// CRISPR Skin and Hair Clinic's three dermatology doctors -- used when a
+// patient books without a doctor preference (candidateDoctorIds omitted
+// or covers doctors we should re-verify against). Kept in sync with the
+// same list in public-available-slots.js.
+const CLINIC_DOCTOR_IDS = [
+  "514ff136-ee45-4d49-89b5-d128d96aef62", // Karthik L
+  "d5372165-fc7e-47e8-aee6-ce02e7fefc71", // Narayanan A
+  "519dbd89-d3d9-4ee9-8923-5fabbe51cf2e", // Narayanan B
+];
 
 // Maps JS Date#getUTCDay() (0 = Sunday) to slot_templates.day_of_week enum values.
 const DAY_OF_WEEK_BY_INDEX = [
@@ -53,8 +57,22 @@ exports.handler = async (event) => {
   // BookingCalendar.astro should concatenate prefix + firstName + lastName
   // into a single `name` string before calling this function -- patients.name
   // is one text column, so the split-name concept ends at the form layer.
-  const { name, phone, email, service, date, time, doctorId: requestedDoctorId } = payload || {};
-  const doctorId = requestedDoctorId || DEFAULT_DOCTOR_ID;
+  const {
+    name,
+    phone,
+    email,
+    service,
+    date,
+    time,
+    doctorId: requestedDoctorId,
+    // Sent instead of doctorId when the patient booked without a
+    // preference -- the list of doctor IDs the availability check found
+    // free at this exact slot (see public-available-slots.js's merged
+    // "no preference" response). We re-verify and pick randomly among
+    // these server-side, rather than trusting a doctor choice made
+    // client-side or baked in at page-load time.
+    candidateDoctorIds,
+  } = payload || {};
 
   const missing = [];
   if (!name) missing.push("name");
@@ -62,6 +80,9 @@ exports.handler = async (event) => {
   if (!service) missing.push("service");
   if (!date) missing.push("date");
   if (!time) missing.push("time");
+  if (!requestedDoctorId && !(Array.isArray(candidateDoctorIds) && candidateDoctorIds.length > 0)) {
+    missing.push("doctorId (or candidateDoctorIds for no-preference bookings)");
+  }
   if (missing.length) {
     return {
       statusCode: 400,
@@ -117,70 +138,101 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: "Invalid date." }) };
     }
 
-    const { data: overrides, error: overridesError } = await supabase
-      .from("schedule_overrides")
-      .select("*")
-      .eq("doctor_id", doctorId)
-      .eq("override_date", slotDate);
-    if (overridesError) throw overridesError;
+    // Candidates to try, in the order we'll attempt to book them. A single
+    // requested doctorId is tried alone (existing behavior, unchanged).
+    // For no-preference bookings, we shuffle the candidates so which
+    // doctor gets the booking isn't determined by array order or any
+    // other predictable rule -- genuine randomness, decided here on the
+    // server rather than by the client.
+    const candidates = requestedDoctorId
+      ? [requestedDoctorId]
+      : shuffle(candidateDoctorIds.filter((id) => CLINIC_DOCTOR_IDS.includes(id)));
 
-    if ((overrides || []).some((o) => o.override_type === "leave")) {
-      return ok({ success: false, error: "The selected doctor is not available on the selected date." }, 409);
+    if (candidates.length === 0) {
+      return { statusCode: 400, body: JSON.stringify({ error: "No valid doctor candidates provided." }) };
     }
 
-    if ((overrides || []).some((o) => o.override_type === "blocked_slot" && o.blocked_slot === slotTime)) {
-      return ok({ success: false, error: "That time slot is unavailable on the selected date." }, 409);
-    }
-
-    const modifiedOverride = (overrides || []).find((o) => o.override_type === "modified");
-
+    let doctorId = null;
     let validWindow = null;
     let maxPerSlot = 1;
+    let lastFailureReason = "The selected time is outside available hours.";
 
-    if (modifiedOverride) {
-      // A modified override replaces the normal template window for this date.
-      if (
-        modifiedOverride.modified_start &&
-        modifiedOverride.modified_end &&
-        slotTime >= normalizeTime(modifiedOverride.modified_start) &&
-        slotTime < normalizeTime(modifiedOverride.modified_end)
-      ) {
-        validWindow = modifiedOverride;
-      }
-    } else {
-      const { data: templates, error: templatesError } = await supabase
-        .from("slot_templates")
+    for (const candidateId of candidates) {
+      const { data: overrides, error: overridesError } = await supabase
+        .from("schedule_overrides")
         .select("*")
-        .eq("doctor_id", doctorId)
-        .eq("day_of_week", dayOfWeek)
-        .eq("is_active", true);
-      if (templatesError) throw templatesError;
+        .eq("doctor_id", candidateId)
+        .eq("override_date", slotDate);
+      if (overridesError) throw overridesError;
 
-      const matchingTemplate = (templates || []).find(
-        (t) => slotTime >= normalizeTime(t.session_start) && slotTime < normalizeTime(t.session_end)
-      );
-
-      if (matchingTemplate) {
-        validWindow = matchingTemplate;
-        maxPerSlot = matchingTemplate.max_per_slot || 1;
+      if ((overrides || []).some((o) => o.override_type === "leave")) {
+        lastFailureReason = "The selected doctor is not available on the selected date.";
+        continue;
       }
+
+      if ((overrides || []).some((o) => o.override_type === "blocked_slot" && o.blocked_slot === slotTime)) {
+        lastFailureReason = "That time slot is unavailable on the selected date.";
+        continue;
+      }
+
+      const modifiedOverride = (overrides || []).find((o) => o.override_type === "modified");
+
+      let candidateWindow = null;
+      let candidateMaxPerSlot = 1;
+
+      if (modifiedOverride) {
+        if (
+          modifiedOverride.modified_start &&
+          modifiedOverride.modified_end &&
+          slotTime >= normalizeTime(modifiedOverride.modified_start) &&
+          slotTime < normalizeTime(modifiedOverride.modified_end)
+        ) {
+          candidateWindow = modifiedOverride;
+        }
+      } else {
+        const { data: templates, error: templatesError } = await supabase
+          .from("slot_templates")
+          .select("*")
+          .eq("doctor_id", candidateId)
+          .eq("day_of_week", dayOfWeek)
+          .eq("is_active", true);
+        if (templatesError) throw templatesError;
+
+        const matchingTemplate = (templates || []).find(
+          (t) => slotTime >= normalizeTime(t.session_start) && slotTime < normalizeTime(t.session_end)
+        );
+
+        if (matchingTemplate) {
+          candidateWindow = matchingTemplate;
+          candidateMaxPerSlot = matchingTemplate.max_per_slot || 1;
+        }
+      }
+
+      if (!candidateWindow) continue;
+
+      const { count: existingCount, error: countError } = await supabase
+        .from("appointments")
+        .select("id", { count: "exact", head: true })
+        .eq("doctor_id", candidateId)
+        .eq("slot_date", slotDate)
+        .eq("slot_time", slotTime)
+        .not("status", "in", "(cancelled)");
+      if (countError) throw countError;
+
+      if ((existingCount || 0) >= candidateMaxPerSlot) {
+        lastFailureReason = "That time slot is already fully booked.";
+        continue;
+      }
+
+      // This candidate is genuinely available -- use it.
+      doctorId = candidateId;
+      validWindow = candidateWindow;
+      maxPerSlot = candidateMaxPerSlot;
+      break;
     }
 
-    if (!validWindow) {
-      return ok({ success: false, error: "The selected time is outside available hours." }, 409);
-    }
-
-    const { count: existingCount, error: countError } = await supabase
-      .from("appointments")
-      .select("id", { count: "exact", head: true })
-      .eq("doctor_id", doctorId)
-      .eq("slot_date", slotDate)
-      .eq("slot_time", slotTime)
-      .not("status", "in", "(cancelled)");
-    if (countError) throw countError;
-
-    if ((existingCount || 0) >= maxPerSlot) {
-      return ok({ success: false, error: "That time slot is already fully booked." }, 409);
+    if (!doctorId) {
+      return ok({ success: false, error: lastFailureReason }, 409);
     }
 
     // ---- Find or create the patient ----
@@ -265,4 +317,17 @@ function normalizeTime(t) {
 
 function ok(body, statusCode = 200) {
   return { statusCode, body: JSON.stringify(body) };
+}
+
+// Fisher-Yates shuffle -- used to randomize which doctor a no-preference
+// booking is tried against first, so doctor assignment isn't biased by
+// array order (e.g. always trying Karthik first because he's listed
+// first in CLINIC_DOCTOR_IDS).
+function shuffle(array) {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
 }
