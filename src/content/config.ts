@@ -33,6 +33,30 @@ const blogCollection = defineCollection({
   }),
 });
 
+// Curated patient testimonials, shown on Testimonials.astro. Content
+// lives here (not hardcoded in the component) specifically so staff can
+// add/edit/remove them via /staff-admin without a code change or
+// redeploy request -- see create-content.js's "testimonial" contentType.
+const testimonialCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    // Patient name as it should display -- full name as written on
+    // Google, or a shortened form, per whatever the staff member enters.
+    name: z.string(),
+    rating: z.number().min(1).max(5).default(5),
+    // Optional: which doctor this testimonial is attributed to, for
+    // internal reference/filtering. Not required -- some reviews (e.g.
+    // ones that don't name a specific doctor) can omit this.
+    doctorSlug: z.string().optional(),
+    doctorName: z.string().optional(),
+    // Whether this testimonial is currently shown on the site. Lets
+    // staff deactivate one without deleting it (e.g. to swap which 5-6
+    // are featured) rather than losing the content entirely.
+    active: z.boolean().default(true),
+    order: z.number().optional(),
+  }),
+});
+
 // Ad / Google Ads landing pages -- one entry per campaign/ad group.
 const landingPageCollection = defineCollection({
   type: 'data',
@@ -298,4 +322,5 @@ export const collections = {
   'landingPages': landingPageCollection,
   'services': serviceCollection,
   'conditions': conditionCollection,
+  'testimonials': testimonialCollection,
 };
