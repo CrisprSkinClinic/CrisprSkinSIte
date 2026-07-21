@@ -93,6 +93,15 @@ const landingPageCollection = defineCollection({
     // silently ignored (falls back to the unselected placeholder).
     defaultService: z.string().optional(),
 
+    // Pre-selects a doctor in the booking form's dropdown, for services
+    // with an obvious single-doctor match (e.g. pediatric-dermatology ->
+    // Narayanan A). Must match one of siteConfig.doctors[].dbId exactly.
+    // Left unset for services without a natural single-doctor fit, so the
+    // patient picks -- this deliberately does NOT default to any one
+    // doctor when omitted (see the doctor-neutrality fix elsewhere in
+    // this codebase).
+    defaultDoctorId: z.string().optional(),
+
     // Renders ServicesOverviewGrid (full 8-service grid, reusing
     // ServiceCard) in place of a single psychology-specific block, for
     // broad/local-intent pages (e.g. "Eye Clinic KK Nagar") that have
