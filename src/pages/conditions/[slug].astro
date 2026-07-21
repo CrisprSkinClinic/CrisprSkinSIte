@@ -35,11 +35,56 @@ if (data.faqIds && data.faqIds.length > 0) {
     .filter(Boolean)
     .map((f) => ({ question: f.data.question, answer: f.body }));
 }
+
+// Structured data (JSON-LD). MedicalCondition schema maps this page's
+// existing risk factors / symptoms / treatment overview into the
+// Schema.org properties built for exactly this content type, so search
+// engines can understand it as condition-specific medical information
+// rather than a generic page. FAQPage reuses the same faqEntries already
+// resolved above for the visible accordion, so the two can't drift.
+const pageUrl = new URL(`/conditions/${entry.slug}`, siteConfig.url).toString();
+
+const faqSchema = faqEntries.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqEntries.map((f) => ({
+    "@type": "Question",
+    "name": f.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": f.answer,
+    },
+  })),
+} : null;
+
+const conditionSchema = {
+  "@context": "https://schema.org",
+  "@type": "MedicalCondition",
+  "name": data.title,
+  "description": data.metaDescription,
+  "url": pageUrl,
+  ...(data.symptoms && data.symptoms.length > 0 && {
+    "signOrSymptom": data.symptoms.map((s) => ({ "@type": "MedicalSignOrSymptom", "name": s })),
+  }),
+  ...(data.riskFactors && data.riskFactors.length > 0 && {
+    "riskFactor": data.riskFactors.map((r) => ({ "@type": "MedicalRiskFactor", "name": r })),
+  }),
+  ...(data.treatmentOverview && data.treatmentOverview.length > 0 && {
+    "possibleTreatment": data.treatmentOverview.map((t) => ({
+      "@type": "MedicalTherapy",
+      "name": t.name,
+      "description": t.description,
+    })),
+  }),
+};
 ---
 
 <MainLayout title={data.title} description={data.metaDescription}>
+  <script type="application/ld+json" set:html={JSON.stringify(conditionSchema)} />
+  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
+
   <Breadcrumbs items={[
-    { name: "Services", url: "/#services" },
+    { name: "Services", url: "/services" },
     ...(parentService ? [{ name: parentService.data.title, url: `/services/${parentService.slug}` }] : []),
     { name: data.title, url: `/conditions/${entry.slug}` }
   ]} />
