@@ -23,9 +23,11 @@ try {
 
 const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 
-// Same doctor as public-book-appointment.js -- see that file for context
-// on why this is a deliberate hardcode, not an assumption she's the only doctor.
-const DOCTOR_ID = "5523d5a2-855c-46a5-9bda-04a1f1563d38";
+// Fallback only -- used if a caller doesn't pass doctorId, so any existing
+// eye-clinic-site integration that predates doctor selection keeps working
+// unchanged. All CRISPR Skin and Hair Clinic requests pass an explicit
+// doctorId for one of Karthik L / Narayanan A / Narayanan B.
+const DEFAULT_DOCTOR_ID = "5523d5a2-855c-46a5-9bda-04a1f1563d38";
 
 const DAY_OF_WEEK_BY_INDEX = [
   "sunday",
@@ -46,6 +48,11 @@ exports.handler = async (event) => {
     event.httpMethod === "GET"
       ? event.queryStringParameters && event.queryStringParameters.date
       : safeParse(event.body)?.date;
+
+  const doctorId =
+    (event.httpMethod === "GET"
+      ? event.queryStringParameters && event.queryStringParameters.doctorId
+      : safeParse(event.body)?.doctorId) || DEFAULT_DOCTOR_ID;
 
   if (!date) {
     return { statusCode: 400, body: JSON.stringify({ error: "Missing required field: date" }) };
@@ -93,7 +100,7 @@ exports.handler = async (event) => {
     const { data: doctorRow, error: doctorError } = await supabase
       .from("doctors")
       .select("slot_duration_mins")
-      .eq("id", DOCTOR_ID)
+      .eq("id", doctorId)
       .single();
     if (doctorError) throw doctorError;
     const slotDurationMins = doctorRow?.slot_duration_mins || 30;
@@ -108,12 +115,12 @@ exports.handler = async (event) => {
     const { data: overrides, error: overridesError } = await supabase
       .from("schedule_overrides")
       .select("*")
-      .eq("doctor_id", DOCTOR_ID)
+      .eq("doctor_id", doctorId)
       .eq("override_date", slotDate);
     if (overridesError) throw overridesError;
 
     if ((overrides || []).some((o) => o.override_type === "leave")) {
-      return ok({ slots: [], reason: "Dr. Rajeswari is not available on the selected date." });
+      return ok({ slots: [], reason: "The selected doctor is not available on the selected date." });
     }
 
     const blockedTimes = new Set(
@@ -131,7 +138,7 @@ exports.handler = async (event) => {
       const { data: templates, error: templatesError } = await supabase
         .from("slot_templates")
         .select("*")
-        .eq("doctor_id", DOCTOR_ID)
+        .eq("doctor_id", doctorId)
         .eq("day_of_week", dayOfWeek)
         .eq("is_active", true)
         .order("session_start", { ascending: true });
@@ -161,7 +168,7 @@ exports.handler = async (event) => {
     const { data: existingAppointments, error: appointmentsError } = await supabase
       .from("appointments")
       .select("slot_time")
-      .eq("doctor_id", DOCTOR_ID)
+      .eq("doctor_id", doctorId)
       .eq("slot_date", slotDate)
       .not("status", "in", "(cancelled)");
     if (appointmentsError) throw appointmentsError;

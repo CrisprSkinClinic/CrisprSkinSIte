@@ -21,12 +21,11 @@ try {
 
 const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 
-// Dr. Rajeswari is currently the only doctor accepting public bookings.
-// Confirmed via direct query against AppointmentManager's `doctors` table
-// (2026-06-29) -- there is a second doctor row (Karthik L) in the table,
-// so this is a deliberate hardcode of the one doctor open to self-service
-// booking, not an assumption that she's the only row.
-const DOCTOR_ID = "5523d5a2-855c-46a5-9bda-04a1f1563d38";
+// Fallback only -- used if a caller doesn't pass doctorId, preserving
+// behavior for any existing integration that predates doctor selection.
+// CRISPR Skin and Hair Clinic's BookingCalendar always passes an explicit
+// doctorId for one of Karthik L / Narayanan A / Narayanan B.
+const DEFAULT_DOCTOR_ID = "5523d5a2-855c-46a5-9bda-04a1f1563d38";
 
 // Maps JS Date#getUTCDay() (0 = Sunday) to slot_templates.day_of_week enum values.
 const DAY_OF_WEEK_BY_INDEX = [
@@ -54,7 +53,8 @@ exports.handler = async (event) => {
   // BookingCalendar.astro should concatenate prefix + firstName + lastName
   // into a single `name` string before calling this function -- patients.name
   // is one text column, so the split-name concept ends at the form layer.
-  const { name, phone, email, service, date, time } = payload || {};
+  const { name, phone, email, service, date, time, doctorId: requestedDoctorId } = payload || {};
+  const doctorId = requestedDoctorId || DEFAULT_DOCTOR_ID;
 
   const missing = [];
   if (!name) missing.push("name");
@@ -120,12 +120,12 @@ exports.handler = async (event) => {
     const { data: overrides, error: overridesError } = await supabase
       .from("schedule_overrides")
       .select("*")
-      .eq("doctor_id", DOCTOR_ID)
+      .eq("doctor_id", doctorId)
       .eq("override_date", slotDate);
     if (overridesError) throw overridesError;
 
     if ((overrides || []).some((o) => o.override_type === "leave")) {
-      return ok({ success: false, error: "Dr. Rajeswari is not available on the selected date." }, 409);
+      return ok({ success: false, error: "The selected doctor is not available on the selected date." }, 409);
     }
 
     if ((overrides || []).some((o) => o.override_type === "blocked_slot" && o.blocked_slot === slotTime)) {
@@ -151,7 +151,7 @@ exports.handler = async (event) => {
       const { data: templates, error: templatesError } = await supabase
         .from("slot_templates")
         .select("*")
-        .eq("doctor_id", DOCTOR_ID)
+        .eq("doctor_id", doctorId)
         .eq("day_of_week", dayOfWeek)
         .eq("is_active", true);
       if (templatesError) throw templatesError;
@@ -173,7 +173,7 @@ exports.handler = async (event) => {
     const { count: existingCount, error: countError } = await supabase
       .from("appointments")
       .select("id", { count: "exact", head: true })
-      .eq("doctor_id", DOCTOR_ID)
+      .eq("doctor_id", doctorId)
       .eq("slot_date", slotDate)
       .eq("slot_time", slotTime)
       .not("status", "in", "(cancelled)");
@@ -219,7 +219,7 @@ exports.handler = async (event) => {
       .from("appointments")
       .insert({
         patient_id: patientId,
-        doctor_id: DOCTOR_ID,
+        doctor_id: doctorId,
         slot_date: slotDate,
         slot_time: slotTime,
         status: "booked",
