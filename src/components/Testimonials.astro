@@ -1,26 +1,48 @@
 ---
-// PLACEHOLDER REVIEWS -- replace with real, consented patient
-// testimonials before launch. Do not publish fabricated quotes
-// attributed to named patients; medical testimonial advertising is
-// tightly regulated (MCI/NMC guidelines) and fake reviews carry real
-// legal and reputational risk. Swap each entry below for an actual
-// review once collected, or wire this up to Google Reviews.
+// Real Google reviews, curated 2-per-doctor from CRISPR_Google_Reviews_Compiled.xlsx.
+// Names shown as written on Google, formatted to consistent title case.
+// Quotes are trimmed to a representative excerpt of the original review
+// (full text is longer in most cases) -- trimmed for card length, not
+// reworded, per the user's explicit instruction to keep them real
+// excerpts rather than paraphrase.
+
 const reviews = [
   {
-    name: "Patient testimonial pending",
-    service: "Hair Transplant",
-    quote: "Add a real, consented patient review here before launch."
+    name: "Varun Shenoy",
+    doctorSlug: "dr-karthik-l",
+    doctorName: "Dr. Karthik L",
+    quote: "I have undergone hair transplant surgery performed by Dr Karthik L & Dr Narayanan B. The surgery was done to their fullest effort and great expertise. I had no swelling post surgery. Trustworthy and highly recommended."
   },
   {
-    name: "Patient testimonial pending",
-    service: "Acne Treatment",
-    quote: "Add a real, consented patient review here before launch."
+    name: "Soundarya Balaji",
+    doctorSlug: "dr-karthik-l",
+    doctorName: "Dr. Karthik L",
+    quote: "Dr. Karthik performed wart removal on our little one. He was very patient in addressing the issue to us and explained the process beforehand. He was smooth and quick during the procedure."
   },
   {
-    name: "Patient testimonial pending",
-    service: "Cosmetic Dermatology",
-    quote: "Add a real, consented patient review here before launch."
-  }
+    name: "Sakthivel Kanakavelu",
+    doctorSlug: "dr-narayanan-a",
+    doctorName: "Dr. Narayanan A",
+    quote: "His kindness, focused listening, and thorough analysis of my skin condition stood out from the very beginning. Thanks to his accurate diagnosis and prompt treatment, my skin issues were resolved in the shortest possible time."
+  },
+  {
+    name: "Balasubramanian S.N.",
+    doctorSlug: "dr-narayanan-a",
+    doctorName: "Dr. Narayanan A",
+    quote: "The Doctor is mild mannered, and very amiable in nature. He inspected the affected portions and gave positive diagnosis... would willingly suggest and recommend his name for anything concerned with hair and skin."
+  },
+  {
+    name: "VVP Comps",
+    doctorSlug: "dr-narayanan-b",
+    doctorName: "Dr. Narayanan B",
+    quote: "The way of communicating with the patients is inspiring. His detailed analysis is very attractive. He doesn't unnecessarily prescribe extra medicines. I am seeing a good result in my treatment."
+  },
+  {
+    name: "Varun Shenoy",
+    doctorSlug: "dr-narayanan-b",
+    doctorName: "Dr. Narayanan B",
+    quote: "The surgery was done to their fullest effort and great expertise. Pre and post surgical care was great and I am extremely satisfied. Trustworthy and highly recommended."
+  },
 ];
 ---
 
@@ -54,10 +76,23 @@ const reviews = [
           <!-- Patient Info -->
           <div class="mt-auto pt-6 border-t border-champagne-200">
             <p class="font-extrabold text-slate-900">{review.name}</p>
-            <p class="text-sm text-brand-600 font-semibold uppercase tracking-wider mt-1">{review.service}</p>
+            <a href={`/our-doctors/${review.doctorSlug}`} class="text-sm text-brand-600 font-semibold uppercase tracking-wider mt-1 hover:underline inline-block">
+              Patient of {review.doctorName}
+            </a>
           </div>
         </div>
       ))}
+    </div>
+
+    <div class="text-center mt-12">
+      <a
+        href="https://share.google/VOkSEAUYVlRCSgVgT"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 text-brand-700 font-bold hover:underline"
+      >
+        Read all our reviews on Google &rarr;
+      </a>
     </div>
   </div>
 </section>
