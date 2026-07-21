@@ -120,6 +120,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
             return;
           }
 
+          if (href.startsWith('mailto:')) {
+            gtag('event', 'email_click', {
+              event_category: 'engagement',
+              event_label: href.replace('mailto:', ''),
+            });
+            return;
+          }
+
           if (link.dataset.track === 'booking-click') {
             gtag('event', 'booking_click', {
               event_category: 'engagement',
