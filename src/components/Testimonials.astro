@@ -53,7 +53,7 @@ const reviews = [
       <p class="text-lg text-slate-600 max-w-2xl mx-auto">Read about the experiences of patients who trusted CRISPR Skin and Hair Clinic with their care.</p>
     </div>
     
-    <div class="flex md:grid md:grid-cols-3 gap-6 md:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-smooth pb-4 -mx-6 px-6 md:mx-0 md:px-0">
+    <div id="testimonialsTrack" class="flex md:grid md:grid-cols-3 gap-6 md:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-smooth pb-4 -mx-6 px-6 md:mx-0 md:px-0">
       {reviews.map((review) => (
         <div class="shrink-0 w-[85vw] sm:w-80 md:w-auto snap-start bg-white p-8 rounded-2xl shadow-sm border border-champagne-200 relative group hover:shadow-md hover:border-brand-200 transition-all duration-300 flex flex-col">
           <!-- Decorative Quote Icon -->
@@ -77,7 +77,7 @@ const reviews = [
           <div class="mt-auto pt-6 border-t border-champagne-200">
             <p class="font-extrabold text-slate-900">{review.name}</p>
             <a href={`/our-doctors/${review.doctorSlug}`} class="text-sm text-brand-600 font-semibold uppercase tracking-wider mt-1 hover:underline inline-block">
-              Patient of {review.doctorName}
+              {review.doctorName}
             </a>
           </div>
         </div>
@@ -96,3 +96,21 @@ const reviews = [
     </div>
   </div>
 </section>
+
+<script>
+  // Shuffle review order on each visit. This is a static build, so a
+  // shuffle done in frontmatter would freeze the same order for every
+  // visitor until the next deploy -- doing it client-side here means no
+  // doctor's reviews are consistently shown first, matching the same
+  // unbiased-order approach used for the doctor grid elsewhere on the site.
+  document.addEventListener('astro:page-load', () => {
+    const track = document.getElementById('testimonialsTrack');
+    if (!track) return;
+    const cards = Array.from(track.children);
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    cards.forEach((card) => track.appendChild(card));
+  });
+</script>
