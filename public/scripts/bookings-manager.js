@@ -19,6 +19,8 @@ const state = {
   profile: null,
   viewDate: todayStr(),
   doctorFilter: 'all',
+  typeFilter: 'all',
+  statusFilter: 'all',
   appointments: [],
   editingAppointmentId: null,
   selectedSlots: [], // array of "HH:MM" strings
@@ -199,6 +201,32 @@ document.querySelectorAll('.bm-doctor-filter-btn').forEach((btn) => {
   });
 });
 
+document.querySelectorAll('.bm-type-filter-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    state.typeFilter = btn.dataset.typeFilter;
+    document.querySelectorAll('.bm-type-filter-btn').forEach((b) => {
+      b.classList.remove('bg-brand-900', 'text-white');
+      b.classList.add('bg-slate-100', 'text-slate-600');
+    });
+    btn.classList.remove('bg-slate-100', 'text-slate-600');
+    btn.classList.add('bg-brand-900', 'text-white');
+    renderAppointmentFeed();
+  });
+});
+
+document.querySelectorAll('.bm-status-filter-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    state.statusFilter = btn.dataset.statusFilter;
+    document.querySelectorAll('.bm-status-filter-btn').forEach((b) => {
+      b.classList.remove('bg-brand-900', 'text-white');
+      b.classList.add('bg-slate-100', 'text-slate-600');
+    });
+    btn.classList.remove('bg-slate-100', 'text-slate-600');
+    btn.classList.add('bg-brand-900', 'text-white');
+    renderAppointmentFeed();
+  });
+});
+
 // ---- Appointments ----
 async function loadAppointments() {
   const feed = document.getElementById('bm-appointment-feed');
@@ -214,8 +242,23 @@ async function loadAppointments() {
 
 function renderAppointmentFeed() {
   const feed = document.getElementById('bm-appointment-feed');
-  let list = state.appointments.filter((a) => a.status !== 'cancelled');
+  let list = state.statusFilter === 'all' ? state.appointments.filter((a) => a.status !== 'cancelled') : state.appointments.filter((a) => a.status === state.statusFilter);
   if (state.doctorFilter !== 'all') list = list.filter((a) => a.doctor_id === state.doctorFilter);
+  if (state.typeFilter !== 'all') {
+    list = list.filter((a) => {
+      // "New" and "Review" are stored verbatim at the start of notes
+      // (see the booking form's appointmentType construction), so those
+      // two match by literal prefix. "Procedure" bookings store the
+      // actual procedure name instead (e.g. "Chemical Peel"), not the
+      // literal word -- so Procedure is detected by exclusion (neither
+      // New nor Review) rather than a direct text match.
+      const serviceLabel = (a.notes || '').split('|')[0].trim();
+      if (state.typeFilter === 'Procedure') {
+        return serviceLabel !== 'New' && serviceLabel !== 'Review';
+      }
+      return serviceLabel === state.typeFilter;
+    });
+  }
   list.sort((a, b) => a.slot_time.localeCompare(b.slot_time));
 
   if (list.length === 0) {
@@ -276,6 +319,25 @@ function openDetailModal(appt) {
       <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Booked Via</span><span class="font-semibold text-slate-800">${sourceLabel}</span></div>
     </div>
   `;
+
+  // WhatsApp: pre-fill a confirmation message with the patient's own
+  // number, using wa.me's ?text= param. Only shown when a phone number
+  // is actually on file -- there's nothing to link to otherwise.
+  const whatsappBtn = document.getElementById('bm-whatsapp-appt');
+  const rawPhone = (appt.patients?.phone || '').replace(/[^\d]/g, '');
+  if (rawPhone) {
+    // wa.me needs a country code; assume India (+91) if a 10-digit
+    // local number was stored without one -- matches the clinic's own
+    // number format (+91 96984 44888) used elsewhere on the site.
+    const fullNumber = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+    const dateFormatted = new Date(appt.slot_date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
+    const message = `Hi ${appt.patients?.name || ''}, this is a confirmation of your appointment at CRISPR Skin and Hair Clinic with ${doctor ? doctor.name : 'our doctor'} on ${dateFormatted} at ${formatTime12h(appt.slot_time)} for ${serviceLabel}. Please arrive 10 minutes early. Call us at +91 96984 44888 if you need to reschedule.`;
+    whatsappBtn.href = `https://wa.me/${fullNumber}?text=${encodeURIComponent(message)}`;
+    whatsappBtn.classList.remove('hidden');
+  } else {
+    whatsappBtn.classList.add('hidden');
+  }
+
   document.getElementById('bm-detail-modal').classList.remove('hidden');
 }
 
@@ -421,6 +483,14 @@ async function refreshTimeSlots() {
       perDoctorFreeSlots[docId] = free;
     }
 
+    // Preserved (not just the merged set) so a "New" (30 min) booking
+    // can verify BOTH 15-min sub-slots are free for the SAME doctor --
+    // the merged set alone can't tell us that, since it would show a
+    // slot as available even if only a different candidate doctor is
+    // free there than the one free at the first slot.
+    state.perDoctorFreeSlots = perDoctorFreeSlots;
+    state.currentDoctorsToCheck = doctorsToCheck;
+
     // Merge: a slot is shown if at least one candidate doctor is free at it.
     const mergedSlots = new Set();
     for (const docId of doctorsToCheck) {
@@ -444,6 +514,21 @@ async function refreshTimeSlots() {
       btn.addEventListener('click', () => {
         if (isMulti) {
           state.selectedSlots = state.selectedSlots.includes(t) ? state.selectedSlots.filter((s) => s !== t) : [...state.selectedSlots, t];
+        } else if (typeEl.value === 'New') {
+          // New patient consultations are 30 min -- automatically
+          // reserve this slot plus the next consecutive 15-min slot,
+          // but only if some single doctor among the current
+          // candidates is free for BOTH (not just each slot
+          // individually across possibly-different doctors).
+          const nextSlot = minutesToTime(timeToMinutes(t) + 15);
+          const doctorFreeForBoth = doctorsToCheck.find(
+            (docId) => state.perDoctorFreeSlots[docId]?.has(t) && state.perDoctorFreeSlots[docId]?.has(nextSlot)
+          );
+          if (!doctorFreeForBoth) {
+            alert(`This slot is only 15 minutes free -- a New patient consultation needs 30 minutes with the same doctor. Please choose a different time.`);
+            return;
+          }
+          state.selectedSlots = [t, nextSlot];
         } else {
           state.selectedSlots = [t];
         }
