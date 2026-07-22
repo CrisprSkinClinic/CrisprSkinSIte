@@ -453,6 +453,14 @@ async function createAppointment(supabase, data, staffName, staffProfileId, logA
   const doctorsToCheck = doctorId === "any" ? CLINIC_DOCTOR_IDS : [doctorId];
   const linkedGroupId = slots.length > 1 ? crypto.randomUUID() : null;
   const insertedRows = [];
+  // Overbooking only makes sense against one specific, staff-chosen
+  // doctor -- "any available" plus override would mean silently
+  // picking who gets double-booked, which isn't a decision to make
+  // automatically. The frontend already enforces this (switching off
+  // "any" before allowing the override button to appear), but this is
+  // re-checked here too since client-side state is not a security or
+  // correctness boundary.
+  const allowOverbook = data.allowOverbook === true && doctorId !== "any";
 
   for (const slotTime of slots) {
     // For "any available", pick whichever doctor is actually free at
@@ -473,7 +481,16 @@ async function createAppointment(supabase, data, staffName, staffProfileId, logA
       }
     }
     if (!assignedDoctor) {
-      return { statusCode: 409, body: JSON.stringify({ error: `No doctor available at ${slotTime} -- that slot is fully booked.` }) };
+      if (allowOverbook) {
+        // Staff explicitly confirmed booking anyway despite no free
+        // capacity -- proceed with the doctor they chose rather than
+        // rejecting. This is a deliberate exception path, not a bug:
+        // walk-in patients standing at the desk are a real situation
+        // the "no slots" rejection alone doesn't handle.
+        assignedDoctor = doctorId;
+      } else {
+        return { statusCode: 409, body: JSON.stringify({ error: `No doctor available at ${slotTime} -- that slot is fully booked.` }) };
+      }
     }
 
     const { data: newAppt, error } = await supabase
