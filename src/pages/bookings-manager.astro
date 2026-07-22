@@ -1,0 +1,275 @@
+---
+// src/pages/bookings-manager.astro
+//
+// Standalone staff booking-management tool, separate from /staff-admin.
+// Uses real per-staff Supabase Auth logins (created directly in
+// Supabase by clinic admin) rather than a single shared password --
+// every appointment/schedule change is attributed to the actual signed-in
+// staff member. Replaces the clinic's previous Firebase-based scheduler
+// with an equivalent tool built on the same Supabase/AppointmentManager
+// backend the rest of the site's booking system already uses.
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Bookings Manager" description="Staff appointment and schedule management" noindex={true}>
+<div id="bm-root" class="min-h-screen bg-slate-100">
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="bm-login-screen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
+      <h2 class="text-2xl font-bold text-slate-800 mb-1">Bookings Manager</h2>
+      <p class="text-slate-500 text-sm mb-6">Sign in with your staff account.</p>
+      <form id="bm-login-form" class="space-y-4 text-left">
+        <div>
+          <label for="bm-email" class="text-xs font-semibold text-slate-500 mb-1 block">Email</label>
+          <input type="email" id="bm-email" required placeholder="you@crisprdermatology.com"
+                 class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+        </div>
+        <div>
+          <label for="bm-password" class="text-xs font-semibold text-slate-500 mb-1 block">Password</label>
+          <input type="password" id="bm-password" required placeholder="••••••••"
+                 class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+        </div>
+        <button type="submit" id="bm-login-btn"
+                class="w-full bg-brand-900 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-[0.98]">
+          Sign In
+        </button>
+        <p id="bm-login-error" class="text-red-500 text-sm text-center min-h-[1.25rem]"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP (hidden until signed in) ================= -->
+  <div id="bm-app" class="hidden min-h-screen flex flex-col">
+
+    <!-- Top bar -->
+    <div class="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div>
+        <h1 class="text-lg font-bold text-brand-900">Bookings Manager</h1>
+        <p id="bm-staff-name" class="text-xs text-slate-500"></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="bm-open-audit" title="Audit Log" class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6M9 8h6M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"/></svg>
+        </button>
+        <button id="bm-open-schedule" title="Manage Schedule" class="w-9 h-9 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-slate-200 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </button>
+        <button id="bm-signout" title="Sign Out" class="w-9 h-9 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Date pills for browsing appointments -->
+    <div class="bg-white border-b border-slate-200 px-4 py-3">
+      <div id="bm-date-pills" class="flex gap-2 overflow-x-auto pb-1"></div>
+    </div>
+
+    <!-- Doctor filter -->
+    <div class="bg-white border-b border-slate-200 px-4 py-2 flex gap-2 overflow-x-auto">
+      <button data-doctor-filter="all" class="bm-doctor-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-900 text-white whitespace-nowrap">All Doctors</button>
+      <button data-doctor-filter="514ff136-ee45-4d49-89b5-d128d96aef62" class="bm-doctor-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Dr. Karthik L</button>
+      <button data-doctor-filter="d5372165-fc7e-47e8-aee6-ce02e7fefc71" class="bm-doctor-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Dr. Narayanan A</button>
+      <button data-doctor-filter="519dbd89-d3d9-4ee9-8923-5fabbe51cf2e" class="bm-doctor-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Dr. Narayanan B</button>
+    </div>
+
+    <!-- Appointment feed -->
+    <div id="bm-appointment-feed" class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+      <p class="text-slate-400 text-sm text-center py-10">Loading...</p>
+    </div>
+
+    <!-- Floating "new appointment" button -->
+    <button id="bm-fab-new" class="fixed bottom-6 right-6 w-14 h-14 bg-brand-900 text-white rounded-2xl shadow-xl flex items-center justify-center z-30 hover:bg-brand-800 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+
+  <!-- ================= NEW/EDIT APPOINTMENT OVERLAY ================= -->
+  <div id="bm-booking-overlay" class="hidden fixed inset-0 bg-white z-40 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-100 justify-between items-center bg-white sticky top-0 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900">New Appointment</h2>
+      <button id="bm-close-booking" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="bm-edit-banner" class="hidden bg-amber-50 px-5 py-2.5 text-amber-800 text-sm font-bold flex justify-between items-center border-b border-amber-100">
+      <span>Editing Appointment</span>
+      <button id="bm-cancel-edit" class="underline text-xs">Cancel Edit</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-5 space-y-6 pb-32">
+      <!-- Date -->
+      <section>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">1. Date</label>
+        <input type="date" id="bm-form-date" class="w-full px-4 py-3 border border-slate-300 rounded-xl" />
+      </section>
+
+      <!-- Doctor -->
+      <section>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">2. Doctor</label>
+        <div class="grid grid-cols-4 gap-2" id="bm-form-doctor-group">
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-doctor" value="514ff136-ee45-4d49-89b5-d128d96aef62" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Karthik L</div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-doctor" value="d5372165-fc7e-47e8-aee6-ce02e7fefc71" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Narayanan A</div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-doctor" value="519dbd89-d3d9-4ee9-8923-5fabbe51cf2e" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Narayanan B</div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-doctor" value="any" class="peer sr-only" />
+            <div class="peer-checked:bg-slate-600 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Any</div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Appointment type -->
+      <section>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">3. Type & Duration</label>
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-type" value="New" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-white text-xs font-bold transition">New<span class="block text-[10px] opacity-70 font-normal mt-0.5">30 min</span></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-type" value="Review" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-white text-xs font-bold transition">Review<span class="block text-[10px] opacity-70 font-normal mt-0.5">15 min</span></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-type" value="Procedure" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-white text-xs font-bold transition">Procedure<span class="block text-[10px] opacity-70 font-normal mt-0.5">Custom</span></div>
+          </label>
+        </div>
+        <div id="bm-procedure-config" class="hidden space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <input type="text" id="bm-procedure-name" placeholder="Procedure name (e.g. Chemical Peel)" class="w-full p-2.5 text-sm border border-slate-300 rounded-lg" />
+          <label class="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <input type="checkbox" id="bm-multi-slot-toggle" class="w-4 h-4" />
+            Multi-slot (select several times below)
+          </label>
+        </div>
+      </section>
+
+      <!-- Time slots -->
+      <section>
+        <div class="flex justify-between items-end mb-2">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">4. Available Times</label>
+          <span id="bm-duration-label" class="text-xs font-bold bg-brand-100 text-brand-800 px-2 py-0.5 rounded-full"></span>
+        </div>
+        <div id="bm-time-slots-grid" class="grid grid-cols-3 gap-2">
+          <p class="col-span-3 text-slate-400 text-sm text-center py-6">Select doctor and type first.</p>
+        </div>
+      </section>
+
+      <!-- Patient -->
+      <section>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">5. Patient Details</label>
+        <input type="text" id="bm-patient-name" placeholder="Full name" required class="w-full text-base font-semibold border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 outline-none mb-2" />
+        <input type="tel" id="bm-patient-phone" placeholder="Phone (optional)" class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 outline-none" />
+      </section>
+    </div>
+
+    <div class="p-4 bg-white border-t border-slate-200">
+      <button id="bm-submit-booking" class="w-full bg-brand-900 text-white font-bold py-4 rounded-2xl shadow-lg transition active:scale-[0.98]">
+        Confirm & Book
+      </button>
+      <p id="bm-booking-error" class="text-red-500 text-sm text-center mt-2 min-h-[1.25rem]"></p>
+    </div>
+  </div>
+
+  <!-- ================= APPOINTMENT DETAIL MODAL ================= -->
+  <div id="bm-detail-modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" id="bm-detail-backdrop"></div>
+    <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:left-1/2 md:right-auto md:w-[420px] md:-translate-x-1/2 md:-translate-y-1/2 bg-white rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+      <div id="bm-detail-body" class="p-6 overflow-y-auto flex-1"></div>
+      <div class="grid grid-cols-2 gap-2 p-4 bg-slate-50 border-t border-slate-100">
+        <button data-status="arrived" class="bm-status-btn bg-green-100 hover:bg-green-200 text-green-800 font-bold py-2.5 rounded-xl text-sm transition">Check In</button>
+        <button data-status="complete" class="bm-status-btn bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl text-sm transition">Complete</button>
+        <button data-status="no_show" class="bm-status-btn bg-red-100 hover:bg-red-200 text-red-800 font-bold py-2.5 rounded-xl text-sm transition">No Show</button>
+        <button id="bm-delete-appt" class="bg-red-50 hover:bg-red-100 text-red-700 font-bold py-2.5 rounded-xl text-sm border border-red-200 transition">Delete</button>
+      </div>
+      <button id="bm-close-detail" class="w-full bg-slate-800 text-white font-semibold py-3 text-sm">Close</button>
+    </div>
+  </div>
+
+  <!-- ================= SCHEDULE MANAGER OVERLAY ================= -->
+  <div id="bm-schedule-overlay" class="hidden fixed inset-0 bg-slate-100 z-50 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-200 justify-between items-center bg-white shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900">Schedule Manager</h2>
+      <button id="bm-close-schedule" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="flex bg-white border-b border-slate-200">
+      <button data-schedule-doctor="514ff136-ee45-4d49-89b5-d128d96aef62" class="bm-schedule-tab flex-1 py-3 text-sm font-semibold text-brand-600 border-b-2 border-brand-600">Karthik L</button>
+      <button data-schedule-doctor="d5372165-fc7e-47e8-aee6-ce02e7fefc71" class="bm-schedule-tab flex-1 py-3 text-sm font-semibold text-slate-500">Narayanan A</button>
+      <button data-schedule-doctor="519dbd89-d3d9-4ee9-8923-5fabbe51cf2e" class="bm-schedule-tab flex-1 py-3 text-sm font-semibold text-slate-500">Narayanan B</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5 space-y-8 pb-24">
+      <section class="bg-white p-5 rounded-2xl shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-4">Weekly Schedule</h3>
+        <div id="bm-weekly-schedule-rows" class="space-y-3"></div>
+        <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">
+          <select id="bm-new-block-day" class="px-3 py-2 border border-slate-300 rounded-lg text-sm">
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday">Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="saturday">Saturday</option>
+            <option value="sunday">Sunday</option>
+          </select>
+          <input type="time" id="bm-new-block-start" class="px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <input type="time" id="bm-new-block-end" class="px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <button id="bm-add-block" class="bg-brand-900 text-white text-sm font-semibold px-4 py-2 rounded-lg">Add</button>
+        </div>
+      </section>
+
+      <section class="bg-white p-5 rounded-2xl shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-4">Exceptions & Leave</h3>
+        <div id="bm-exceptions-list" class="space-y-2 mb-4"></div>
+        <div class="space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <input type="date" id="bm-exception-date" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" />
+          <div class="flex items-center gap-2">
+            <input type="time" id="bm-exception-start" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+            <span class="text-slate-400 text-sm">to</span>
+            <input type="time" id="bm-exception-end" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          </div>
+          <div class="flex items-center justify-between">
+            <label class="flex items-center gap-2 text-sm font-medium text-red-600">
+              <input type="checkbox" id="bm-exception-leave" class="w-4 h-4" />
+              Mark as full-day leave
+            </label>
+            <button id="bm-add-exception" class="px-4 py-2 bg-brand-900 text-white text-sm font-semibold rounded-lg">Add</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ================= AUDIT LOG OVERLAY ================= -->
+  <div id="bm-audit-overlay" class="hidden fixed inset-0 bg-slate-100 z-50 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-200 justify-between items-center bg-white shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900">Audit Log</h2>
+      <button id="bm-close-audit" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="bm-audit-list" class="flex-1 overflow-y-auto p-4 space-y-2">
+      <p class="text-slate-400 text-sm text-center py-10">Loading...</p>
+    </div>
+  </div>
+
+</div>
+</MainLayout>
+
+<script define:vars={{ supabaseUrl: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_URL, supabaseAnonKey: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_ANON_KEY }}>
+  window.__BM_SUPABASE_URL__ = supabaseUrl;
+  window.__BM_SUPABASE_ANON_KEY__ = supabaseAnonKey;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/scripts/bookings-manager.js"></script>
