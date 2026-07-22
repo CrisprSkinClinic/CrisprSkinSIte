@@ -370,6 +370,7 @@ function closeBookingOverlay() {
 function resetBookingForm() {
   document.getElementById('bm-patient-name').value = '';
   document.getElementById('bm-patient-phone').value = '';
+  document.getElementById('bm-phone-lookup-status').textContent = '';
   document.getElementById('bm-procedure-name').value = '';
   document.getElementById('bm-multi-slot-toggle').checked = false;
   document.querySelectorAll('input[name="bm-doctor"], input[name="bm-type"]').forEach((el) => (el.checked = false));
@@ -379,6 +380,62 @@ function resetBookingForm() {
   document.getElementById('bm-edit-banner').classList.add('hidden');
   document.getElementById('bm-booking-error').textContent = '';
 }
+
+// Phone-lookup autofill: typing a phone number looks up an existing
+// patient and pre-fills their name, and -- since this is most useful
+// for Review visits with a returning patient -- suggests the doctor
+// they last saw. Debounced so it doesn't fire on every keystroke; only
+// triggers once a plausible number length is reached, and never
+// overwrites a name the staff member has already typed manually.
+let phoneLookupTimeout = null;
+document.getElementById('bm-patient-phone').addEventListener('input', (e) => {
+  clearTimeout(phoneLookupTimeout);
+  const phone = e.target.value.trim();
+  const statusEl = document.getElementById('bm-phone-lookup-status');
+  if (phone.replace(/\D/g, '').length < 10) {
+    statusEl.textContent = '';
+    return;
+  }
+  statusEl.textContent = 'Looking up...';
+  statusEl.className = 'text-xs min-h-[1rem] mb-2 px-1 text-slate-400';
+  phoneLookupTimeout = setTimeout(async () => {
+    try {
+      const result = await callFunction('lookup_patient_by_phone', { phone });
+      if (result.found) {
+        const nameField = document.getElementById('bm-patient-name');
+        // Don't clobber a name the staff member already typed for a
+        // *different* patient at this phone number (e.g. a family
+        // member's phone reused for multiple patients) -- only
+        // autofill when the name field is still empty.
+        if (!nameField.value.trim()) {
+          nameField.value = result.patient.name;
+        }
+        const lastSeenText = result.lastDoctorName
+          ? ` · Last seen by ${result.lastDoctorName}${result.lastVisitDate ? ` on ${result.lastVisitDate}` : ''}`
+          : '';
+        statusEl.textContent = `Existing patient found${lastSeenText}`;
+        statusEl.className = 'text-xs min-h-[1rem] mb-2 px-1 text-green-600 font-medium';
+
+        // Suggest (but don't force) the doctor they last saw, if the
+        // doctor field hasn't already been chosen -- most useful for
+        // Review visits with the same doctor as before.
+        const doctorAlreadyChosen = document.querySelector('input[name="bm-doctor"]:checked');
+        if (!doctorAlreadyChosen && result.lastDoctorId) {
+          const suggestedDoctorInput = document.querySelector(`input[name="bm-doctor"][value="${result.lastDoctorId}"]`);
+          if (suggestedDoctorInput) {
+            suggestedDoctorInput.checked = true;
+            refreshTimeSlots();
+          }
+        }
+      } else {
+        statusEl.textContent = 'New patient (no match found)';
+        statusEl.className = 'text-xs min-h-[1rem] mb-2 px-1 text-slate-400';
+      }
+    } catch (err) {
+      statusEl.textContent = '';
+    }
+  }, 500);
+});
 
 document.getElementById('bm-form-date').addEventListener('change', (e) => {
   state.viewDate = e.target.value;
