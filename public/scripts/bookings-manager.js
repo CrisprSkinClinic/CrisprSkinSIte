@@ -243,8 +243,28 @@ function renderAppointmentFeed() {
     return;
   }
 
+  // Group rows sharing a linked_group_id into one card. A "New" (30
+  // min) booking creates 2 linked rows (two consecutive 15-min slots),
+  // and a multi-slot Procedure can create several -- both should show
+  // as one card spanning the full time range, not one card per
+  // underlying row.
+  const grouped = [];
+  const seenGroupIds = new Set();
+  for (const appt of list) {
+    if (appt.linked_group_id) {
+      if (seenGroupIds.has(appt.linked_group_id)) continue;
+      seenGroupIds.add(appt.linked_group_id);
+      const groupRows = list
+        .filter((a) => a.linked_group_id === appt.linked_group_id)
+        .sort((a, b) => a.slot_time.localeCompare(b.slot_time));
+      grouped.push({ ...groupRows[0], _groupRows: groupRows, _endTime: groupRows[groupRows.length - 1].slot_time });
+    } else {
+      grouped.push({ ...appt, _groupRows: [appt], _endTime: appt.slot_time });
+    }
+  }
+
   feed.innerHTML = '';
-  list.forEach((appt) => {
+  grouped.forEach((appt) => {
     const doctor = CLINIC_DOCTORS.find((d) => d.id === appt.doctor_id);
     const statusColors = {
       booked: 'bg-slate-800',
@@ -263,13 +283,19 @@ function renderAppointmentFeed() {
       : 'Booked online';
     const card = document.createElement('div');
     card.className = `${statusColors[appt.status] || 'bg-slate-800'} text-white rounded-2xl p-4 shadow-sm cursor-pointer transition active:scale-[0.99]`;
+    // For a grouped multi-slot booking, show the actual end of the
+    // last slot (+15 min) so the displayed range reflects the true
+    // occupied duration, not just the start of the final row.
+    const timeDisplay = appt._groupRows.length > 1
+      ? `${formatTime12h(appt.slot_time)} – ${formatTime12h(minutesToTime(timeToMinutes(appt._endTime.slice(0, 5)) + 15))}`
+      : formatTime12h(appt.slot_time);
     card.innerHTML = `
       <div class="flex justify-between items-start mb-2">
-        <span class="font-mono font-bold text-lg">${formatTime12h(appt.slot_time)}</span>
+        <span class="font-mono font-bold text-lg">${timeDisplay}</span>
         <span class="text-xs font-bold bg-white/20 px-2 py-1 rounded-full">${doctor ? doctor.short : '?'}</span>
       </div>
       <p class="font-bold text-base mb-1 truncate">${appt.patients?.name || 'Unknown patient'}</p>
-      <p class="text-sm opacity-90 mb-1">${serviceLabel}${appt.linked_group_id ? ' · Multi-slot' : ''}</p>
+      <p class="text-sm opacity-90 mb-1">${serviceLabel}</p>
       <p class="text-[11px] opacity-70 font-semibold uppercase tracking-wide">${sourceLabel}</p>
     `;
     card.addEventListener('click', () => openDetailModal(appt));
@@ -285,13 +311,16 @@ function openDetailModal(appt) {
   const sourceLabel = appt.booked_by
     ? `Staff (${appt.booked_by_profile?.full_name || 'Unknown staff member'})`
     : 'Online (public website)';
+  const timeDisplay = appt._groupRows && appt._groupRows.length > 1
+    ? `${formatTime12h(appt.slot_time)} – ${formatTime12h(minutesToTime(timeToMinutes(appt._endTime.slice(0, 5)) + 15))}`
+    : formatTime12h(appt.slot_time);
   document.getElementById('bm-detail-body').innerHTML = `
     <button id="bm-open-patient-from-detail" class="text-left w-full hover:opacity-70 transition">
       <h3 class="text-xl font-bold text-slate-900 mb-1 underline decoration-dotted underline-offset-4">${appt.patients?.name || 'Unknown patient'}</h3>
     </button>
     <p class="text-sm text-slate-500 mb-4">${appt.patients?.phone || 'No phone on file'}</p>
     <div class="space-y-3">
-      <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Time</span><span class="font-semibold text-slate-800">${formatTime12h(appt.slot_time)} · ${appt.slot_date}</span></div>
+      <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Time</span><span class="font-semibold text-slate-800">${timeDisplay} · ${appt.slot_date}</span></div>
       <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Doctor</span><span class="font-semibold text-slate-800">${doctor ? doctor.name : 'Unknown'}</span></div>
       <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Service</span><span class="font-semibold text-slate-800">${serviceLabel}</span></div>
       <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Status</span><span class="font-semibold text-slate-800 capitalize">${appt.status.replace('_', ' ')}</span></div>
@@ -434,7 +463,9 @@ function openEditOrReschedule(appt, isReschedule) {
   const doctorInput = document.querySelector(`input[name="bm-doctor"][value="${appt.doctor_id}"]`);
   if (doctorInput) doctorInput.checked = true;
 
-  state.selectedSlots = [appt.slot_time.slice(0, 5)];
+  state.selectedSlots = appt._groupRows
+    ? appt._groupRows.map((r) => r.slot_time.slice(0, 5))
+    : [appt.slot_time.slice(0, 5)];
 
   const banner = document.getElementById('bm-edit-banner');
   banner.querySelector('span').textContent = isReschedule ? 'Rescheduling Appointment' : 'Editing Appointment';
@@ -777,6 +808,163 @@ document.getElementById('bm-submit-booking').addEventListener('click', async () 
   } finally {
     btn.disabled = false;
     btn.textContent = 'Confirm & Book';
+  }
+});
+
+// ---- Record Payment ----
+document.getElementById('bm-record-payment-btn').addEventListener('click', () => {
+  const appt = state.currentDetailAppointment;
+  if (!appt) return;
+  document.getElementById('bm-payment-patient-name').textContent = `For ${appt.patients?.name || 'this patient'}`;
+  document.getElementById('bm-payment-amount').value = '';
+  document.getElementById('bm-payment-mode').value = 'cash';
+  document.getElementById('bm-payment-notes').value = '';
+  document.getElementById('bm-payment-error').textContent = '';
+  document.getElementById('bm-payment-modal').classList.remove('hidden');
+});
+
+function closePaymentModal() {
+  document.getElementById('bm-payment-modal').classList.add('hidden');
+}
+document.getElementById('bm-payment-cancel').addEventListener('click', closePaymentModal);
+document.getElementById('bm-payment-backdrop').addEventListener('click', closePaymentModal);
+
+document.getElementById('bm-payment-save').addEventListener('click', async () => {
+  const appt = state.currentDetailAppointment;
+  const errorEl = document.getElementById('bm-payment-error');
+  const amount = document.getElementById('bm-payment-amount').value;
+  if (!appt?.patient_id) {
+    errorEl.textContent = 'Could not identify the patient for this appointment.';
+    return;
+  }
+  if (!amount || Number(amount) <= 0) {
+    errorEl.textContent = 'Please enter a valid amount.';
+    return;
+  }
+  const btn = document.getElementById('bm-payment-save');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  try {
+    await callFunction('record_payment', {
+      appointment_id: appt.id,
+      patient_id: appt.patient_id,
+      amount,
+      mode: document.getElementById('bm-payment-mode').value,
+      notes: document.getElementById('bm-payment-notes').value.trim(),
+    });
+    closePaymentModal();
+  } catch (err) {
+    errorEl.textContent = err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save';
+  }
+});
+
+// ---- Day Close / Cash Reconciliation ----
+document.getElementById('bm-open-dayclose').addEventListener('click', () => {
+  document.getElementById('bm-dayclose-overlay').classList.remove('hidden');
+  document.getElementById('bm-dayclose-overlay').classList.add('flex');
+  document.getElementById('bm-dayclose-date').value = todayStr();
+  document.getElementById('bm-counted-cash').value = '';
+  document.getElementById('bm-reconciliation-result').classList.add('hidden');
+  loadDayClose(todayStr());
+});
+document.getElementById('bm-close-dayclose').addEventListener('click', () => {
+  document.getElementById('bm-dayclose-overlay').classList.add('hidden');
+  document.getElementById('bm-dayclose-overlay').classList.remove('flex');
+});
+document.getElementById('bm-dayclose-date').addEventListener('change', (e) => {
+  document.getElementById('bm-counted-cash').value = '';
+  document.getElementById('bm-reconciliation-result').classList.add('hidden');
+  loadDayClose(e.target.value);
+});
+
+let currentDayClosePayments = [];
+
+async function loadDayClose(date) {
+  const totalsEl = document.getElementById('bm-dayclose-totals');
+  const listEl = document.getElementById('bm-dayclose-list');
+  totalsEl.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
+  listEl.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
+  try {
+    const { payments } = await callFunction('list_payments_for_date', { date });
+    currentDayClosePayments = payments;
+
+    const totalsByMode = { cash: 0, upi: 0, card: 0, other: 0 };
+    payments.forEach((p) => {
+      totalsByMode[p.mode] = (totalsByMode[p.mode] || 0) + Number(p.amount);
+    });
+    const grandTotal = Object.values(totalsByMode).reduce((sum, v) => sum + v, 0);
+
+    const modeLabels = { cash: 'Cash', upi: 'UPI', card: 'Card', other: 'Other' };
+    totalsEl.innerHTML = Object.entries(totalsByMode)
+      .map(([mode, amt]) => `
+        <div class="flex justify-between items-center py-1.5 ${mode !== 'other' ? 'border-b border-slate-100' : ''}">
+          <span class="text-sm font-semibold text-slate-600">${modeLabels[mode]}</span>
+          <span class="font-bold text-slate-900">₹${amt.toFixed(2)}</span>
+        </div>
+      `)
+      .join('') + `
+        <div class="flex justify-between items-center pt-2 mt-1 border-t-2 border-slate-800">
+          <span class="text-sm font-bold text-slate-900">Total</span>
+          <span class="font-extrabold text-lg text-slate-900">₹${grandTotal.toFixed(2)}</span>
+        </div>
+      `;
+
+    if (payments.length === 0) {
+      listEl.innerHTML = '<p class="text-slate-400 text-sm">No payments recorded for this date.</p>';
+    } else {
+      listEl.innerHTML = '';
+      payments.forEach((p) => {
+        const row = document.createElement('div');
+        row.className = 'flex justify-between items-center py-2 border-b border-slate-100 last:border-0';
+        const time = new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        row.innerHTML = `
+          <div>
+            <p class="text-sm font-semibold text-slate-800">${p.patients?.name || 'Unknown patient'}</p>
+            <p class="text-xs text-slate-400">${time} · ${p.mode.toUpperCase()} · by ${p.collected_by_profile?.full_name || 'Staff'}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-900">₹${Number(p.amount).toFixed(2)}</span>
+            <button data-delete-payment="${p.id}" class="text-red-500 text-xs font-bold">✕</button>
+          </div>
+        `;
+        row.querySelector('[data-delete-payment]').addEventListener('click', async () => {
+          if (!confirm('Delete this payment entry?')) return;
+          await callFunction('delete_payment', { id: p.id });
+          loadDayClose(date);
+        });
+        listEl.appendChild(row);
+      });
+    }
+  } catch (err) {
+    totalsEl.innerHTML = `<p class="text-red-600 text-sm">${err.message}</p>`;
+    listEl.innerHTML = '';
+  }
+}
+
+document.getElementById('bm-counted-cash').addEventListener('input', (e) => {
+  const resultEl = document.getElementById('bm-reconciliation-result');
+  const counted = e.target.value;
+  if (counted === '') {
+    resultEl.classList.add('hidden');
+    return;
+  }
+  const recordedCash = currentDayClosePayments
+    .filter((p) => p.mode === 'cash')
+    .reduce((sum, p) => sum + Number(p.amount), 0);
+  const diff = Number(counted) - recordedCash;
+  resultEl.classList.remove('hidden');
+  if (diff === 0) {
+    resultEl.className = 'p-4 rounded-xl text-center font-bold bg-green-50 text-green-700';
+    resultEl.textContent = `Matches exactly. Recorded cash: ₹${recordedCash.toFixed(2)}`;
+  } else if (diff > 0) {
+    resultEl.className = 'p-4 rounded-xl text-center font-bold bg-amber-50 text-amber-700';
+    resultEl.textContent = `₹${diff.toFixed(2)} MORE than recorded (recorded: ₹${recordedCash.toFixed(2)})`;
+  } else {
+    resultEl.className = 'p-4 rounded-xl text-center font-bold bg-red-50 text-red-700';
+    resultEl.textContent = `₹${Math.abs(diff).toFixed(2)} SHORT of recorded (recorded: ₹${recordedCash.toFixed(2)})`;
   }
 });
 
