@@ -78,6 +78,23 @@ async function callFunction(action, data = {}) {
 
 // ---- Auth ----
 async function initAuth() {
+  // Defensive checks -- these three failure modes each give a specific,
+  // readable error instead of a generic "Cannot read properties of
+  // null (reading 'auth')" crash if the CDN script didn't load, or if
+  // the required env vars weren't set at build time.
+  if (typeof window.supabase === 'undefined' || !window.supabase) {
+    showLoginScreen();
+    document.getElementById('bm-login-error').textContent =
+      'Could not load the Supabase library. Please check your internet connection and reload the page.';
+    return;
+  }
+  if (!window.__BM_SUPABASE_URL__ || !window.__BM_SUPABASE_ANON_KEY__) {
+    showLoginScreen();
+    document.getElementById('bm-login-error').textContent =
+      'This page is missing required configuration (Supabase URL/key). Contact the site administrator.';
+    return;
+  }
+
   supabaseClient = window.supabase.createClient(window.__BM_SUPABASE_URL__, window.__BM_SUPABASE_ANON_KEY__);
 
   const { data: { session } } = await supabaseClient.auth.getSession();
