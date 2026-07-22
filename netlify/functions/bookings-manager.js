@@ -402,46 +402,104 @@ exports.handler = async (event) => {
       // ---- Payments (simple log, not a billing/invoicing system) ----
 
       case "record_payment": {
-        if (!data?.patient_id || !data?.amount) {
-          return { statusCode: 400, body: JSON.stringify({ error: "patient_id and amount are required." }) };
+        // splits is an array of { mode, amount }, 1+ entries, summing to
+        // totalAmount -- supports both a plain single-mode payment
+        // (one split) and a genuine split payment (2+ splits).
+        // patient_id is required UNLESS new_patient_name is given
+        // instead -- standalone payment entries (pharmacy/lab walk-ins
+        // with no prior booking) may need to create a brand new patient
+        // record on the spot, same as create_appointment already does
+        // for a fresh booking.
+        if ((!data?.patient_id && !data?.new_patient_name) || !data?.category || (!data?.consultationSubtype || data.consultationSubtype !== "free") && (!Array.isArray(data.splits) || data.splits.length === 0)) {
+          return { statusCode: 400, body: JSON.stringify({ error: "A patient (existing patient_id or new_patient_name), category, and at least one payment split are required." }) };
         }
-        const amountNum = Number(data.amount);
-        if (Number.isNaN(amountNum) || amountNum <= 0) {
-          return { statusCode: 400, body: JSON.stringify({ error: "Amount must be a positive number." }) };
+        const validCategories = ["consultation", "pharmacy", "lab", "vaccination", "procedure"];
+        if (!validCategories.includes(data.category)) {
+          return { statusCode: 400, body: JSON.stringify({ error: "Invalid category." }) };
         }
-        const validModes = ["cash", "card", "upi", "other"];
-        const mode = validModes.includes(data.mode) ? data.mode : "cash";
 
-        const { data: payment, error } = await supabase
+        let resolvedPatientId = data.patient_id || null;
+        if (!resolvedPatientId && data.new_patient_name) {
+          const { data: newPatient, error: newPatientErr } = await supabase
+            .from("patients")
+            .insert({ name: data.new_patient_name, phone: data.new_patient_phone || null, is_registered: false })
+            .select("id")
+            .single();
+          if (newPatientErr) throw newPatientErr;
+          resolvedPatientId = newPatient.id;
+        }
+
+        let consultationSubtype = null;
+        if (data.category === "consultation") {
+          const validSubtypes = ["new", "review", "free"];
+          if (!validSubtypes.includes(data.consultationSubtype)) {
+            return { statusCode: 400, body: JSON.stringify({ error: "consultationSubtype (new/review/free) is required for consultation payments." }) };
+          }
+          consultationSubtype = data.consultationSubtype;
+        }
+
+        const validModes = ["cash", "card", "upi", "other"];
+        let splitTotal = 0;
+        for (const split of data.splits) {
+          if (!validModes.includes(split.mode) || typeof split.amount !== "number" || split.amount <= 0) {
+            return { statusCode: 400, body: JSON.stringify({ error: "Each split needs a valid mode and a positive amount." }) };
+          }
+          splitTotal += split.amount;
+        }
+
+        const totalAmount = Number(data.totalAmount);
+        // Free consultations are the one case where total_amount is
+        // legitimately 0 -- in that case there should be no splits at
+        // all (nothing was actually paid), not a single zero-amount
+        // split, since payment_splits.amount has its own > 0 constraint.
+        if (consultationSubtype === "free") {
+          if (data.splits.length !== 0 || totalAmount !== 0) {
+            return { statusCode: 400, body: JSON.stringify({ error: "A free consultation should have no payment splits and a total of 0." }) };
+          }
+        } else if (Math.abs(splitTotal - totalAmount) > 0.01) {
+          return { statusCode: 400, body: JSON.stringify({ error: `Split amounts (₹${splitTotal}) must add up to the total (₹${totalAmount}).` }) };
+        }
+
+        const { data: entry, error: entryError } = await supabase
           .from("payment_entries")
           .insert({
             appointment_id: data.appointment_id || null,
-            patient_id: data.patient_id,
-            amount: amountNum,
-            mode,
+            patient_id: resolvedPatientId,
+            category: data.category,
+            consultation_subtype: consultationSubtype,
+            total_amount: totalAmount,
             collected_by: profile.id,
             notes: data.notes || null,
           })
           .select("id")
           .single();
-        if (error) throw error;
+        if (entryError) throw entryError;
 
-        await logAudit("CREATE", `Recorded ₹${amountNum} (${mode}) payment for patient ${data.patient_id}`);
-        return ok({ success: true, paymentId: payment.id });
+        if (data.splits.length > 0) {
+          const { error: splitsError } = await supabase
+            .from("payment_splits")
+            .insert(data.splits.map((s) => ({ payment_entry_id: entry.id, mode: s.mode, amount: s.amount })));
+          if (splitsError) throw splitsError;
+        }
+
+        await logAudit(
+          "CREATE",
+          `Recorded ${consultationSubtype === "free" ? "a free consultation" : `₹${totalAmount} ${data.category}`} payment for patient ${resolvedPatientId}`
+        );
+        return ok({ success: true, paymentId: entry.id });
       }
 
       case "list_payments_for_date": {
         if (!data?.date) {
           return { statusCode: 400, body: JSON.stringify({ error: "date is required." }) };
         }
-        // No date column on payment_entries itself (created_at is a
-        // full timestamp) -- bound the query to the given calendar day
-        // using created_at's range rather than a plain equality match.
         const startOfDay = `${data.date}T00:00:00.000Z`;
         const endOfDay = `${data.date}T23:59:59.999Z`;
         const { data: payments, error } = await supabase
           .from("payment_entries")
-          .select("*, patients(name), collected_by_profile:profiles!payment_entries_collected_by_fkey(full_name)")
+          .select(
+            "*, patients(name), collected_by_profile:profiles!payment_entries_collected_by_fkey(full_name), payment_splits(mode, amount)"
+          )
           .gte("created_at", startOfDay)
           .lte("created_at", endOfDay)
           .order("created_at", { ascending: true });
@@ -452,16 +510,224 @@ exports.handler = async (event) => {
       case "delete_payment": {
         const { data: payment, error: fetchErr } = await supabase
           .from("payment_entries")
-          .select("amount, mode, patients(name)")
+          .select("total_amount, category, patients(name)")
           .eq("id", data.id)
           .single();
         if (fetchErr) throw fetchErr;
 
+        // payment_splits rows cascade-delete automatically (on delete
+        // cascade on payment_entry_id), so only the parent needs
+        // deleting explicitly here.
         const { error } = await supabase.from("payment_entries").delete().eq("id", data.id);
         if (error) throw error;
 
-        await logAudit("DELETE", `Deleted ₹${payment.amount} (${payment.mode}) payment entry for ${payment.patients?.name || "patient"}`);
+        await logAudit("DELETE", `Deleted ₹${payment.total_amount} ${payment.category} payment entry for ${payment.patients?.name || "patient"}`);
         return ok({ success: true });
+      }
+
+      // ---- Expenses ----
+
+      case "record_expense": {
+        if (!data?.category || !data?.amount) {
+          return { statusCode: 400, body: JSON.stringify({ error: "category and amount are required." }) };
+        }
+        const validExpenseCategories = ["bank_deposit", "handed_to_doctor", "petty_expense", "other"];
+        if (!validExpenseCategories.includes(data.category)) {
+          return { statusCode: 400, body: JSON.stringify({ error: "Invalid expense category." }) };
+        }
+        const amountNum = Number(data.amount);
+        if (Number.isNaN(amountNum) || amountNum <= 0) {
+          return { statusCode: 400, body: JSON.stringify({ error: "Amount must be a positive number." }) };
+        }
+        const { data: expense, error } = await supabase
+          .from("expense_entries")
+          .insert({ category: data.category, amount: amountNum, notes: data.notes || null, recorded_by: profile.id })
+          .select("id")
+          .single();
+        if (error) throw error;
+
+        await logAudit("CREATE", `Recorded expense: ₹${amountNum} (${data.category})`);
+        return ok({ success: true, expenseId: expense.id });
+      }
+
+      case "list_expenses_for_date": {
+        if (!data?.date) {
+          return { statusCode: 400, body: JSON.stringify({ error: "date is required." }) };
+        }
+        const startOfDay = `${data.date}T00:00:00.000Z`;
+        const endOfDay = `${data.date}T23:59:59.999Z`;
+        const { data: expenses, error } = await supabase
+          .from("expense_entries")
+          .select("*, recorded_by_profile:profiles!expense_entries_recorded_by_fkey(full_name)")
+          .gte("created_at", startOfDay)
+          .lte("created_at", endOfDay)
+          .order("created_at", { ascending: true });
+        if (error) throw error;
+        return ok({ expenses });
+      }
+
+      case "delete_expense": {
+        const { error } = await supabase.from("expense_entries").delete().eq("id", data.id);
+        if (error) throw error;
+        await logAudit("DELETE", `Deleted expense entry ${data.id}`);
+        return ok({ success: true });
+      }
+
+      // ---- Daily cash session (mandatory opening + closing counts) ----
+
+      case "get_cash_session": {
+        if (!data?.date) {
+          return { statusCode: 400, body: JSON.stringify({ error: "date is required." }) };
+        }
+        const { data: session, error } = await supabase
+          .from("daily_cash_sessions")
+          .select("*")
+          .eq("session_date", data.date)
+          .maybeSingle();
+        if (error) throw error;
+
+        // Also surface the previous calendar day's closing total, so
+        // the frontend can flag a mismatch between yesterday's close
+        // and today's opening count -- a common sign the till wasn't
+        // actually reconciled properly overnight.
+        const prevDate = new Date(`${data.date}T00:00:00Z`);
+        prevDate.setUTCDate(prevDate.getUTCDate() - 1);
+        const prevDateStr = prevDate.toISOString().slice(0, 10);
+        const { data: prevSession } = await supabase
+          .from("daily_cash_sessions")
+          .select("closing_total")
+          .eq("session_date", prevDateStr)
+          .maybeSingle();
+
+        return ok({ session: session || null, previousClosingTotal: prevSession?.closing_total ?? null });
+      }
+
+      case "record_cash_opening": {
+        if (!data?.date) {
+          return { statusCode: 400, body: JSON.stringify({ error: "date is required." }) };
+        }
+        const counts = {
+          opening_count_50: Number(data.count50) || 0,
+          opening_count_100: Number(data.count100) || 0,
+          opening_count_200: Number(data.count200) || 0,
+          opening_count_500: Number(data.count500) || 0,
+        };
+        const openingTotal = counts.opening_count_50 * 50 + counts.opening_count_100 * 100 + counts.opening_count_200 * 200 + counts.opening_count_500 * 500;
+
+        const { error } = await supabase.from("daily_cash_sessions").upsert(
+          {
+            session_date: data.date,
+            ...counts,
+            opening_total: openingTotal,
+            opening_recorded_by: profile.id,
+            opening_recorded_at: new Date().toISOString(),
+          },
+          { onConflict: "session_date" }
+        );
+        if (error) throw error;
+
+        await logAudit("CREATE", `Recorded opening cash count for ${data.date}: ₹${openingTotal}`);
+        return ok({ success: true, openingTotal });
+      }
+
+      case "record_cash_closing": {
+        if (!data?.date) {
+          return { statusCode: 400, body: JSON.stringify({ error: "date is required." }) };
+        }
+        const { data: existingSession, error: fetchErr } = await supabase
+          .from("daily_cash_sessions")
+          .select("opening_total")
+          .eq("session_date", data.date)
+          .maybeSingle();
+        if (fetchErr) throw fetchErr;
+        if (!existingSession || existingSession.opening_total === null) {
+          return { statusCode: 400, body: JSON.stringify({ error: "Opening cash count must be recorded before closing for this date." }) };
+        }
+
+        const counts = {
+          closing_count_50: Number(data.count50) || 0,
+          closing_count_100: Number(data.count100) || 0,
+          closing_count_200: Number(data.count200) || 0,
+          closing_count_500: Number(data.count500) || 0,
+        };
+        const closingTotal = counts.closing_count_50 * 50 + counts.closing_count_100 * 100 + counts.closing_count_200 * 200 + counts.closing_count_500 * 500;
+
+        // expected_closing = opening + cash payments today - cash expenses today
+        const startOfDay = `${data.date}T00:00:00.000Z`;
+        const endOfDay = `${data.date}T23:59:59.999Z`;
+        const { data: cashSplits } = await supabase
+          .from("payment_splits")
+          .select("amount, payment_entries!inner(created_at)")
+          .eq("mode", "cash")
+          .gte("payment_entries.created_at", startOfDay)
+          .lte("payment_entries.created_at", endOfDay);
+        const cashCollected = (cashSplits || []).reduce((sum, s) => sum + Number(s.amount), 0);
+
+        const { data: cashExpenses } = await supabase
+          .from("expense_entries")
+          .select("amount")
+          .gte("created_at", startOfDay)
+          .lte("created_at", endOfDay);
+        const expensesTotal = (cashExpenses || []).reduce((sum, e) => sum + Number(e.amount), 0);
+
+        const expectedClosing = Number(existingSession.opening_total) + cashCollected - expensesTotal;
+        const discrepancy = closingTotal - expectedClosing;
+
+        const { error } = await supabase
+          .from("daily_cash_sessions")
+          .update({
+            ...counts,
+            closing_total: closingTotal,
+            closing_recorded_by: profile.id,
+            closing_recorded_at: new Date().toISOString(),
+            expected_closing: expectedClosing,
+            discrepancy,
+          })
+          .eq("session_date", data.date);
+        if (error) throw error;
+
+        await logAudit(
+          "UPDATE",
+          `Recorded closing cash count for ${data.date}: ₹${closingTotal} (expected ₹${expectedClosing.toFixed(2)}, discrepancy ₹${discrepancy.toFixed(2)})`
+        );
+        return ok({ success: true, closingTotal, expectedClosing, discrepancy });
+      }
+
+      case "record_cash_recount": {
+        if (!data?.date) {
+          return { statusCode: 400, body: JSON.stringify({ error: "date is required." }) };
+        }
+        const count50 = Number(data.count50) || 0;
+        const count100 = Number(data.count100) || 0;
+        const count200 = Number(data.count200) || 0;
+        const count500 = Number(data.count500) || 0;
+        const countedTotal = count50 * 50 + count100 * 100 + count200 * 200 + count500 * 500;
+
+        const { error } = await supabase.from("cash_recounts").insert({
+          session_date: data.date,
+          count_50: count50,
+          count_100: count100,
+          count_200: count200,
+          count_500: count500,
+          counted_total: countedTotal,
+          recorded_by: profile.id,
+        });
+        if (error) throw error;
+
+        return ok({ success: true, countedTotal });
+      }
+
+      case "list_cash_recounts": {
+        if (!data?.date) {
+          return { statusCode: 400, body: JSON.stringify({ error: "date is required." }) };
+        }
+        const { data: recounts, error } = await supabase
+          .from("cash_recounts")
+          .select("*, recorded_by_profile:profiles!cash_recounts_recorded_by_fkey(full_name)")
+          .eq("session_date", data.date)
+          .order("recorded_at", { ascending: true });
+        if (error) throw error;
+        return ok({ recounts });
       }
 
       case "whoami": {
