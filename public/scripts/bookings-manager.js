@@ -813,7 +813,9 @@ document.getElementById('bm-submit-booking').addEventListener('click', async () 
 
 // ---- Record Payment (categorized, split-mode, standalone-capable) ----
 const CONSULTATION_PRICES = { new: 700, review: 600, free: 0 };
+const CATEGORY_LABELS = { consultation: 'Consultation', pharmacy: 'Pharmacy', lab: 'Lab', vaccination: 'Vaccination', procedure: 'Procedure' };
 let paymentContext = null; // { appointmentId, patientId, patientName } or null for standalone entry
+let categoryLineAmounts = {}; // { consultation: { subtype: 'new', amount: 700 }, pharmacy: { amount: 250 }, ... }
 
 function openPaymentModal(context) {
   paymentContext = context;
@@ -829,11 +831,16 @@ function openPaymentModal(context) {
     document.getElementById('bm-payment-phone-lookup-status').textContent = '';
   }
 
-  document.getElementById('bm-payment-category').value = 'consultation';
-  document.querySelector('input[name="bm-consult-subtype"][value="new"]').checked = true;
+  // Default to just Consultation checked, matching the most common
+  // single-category visit -- staff check additional boxes (pharmacy,
+  // lab, etc.) for a visit spanning multiple categories at once.
+  document.querySelectorAll('[data-category-checkbox]').forEach((el) => {
+    el.checked = el.dataset.categoryCheckbox === 'consultation';
+  });
+  categoryLineAmounts = { consultation: { subtype: 'new', amount: CONSULTATION_PRICES.new } };
   document.getElementById('bm-payment-notes').value = '';
   document.getElementById('bm-payment-error').textContent = '';
-  updatePaymentCategoryUI();
+  renderCategoryLines();
   document.getElementById('bm-payment-modal').classList.remove('hidden');
 }
 
@@ -885,32 +892,83 @@ document.getElementById('bm-payment-patient-phone').addEventListener('input', (e
   }, 500);
 });
 
-document.getElementById('bm-payment-category').addEventListener('change', updatePaymentCategoryUI);
-document.querySelectorAll('input[name="bm-consult-subtype"]').forEach((el) => el.addEventListener('change', updatePaymentCategoryUI));
+document.querySelectorAll('[data-category-checkbox]').forEach((el) => {
+  el.addEventListener('change', () => {
+    const category = el.dataset.categoryCheckbox;
+    if (el.checked) {
+      categoryLineAmounts[category] = category === 'consultation' ? { subtype: 'new', amount: CONSULTATION_PRICES.new } : { amount: null };
+    } else {
+      delete categoryLineAmounts[category];
+    }
+    renderCategoryLines();
+  });
+});
 
-function updatePaymentCategoryUI() {
-  const category = document.getElementById('bm-payment-category').value;
-  const isConsultation = category === 'consultation';
-  document.getElementById('bm-payment-consultation-section').classList.toggle('hidden', !isConsultation);
+// Renders one block per checked category with its own amount input
+// (consultation gets the New/Review/Free tiles instead of a free-typed
+// amount, auto-filling and locking the price same as before). Grand
+// total is the sum across all checked categories' amounts, and that's
+// what the payment splits need to add up to.
+function renderCategoryLines() {
+  const container = document.getElementById('bm-payment-category-lines');
+  container.innerHTML = '';
 
-  const amountInput = document.getElementById('bm-payment-total-amount');
-  if (isConsultation) {
-    const subtype = document.querySelector('input[name="bm-consult-subtype"]:checked')?.value || 'new';
-    amountInput.value = CONSULTATION_PRICES[subtype];
-    const isFree = subtype === 'free';
-    document.getElementById('bm-payment-amount-section').classList.toggle('hidden', isFree);
-    document.getElementById('bm-payment-splits-section').classList.toggle('hidden', isFree);
-    amountInput.disabled = true;
-    amountInput.className = 'w-full text-lg font-bold px-4 py-3 border border-slate-300 rounded-xl mb-3 bg-slate-50 text-slate-500';
-  } else {
-    document.getElementById('bm-payment-amount-section').classList.remove('hidden');
-    document.getElementById('bm-payment-splits-section').classList.remove('hidden');
-    amountInput.disabled = false;
-    amountInput.className = 'w-full text-lg font-bold px-4 py-3 border border-slate-300 rounded-xl mb-3';
-    if (amountInput.value == 700 || amountInput.value == 600 || amountInput.value == 0) amountInput.value = '';
-  }
+  Object.keys(categoryLineAmounts).forEach((category) => {
+    const block = document.createElement('div');
+    if (category === 'consultation') {
+      const subtype = categoryLineAmounts.consultation.subtype;
+      block.innerHTML = `
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Consultation Type</label>
+        <div class="grid grid-cols-3 gap-2">
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-consult-subtype" value="new" class="peer sr-only" ${subtype === 'new' ? 'checked' : ''} />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">New<span class="block text-[10px] opacity-70 font-normal">₹700</span></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-consult-subtype" value="review" class="peer sr-only" ${subtype === 'review' ? 'checked' : ''} />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Review<span class="block text-[10px] opacity-70 font-normal">₹600</span></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-consult-subtype" value="free" class="peer sr-only" ${subtype === 'free' ? 'checked' : ''} />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Free<span class="block text-[10px] opacity-70 font-normal">₹0</span></div>
+          </label>
+        </div>
+      `;
+      container.appendChild(block);
+      block.querySelectorAll('input[name="bm-consult-subtype"]').forEach((el) => {
+        el.addEventListener('change', (e) => {
+          categoryLineAmounts.consultation = { subtype: e.target.value, amount: CONSULTATION_PRICES[e.target.value] };
+          renderSplitRows();
+          updateGrandTotal();
+        });
+      });
+    } else {
+      const line = categoryLineAmounts[category];
+      block.innerHTML = `
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">${CATEGORY_LABELS[category]} Amount (₹)</label>
+        <input type="number" data-category-amount="${category}" min="0" step="1" value="${line.amount ?? ''}" placeholder="0" class="w-full text-base font-bold px-4 py-2.5 border border-slate-300 rounded-xl" />
+      `;
+      container.appendChild(block);
+      block.querySelector(`[data-category-amount="${category}"]`).addEventListener('input', (e) => {
+        categoryLineAmounts[category].amount = Number(e.target.value) || null;
+        renderSplitRows();
+        updateGrandTotal();
+      });
+    }
+  });
+
+  updateGrandTotal();
   renderSplitRows();
 }
+
+function getGrandTotal() {
+  return Object.values(categoryLineAmounts).reduce((sum, line) => sum + (line.amount || 0), 0);
+}
+
+function updateGrandTotal() {
+  document.getElementById('bm-payment-grand-total').textContent = `₹${getGrandTotal()}`;
+}
+
 
 // Split payment rows: each row is one { mode, amount } pair. Starts
 // with exactly one row (the common case -- a single mode covering the
@@ -919,7 +977,7 @@ let splitRows = [{ mode: 'cash', amount: null }];
 
 function renderSplitRows() {
   const container = document.getElementById('bm-payment-splits-rows');
-  const totalAmount = Number(document.getElementById('bm-payment-total-amount').value) || 0;
+  const totalAmount = getGrandTotal();
   container.innerHTML = '';
   splitRows.forEach((row, idx) => {
     const rowEl = document.createElement('div');
@@ -968,7 +1026,7 @@ function renderSplitRows() {
 }
 
 function updateSplitsRemainder() {
-  const totalAmount = Number(document.getElementById('bm-payment-total-amount').value) || 0;
+  const totalAmount = getGrandTotal();
   const splitSum = splitRows.reduce((sum, r) => sum + (r.amount || 0), 0);
   const remainder = totalAmount - splitSum;
   const remainderEl = document.getElementById('bm-payment-splits-remainder');
@@ -988,22 +1046,33 @@ document.getElementById('bm-add-split-row').addEventListener('click', () => {
   renderSplitRows();
 });
 
-document.getElementById('bm-payment-total-amount').addEventListener('input', () => {
-  // Only auto-sync when there's exactly one split row -- with 2+ rows
-  // (a genuine split), changing the total shouldn't silently overwrite
-  // amounts the staff member already entered per mode.
-  if (splitRows.length === 1) renderSplitRows();
-  else updateSplitsRemainder();
-});
-
 document.getElementById('bm-payment-save').addEventListener('click', async () => {
   const errorEl = document.getElementById('bm-payment-error');
   errorEl.textContent = '';
-  const category = document.getElementById('bm-payment-category').value;
-  const isConsultation = category === 'consultation';
-  const consultSubtype = isConsultation ? document.querySelector('input[name="bm-consult-subtype"]:checked')?.value : undefined;
-  const isFree = consultSubtype === 'free';
-  const totalAmount = Number(document.getElementById('bm-payment-total-amount').value) || 0;
+
+  if (Object.keys(categoryLineAmounts).length === 0) {
+    errorEl.textContent = 'Please select at least one category.';
+    return;
+  }
+
+  // Build one line-item per checked category. A category (other than
+  // a free consultation) needs a real amount entered -- catches the
+  // case where a box was checked but the amount field was left blank.
+  const lineItems = [];
+  for (const [category, line] of Object.entries(categoryLineAmounts)) {
+    if (category === 'consultation') {
+      lineItems.push({ category, consultationSubtype: line.subtype, amount: line.amount });
+    } else {
+      if (!line.amount || line.amount <= 0) {
+        errorEl.textContent = `Please enter a valid amount for ${CATEGORY_LABELS[category]}.`;
+        return;
+      }
+      lineItems.push({ category, amount: line.amount });
+    }
+  }
+
+  const grandTotal = getGrandTotal();
+  const isEntirelyFree = grandTotal === 0;
 
   // Resolve the patient: either the existing appointment context, an
   // already-found standalone patient, or a brand new one to create.
@@ -1015,12 +1084,6 @@ document.getElementById('bm-payment-save').addEventListener('click', async () =>
       errorEl.textContent = 'Please enter the patient name.';
       return;
     }
-    // No dedicated "create patient" action exists yet -- reuse
-    // create_appointment's patient resolution indirectly isn't
-    // possible here (no slot to book), so this calls a lightweight
-    // patient-creation path via record_payment itself, which accepts
-    // an optional newPatientName/newPatientPhone pair when patient_id
-    // is not yet known.
     paymentContext = {
       ...paymentContext,
       newPatientName: nameInput.value.trim(),
@@ -1028,13 +1091,13 @@ document.getElementById('bm-payment-save').addEventListener('click', async () =>
     };
   }
 
-  if (!isFree && splitRows.some((r) => !r.amount || r.amount <= 0)) {
+  if (!isEntirelyFree && splitRows.some((r) => !r.amount || r.amount <= 0)) {
     errorEl.textContent = 'Please enter a valid amount for every payment row.';
     return;
   }
   const splitSum = splitRows.reduce((sum, r) => sum + (r.amount || 0), 0);
-  if (!isFree && Math.abs(splitSum - totalAmount) > 0.01) {
-    errorEl.textContent = `Payment splits (₹${splitSum}) must add up to the total (₹${totalAmount}).`;
+  if (!isEntirelyFree && Math.abs(splitSum - grandTotal) > 0.01) {
+    errorEl.textContent = `Payment splits (₹${splitSum}) must add up to the total (₹${grandTotal}).`;
     return;
   }
 
@@ -1047,10 +1110,8 @@ document.getElementById('bm-payment-save').addEventListener('click', async () =>
       patient_id: patientId,
       new_patient_name: paymentContext?.newPatientName || null,
       new_patient_phone: paymentContext?.newPatientPhone || null,
-      category,
-      consultationSubtype: consultSubtype,
-      totalAmount: isFree ? 0 : totalAmount,
-      splits: isFree ? [] : splitRows.map((r) => ({ mode: r.mode, amount: r.amount })),
+      lineItems,
+      splits: isEntirelyFree ? [] : splitRows.map((r) => ({ mode: r.mode, amount: r.amount })),
       notes: document.getElementById('bm-payment-notes').value.trim(),
     });
     closePaymentModal();
@@ -1098,11 +1159,15 @@ async function loadDayClose(date) {
     currentDayCloseExpenses = expenses;
 
     // Totals by mode, computed from each payment's splits (a split
-    // payment contributes to more than one mode's total).
+    // payment contributes to more than one mode's total). Totals by
+    // category computed from each payment's line-items, since one
+    // payment event can now span multiple categories.
     const totalsByMode = { cash: 0, upi: 0, card: 0, other: 0 };
     const totalsByCategory = { consultation: 0, pharmacy: 0, lab: 0, vaccination: 0, procedure: 0 };
     payments.forEach((p) => {
-      totalsByCategory[p.category] = (totalsByCategory[p.category] || 0) + Number(p.total_amount);
+      (p.payment_line_items || []).forEach((li) => {
+        totalsByCategory[li.category] = (totalsByCategory[li.category] || 0) + Number(li.amount);
+      });
       (p.payment_splits || []).forEach((s) => {
         totalsByMode[s.mode] = (totalsByMode[s.mode] || 0) + Number(s.amount);
       });
@@ -1160,9 +1225,9 @@ async function loadDayClose(date) {
             <tbody>
               ${payments.map((p) => {
                 const time = new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const categoryDisplay = p.category === 'consultation'
-                  ? `Consultation${p.consultation_subtype ? ` (${p.consultation_subtype})` : ''}`
-                  : categoryLabels[p.category];
+                const categoryDisplay = (p.payment_line_items || [])
+                  .map((li) => (li.category === 'consultation' ? `Consultation (${li.consultation_subtype})` : categoryLabels[li.category]))
+                  .join(', ') || 'Unknown';
                 return `
                   <tr class="border-b border-slate-50">
                     <td class="py-2 pr-2 whitespace-nowrap text-slate-500">${time}</td>
