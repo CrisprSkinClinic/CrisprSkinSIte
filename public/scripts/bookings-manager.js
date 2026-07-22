@@ -25,6 +25,7 @@ const state = {
   editingAppointmentId: null,
   isReschedule: false,
   isWalkIn: false,
+  isOverbook: false,
   selectedSlots: [], // array of "HH:MM" strings
   currentDetailAppointment: null,
   scheduleDoctorId: CLINIC_DOCTORS[0].id,
@@ -459,6 +460,7 @@ function resetBookingForm() {
   state.editingAppointmentId = null;
   state.isReschedule = false;
   state.isWalkIn = false;
+  state.isOverbook = false;
   document.getElementById('bm-edit-banner').classList.add('hidden');
   document.getElementById('bm-booking-error').textContent = '';
 }
@@ -617,7 +619,41 @@ async function refreshTimeSlots() {
 
     const sortedSlots = Array.from(mergedSlots).sort();
     if (sortedSlots.length === 0) {
-      grid.innerHTML = '<p class="col-span-3 text-slate-400 text-sm text-center py-6">No available slots for this date.</p>';
+      // Only walk-ins get an override path here -- a normal future
+      // booking with no free slots is a genuine scheduling conflict
+      // that shouldn't be silently double-booked, but a walk-in
+      // patient standing at the desk right now is a real situation
+      // staff need a way to handle rather than turn away outright.
+      if (state.isWalkIn) {
+        grid.innerHTML = `
+          <div class="col-span-3 text-center py-6">
+            <p class="text-slate-500 text-sm mb-3">No free slots today -- fully booked.</p>
+            <button id="bm-override-slot-btn" type="button" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition">
+              Book Anyway (Overbook Walk-In)
+            </button>
+          </div>
+        `;
+        document.getElementById('bm-override-slot-btn').addEventListener('click', () => {
+          state.isOverbook = true;
+          // Falls back to the current time rounded to the nearest 15
+          // min, and whichever doctor is currently selected (or the
+          // first clinic doctor if "any" was chosen, since an
+          // overbooked slot needs one specific doctor of record, not
+          // an ambiguous "any").
+          const now = new Date();
+          const roundedMinutes = Math.round(now.getMinutes() / 15) * 15;
+          const overrideTime = minutesToTime(now.getHours() * 60 + roundedMinutes);
+          state.selectedSlots = [overrideTime];
+          if (doctorEl.value === 'any') {
+            const specificDoctor = document.querySelector('input[name="bm-doctor"]:not([value="any"])');
+            if (specificDoctor) specificDoctor.checked = true;
+          }
+          updateDurationLabel();
+          renderOverbookNotice(overrideTime);
+        });
+      } else {
+        grid.innerHTML = '<p class="col-span-3 text-slate-400 text-sm text-center py-6">No available slots for this date.</p>';
+      }
       return;
     }
 
@@ -659,6 +695,24 @@ async function refreshTimeSlots() {
   } catch (err) {
     grid.innerHTML = `<p class="col-span-3 text-red-600 text-sm text-center py-6">${err.message}</p>`;
   }
+}
+
+// Shows the overbook slot that was just auto-picked (current time,
+// rounded to the nearest 15 min) after staff confirms they want to
+// book anyway despite no free capacity. Lets them switch to a
+// different doctor -- since the override always lands on whichever
+// doctor happened to be selected, or the first one if "any" -- without
+// re-running the full availability check (there's deliberately no
+// "free" slot to re-check against here).
+function renderOverbookNotice(overrideTime) {
+  const grid = document.getElementById('bm-time-slots-grid');
+  const currentDoctor = document.querySelector('input[name="bm-doctor"]:checked');
+  grid.innerHTML = `
+    <div class="col-span-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+      <p class="text-amber-800 font-bold text-sm mb-1">⚠ Overbooking ${formatTime12h(overrideTime)}</p>
+      <p class="text-amber-700 text-xs">This slot is already at capacity for ${CLINIC_DOCTORS.find((d) => d.id === currentDoctor?.value)?.name || 'the selected doctor'}. Booking will proceed anyway and is flagged in the notes.</p>
+    </div>
+  `;
 }
 
 function updateDurationLabel() {
@@ -704,7 +758,8 @@ document.getElementById('bm-submit-booking').addEventListener('click', async () 
       date: dateVal,
       slots: state.selectedSlots.sort(),
       appointmentType,
-      notes: `${appointmentType} | Booked via Bookings Manager${state.isWalkIn ? ' (Walk-In)' : ''}`,
+      notes: `${appointmentType} | Booked via Bookings Manager${state.isWalkIn ? ' (Walk-In)' : ''}${state.isOverbook ? ' (OVERBOOKED - no free capacity)' : ''}`,
+      allowOverbook: state.isOverbook,
     };
     if (isEditing) {
       payload.originalAppointmentId = state.editingAppointmentId;
