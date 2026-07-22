@@ -190,8 +190,9 @@ import AppLayout from '../layouts/AppLayout.astro';
       <!-- Patient -->
       <section>
         <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">5. Patient Details</label>
-        <input type="text" id="bm-patient-name" placeholder="Full name" required class="w-full text-base font-semibold border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 outline-none mb-2" />
-        <input type="tel" id="bm-patient-phone" placeholder="Phone (optional)" class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 outline-none" />
+        <input type="tel" id="bm-patient-phone" placeholder="Phone number" class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 outline-none mb-1" />
+        <p id="bm-phone-lookup-status" class="text-xs min-h-[1rem] mb-2 px-1"></p>
+        <input type="text" id="bm-patient-name" placeholder="Full name" required class="w-full text-base font-semibold border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 outline-none" />
       </section>
     </div>
 
