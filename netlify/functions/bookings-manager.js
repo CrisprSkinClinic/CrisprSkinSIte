@@ -163,6 +163,52 @@ exports.handler = async (event) => {
         return ok({ success: true });
       }
 
+      case "update_appointment": {
+        // Covers both "Edit" (same slot, changed patient/service details)
+        // and "Reschedule" (changed date/time/doctor). Rather than
+        // mutating the existing row(s) in place -- which would mean
+        // re-implementing all of createAppointment's capacity-checking,
+        // multi-slot linking, and "any available" doctor-assignment
+        // logic a second time and risking the two paths drifting apart
+        // -- this creates the new booking first via the same
+        // createAppointment() used for fresh bookings, and only deletes
+        // the original row(s) after that succeeds. This ordering means
+        // a failed reschedule leaves the patient's original appointment
+        // intact rather than deleting it and then failing to create
+        // the replacement.
+        if (!data.originalAppointmentId) {
+          return { statusCode: 400, body: JSON.stringify({ error: "originalAppointmentId is required for update_appointment." }) };
+        }
+
+        const { data: original, error: fetchErr } = await supabase
+          .from("appointments")
+          .select("linked_group_id")
+          .eq("id", data.originalAppointmentId)
+          .single();
+        if (fetchErr) throw fetchErr;
+
+        const createResult = await createAppointment(supabase, data, staffName, profile.id, logAudit);
+        // createAppointment returns a Netlify-style response object
+        // ({ statusCode, body }) on validation/capacity failure rather
+        // than throwing -- surface that failure as-is without touching
+        // the original appointment.
+        if (createResult.statusCode && createResult.statusCode !== 200) {
+          return createResult;
+        }
+
+        const oldTargetIds = original.linked_group_id
+          ? (await supabase.from("appointments").select("id").eq("linked_group_id", original.linked_group_id)).data.map((r) => r.id)
+          : [data.originalAppointmentId];
+        const { error: deleteError } = await supabase.from("appointments").delete().in("id", oldTargetIds);
+        if (deleteError) throw deleteError;
+
+        await logAudit(
+          data.isReschedule ? "RESCHEDULE" : "UPDATE",
+          `${data.isReschedule ? "Rescheduled" : "Edited"} appointment for ${data.patientName || "patient"}`
+        );
+        return createResult;
+      }
+
       // ---- Weekly schedule (slot_templates) ----
 
       case "list_schedule": {
