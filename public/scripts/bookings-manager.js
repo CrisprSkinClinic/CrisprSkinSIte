@@ -24,6 +24,7 @@ const state = {
   appointments: [],
   editingAppointmentId: null,
   isReschedule: false,
+  isWalkIn: false,
   selectedSlots: [], // array of "HH:MM" strings
   currentDetailAppointment: null,
   scheduleDoctorId: CLINIC_DOCTORS[0].id,
@@ -365,6 +366,7 @@ document.getElementById('bm-reschedule-appt').addEventListener('click', () => {
 
 // ---- New/Edit appointment overlay ----
 document.getElementById('bm-fab-new').addEventListener('click', () => openBookingOverlay());
+document.getElementById('bm-fab-walkin').addEventListener('click', () => openWalkInOverlay());
 document.getElementById('bm-close-booking').addEventListener('click', closeBookingOverlay);
 
 function openBookingOverlay() {
@@ -372,6 +374,34 @@ function openBookingOverlay() {
   document.getElementById('bm-booking-overlay').classList.remove('hidden');
   document.getElementById('bm-booking-overlay').classList.add('flex');
   refreshTimeSlots();
+}
+
+// Walk-ins still go through the normal slot grid -- the clinic's whole
+// capacity system (schedules, overrides, the public site's own
+// availability check) is built around 15-min slot alignment, so
+// inventing an "off-grid, whatever time it actually is" booking type
+// would silently break capacity tracking elsewhere. Instead, this
+// defaults to today and auto-selects the EARLIEST available slot
+// across all doctors, since speed is the actual point of a walk-in --
+// staff can still change the doctor/time manually before confirming
+// if the auto-picked one isn't right.
+async function openWalkInOverlay() {
+  state.isWalkIn = true;
+  const today = todayStr();
+  document.getElementById('bm-form-date').value = today;
+  document.getElementById('bm-booking-overlay').classList.remove('hidden');
+  document.getElementById('bm-booking-overlay').classList.add('flex');
+  document.querySelector('input[name="bm-doctor"][value="any"]').checked = true;
+  document.querySelector('input[name="bm-type"][value="Review"]').checked = true;
+
+  await refreshTimeSlots();
+
+  // Auto-select the earliest currently-showing slot (refreshTimeSlots
+  // already filters to genuinely free ones), same "New needs 2
+  // consecutive slots for one doctor" logic as a normal click, since
+  // Review defaults here but staff may switch to New before confirming.
+  const firstSlotBtn = document.querySelector('#bm-time-slots-grid button');
+  if (firstSlotBtn) firstSlotBtn.click();
 }
 
 // Pre-fills the booking form from an existing appointment for Edit or
@@ -428,6 +458,7 @@ function resetBookingForm() {
   state.selectedSlots = [];
   state.editingAppointmentId = null;
   state.isReschedule = false;
+  state.isWalkIn = false;
   document.getElementById('bm-edit-banner').classList.add('hidden');
   document.getElementById('bm-booking-error').textContent = '';
 }
@@ -673,7 +704,7 @@ document.getElementById('bm-submit-booking').addEventListener('click', async () 
       date: dateVal,
       slots: state.selectedSlots.sort(),
       appointmentType,
-      notes: `${appointmentType} | Booked via Bookings Manager`,
+      notes: `${appointmentType} | Booked via Bookings Manager${state.isWalkIn ? ' (Walk-In)' : ''}`,
     };
     if (isEditing) {
       payload.originalAppointmentId = state.editingAppointmentId;
