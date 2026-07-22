@@ -5,25 +5,25 @@
 // text -- patients understand a flow diagram immediately.
 
 interface Props {
- steps: string[];
+  steps: string[];
 }
 
 const { steps } = Astro.props;
 ---
 
-<section class="py-10 px-6 bg-paper-50 border-t border-stone-400/15">
- <div class="max-w-md mx-auto">
-  <div class="flex flex-col items-center gap-2">
-   {steps.map((step: string, index: number) => (
-    <>
-     <div class="bg-white px-5 py-3 border border-stone-400/15 text-sm font-semibold text-stone-700 text-center w-full">
-      {step}
-     </div>
-     {index < steps.length - 1 && (
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
-     )}
-    </>
-   ))}
+<section class="py-10 px-6 bg-champagne-50 border-t border-slate-200">
+  <div class="max-w-md mx-auto">
+    <div class="flex flex-col items-center gap-2">
+      {steps.map((step: string, index: number) => (
+        <>
+          <div class="bg-white rounded-xl px-5 py-3 shadow-sm border border-slate-100 text-sm font-semibold text-slate-800 text-center w-full">
+            {step}
+          </div>
+          {index < steps.length - 1 && (
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+          )}
+        </>
+      ))}
+    </div>
   </div>
- </div>
 </section>

@@ -16,44 +16,42 @@
 import { siteConfig } from '../../config/site.js';
 
 interface Props {
- perspective?: string;
- patientConcern?: string;
- response?: string;
- doctorSlug: string;
+  perspective?: string;
+  patientConcern?: string;
+  response?: string;
+  doctorSlug: string;
 }
 
 const { perspective, patientConcern, response, doctorSlug } = Astro.props;
 const doctor = siteConfig.doctors.find((d) => d.slug === doctorSlug) || siteConfig.doctors[0];
 ---
 
-<section class="py-16 px-6 bg-white border-t border-stone-400/15">
- <div class="max-w-2xl mx-auto">
-  <div class="border border-stone-400/15 p-8 md:p-10">
-   <div class="flex items-center gap-3 mb-6">
-    <div class="w-11 h-11 border border-stone-400/15 overflow-hidden shrink-0">
-     <img
-      src={`/images/doctors/${doctor.slug}.jpg`}
-      alt={doctor.name}
-      class="w-full h-full object-cover"
-      onerror={`this.onerror=null;this.src='https://placehold.co/100x100/F3F0F6/1A1D1F?text=${encodeURIComponent(doctor.name)}'`}
-     />
-    </div>
-    <div>
-     <p class="font-medium text-ink text-sm">
-      {patientConcern ? "What I Commonly Hear From Patients" : `${doctor.name}'s Perspective`}
-     </p>
-     <p class="text-xs text-brand-500 uppercase tracking-[0.1em] mt-0.5">{doctor.designation}</p>
-    </div>
-   </div>
+<section class="py-12 px-6 bg-gradient-to-br from-brand-50 to-white border-t border-slate-100">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-3xl shadow-sm border border-brand-100 p-6 md:p-8">
+      <div class="flex items-center gap-3 mb-4">
+        <img
+          src={`/images/doctors/${doctor.slug}.jpg`}
+          alt={doctor.name}
+          class="w-12 h-12 rounded-full object-cover border-2 border-brand-100"
+          onerror={`this.onerror=null;this.src='https://placehold.co/100x100/EEF0F6/223154?text=${encodeURIComponent(doctor.name)}'`}
+        />
+        <div>
+          <p class="font-bold text-slate-900 text-sm">
+            {patientConcern ? "What I Commonly Hear From Patients" : `${doctor.name}'s Perspective`}
+          </p>
+          <p class="text-xs text-brand-600 font-semibold uppercase tracking-wide">{doctor.designation}</p>
+        </div>
+      </div>
 
-   {patientConcern ? (
-    <>
-     <p class="font-display text-lg text-ink italic mb-3">"{patientConcern}"</p>
-     <p class="text-stone-600 leading-relaxed">{response}</p>
-    </>
-   ) : (
-    <p class="font-display text-lg text-ink italic leading-relaxed">"{perspective}"</p>
-   )}
+      {patientConcern ? (
+        <>
+          <p class="text-slate-900 font-semibold italic mb-3">"{patientConcern}"</p>
+          <p class="text-slate-700 leading-relaxed">{response}</p>
+        </>
+      ) : (
+        <p class="text-slate-700 leading-relaxed italic">"{perspective}"</p>
+      )}
+    </div>
   </div>
- </div>
 </section>

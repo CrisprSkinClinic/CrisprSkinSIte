@@ -16,11 +16,11 @@ import { siteConfig } from '../../config/site.js';
 // swapped back to astro:assets Image imports for optimization.
 
 export async function getStaticPaths() {
- const services = await getCollection('services');
- return services.map((entry) => ({
-  params: { slug: entry.slug },
-  props: { entry },
- }));
+  const services = await getCollection('services');
+  return services.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
 }
 
 const { entry } = Astro.props;
@@ -28,133 +28,169 @@ const { Content } = await entry.render();
 const data = entry.data;
 
 const heroImageSrc = data.heroImage
- ? `/images/services/${data.heroImage}.jpg`
- : null;
+  ? `/images/services/${data.heroImage}.jpg`
+  : null;
 
 // Resolve linked condition entries (if any) for the "Conditions We
 // Manage" section, so links and titles stay in sync with the
 // conditions collection automatically.
 const conditionEntries = data.conditionsManaged
- ? (await Promise.all(
-   data.conditionsManaged.map((slug) => getEntry('conditions', slug))
-  )).filter(Boolean)
- : [];
+  ? (await Promise.all(
+      data.conditionsManaged.map((slug) => getEntry('conditions', slug))
+    )).filter(Boolean)
+  : [];
 
 // Resolve faqIds against the central faqs collection. Each FAQ's
 // answer lives in its markdown body (matching the existing FAQ.astro
 // pattern), so we render it to a string here.
 let faqEntries = [];
 if (data.faqIds && data.faqIds.length > 0) {
- const resolved = await Promise.all(
-  data.faqIds.map((id) => getEntry('faqs', id))
- );
- faqEntries = resolved
-  .filter(Boolean)
-  .map((f) => ({ question: f.data.question, answer: f.body }));
+  const resolved = await Promise.all(
+    data.faqIds.map((id) => getEntry('faqs', id))
+  );
+  faqEntries = resolved
+    .filter(Boolean)
+    .map((f) => ({ question: f.data.question, answer: f.body }));
 }
+
+// Structured data (JSON-LD) for search engines. FAQPage schema mirrors
+// the same faqEntries already resolved above for the visible accordion
+// -- reusing that data rather than re-deriving it, so the two can never
+// drift out of sync. MedicalWebPage identifies this as patient-facing
+// medical content and folds in the treatments already listed on the
+// page as MedicalTherapy sub-entities.
+const pageUrl = new URL(`/services/${entry.slug}`, siteConfig.url).toString();
+
+const faqSchema = faqEntries.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqEntries.map((f) => ({
+    "@type": "Question",
+    "name": f.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": f.answer,
+    },
+  })),
+} : null;
+
+const medicalWebPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "MedicalWebPage",
+  "name": data.title,
+  "description": data.metaDescription,
+  "url": pageUrl,
+  "medicalAudience": {
+    "@type": "MedicalAudience",
+    "audienceType": "Patient",
+  },
+  ...(data.treatments && data.treatments.length > 0 && {
+    "about": data.treatments.map((t) => ({
+      "@type": "MedicalTherapy",
+      "name": t.name,
+      "description": t.description,
+    })),
+  }),
+};
 ---
 
 <MainLayout title={data.title} description={data.metaDescription}>
- <Breadcrumbs items={[
-  { name: "Services", url: "/services" },
-  { name: data.title, url: `/services/${entry.slug}` }
- ]} />
+  <script type="application/ld+json" set:html={JSON.stringify(medicalWebPageSchema)} />
+  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
- <section class="pt-8 pb-16 md:pt-12 md:pb-24 px-6">
-  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-   <div class="lg:col-span-7">
-    {data.heroEyebrow && (
-     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-500 mb-6">{data.heroEyebrow}</p>
-    )}
-    <h1 class="font-display text-4xl md:text-5xl font-medium mb-6 leading-[1.1] text-ink">{data.heroHeadline}</h1>
-    <p class="text-lg text-stone-600 mb-8 leading-relaxed max-w-lg">
-     {data.heroSubheadline}
-    </p>
-    <a href="#book" class="inline-block bg-ink text-white text-base px-8 py-4 hover:bg-brand-600 transition-colors duration-300">
-     {data.ctaTitle || `Book a ${data.title} Evaluation`}
-    </a>
-   </div>
-   {heroImageSrc && (
-    <div class="lg:col-span-5">
-     <div class="border border-stone-400/15 aspect-[4/3] overflow-hidden">
-      <img
-       src={heroImageSrc}
-       alt={data.heroHeadline}
-       class="w-full h-full object-cover"
-       onerror={`this.onerror=null;this.src='https://placehold.co/800x600/F3F0F6/1A1D1F?text=${encodeURIComponent(data.title)}'`}
-      />
-     </div>
+  <Breadcrumbs items={[
+    { name: "Services", url: "/services" },
+    { name: data.title, url: `/services/${entry.slug}` }
+  ]} />
+
+  <section class="bg-brand-900 text-white py-20 px-6">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
+      <div class="md:w-1/2">
+        {data.heroEyebrow && (
+          <span class="text-brand-300 font-bold tracking-wider uppercase text-sm mb-4 block">{data.heroEyebrow}</span>
+        )}
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">{data.heroHeadline}</h1>
+        <p class="text-xl text-brand-100 mb-8 leading-relaxed">
+          {data.heroSubheadline}
+        </p>
+        <a href="#book" class="bg-white text-brand-900 font-bold px-8 py-3 rounded-md shadow-lg hover:bg-brand-50 transition inline-block">
+          {data.ctaTitle || `Book a ${data.title} Evaluation`}
+        </a>
+      </div>
+      {heroImageSrc && (
+        <div class="md:w-1/2 w-full">
+          <img
+            src={heroImageSrc}
+            alt={data.heroHeadline}
+            class="rounded-2xl shadow-2xl border-4 border-white/10 w-full object-cover aspect-video"
+            onerror={`this.onerror=null;this.src='https://placehold.co/800x450/0f172a/ffffff?text=${encodeURIComponent(data.title)}'`}
+          />
+        </div>
+      )}
     </div>
-   )}
-  </div>
- </section>
+  </section>
 
- {data.twoPaths && (
-  <section class="py-16 px-6 max-w-5xl mx-auto">
-   <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-stone-400/15 border border-stone-400/15">
-    <div class="bg-white p-8">
-     <h2 class="font-display text-xl font-medium text-ink mb-3">{data.twoPaths.screeningTitle}</h2>
-     <p class="text-stone-600 leading-relaxed">{data.twoPaths.screeningBody}</p>
+  {data.twoPaths && (
+    <section class="py-16 px-6 max-w-5xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-brand-50 border border-brand-100 p-8 rounded-xl">
+          <h2 class="text-xl font-bold text-brand-900 mb-3">{data.twoPaths.screeningTitle}</h2>
+          <p class="text-slate-700 leading-relaxed">{data.twoPaths.screeningBody}</p>
+        </div>
+        <div class="bg-red-50 border border-red-200 p-8 rounded-xl">
+          <h2 class="text-xl font-bold text-red-900 mb-3">{data.twoPaths.symptomsTitle}</h2>
+          <p class="text-red-800 leading-relaxed">{data.twoPaths.symptomsBody}</p>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="py-8 px-6 max-w-4xl mx-auto">
+    <div class="prose prose-lg prose-blue max-w-none text-slate-700">
+      <Content />
     </div>
-    <div class="bg-white p-8">
-     <h2 class="font-display text-xl font-medium text-ink mb-3">{data.twoPaths.symptomsTitle}</h2>
-     <p class="text-stone-600 leading-relaxed">{data.twoPaths.symptomsBody}</p>
-    </div>
-   </div>
   </section>
- )}
 
- <section class="py-8 px-6 max-w-3xl mx-auto">
-  <div class="prose prose-lg max-w-none text-stone-700 prose-headings:font-display prose-headings:font-medium prose-headings:text-ink prose-a:text-brand-600">
-   <Content />
-  </div>
- </section>
+  {data.diagnostics && data.diagnostics.length > 0 && (
+    <section class="py-8 px-6 max-w-4xl mx-auto">
+      <h2 class="text-3xl font-bold text-brand-900 mb-6">How We Evaluate</h2>
+      <ul class="list-disc pl-6 space-y-2 text-slate-700">
+        {data.diagnostics.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+  )}
 
- {data.diagnostics && data.diagnostics.length > 0 && (
-  <section class="py-8 px-6 max-w-3xl mx-auto">
-   <h2 class="font-display text-2xl font-medium text-ink mb-6">How We Evaluate</h2>
-   <ul class="space-y-2 text-stone-600">
-    {data.diagnostics.map((item) => (
-     <li class="flex items-start gap-3">
-      <span class="w-1 h-1 rounded-full bg-brand-500 mt-2.5 shrink-0"></span>
-      {item}
-     </li>
-    ))}
-   </ul>
-  </section>
- )}
+  {data.treatments && data.treatments.length > 0 && (
+    <section class="py-8 px-6 max-w-4xl mx-auto">
+      <div class="bg-brand-50 p-8 rounded-xl border border-brand-100">
+        <h2 class="text-2xl font-bold text-brand-900 mb-4">Treatment Options</h2>
+        <ul class="space-y-3">
+          {data.treatments.map((t) => (
+            <li>
+              <strong class="text-brand-900">{t.name}:</strong>{' '}
+              <span class="text-slate-700">{t.description}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
 
- {data.treatments && data.treatments.length > 0 && (
-  <section class="py-8 px-6 max-w-3xl mx-auto">
-   <div class="border border-stone-400/15 p-8">
-    <h2 class="font-display text-2xl font-medium text-ink mb-5">Treatment Options</h2>
-    <ul class="space-y-4">
-     {data.treatments.map((t) => (
-      <li>
-       <p class="text-ink font-medium mb-0.5">{t.name}</p>
-       <p class="text-stone-600 text-sm leading-relaxed">{t.description}</p>
-      </li>
-     ))}
-    </ul>
-   </div>
-  </section>
- )}
+  {conditionEntries.length > 0 && (
+    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
+      <h2 class="text-2xl font-bold text-brand-900 mb-6">Conditions We Manage</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {conditionEntries.map((c) => (
+          <a href={`/conditions/${c.slug}`} class="block p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 transition-colors">
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Condition</p>
+            <p class="font-semibold text-slate-900">{c.data.title}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
 
- {conditionEntries.length > 0 && (
-  <section class="py-16 px-6 max-w-3xl mx-auto border-t border-stone-400/15">
-   <h2 class="font-display text-2xl font-medium text-ink mb-6">Conditions We Manage</h2>
-   <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-stone-400/15 border border-stone-400/15">
-    {conditionEntries.map((c) => (
-     <a href={`/conditions/${c.slug}`} class="block p-5 bg-white hover:bg-paper-50 transition-colors">
-      <p class="text-xs text-stone-500 uppercase tracking-[0.1em] mb-1">Condition</p>
-      <p class="text-ink font-medium">{c.data.title}</p>
-     </a>
-    ))}
-   </div>
-  </section>
- )}
+  <FAQAccordion entries={faqEntries} />
 
- <FAQAccordion entries={faqEntries} />
-
- <BookingSection defaultService={data.defaultService} />
+  <BookingSection defaultService={data.defaultService} defaultDoctorId={data.defaultDoctorId} />
 </MainLayout>

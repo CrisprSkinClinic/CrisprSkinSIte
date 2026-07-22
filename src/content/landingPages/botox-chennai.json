@@ -1,0 +1,53 @@
+{
+  "headline": "Botox in Chennai -- Natural-Looking Results",
+  "subheadline": "Conservative, individualized dosing to soften expression lines while preserving natural movement.",
+  "urgent": false,
+  "metaDescription": "Botox treatment in KK Nagar, Chennai from trained dermatologists. Natural-looking, conservative dosing. Book a consultation.",
+
+  "whyPatientsChoose": [
+    { "title": "Conservative Dosing Philosophy", "description": "We favor starting conservatively, aiming to soften lines while preserving natural expression -- not a uniform, one-size dose." },
+    { "title": "Administered by Dermatologists", "description": "Every treatment is administered by a trained consultant dermatologist, not delegated staff." }
+  ],
+
+  "showSymptomCheck": false,
+
+  "showServicesGrid": false,
+  "showLocalArea": true,
+
+  "educationalInsight": {
+    "title": "Why Botox Doesn't Have to Look 'Done'",
+    "body": "Looking overdone is almost always a function of dosing and technique, not the treatment itself. Our default approach favors conservative dosing that preserves natural facial movement.",
+    "pathway": {
+      "steps": [
+        "Facial assessment of muscle activity and expression lines",
+        "Discussion of your specific goals and areas of concern",
+        "Individualized dosing plan"
+      ]
+    }
+  },
+
+  "doctorsPerspectiveStructured": {
+    "patientConcern": "I don't want to look frozen or obviously 'done.'",
+    "response": "That's the default outcome we aim for too. We start conservatively and build from there based on how it actually looks on you -- not a fixed dose applied the same way for everyone.",
+    "doctorSlug": "dr-karthik-l"
+  },
+
+  "processSteps": [
+    { "title": "Consultation", "description": "Facial assessment and discussion of which lines you'd like to address." },
+    { "title": "Treatment", "description": "Conservative, individualized dosing administered by a trained dermatologist." },
+    { "title": "Follow-Up", "description": "Results build over the following days; we're available if you want any adjustment discussed at a follow-up visit." }
+  ],
+
+  "landingFaqs": [
+    { "question": "How long does Botox last?", "answer": "Effects typically build over the days following treatment and gradually fade over several months. Many patients maintain results with periodic sessions." },
+    { "question": "Will it look natural?", "answer": "We favor a conservative, natural-looking approach by default, aiming to soften lines while preserving your natural expression." },
+    { "question": "Is there a minimum age?", "answer": "There's no fixed age -- it depends on your specific expression lines and goals, discussed individually at consultation." }
+  ],
+
+  "learnMoreLink": {
+    "text": "Learn more about Botox treatment",
+    "url": "/services/botox"
+  },
+
+  "defaultService": "Botox"
+}

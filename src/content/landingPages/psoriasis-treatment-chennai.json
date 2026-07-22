@@ -1,0 +1,59 @@
+{
+  "headline": "Psoriasis Treatment in Chennai -- Long-Term, Evidence-Based Management",
+  "subheadline": "Psoriasis is a chronic condition -- we build a sustained management plan, not a promise of a one-time fix.",
+  "urgent": false,
+  "metaDescription": "Psoriasis diagnosis and long-term management in KK Nagar, Chennai from AIIMS-trained dermatologists. Book a consultation.",
+
+  "whyPatientsChoose": [
+    { "title": "Long-Term Management Focus", "description": "We build treatment plans around sustained control of flares, matched to your extent and severity." },
+    { "title": "Full Range of Treatment Options", "description": "From topical therapy to phototherapy to systemic treatment referral, matched to how extensive your psoriasis is." }
+  ],
+
+  "showSymptomCheck": true,
+  "symptoms": [
+    "Thick, red, scaly patches",
+    "Scalp scaling not responding to dandruff shampoo",
+    "Joint pain alongside skin symptoms",
+    "Flares affecting daily life"
+  ],
+
+  "showServicesGrid": false,
+  "showLocalArea": true,
+
+  "educationalInsight": {
+    "title": "Psoriasis Is Not Contagious -- Here's What It Actually Is",
+    "body": "Psoriasis is a chronic autoimmune condition, not an infection. It causes skin cells to build up rapidly, forming thick, scaly patches, and cannot be spread through contact.",
+    "pathway": {
+      "steps": [
+        "Skin examination and assessment of extent (body surface area involved)",
+        "Screening for psoriatic arthritis symptoms",
+        "Assessment of trigger factors"
+      ]
+    }
+  },
+
+  "doctorsPerspectiveStructured": {
+    "patientConcern": "Will I have to deal with this forever?",
+    "response": "Psoriasis is a long-term condition with a relapsing-remitting course, but that doesn't mean it controls your life. With the right sustained plan, most patients get flares well under control and manage the condition effectively over the years.",
+    "doctorSlug": "dr-narayanan-b"
+  },
+
+  "processSteps": [
+    { "title": "Evaluation", "description": "Skin examination, extent assessment, and screening for joint involvement." },
+    { "title": "Treatment Plan", "description": "Topical, phototherapy, or systemic treatment matched to your specific extent and severity." },
+    { "title": "Long-Term Follow-Up", "description": "Ongoing management to track flares and adjust treatment as your condition evolves." }
+  ],
+
+  "landingFaqs": [
+    { "question": "Is psoriasis contagious?", "answer": "No, psoriasis is not contagious. It's a chronic autoimmune condition, not an infection." },
+    { "question": "Can psoriasis be cured?", "answer": "Current treatment focuses on sustained, long-term control rather than a permanent cure. Most patients do well with an ongoing management plan." },
+    { "question": "Does psoriasis affect joints?", "answer": "It can -- psoriatic arthritis sometimes accompanies skin psoriasis. We specifically screen for this at your evaluation." }
+  ],
+
+  "learnMoreLink": {
+    "text": "Learn more about psoriasis and treatment options",
+    "url": "/services/psoriasis"
+  },
+
+  "defaultService": "Psoriasis"
+}

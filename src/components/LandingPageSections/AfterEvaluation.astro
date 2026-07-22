@@ -6,27 +6,27 @@
 // consultation itself, which is what actually drives booking.
 
 interface Props {
- pathways: { finding: string; nextStep: string }[];
+  pathways: { finding: string; nextStep: string }[];
 }
 
 const { pathways } = Astro.props;
 ---
 
-<section class="py-12 px-6 bg-paper-50 border-t border-stone-400/15">
- <div class="max-w-2xl mx-auto">
-  <h2 class="text-2xl md:text-3xl font-medium text-ink mb-6 text-center tracking-tight">
-   What Usually Happens After Evaluation?
-  </h2>
-  <div class="space-y-3">
-   {pathways.map((pathway) => (
-    <div class="flex items-center gap-3 bg-white p-4 border border-stone-400/15">
-     <span class="shrink-0 text-sm font-medium text-ink bg-brand-50 px-3 py-1.5">
-      {pathway.finding}
-     </span>
-     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-     <span class="text-sm text-stone-600 font-medium">{pathway.nextStep}</span>
+<section class="py-12 px-6 bg-champagne-50 border-t border-slate-200">
+  <div class="max-w-2xl mx-auto">
+    <h2 class="text-2xl md:text-3xl font-extrabold text-brand-900 mb-6 text-center tracking-tight">
+      What Usually Happens After Evaluation?
+    </h2>
+    <div class="space-y-3">
+      {pathways.map((pathway) => (
+        <div class="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm border border-slate-100">
+          <span class="shrink-0 text-sm font-bold text-brand-900 bg-brand-50 px-3 py-1.5 rounded-lg">
+            {pathway.finding}
+          </span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          <span class="text-sm text-slate-700 font-medium">{pathway.nextStep}</span>
+        </div>
+      ))}
     </div>
-   ))}
   </div>
- </div>
 </section>

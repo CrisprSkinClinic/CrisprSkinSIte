@@ -1,0 +1,59 @@
+{
+  "headline": "Pediatric Dermatology in Chennai -- Child-Friendly Skin Care",
+  "subheadline": "A patient, age-appropriate approach to your child's skin, hair, and nail concerns from a trained paediatric dermatologist.",
+  "urgent": false,
+  "metaDescription": "Pediatric dermatology in KK Nagar, Chennai from an AIIMS-trained paediatric dermatologist. Book a consultation for your child.",
+
+  "whyPatientsChoose": [
+    { "title": "Trained Paediatric Dermatologist", "description": "Dr. Narayanan A completed a dedicated paediatric dermatology fellowship at JIPMER, Puducherry -- not general dermatology experience alone." },
+    { "title": "Child-Friendly Approach", "description": "We work at your child's pace, explaining things in an age-appropriate way to reduce anxiety around the visit." }
+  ],
+
+  "showSymptomCheck": true,
+  "symptoms": [
+    "Persistent rash or dry, itchy patches",
+    "New birthmark or skin growth",
+    "Recurring bumps or spots",
+    "Diaper rash not improving with basic care"
+  ],
+
+  "showServicesGrid": false,
+  "showLocalArea": true,
+
+  "educationalInsight": {
+    "title": "Common Childhood Skin Concerns",
+    "body": "Children's skin presents a distinct set of conditions compared to adults, and treatment always needs to account for age, skin sensitivity, and what's realistic for a parent to maintain at home.",
+    "pathway": {
+      "steps": [
+        "Age-appropriate examination and history from parent/caregiver",
+        "Clear explanation to the child where possible",
+        "Practical, sustainable home-care guidance"
+      ]
+    }
+  },
+
+  "doctorsPerspectiveStructured": {
+    "patientConcern": "My child is scared of doctor visits -- will this be difficult for them?",
+    "response": "We work specifically to make paediatric visits comfortable -- explaining things at their level, going at their pace, and keeping the environment as unintimidating as a clinical visit can be.",
+    "doctorSlug": "dr-narayanan-a"
+  },
+
+  "processSteps": [
+    { "title": "Evaluation", "description": "Age-appropriate examination and detailed history from you as the parent or caregiver." },
+    { "title": "Treatment Plan", "description": "A realistic routine you can maintain daily, alongside any needed medical treatment." },
+    { "title": "Follow-Up", "description": "Monitoring appropriate to your child's specific condition as they grow." }
+  ],
+
+  "landingFaqs": [
+    { "question": "What age range do you see?", "answer": "We see patients from infancy through the teenage years, adapting our approach to each child's age and comfort." },
+    { "question": "Will the visit be stressful for my child?", "answer": "We work to make visits comfortable, using age-appropriate explanations and working at your child's pace." },
+    { "question": "What if it turns out to be nothing serious?", "answer": "Many childhood skin concerns are common and easily managed -- accurate reassurance is itself a valuable outcome of an evaluation." }
+  ],
+
+  "learnMoreLink": {
+    "text": "Learn more about our pediatric dermatology care",
+    "url": "/services/pediatric-dermatology"
+  },
+
+  "defaultService": "Pediatric Dermatology"
+}

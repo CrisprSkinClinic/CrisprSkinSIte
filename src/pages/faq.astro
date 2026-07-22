@@ -10,44 +10,44 @@ const allFaqs = await getCollection('faqs');
 const sortedFaqs = allFaqs.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
 
 const schema = {
- "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": sortedFaqs.map((faq) => ({
-  "@type": "Question",
-  "name": faq.data.question,
-  "acceptedAnswer": {
-   "@type": "Answer",
-   "text": faq.body,
-  },
- })),
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": sortedFaqs.map((faq) => ({
+    "@type": "Question",
+    "name": faq.data.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.body,
+    },
+  })),
 };
 ---
 
 <MainLayout title={pageTitle} description={pageDescription}>
- <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
- <section class="bg-paper-50 border-b border-stone-400/15 pt-8 pb-16 md:pb-24 px-6 text-center">
-  <div class="max-w-3xl mx-auto">
-   <h1 class="font-display text-4xl md:text-5xl font-medium mb-4 text-ink">Frequently Asked Questions</h1>
-   <p class="text-lg text-stone-600">Answers to common questions about skin, hair, and cosmetic care.</p>
-  </div>
- </section>
+  <section class="bg-brand-900 text-white py-16 px-6 text-center">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Frequently Asked Questions</h1>
+      <p class="text-xl text-brand-200">Answers to common questions about skin, hair, and cosmetic care.</p>
+    </div>
+  </section>
 
- <section class="py-24 px-6 max-w-3xl mx-auto">
-  <div class="divide-y divide-stone-400/15 border-t border-stone-400/15">
-   {sortedFaqs.map((faq) => (
-    <details class="group py-6">
-     <summary class="flex items-center justify-between gap-6 cursor-pointer text-base text-ink font-medium list-none">
-      {faq.data.question}
-      <span class="shrink-0 transition-transform duration-300 group-open:rotate-45 text-brand-500">
-       <svg fill="none" height="18" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="18"><path d="M12 5v14M5 12h14"></path></svg>
-      </span>
-     </summary>
-     <div class="pt-4 text-stone-600 leading-relaxed max-w-2xl">
-      {faq.body}
-     </div>
-    </details>
-   ))}
-  </div>
- </section>
+  <section class="py-16 px-6 max-w-3xl mx-auto">
+    <div class="space-y-4">
+      {sortedFaqs.map((faq) => (
+        <details class="group bg-champagne-50 rounded-lg border border-slate-200 overflow-hidden">
+          <summary class="flex items-center justify-between cursor-pointer p-6 font-bold text-lg text-slate-900 group-hover:text-brand-600 transition">
+            {faq.data.question}
+            <span class="transition group-open:rotate-180 shrink-0 ml-4">
+              <svg fill="none" height="24" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+            </span>
+          </summary>
+          <div class="p-6 pt-0 text-slate-600 leading-relaxed border-t border-slate-100 mt-2">
+            {faq.body}
+          </div>
+        </details>
+      ))}
+    </div>
+  </section>
 </MainLayout>

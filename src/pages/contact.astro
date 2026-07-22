@@ -4,54 +4,53 @@ import { siteConfig } from '../config/site.js';
 ---
 
 <MainLayout title={`Contact & Location | ${siteConfig.name}`}>
- <div class="max-w-6xl mx-auto py-24 px-6">
-  <h1 class="font-display text-4xl font-medium text-ink mb-12 text-center">Visit {siteConfig.name}</h1>
-  
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-stone-400/15 border border-stone-400/15">
-   <div class="bg-white p-8 md:p-12">
-    <h2 class="font-display text-2xl font-medium text-ink mb-6">Get in Touch</h2>
-    <div class="space-y-6">
-     <div>
-      <p class="text-xs text-stone-500 uppercase tracking-[0.15em] mb-1.5">Clinic Address</p>
-      <p class="text-lg text-ink">{siteConfig.contact.address.street}, {siteConfig.contact.address.locality}, {siteConfig.contact.address.city} - {siteConfig.contact.address.postalCode}</p>
-      <p class="text-stone-600 mt-2">Serving Ashok Nagar, Vadapalani, Virugambakkam & Ramapuram.</p>
-     </div>
-     <div>
-      <p class="text-xs text-stone-500 uppercase tracking-[0.15em] mb-1.5">Phone</p>
-      <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="text-xl text-ink hover:text-brand-600 transition-colors">{siteConfig.contact.phone}</a>
-     </div>
-     <div>
-      <p class="text-xs text-stone-500 uppercase tracking-[0.15em] mb-1.5">Working Hours</p>
-      <p class="text-lg text-ink">{siteConfig.contact.workingHoursDisplay}</p>
-     </div>
-    </div>
-   </div>
+  <div class="max-w-6xl mx-auto py-16 px-6">
+    <h1 class="text-4xl font-extrabold text-brand-900 mb-8 text-center">Visit {siteConfig.name}</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white rounded-2xl shadow-sm border border-champagne-200 p-8 md:p-12">
+      <div>
+        <h2 class="text-2xl font-bold mb-6">Get in Touch</h2>
+        <div class="space-y-6">
+          <div>
+            <p class="text-sm text-slate-500 font-semibold uppercase tracking-wider mb-1">Clinic Address</p>
+            <p class="text-lg text-slate-800">{siteConfig.contact.address}</p>
+            <p class="text-slate-600 mt-2">Serving Ashok Nagar, Vadapalani, Virugambakkam & Ramapuram.</p>
+          </div>
+          <div>
+            <p class="text-sm text-slate-500 font-semibold uppercase tracking-wider mb-1">Phone & Emergencies</p>
+            <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="text-2xl text-brand-600 font-bold hover:underline">{siteConfig.contact.phone}</a>
+          </div>
+          <div>
+            <p class="text-sm text-slate-500 font-semibold uppercase tracking-wider mb-1">Working Hours</p>
+            <p class="text-lg text-slate-800">{siteConfig.contact.workingHoursDisplay}</p>
+          </div>
+        </div>
+      </div>
 
-   <div class="bg-paper-50 p-8 md:p-12">
-    <h3 class="font-display text-xl font-medium text-ink mb-6">Request a Call Back</h3>
-    <form class="space-y-4" action="#" method="POST" onsubmit="event.preventDefault(); alert('Form submission connected successfully!');">
-     <div>
-      <label class="block text-sm text-stone-600 mb-1.5">Full Name</label>
-      <input type="text" class="w-full px-4 py-2.5 bg-white border border-stone-400/30 focus:border-ink outline-none text-sm" required />
-     </div>
-     <div>
-      <label class="block text-sm text-stone-600 mb-1.5">Phone Number</label>
-      <input type="tel" class="w-full px-4 py-2.5 bg-white border border-stone-400/30 focus:border-ink outline-none text-sm" required />
-     </div>
-     <div>
-      <label class="block text-sm text-stone-600 mb-1.5">Service Needed</label>
-      <select class="w-full px-4 py-2.5 bg-white border border-stone-400/30 focus:border-ink outline-none text-sm">
-       <option>General Dermatology Consultation</option>
-       <option>Hair Transplant (FUE)</option>
-       <option>Hair Loss Treatment</option>
-       <option>Acne Treatment</option>
-       <option>Cosmetic Dermatology</option>
-      </select>
-     </div>
-     <button type="submit" class="w-full bg-ink text-white text-sm py-3.5 hover:bg-brand-600 transition-colors duration-300">Submit Request</button>
-    </form>
-   </div>
+      <div class="bg-brand-50 p-8 rounded-xl">
+        <h3 class="text-xl font-bold text-brand-900 mb-4">Request a Call Back</h3>
+        <form class="space-y-4" action="#" method="POST" onsubmit="event.preventDefault(); alert('Form submission connected successfully!');">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+            <input type="text" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-brand-500 focus:border-brand-500" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
+            <input type="tel" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-brand-500 focus:border-brand-500" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Service Needed</label>
+            <select class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-brand-500 focus:border-brand-500">
+              <option>General Checkup</option>
+              <option>Cataract Evaluation</option>
+              <option>LASIK Consult</option>
+              <option>Retina Care</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-brand-600 text-white font-bold py-3 rounded-md hover:bg-brand-700 transition">Submit Request</button>
+        </form>
+      </div>
+    </div>
   </div>
- </div>
 </MainLayout>
 

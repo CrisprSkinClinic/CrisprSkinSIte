@@ -1,0 +1,59 @@
+{
+  "headline": "Vitiligo Treatment in Chennai -- Honest, Evidence-Based Care",
+  "subheadline": "An accurate diagnosis and a realistic conversation about treatment options -- not a promise of a cure that doesn't exist.",
+  "urgent": false,
+  "metaDescription": "Vitiligo diagnosis and treatment in KK Nagar, Chennai from AIIMS-trained dermatologists. Honest, comprehensive management. Book a consultation.",
+
+  "whyPatientsChoose": [
+    { "title": "No False Promises", "description": "We're upfront that there's no guaranteed cure, and discuss realistic outcomes based on your specific pattern and extent." },
+    { "title": "Full Range of Options", "description": "From topical therapy to phototherapy to cosmetic camouflage, we discuss what's genuinely likely to help you." }
+  ],
+
+  "showSymptomCheck": true,
+  "symptoms": [
+    "New white or pale patches on the skin",
+    "Patches that seem to be spreading",
+    "Depigmentation around the eyes or mouth",
+    "Concerns about an existing vitiligo diagnosis"
+  ],
+
+  "showServicesGrid": false,
+  "showLocalArea": true,
+
+  "educationalInsight": {
+    "title": "Understanding Your Vitiligo Pattern",
+    "body": "Vitiligo's course varies significantly between individuals. Some patients have a few small, stable patches for years; others experience more extensive or actively spreading depigmentation. Understanding which applies to you shapes the treatment conversation.",
+    "pathway": {
+      "steps": [
+        "Skin examination, often with Wood's lamp assessment",
+        "Assessment of extent, distribution, and activity",
+        "Screening for associated autoimmune conditions where relevant"
+      ]
+    }
+  },
+
+  "doctorsPerspectiveStructured": {
+    "patientConcern": "Is there any point in treatment if there's no permanent cure?",
+    "response": "Absolutely -- treatment can meaningfully restore pigment in many cases, especially with early and consistent treatment. We're honest that outcomes vary, but that doesn't mean treatment isn't worthwhile for most patients.",
+    "doctorSlug": "dr-karthik-l"
+  },
+
+  "processSteps": [
+    { "title": "Evaluation", "description": "Skin examination and assessment of extent and activity of your vitiligo." },
+    { "title": "Treatment Discussion", "description": "Honest conversation about which options -- topical, phototherapy, or camouflage -- fit your situation." },
+    { "title": "Ongoing Management", "description": "Regular follow-up to track response and adjust treatment as needed." }
+  ],
+
+  "landingFaqs": [
+    { "question": "Can vitiligo be cured?", "answer": "There's currently no guaranteed cure, but treatment can meaningfully restore pigment in many cases. We discuss realistic expectations specific to your pattern at your evaluation." },
+    { "question": "Will my vitiligo keep spreading?", "answer": "It varies significantly between individuals -- some patients have stable patches for years, others see more active spread. Your evaluation assesses which pattern currently applies to you." },
+    { "question": "Are there options if medical treatment doesn't fully repigment an area?", "answer": "Yes -- cosmetic camouflage is available as a complement to medical treatment for patients who want it." }
+  ],
+
+  "learnMoreLink": {
+    "text": "Learn more about vitiligo and treatment options",
+    "url": "/services/vitiligo"
+  },
+
+  "defaultService": "Vitiligo"
+}

@@ -11,7 +11,11 @@ const {
   title, 
   description = siteConfig.description,
   image = '/images/hero-doctor.jpg', // Default fallback image for link sharing
-  type = 'website'
+  type = 'website',
+  // Defaults to indexed (false) -- only internal/non-public pages like
+  // /staff-admin should pass true here. Ad landing pages use their own
+  // LandingPageLayout, which already handles noindex separately.
+  noindex = false,
 } = Astro.props;
 
 // Automatically generate the exact canonical URL for the current page
@@ -32,6 +36,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
     <title>{title} | {siteConfig.name}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonicalURL} />
@@ -47,13 +52,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
 
     <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-    <!-- TODO: replace with a new GA4 property for crisprdermatology.com -- this ID is still the eye-care site's -->
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-GR0G04EY1M"></script>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-6JTEB0S8T0"></script>
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-GR0G04EY1M');
+      gtag('config', 'G-6JTEB0S8T0');
     </script>
 
     <script type="application/ld+json" set:html={JSON.stringify({ 
@@ -105,12 +109,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   </head>
 
-  <body class="bg-paper-50 text-ink antialiased selection:bg-brand-200 selection:text-ink flex flex-col min-h-screen font-sans">
+  <body class="bg-warmwhite text-charcoal antialiased selection:bg-brand-200 selection:text-brand-900 flex flex-col min-h-screen">
     
-    <div class="bg-ink text-paper-50 text-xs sm:text-sm py-2 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-0 relative z-50 text-center sm:text-left tracking-wide">
+    <div class="bg-brand-900 text-white text-xs sm:text-sm py-2 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-0 relative z-50 text-center sm:text-left">
       <span>{siteConfig.contact.workingHoursDisplay}</span>
       <div class="flex flex-col sm:flex-row sm:space-x-4 items-center">
         <span>Call: {siteConfig.contact.phone}</span>
@@ -166,6 +170,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
             gtag('event', 'directions_click', {
               event_category: 'engagement',
               event_label: 'get_directions',
+            });
+            return;
+          }
+
+          if (href.startsWith('mailto:')) {
+            gtag('event', 'email_click', {
+              event_category: 'engagement',
+              event_label: href.replace('mailto:', ''),
             });
             return;
           }
@@ -246,28 +258,29 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
     </script>
     
     <style is:global>
-      /* Body face is set via font-sans (Inter) on <body> in Tailwind;
-         headings opt into the display serif explicitly per-element via
-         font-display, so plain text never accidentally inherits it. */
-      h1, h2, h3, h4 {
-        font-family: 'Fraunces', ui-serif, Georgia, serif;
-        font-weight: 500;
-        letter-spacing: -0.01em;
+      /* Enforce the new premium font globally */
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
       }
-
-      /* Quiet, warm-neutral scrollbar instead of the default cool grey */
+      
+      /* Premium Custom Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #F5F4F1;
+        background: #f8fafc; 
       }
       ::-webkit-scrollbar-thumb {
-        background: #C7B4D6;
+        background: #cbd5e1; 
         border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #A587BD;
+        background: #94a3b8; 
+      }
+
+      /* Tighter letter spacing for a modern, clinical look */
+      h1, h2, h3, h4, h5, h6 {
+        letter-spacing: -0.02em; 
       }
     </style>
   </body>

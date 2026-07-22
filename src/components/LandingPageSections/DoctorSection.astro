@@ -6,32 +6,32 @@
 import { siteConfig } from '../../config/site.js';
 ---
 
-<section class="py-20 px-6 bg-paper-100 border-y border-stone-400/15">
- <div class="max-w-5xl mx-auto">
-  <div class="text-center mb-12">
-   <h3 class="font-display text-2xl md:text-3xl font-medium text-ink tracking-tight mb-3">Meet Our Doctors</h3>
-   <p class="text-stone-600 max-w-2xl mx-auto">Three AIIMS-trained consultant dermatologists, committed to providing ethical, evidence-based care -- prioritizing your long-term skin and hair health over high-volume transactions.</p>
-  </div>
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
-   {siteConfig.doctors.map((doc) => (
-    <div class="text-center">
-     <div class="w-28 h-28 mx-auto mb-4 border border-stone-400/15 overflow-hidden">
-      <img
-       src={`/images/doctors/${doc.slug}.jpg`}
-       alt={doc.name}
-       class="w-full h-full object-cover"
-       onerror={`this.onerror=null;this.src='https://placehold.co/200x200/F3F0F6/1A1D1F?text=${encodeURIComponent(doc.name)}'`}
-      />
-     </div>
-     <h4 class="font-display text-lg font-medium text-ink">{doc.name}</h4>
-     <p class="text-xs text-brand-500 uppercase tracking-[0.1em] mt-1">{doc.designation}</p>
+<section class="py-16 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="bg-gradient-to-br from-brand-50 to-white rounded-3xl border border-brand-100 shadow-sm p-8 md:p-12">
+      <div class="text-center mb-10">
+        <h3 class="text-2xl md:text-3xl font-extrabold text-brand-900 tracking-tight mb-2">Meet Our Doctors</h3>
+        <p class="text-slate-600 max-w-2xl mx-auto">Three AIIMS-trained consultant dermatologists, committed to providing ethical, evidence-based care -- prioritizing your long-term skin and hair health over high-volume transactions.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+        {siteConfig.doctors.map((doc) => (
+          <div class="text-center">
+            <img
+              src={`/images/doctors/${doc.slug}.jpg`}
+              alt={doc.name}
+              class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md mx-auto mb-4"
+              onerror={`this.onerror=null;this.src='https://placehold.co/200x200/EEF0F6/223154?text=${encodeURIComponent(doc.name)}'`}
+            />
+            <h4 class="text-lg font-extrabold text-brand-900">{doc.name}</h4>
+            <p class="text-xs text-brand-600 font-bold uppercase tracking-widest">{doc.designation}</p>
+          </div>
+        ))}
+      </div>
+      <div class="text-center mt-10">
+        <a href="/our-doctors" class="inline-block bg-brand-100 text-brand-800 px-6 py-2.5 rounded-lg font-semibold hover:bg-brand-200 transition text-sm">
+          View Full Credentials
+        </a>
+      </div>
     </div>
-   ))}
   </div>
-  <div class="text-center mt-12">
-   <a href="/our-doctors" class="text-sm text-ink border-b border-ink hover:text-brand-600 hover:border-brand-500 transition-colors">
-    View Full Credentials
-   </a>
-  </div>
- </div>
 </section>

@@ -7,6 +7,7 @@ heroSubheadline: "Natural, permanent hair restoration through Follicular Unit Ex
 heroImage: "hair-transplant-fue"
 category: "hair"
 defaultService: "Hair Transplant (FUE)"
+defaultDoctorId: "514ff136-ee45-4d49-89b5-d128d96aef62"
 
 twoPaths:
   screeningTitle: "Wondering if you're a candidate?"

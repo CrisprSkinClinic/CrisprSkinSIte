@@ -12,7 +12,12 @@ try {
   console.error("Failed to import @supabase/supabase-js:", importError);
 }
 
-const SUPABASE_URL = "https://tvvknokblzmjxlixdqce.supabase.co";
+// Read from env var (matching public-available-slots.js / public-book-appointment.js)
+// rather than hardcoding a project URL -- this was previously hardcoded to a
+// different clinic's own Supabase project, which would have silently pointed
+// this clinic's admin booking manager at someone else's database.
+// Set APPOINTMENT_MANAGER_SUPABASE_URL in Netlify env vars.
+const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -39,11 +44,11 @@ exports.handler = async (event) => {
     };
   }
 
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceRoleKey = process.env.APPOINTMENT_MANAGER_SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceRoleKey) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "SUPABASE_SERVICE_ROLE_KEY environment variable is missing." }),
+      body: JSON.stringify({ error: "APPOINTMENT_MANAGER_SUPABASE_SERVICE_ROLE_KEY environment variable is missing." }),
     };
   }
 

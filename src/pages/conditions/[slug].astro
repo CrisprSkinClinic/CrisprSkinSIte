@@ -7,11 +7,11 @@ import FAQAccordion from '../../components/FAQAccordion.astro';
 import { siteConfig } from '../../config/site.js';
 
 export async function getStaticPaths() {
- const conditions = await getCollection('conditions');
- return conditions.map((entry) => ({
-  params: { slug: entry.slug },
-  props: { entry },
- }));
+  const conditions = await getCollection('conditions');
+  return conditions.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
 }
 
 const { entry } = Astro.props;
@@ -20,154 +20,184 @@ const data = entry.data;
 
 const parentService = await getEntry('services', data.parentService);
 const relatedConditionEntries = data.relatedConditions
- ? await Promise.all(
-   data.relatedConditions.map((slug) => getEntry('conditions', slug))
-  )
- : [];
+  ? await Promise.all(
+      data.relatedConditions.map((slug) => getEntry('conditions', slug))
+    )
+  : [];
 
 // Resolve faqIds against the central faqs collection.
 let faqEntries = [];
 if (data.faqIds && data.faqIds.length > 0) {
- const resolved = await Promise.all(
-  data.faqIds.map((id) => getEntry('faqs', id))
- );
- faqEntries = resolved
-  .filter(Boolean)
-  .map((f) => ({ question: f.data.question, answer: f.body }));
+  const resolved = await Promise.all(
+    data.faqIds.map((id) => getEntry('faqs', id))
+  );
+  faqEntries = resolved
+    .filter(Boolean)
+    .map((f) => ({ question: f.data.question, answer: f.body }));
 }
+
+// Structured data (JSON-LD). MedicalCondition schema maps this page's
+// existing risk factors / symptoms / treatment overview into the
+// Schema.org properties built for exactly this content type, so search
+// engines can understand it as condition-specific medical information
+// rather than a generic page. FAQPage reuses the same faqEntries already
+// resolved above for the visible accordion, so the two can't drift.
+const pageUrl = new URL(`/conditions/${entry.slug}`, siteConfig.url).toString();
+
+const faqSchema = faqEntries.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqEntries.map((f) => ({
+    "@type": "Question",
+    "name": f.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": f.answer,
+    },
+  })),
+} : null;
+
+const conditionSchema = {
+  "@context": "https://schema.org",
+  "@type": "MedicalCondition",
+  "name": data.title,
+  "description": data.metaDescription,
+  "url": pageUrl,
+  ...(data.symptoms && data.symptoms.length > 0 && {
+    "signOrSymptom": data.symptoms.map((s) => ({ "@type": "MedicalSignOrSymptom", "name": s })),
+  }),
+  ...(data.riskFactors && data.riskFactors.length > 0 && {
+    "riskFactor": data.riskFactors.map((r) => ({ "@type": "MedicalRiskFactor", "name": r })),
+  }),
+  ...(data.treatmentOverview && data.treatmentOverview.length > 0 && {
+    "possibleTreatment": data.treatmentOverview.map((t) => ({
+      "@type": "MedicalTherapy",
+      "name": t.name,
+      "description": t.description,
+    })),
+  }),
+};
 ---
 
 <MainLayout title={data.title} description={data.metaDescription}>
- <Breadcrumbs items={[
-  { name: "Services", url: "/services" },
-  ...(parentService ? [{ name: parentService.data.title, url: `/services/${parentService.slug}` }] : []),
-  { name: data.title, url: `/conditions/${entry.slug}` }
- ]} />
+  <script type="application/ld+json" set:html={JSON.stringify(conditionSchema)} />
+  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
- <section class="pt-8 pb-16 md:pb-24 px-6 bg-paper-50 border-b border-stone-400/15">
-  <div class="max-w-3xl mx-auto">
-   {data.heroEyebrow && (
-    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-500 mb-6">{data.heroEyebrow}</p>
-   )}
-   <h1 class="font-display text-4xl md:text-5xl font-medium mb-6 leading-[1.1] text-ink">{data.heroHeadline}</h1>
-   <p class="text-lg text-stone-600 mb-8 leading-relaxed max-w-xl">
-    {data.heroSubheadline}
-   </p>
-   <a href="#book" class="inline-block bg-ink text-white text-base px-8 py-4 hover:bg-brand-600 transition-colors duration-300">
-    {data.ctaTitle || `Book an Evaluation`}
-   </a>
-  </div>
- </section>
+  <Breadcrumbs items={[
+    { name: "Services", url: "/services" },
+    ...(parentService ? [{ name: parentService.data.title, url: `/services/${parentService.slug}` }] : []),
+    { name: data.title, url: `/conditions/${entry.slug}` }
+  ]} />
 
- {data.twoPaths && (
-  <section class="py-16 px-6 max-w-5xl mx-auto">
-   <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-stone-400/15 border border-stone-400/15">
-    <div class="bg-white p-8">
-     <h2 class="font-display text-xl font-medium text-ink mb-3">{data.twoPaths.screeningTitle}</h2>
-     <p class="text-stone-600 leading-relaxed">{data.twoPaths.screeningBody}</p>
-    </div>
-    <div class="bg-white p-8">
-     <h2 class="font-display text-xl font-medium text-ink mb-3">{data.twoPaths.symptomsTitle}</h2>
-     <p class="text-stone-600 leading-relaxed">{data.twoPaths.symptomsBody}</p>
-    </div>
-   </div>
-  </section>
- )}
-
- <section class="py-8 px-6 max-w-3xl mx-auto">
-  <div class="prose prose-lg max-w-none text-stone-700 prose-headings:font-display prose-headings:font-medium prose-headings:text-ink prose-a:text-brand-600">
-   <h2>What Is It?</h2>
-   <Content />
-  </div>
- </section>
-
- {data.riskFactors && data.riskFactors.length > 0 && (
-  <section class="py-8 px-6 max-w-3xl mx-auto">
-   <h2 class="font-display text-2xl font-medium text-ink mb-6">Risk Factors</h2>
-   <ul class="space-y-2 text-stone-600">
-    {data.riskFactors.map((item) => (
-     <li class="flex items-start gap-3">
-      <span class="w-1 h-1 rounded-full bg-brand-500 mt-2.5 shrink-0"></span>
-      {item}
-     </li>
-    ))}
-   </ul>
-  </section>
- )}
-
- {data.symptoms && data.symptoms.length > 0 && (
-  <section class="py-8 px-6 max-w-3xl mx-auto">
-   <h2 class="font-display text-2xl font-medium text-ink mb-6">Symptoms</h2>
-   <ul class="space-y-2 text-stone-600">
-    {data.symptoms.map((item) => (
-     <li class="flex items-start gap-3">
-      <span class="w-1 h-1 rounded-full bg-brand-500 mt-2.5 shrink-0"></span>
-      {item}
-     </li>
-    ))}
-   </ul>
-  </section>
- )}
-
- {data.treatmentOverview && data.treatmentOverview.length > 0 && (
-  <section class="py-8 px-6 max-w-3xl mx-auto">
-   <div class="border border-stone-400/15 p-8">
-    <h2 class="font-display text-2xl font-medium text-ink mb-5">Treatment</h2>
-    <ul class="space-y-4">
-     {data.treatmentOverview.map((t) => (
-      <li>
-       <p class="text-ink font-medium mb-0.5">{t.name}</p>
-       <p class="text-stone-600 text-sm leading-relaxed">{t.description}</p>
-      </li>
-     ))}
-    </ul>
-    {parentService && (
-     <p class="mt-8 pt-6 border-t border-stone-400/15 text-sm">
-      <a href={`/services/${parentService.slug}`} class="text-ink border-b border-ink hover:text-brand-600 hover:border-brand-500 transition-colors">
-       Learn more about {parentService.data.title} &rarr;
+  <section class="bg-brand-900 text-white py-20 px-6">
+    <div class="max-w-7xl mx-auto">
+      {data.heroEyebrow && (
+        <span class="text-brand-300 font-bold tracking-wider uppercase text-sm mb-4 block">{data.heroEyebrow}</span>
+      )}
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight max-w-3xl">{data.heroHeadline}</h1>
+      <p class="text-xl text-brand-100 mb-8 leading-relaxed max-w-2xl">
+        {data.heroSubheadline}
+      </p>
+      <a href="#book" class="bg-white text-brand-900 font-bold px-8 py-3 rounded-md shadow-lg hover:bg-brand-50 transition inline-block">
+        {data.ctaTitle || `Book an Evaluation`}
       </a>
-     </p>
-    )}
-   </div>
+    </div>
   </section>
- )}
 
- {data.urgentScenarios && data.urgentScenarios.length > 0 && (
-  <section class="py-8 px-6 max-w-3xl mx-auto">
-   <div class="border border-red-200 bg-red-50/50 p-8">
-    <h3 class="font-display text-xl font-medium text-red-900 mb-3">{data.urgentCareTitle}</h3>
-    {data.urgentCareBody && <p class="text-red-800 leading-relaxed mb-4">{data.urgentCareBody}</p>}
-    <ul class="space-y-2 text-red-800">
-     {data.urgentScenarios.map((item) => (
-      <li class="flex items-start gap-3">
-       <span class="w-1 h-1 rounded-full bg-red-500 mt-2.5 shrink-0"></span>
-       {item}
-      </li>
-     ))}
-    </ul>
-   </div>
+  {data.twoPaths && (
+    <section class="py-16 px-6 max-w-5xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-brand-50 border border-brand-100 p-8 rounded-xl">
+          <h2 class="text-xl font-bold text-brand-900 mb-3">{data.twoPaths.screeningTitle}</h2>
+          <p class="text-slate-700 leading-relaxed">{data.twoPaths.screeningBody}</p>
+        </div>
+        <div class="bg-red-50 border border-red-200 p-8 rounded-xl">
+          <h2 class="text-xl font-bold text-red-900 mb-3">{data.twoPaths.symptomsTitle}</h2>
+          <p class="text-red-800 leading-relaxed">{data.twoPaths.symptomsBody}</p>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="py-8 px-6 max-w-4xl mx-auto">
+    <div class="prose prose-lg prose-blue max-w-none text-slate-700">
+      <h2 class="text-3xl font-bold text-brand-900 mb-6">What Is It?</h2>
+      <Content />
+    </div>
   </section>
- )}
 
- {relatedConditionEntries.length > 0 && (
-  <section class="py-16 px-6 max-w-3xl mx-auto border-t border-stone-400/15">
-   <h2 class="font-display text-2xl font-medium text-ink mb-6">Related Conditions</h2>
-   <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-stone-400/15 border border-stone-400/15">
-    {relatedConditionEntries.map((c) => (
-     <a href={`/conditions/${c.slug}`} class="block p-5 bg-white hover:bg-paper-50 transition-colors">
-      <p class="text-xs text-stone-500 uppercase tracking-[0.1em] mb-1">Related Condition</p>
-      <p class="text-ink font-medium">{c.data.title}</p>
-     </a>
-    ))}
-   </div>
-  </section>
- )}
+  {data.riskFactors && data.riskFactors.length > 0 && (
+    <section class="py-8 px-6 max-w-4xl mx-auto">
+      <h2 class="text-3xl font-bold text-brand-900 mb-6">Risk Factors</h2>
+      <ul class="list-disc pl-6 space-y-2 text-slate-700">
+        {data.riskFactors.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+  )}
 
- <FAQAccordion entries={faqEntries} />
+  {data.symptoms && data.symptoms.length > 0 && (
+    <section class="py-8 px-6 max-w-4xl mx-auto">
+      <h2 class="text-3xl font-bold text-brand-900 mb-6">Symptoms</h2>
+      <ul class="list-disc pl-6 space-y-2 text-slate-700">
+        {data.symptoms.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+  )}
 
- <CTA
-  title={data.ctaTitle || `Book an Evaluation for ${data.title}`}
-  address={`${siteConfig.contact.address.street}, ${siteConfig.contact.address.locality} - ${siteConfig.contact.address.postalCode}`}
-  phone={siteConfig.contact.phone}
- />
+  {data.treatmentOverview && data.treatmentOverview.length > 0 && (
+    <section class="py-8 px-6 max-w-4xl mx-auto">
+      <div class="bg-brand-50 p-8 rounded-xl border border-brand-100">
+        <h2 class="text-2xl font-bold text-brand-900 mb-4">Treatment</h2>
+        <ul class="space-y-3">
+          {data.treatmentOverview.map((t) => (
+            <li>
+              <strong class="text-brand-900">{t.name}:</strong>{' '}
+              <span class="text-slate-700">{t.description}</span>
+            </li>
+          ))}
+        </ul>
+        {parentService && (
+          <p class="mt-6 text-sm">
+            <a href={`/services/${parentService.slug}`} class="text-brand-700 font-semibold hover:underline">
+              Learn more about {parentService.data.title} &rarr;
+            </a>
+          </p>
+        )}
+      </div>
+    </section>
+  )}
+
+  {data.urgentScenarios && data.urgentScenarios.length > 0 && (
+    <section class="py-8 px-6 max-w-4xl mx-auto">
+      <div class="bg-red-50 border border-red-200 p-8 rounded-xl">
+        <h3 class="text-xl font-bold text-red-900 mb-3">{data.urgentCareTitle}</h3>
+        {data.urgentCareBody && <p class="text-red-800 leading-relaxed mb-4">{data.urgentCareBody}</p>}
+        <ul class="list-disc pl-6 space-y-2 text-red-800">
+          {data.urgentScenarios.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {relatedConditionEntries.length > 0 && (
+    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
+      <h2 class="text-2xl font-bold text-brand-900 mb-6">Related Conditions</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {relatedConditionEntries.map((c) => (
+          <a href={`/conditions/${c.slug}`} class="block p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 transition-colors">
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Related Condition</p>
+            <p class="font-semibold text-slate-900">{c.data.title}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQAccordion entries={faqEntries} />
+
+  <CTA
+    title={data.ctaTitle || `Book an Evaluation for ${data.title}`}
+    address={`${siteConfig.contact.address.street}, ${siteConfig.contact.address.locality} - ${siteConfig.contact.address.postalCode}`}
+    phone={siteConfig.contact.phone}
+  />
 </MainLayout>

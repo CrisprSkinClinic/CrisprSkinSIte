@@ -1,0 +1,64 @@
+{
+  "headline": "Hair Transplant in Chennai -- AIIMS-Trained Surgeon",
+  "subheadline": "Advanced FUE hair transplant with honest candidacy evaluation. No overselling graft counts you don't need.",
+  "urgent": false,
+  "metaDescription": "Hair transplant in KK Nagar, Chennai by an AIIMS-trained dermatosurgeon. FUE technique, honest candidacy evaluation. Book a consultation.",
+
+  "whyPatientsChoose": [
+    { "title": "Conservative Graft Planning", "description": "We plan grafts around your actual donor supply, not a number that sounds impressive -- protecting your future options." },
+    { "title": "Honest Candidacy Evaluation", "description": "If medical therapy should come before surgery in your case, we'll say so directly, rather than proceeding to a sale." }
+  ],
+
+  "showSymptomCheck": true,
+  "symptoms": [
+    "Receding hairline",
+    "Thinning at the crown",
+    "Visible scalp through thinning hair",
+    "Hair loss affecting confidence"
+  ],
+
+  "showServicesGrid": false,
+  "showLocalArea": true,
+
+  "educationalInsight": {
+    "title": "Is a Hair Transplant Right for You Right Now?",
+    "body": "Not every patient with hair loss benefits from immediate surgery. Donor density, pattern stability, and your realistic goals all factor into whether a transplant makes sense now, or whether medical therapy should come first.",
+    "pathway": {
+      "steps": [
+        "Scalp and donor area examination",
+        "Assessment of hair loss pattern and stability",
+        "Honest graft estimate and candidacy discussion"
+      ],
+      "branches": [
+        { "finding": "Stable loss, good donor density", "outcome": "Proceed to surgical planning and hairline design" },
+        { "finding": "Still-progressing hair loss", "outcome": "Medical therapy recommended first to stabilize before considering surgery" }
+      ]
+    }
+  },
+
+  "doctorsPerspectiveStructured": {
+    "patientConcern": "I don't want to end up needing a second surgery later because too much was taken the first time.",
+    "response": "That's exactly why we plan conservatively around your actual donor supply rather than a target graft count. Protecting your future options matters more to us than a bigger number on day one.",
+    "doctorSlug": "dr-karthik-l"
+  },
+
+  "processSteps": [
+    { "title": "Consultation", "description": "Scalp examination, donor assessment, and an honest conversation about candidacy." },
+    { "title": "Planning", "description": "Hairline design and graft planning specific to your face and donor supply." },
+    { "title": "Procedure", "description": "FUE performed under local anaesthesia, typically completed in one session." },
+    { "title": "Recovery & Follow-Up", "description": "Post-operative care guidance and scheduled follow-up to track growth over the following months." }
+  ],
+
+  "landingFaqs": [
+    { "question": "Will I need a second session later?", "answer": "It depends on how your hair loss progresses after surgery. Conservative donor planning at your first session helps keep this option open if you ever need it." },
+    { "question": "How soon can I book if I'm ready to proceed?", "answer": "We can typically schedule your evaluation within the week -- call or book online to see available slots." },
+    { "question": "Is this really from an AIIMS-trained surgeon, not a technician?", "answer": "Yes -- Dr. Karthik L, Consultant Dermatologist and Dermatosurgeon (MD, AIIMS New Delhi), personally performs evaluations and procedures." }
+  ],
+
+  "learnMoreLink": {
+    "text": "Learn more about the FUE procedure, recovery, and results timeline",
+    "url": "/services/hair-transplant-fue"
+  },
+
+  "defaultService": "Hair Transplant (FUE)"
+}

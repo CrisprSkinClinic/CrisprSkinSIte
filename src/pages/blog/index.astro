@@ -8,44 +8,44 @@ const pageDescription = `Patient guides and clinical insights on hair loss, acne
 
 const allPosts = await getCollection('blog');
 const sortedPosts = allPosts.sort(
- (a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
+  (a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
 );
 ---
 
 <MainLayout title={pageTitle} description={pageDescription}>
- <section class="bg-paper-50 border-b border-stone-400/15 pt-8 pb-16 md:pb-24 px-6 text-center">
-  <div class="max-w-3xl mx-auto">
-   <h1 class="font-display text-4xl md:text-5xl font-medium mb-4 text-ink">Skin & Hair Health Blog</h1>
-   <p class="text-lg text-stone-600">Patient guides and clinical insights from our doctors.</p>
-  </div>
- </section>
+  <section class="bg-brand-900 text-white py-16 px-6 text-center">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Skin & Hair Health Blog</h1>
+      <p class="text-xl text-brand-200">Patient guides and clinical insights from our doctors.</p>
+    </div>
+  </section>
 
- <section class="py-16 px-6 max-w-7xl mx-auto">
-  {sortedPosts.length === 0 ? (
-   <p class="text-center text-slate-600 text-lg">No articles published yet. Check back soon.</p>
-  ) : (
-   <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-    {sortedPosts.map((post) => (
-     <a href={`/blog/${post.slug}`} class="bg-white border border-stone-400/20 hover:border-brand-200 transition-all duration-300 group flex flex-col h-full p-6 md:p-8 relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-1.5 h-full bg-brand-600 group-hover:bg-brand-700 transition-colors"></div>
-      <p class="text-xs text-brand-600 mb-3 font-medium uppercase tracking-wider">
-       {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-       {post.data.tags && post.data.tags.length > 0 && (
-        <span class="text-slate-400"> &middot; {post.data.tags[0]}</span>
-       )}
-      </p>
-      <h2 class="text-xl font-medium text-slate-900 mb-3 group-hover:text-brand-600 transition-colors line-clamp-2">
-       {post.data.title}
-      </h2>
-      <p class="text-slate-600 text-sm mb-6 line-clamp-3 flex-grow leading-relaxed">
-       {post.data.description}
-      </p>
-      <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
-       Read Article <span aria-hidden="true">→</span>
-      </span>
-     </a>
-    ))}
-   </div>
-  )}
- </section>
+  <section class="py-16 px-6 max-w-7xl mx-auto">
+    {sortedPosts.length === 0 ? (
+      <p class="text-center text-slate-600 text-lg">No articles published yet. Check back soon.</p>
+    ) : (
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {sortedPosts.map((post) => (
+          <a href={`/blog/${post.slug}`} class="bg-white rounded-2xl shadow-sm border border-champagne-200 hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full p-6 md:p-8 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-brand-600 group-hover:bg-brand-700 transition-colors"></div>
+            <p class="text-xs text-brand-600 mb-3 font-bold uppercase tracking-wider">
+              {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {post.data.tags && post.data.tags.length > 0 && (
+                <span class="text-slate-400"> &middot; {post.data.tags[0]}</span>
+              )}
+            </p>
+            <h2 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-brand-600 transition-colors line-clamp-2">
+              {post.data.title}
+            </h2>
+            <p class="text-slate-600 text-sm mb-6 line-clamp-3 flex-grow leading-relaxed">
+              {post.data.description}
+            </p>
+            <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
+              Read Article <span aria-hidden="true">→</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
 </MainLayout>
