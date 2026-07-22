@@ -105,6 +105,9 @@ import AppLayout from '../layouts/AppLayout.astro';
     </div>
 
     <!-- Floating action buttons -->
+    <button id="bm-fab-payment-only" class="fixed bottom-40 right-6 w-12 h-12 bg-teal-600 text-white rounded-2xl shadow-xl flex items-center justify-center z-30 hover:bg-teal-700 transition" title="Payment Only (No Appointment)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+    </button>
     <button id="bm-fab-walkin" class="fixed bottom-24 right-6 w-12 h-12 bg-emerald-600 text-white rounded-2xl shadow-xl flex items-center justify-center z-30 hover:bg-emerald-700 transition" title="Walk-In">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
     </button>
@@ -300,20 +303,67 @@ import AppLayout from '../layouts/AppLayout.astro';
   <!-- ================= RECORD PAYMENT MODAL ================= -->
   <div id="bm-payment-modal" class="hidden fixed inset-0 z-50">
     <div class="absolute inset-0 bg-black/50" id="bm-payment-backdrop"></div>
-    <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:left-1/2 md:right-auto md:w-[380px] md:-translate-x-1/2 md:-translate-y-1/2 bg-white rounded-t-3xl md:rounded-3xl shadow-2xl p-6">
-      <h3 class="text-lg font-bold text-slate-900 mb-4">Record Payment</h3>
+    <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:left-1/2 md:right-auto md:w-[420px] md:-translate-x-1/2 md:-translate-y-1/2 bg-white rounded-t-3xl md:rounded-3xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+      <h3 class="text-lg font-bold text-slate-900 mb-1">Record Payment</h3>
       <p id="bm-payment-patient-name" class="text-sm text-slate-500 mb-4"></p>
-      <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Amount (₹)</label>
-      <input type="number" id="bm-payment-amount" min="1" step="1" placeholder="0" class="w-full text-lg font-bold px-4 py-3 border border-slate-300 rounded-xl mb-3" />
-      <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Mode</label>
-      <select id="bm-payment-mode" class="w-full px-4 py-3 border border-slate-300 rounded-xl mb-3">
-        <option value="cash">Cash</option>
-        <option value="upi">UPI</option>
-        <option value="card">Card</option>
-        <option value="other">Other</option>
+
+      <!-- Only shown for standalone entries (pharmacy/lab walk-ins with -->
+      <!-- no appointment) -- reuses the same phone-lookup pattern as -->
+      <!-- the booking form. Hidden when opened from an appointment, -->
+      <!-- since the patient is already known there. -->
+      <div id="bm-payment-patient-picker" class="hidden mb-4 pb-4 border-b border-slate-100">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Patient Phone</label>
+        <input type="tel" id="bm-payment-patient-phone" placeholder="Phone number" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl mb-1" />
+        <p id="bm-payment-phone-lookup-status" class="text-xs min-h-[1rem] mb-2 px-1"></p>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Patient Name</label>
+        <input type="text" id="bm-payment-patient-name-input" placeholder="Full name" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+      </div>
+
+      <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Category</label>
+      <select id="bm-payment-category" class="w-full px-4 py-3 border border-slate-300 rounded-xl mb-3">
+        <option value="consultation">Consultation</option>
+        <option value="pharmacy">Pharmacy</option>
+        <option value="lab">Lab</option>
+        <option value="vaccination">Vaccination</option>
+        <option value="procedure">Procedure</option>
       </select>
+
+      <!-- Consultation-specific: New / Review / Free, auto-fills amount -->
+      <div id="bm-payment-consultation-section" class="mb-3">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Consultation Type</label>
+        <div class="grid grid-cols-3 gap-2">
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-consult-subtype" value="new" class="peer sr-only" checked />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">New<span class="block text-[10px] opacity-70 font-normal">₹700</span></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-consult-subtype" value="review" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Review<span class="block text-[10px] opacity-70 font-normal">₹600</span></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-consult-subtype" value="free" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Free</div>
+          </label>
+        </div>
+      </div>
+
+      <div id="bm-payment-amount-section">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Total Amount (₹)</label>
+        <input type="number" id="bm-payment-total-amount" min="0" step="1" placeholder="0" class="w-full text-lg font-bold px-4 py-3 border border-slate-300 rounded-xl mb-3" />
+      </div>
+
+      <!-- Split payment rows -->
+      <div id="bm-payment-splits-section">
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Payment Mode</label>
+          <button id="bm-add-split-row" type="button" class="text-xs font-bold text-brand-600">+ Split Payment</button>
+        </div>
+        <div id="bm-payment-splits-rows" class="space-y-2 mb-2"></div>
+        <p id="bm-payment-splits-remainder" class="text-xs text-slate-400 mb-3"></p>
+      </div>
+
       <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Notes (optional)</label>
-      <input type="text" id="bm-payment-notes" placeholder="e.g. Consultation fee" class="w-full px-4 py-3 border border-slate-300 rounded-xl mb-4" />
+      <input type="text" id="bm-payment-notes" placeholder="e.g. Paracetamol + antiseptic cream" class="w-full px-4 py-3 border border-slate-300 rounded-xl mb-4" />
       <div class="flex gap-2">
         <button id="bm-payment-cancel" class="flex-1 bg-slate-100 text-slate-700 font-semibold py-3 rounded-xl">Cancel</button>
         <button id="bm-payment-save" class="flex-1 bg-brand-900 text-white font-bold py-3 rounded-xl">Save</button>
@@ -349,11 +399,80 @@ import AppLayout from '../layouts/AppLayout.astro';
       </section>
 
       <section class="bg-white p-5 rounded-2xl shadow-sm">
+        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Expenses</h3>
+        <div id="bm-expenses-list" class="space-y-2 mb-4">
+          <p class="text-slate-400 text-sm">Loading...</p>
+        </div>
+        <div class="flex flex-wrap gap-2 p-3 bg-slate-50 rounded-xl items-end">
+          <select id="bm-expense-category" class="px-3 py-2 border border-slate-300 rounded-lg text-sm">
+            <option value="bank_deposit">Bank Deposit</option>
+            <option value="handed_to_doctor">Handed to Doctor</option>
+            <option value="petty_expense">Petty Expense</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="number" id="bm-expense-amount" min="1" step="1" placeholder="Amount (₹)" class="w-32 px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <input type="text" id="bm-expense-notes" placeholder="Notes (optional)" class="flex-1 min-w-[120px] px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <button id="bm-add-expense" class="bg-brand-900 text-white text-sm font-semibold px-4 py-2 rounded-lg">Add</button>
+        </div>
+        <p id="bm-expense-error" class="text-red-500 text-xs mt-2 min-h-[1rem]"></p>
+      </section>
+
+      <section class="bg-white p-5 rounded-2xl shadow-sm">
         <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Cash Reconciliation</h3>
-        <p class="text-xs text-slate-400 mb-3">Enter the actual cash counted at close of day to check for variance against recorded cash payments.</p>
-        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Cash Counted (₹)</label>
-        <input type="number" id="bm-counted-cash" min="0" step="1" placeholder="0" class="w-full text-lg font-bold px-4 py-3 border border-slate-300 rounded-xl mb-3" />
-        <div id="bm-reconciliation-result" class="hidden p-4 rounded-xl text-center font-bold"></div>
+
+        <!-- Previous day's closing, for the mismatch check -->
+        <div id="bm-prev-closing-notice" class="hidden text-xs mb-3 p-2.5 rounded-lg"></div>
+
+        <!-- Opening count -->
+        <div class="mb-5 pb-5 border-b border-slate-100">
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="text-xs font-bold text-slate-700">Opening Count (mandatory)</h4>
+            <span id="bm-opening-status" class="text-xs font-bold px-2 py-0.5 rounded-full"></span>
+          </div>
+          <div class="grid grid-cols-4 gap-2 mb-2">
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹50</label><input type="number" min="0" id="bm-open-50" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹100</label><input type="number" min="0" id="bm-open-100" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹200</label><input type="number" min="0" id="bm-open-200" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹500</label><input type="number" min="0" id="bm-open-500" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+          </div>
+          <div class="flex justify-between items-center">
+            <span id="bm-opening-total" class="text-sm font-bold text-slate-800">Total: ₹0</span>
+            <button id="bm-save-opening" class="bg-brand-900 text-white text-xs font-bold px-4 py-2 rounded-lg">Save Opening Count</button>
+          </div>
+        </div>
+
+        <!-- Mid-day recounts (optional, unlimited) -->
+        <div class="mb-5 pb-5 border-b border-slate-100">
+          <h4 class="text-xs font-bold text-slate-700 mb-2">Mid-Day Recount (optional, as many as needed)</h4>
+          <div class="grid grid-cols-4 gap-2 mb-2">
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹50</label><input type="number" min="0" id="bm-recount-50" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹100</label><input type="number" min="0" id="bm-recount-100" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹200</label><input type="number" min="0" id="bm-recount-200" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹500</label><input type="number" min="0" id="bm-recount-500" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+          </div>
+          <div class="flex justify-between items-center mb-3">
+            <span id="bm-recount-total" class="text-sm font-bold text-slate-800">Total: ₹0</span>
+            <button id="bm-save-recount" class="bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg">Log Recount</button>
+          </div>
+          <div id="bm-recounts-list" class="space-y-1"></div>
+        </div>
+
+        <!-- Closing count -->
+        <div>
+          <h4 class="text-xs font-bold text-slate-700 mb-2">Closing Count (mandatory)</h4>
+          <div class="grid grid-cols-4 gap-2 mb-2">
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹50</label><input type="number" min="0" id="bm-close-50" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹100</label><input type="number" min="0" id="bm-close-100" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹200</label><input type="number" min="0" id="bm-close-200" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹500</label><input type="number" min="0" id="bm-close-500" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+          </div>
+          <div class="flex justify-between items-center mb-3">
+            <span id="bm-closing-total" class="text-sm font-bold text-slate-800">Total: ₹0</span>
+            <button id="bm-save-closing" class="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg">Save Closing Count</button>
+          </div>
+          <div id="bm-reconciliation-result" class="hidden p-4 rounded-xl text-center font-bold"></div>
+        </div>
+        <p id="bm-cash-error" class="text-red-500 text-xs text-center mt-2 min-h-[1rem]"></p>
       </section>
     </div>
   </div>
