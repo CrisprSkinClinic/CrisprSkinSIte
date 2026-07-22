@@ -111,7 +111,7 @@ exports.handler = async (event) => {
       case "list_appointments": {
         let query = supabase
           .from("appointments")
-          .select("*, patients(name, phone), doctors(name)")
+          .select("*, patients(name, phone), doctors(name), booked_by_profile:profiles!appointments_booked_by_fkey(full_name)")
           .order("slot_date", { ascending: true })
           .order("slot_time", { ascending: true });
         if (data?.date) query = query.eq("slot_date", data.date);
@@ -122,7 +122,7 @@ exports.handler = async (event) => {
       }
 
       case "create_appointment": {
-        return await createAppointment(supabase, data, staffName, logAudit);
+        return await createAppointment(supabase, data, staffName, profile.id, logAudit);
       }
 
       case "update_appointment_status": {
@@ -289,7 +289,7 @@ exports.handler = async (event) => {
 // creation, matching the Firebase tool's mkObj/linkId concept -- one
 // linked_group_id ties together all rows belonging to one multi-slot
 // booking, and capacity is checked per-doctor per-slot before booking.
-async function createAppointment(supabase, data, staffName, logAudit) {
+async function createAppointment(supabase, data, staffName, staffProfileId, logAudit) {
   const { patientName, patientPhone, doctorId, date, slots, appointmentType, notes } = data;
   if (!patientName || !doctorId || !date || !Array.isArray(slots) || slots.length === 0) {
     return { statusCode: 400, body: JSON.stringify({ error: "patientName, doctorId, date, and at least one slot are required." }) };
@@ -353,6 +353,12 @@ async function createAppointment(supabase, data, staffName, logAudit) {
         status: "booked",
         notes: notes || appointmentType,
         linked_group_id: linkedGroupId,
+        // Set to the signed-in staff member's profile id -- this is
+        // what actually distinguishes a staff-created booking from a
+        // public self-service one (public-book-appointment.js always
+        // sets this to null). Without this, the two were previously
+        // indistinguishable in the database.
+        booked_by: staffProfileId,
       })
       .select("id")
       .single();
