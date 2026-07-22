@@ -402,21 +402,19 @@ exports.handler = async (event) => {
       // ---- Payments (simple log, not a billing/invoicing system) ----
 
       case "record_payment": {
-        // splits is an array of { mode, amount }, 1+ entries, summing to
-        // totalAmount -- supports both a plain single-mode payment
-        // (one split) and a genuine split payment (2+ splits).
-        // patient_id is required UNLESS new_patient_name is given
-        // instead -- standalone payment entries (pharmacy/lab walk-ins
-        // with no prior booking) may need to create a brand new patient
-        // record on the spot, same as create_appointment already does
-        // for a fresh booking.
-        if ((!data?.patient_id && !data?.new_patient_name) || !data?.category || (!data?.consultationSubtype || data.consultationSubtype !== "free") && (!Array.isArray(data.splits) || data.splits.length === 0)) {
-          return { statusCode: 400, body: JSON.stringify({ error: "A patient (existing patient_id or new_patient_name), category, and at least one payment split are required." }) };
+        // lineItems is an array of { category, consultationSubtype?,
+        // amount }, 1+ entries -- one payment event (one visit's total
+        // bill, one set of mode splits) can now cover multiple
+        // categories at once, e.g. consultation + labs + pharmacy in a
+        // single payment. splits (mode breakdown) applies to the
+        // combined total across all line items, not per-category, per
+        // explicit confirmation that a patient doesn't pay "cash for
+        // consultation, card for pharmacy" separately in the normal case.
+        if ((!data?.patient_id && !data?.new_patient_name) || !Array.isArray(data.lineItems) || data.lineItems.length === 0) {
+          return { statusCode: 400, body: JSON.stringify({ error: "A patient (existing patient_id or new_patient_name) and at least one category line-item are required." }) };
         }
         const validCategories = ["consultation", "pharmacy", "lab", "vaccination", "procedure"];
-        if (!validCategories.includes(data.category)) {
-          return { statusCode: 400, body: JSON.stringify({ error: "Invalid category." }) };
-        }
+        const validSubtypes = ["new", "review", "free"];
 
         let resolvedPatientId = data.patient_id || null;
         if (!resolvedPatientId && data.new_patient_name) {
@@ -429,35 +427,48 @@ exports.handler = async (event) => {
           resolvedPatientId = newPatient.id;
         }
 
-        let consultationSubtype = null;
-        if (data.category === "consultation") {
-          const validSubtypes = ["new", "review", "free"];
-          if (!validSubtypes.includes(data.consultationSubtype)) {
-            return { statusCode: 400, body: JSON.stringify({ error: "consultationSubtype (new/review/free) is required for consultation payments." }) };
+        let lineItemsTotal = 0;
+        let hasFreeConsultation = false;
+        for (const item of data.lineItems) {
+          if (!validCategories.includes(item.category)) {
+            return { statusCode: 400, body: JSON.stringify({ error: `Invalid category: ${item.category}` }) };
           }
-          consultationSubtype = data.consultationSubtype;
+          if (item.category === "consultation") {
+            if (!validSubtypes.includes(item.consultationSubtype)) {
+              return { statusCode: 400, body: JSON.stringify({ error: "consultationSubtype (new/review/free) is required for a consultation line-item." }) };
+            }
+            if (item.consultationSubtype === "free") hasFreeConsultation = true;
+          } else if (item.consultationSubtype) {
+            return { statusCode: 400, body: JSON.stringify({ error: `consultationSubtype should not be set for a ${item.category} line-item.` }) };
+          }
+          if (typeof item.amount !== "number" || item.amount < 0) {
+            return { statusCode: 400, body: JSON.stringify({ error: "Each line-item needs a valid, non-negative amount." }) };
+          }
+          lineItemsTotal += item.amount;
         }
 
         const validModes = ["cash", "card", "upi", "other"];
+        const splits = Array.isArray(data.splits) ? data.splits : [];
         let splitTotal = 0;
-        for (const split of data.splits) {
+        for (const split of splits) {
           if (!validModes.includes(split.mode) || typeof split.amount !== "number" || split.amount <= 0) {
-            return { statusCode: 400, body: JSON.stringify({ error: "Each split needs a valid mode and a positive amount." }) };
+            return { statusCode: 400, body: JSON.stringify({ error: "Each payment split needs a valid mode and a positive amount." }) };
           }
           splitTotal += split.amount;
         }
 
-        const totalAmount = Number(data.totalAmount);
-        // Free consultations are the one case where total_amount is
-        // legitimately 0 -- in that case there should be no splits at
-        // all (nothing was actually paid), not a single zero-amount
-        // split, since payment_splits.amount has its own > 0 constraint.
-        if (consultationSubtype === "free") {
-          if (data.splits.length !== 0 || totalAmount !== 0) {
-            return { statusCode: 400, body: JSON.stringify({ error: "A free consultation should have no payment splits and a total of 0." }) };
+        // A visit that's ENTIRELY a free consultation (the only
+        // line-item) has no splits at all. A visit with a free
+        // consultation ALONGSIDE other paid categories (e.g. free
+        // consult + paid labs) still needs splits covering the paid
+        // portion -- lineItemsTotal already reflects that correctly
+        // since the free line-item contributes 0.
+        if (lineItemsTotal === 0) {
+          if (splits.length !== 0) {
+            return { statusCode: 400, body: JSON.stringify({ error: "A visit totaling ₹0 (e.g. entirely free) should have no payment splits." }) };
           }
-        } else if (Math.abs(splitTotal - totalAmount) > 0.01) {
-          return { statusCode: 400, body: JSON.stringify({ error: `Split amounts (₹${splitTotal}) must add up to the total (₹${totalAmount}).` }) };
+        } else if (Math.abs(splitTotal - lineItemsTotal) > 0.01) {
+          return { statusCode: 400, body: JSON.stringify({ error: `Payment splits (₹${splitTotal}) must add up to the line-items total (₹${lineItemsTotal}).` }) };
         }
 
         const { data: entry, error: entryError } = await supabase
@@ -465,9 +476,7 @@ exports.handler = async (event) => {
           .insert({
             appointment_id: data.appointment_id || null,
             patient_id: resolvedPatientId,
-            category: data.category,
-            consultation_subtype: consultationSubtype,
-            total_amount: totalAmount,
+            total_amount: lineItemsTotal,
             collected_by: profile.id,
             notes: data.notes || null,
           })
@@ -475,17 +484,25 @@ exports.handler = async (event) => {
           .single();
         if (entryError) throw entryError;
 
-        if (data.splits.length > 0) {
+        const { error: lineItemsError } = await supabase.from("payment_line_items").insert(
+          data.lineItems.map((item) => ({
+            payment_entry_id: entry.id,
+            category: item.category,
+            consultation_subtype: item.category === "consultation" ? item.consultationSubtype : null,
+            amount: item.amount,
+          }))
+        );
+        if (lineItemsError) throw lineItemsError;
+
+        if (splits.length > 0) {
           const { error: splitsError } = await supabase
             .from("payment_splits")
-            .insert(data.splits.map((s) => ({ payment_entry_id: entry.id, mode: s.mode, amount: s.amount })));
+            .insert(splits.map((s) => ({ payment_entry_id: entry.id, mode: s.mode, amount: s.amount })));
           if (splitsError) throw splitsError;
         }
 
-        await logAudit(
-          "CREATE",
-          `Recorded ${consultationSubtype === "free" ? "a free consultation" : `₹${totalAmount} ${data.category}`} payment for patient ${resolvedPatientId}`
-        );
+        const categorySummary = data.lineItems.map((i) => (i.category === "consultation" ? `consultation (${i.consultationSubtype})` : i.category)).join(", ");
+        await logAudit("CREATE", `Recorded ₹${lineItemsTotal} payment (${categorySummary}) for patient ${resolvedPatientId}`);
         return ok({ success: true, paymentId: entry.id });
       }
 
@@ -498,7 +515,7 @@ exports.handler = async (event) => {
         const { data: payments, error } = await supabase
           .from("payment_entries")
           .select(
-            "*, patients(name), collected_by_profile:profiles!payment_entries_collected_by_fkey(full_name), payment_splits(mode, amount)"
+            "*, patients(name), collected_by_profile:profiles!payment_entries_collected_by_fkey(full_name), payment_splits(mode, amount), payment_line_items(category, consultation_subtype, amount)"
           )
           .gte("created_at", startOfDay)
           .lte("created_at", endOfDay)
@@ -510,18 +527,20 @@ exports.handler = async (event) => {
       case "delete_payment": {
         const { data: payment, error: fetchErr } = await supabase
           .from("payment_entries")
-          .select("total_amount, category, patients(name)")
+          .select("total_amount, patients(name), payment_line_items(category)")
           .eq("id", data.id)
           .single();
         if (fetchErr) throw fetchErr;
 
-        // payment_splits rows cascade-delete automatically (on delete
-        // cascade on payment_entry_id), so only the parent needs
-        // deleting explicitly here.
+        // payment_splits and payment_line_items rows cascade-delete
+        // automatically (both have on delete cascade on
+        // payment_entry_id), so only the parent needs deleting
+        // explicitly here.
         const { error } = await supabase.from("payment_entries").delete().eq("id", data.id);
         if (error) throw error;
 
-        await logAudit("DELETE", `Deleted ₹${payment.total_amount} ${payment.category} payment entry for ${payment.patients?.name || "patient"}`);
+        const categories = (payment.payment_line_items || []).map((li) => li.category).join(", ") || "unknown category";
+        await logAudit("DELETE", `Deleted ₹${payment.total_amount} payment entry (${categories}) for ${payment.patients?.name || "patient"}`);
         return ok({ success: true });
       }
 
