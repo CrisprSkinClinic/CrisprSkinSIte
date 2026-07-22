@@ -188,43 +188,17 @@ function renderDatePills() {
   }
 }
 
-document.querySelectorAll('.bm-doctor-filter-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    state.doctorFilter = btn.dataset.doctorFilter;
-    document.querySelectorAll('.bm-doctor-filter-btn').forEach((b) => {
-      b.classList.remove('bg-brand-900', 'text-white');
-      b.classList.add('bg-slate-100', 'text-slate-600');
-    });
-    btn.classList.remove('bg-slate-100', 'text-slate-600');
-    btn.classList.add('bg-brand-900', 'text-white');
-    renderAppointmentFeed();
-  });
+document.getElementById('bm-doctor-filter').addEventListener('change', (e) => {
+  state.doctorFilter = e.target.value;
+  renderAppointmentFeed();
 });
-
-document.querySelectorAll('.bm-type-filter-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    state.typeFilter = btn.dataset.typeFilter;
-    document.querySelectorAll('.bm-type-filter-btn').forEach((b) => {
-      b.classList.remove('bg-brand-900', 'text-white');
-      b.classList.add('bg-slate-100', 'text-slate-600');
-    });
-    btn.classList.remove('bg-slate-100', 'text-slate-600');
-    btn.classList.add('bg-brand-900', 'text-white');
-    renderAppointmentFeed();
-  });
+document.getElementById('bm-type-filter').addEventListener('change', (e) => {
+  state.typeFilter = e.target.value;
+  renderAppointmentFeed();
 });
-
-document.querySelectorAll('.bm-status-filter-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    state.statusFilter = btn.dataset.statusFilter;
-    document.querySelectorAll('.bm-status-filter-btn').forEach((b) => {
-      b.classList.remove('bg-brand-900', 'text-white');
-      b.classList.add('bg-slate-100', 'text-slate-600');
-    });
-    btn.classList.remove('bg-slate-100', 'text-slate-600');
-    btn.classList.add('bg-brand-900', 'text-white');
-    renderAppointmentFeed();
-  });
+document.getElementById('bm-status-filter').addEventListener('change', (e) => {
+  state.statusFilter = e.target.value;
+  renderAppointmentFeed();
 });
 
 // ---- Appointments ----
@@ -309,7 +283,9 @@ function openDetailModal(appt) {
     ? `Staff (${appt.booked_by_profile?.full_name || 'Unknown staff member'})`
     : 'Online (public website)';
   document.getElementById('bm-detail-body').innerHTML = `
-    <h3 class="text-xl font-bold text-slate-900 mb-1">${appt.patients?.name || 'Unknown patient'}</h3>
+    <button id="bm-open-patient-from-detail" class="text-left w-full hover:opacity-70 transition">
+      <h3 class="text-xl font-bold text-slate-900 mb-1 underline decoration-dotted underline-offset-4">${appt.patients?.name || 'Unknown patient'}</h3>
+    </button>
     <p class="text-sm text-slate-500 mb-4">${appt.patients?.phone || 'No phone on file'}</p>
     <div class="space-y-3">
       <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Time</span><span class="font-semibold text-slate-800">${formatTime12h(appt.slot_time)} · ${appt.slot_date}</span></div>
@@ -339,6 +315,9 @@ function openDetailModal(appt) {
   }
 
   document.getElementById('bm-detail-modal').classList.remove('hidden');
+  document.getElementById('bm-open-patient-from-detail')?.addEventListener('click', () => {
+    if (appt.patient_id) openPatientDetail(appt.patient_id);
+  });
 }
 
 document.getElementById('bm-close-detail').addEventListener('click', closeDetailModal);
@@ -594,6 +573,128 @@ document.getElementById('bm-submit-booking').addEventListener('click', async () 
     btn.textContent = 'Confirm & Book';
   }
 });
+
+// ---- Patient Detail (Profile + Visit History) ----
+let currentPatientId = null;
+
+async function openPatientDetail(patientId) {
+  currentPatientId = patientId;
+  document.getElementById('bm-patient-overlay').classList.remove('hidden');
+  document.getElementById('bm-patient-overlay').classList.add('flex');
+  switchPatientTab('profile');
+  await loadPatientProfile(patientId);
+}
+
+document.getElementById('bm-close-patient').addEventListener('click', () => {
+  document.getElementById('bm-patient-overlay').classList.add('hidden');
+  document.getElementById('bm-patient-overlay').classList.remove('flex');
+  currentPatientId = null;
+});
+
+document.querySelectorAll('.bm-patient-tab').forEach((tab) => {
+  tab.addEventListener('click', () => switchPatientTab(tab.dataset.patientTab));
+});
+
+function switchPatientTab(tabName) {
+  document.querySelectorAll('.bm-patient-tab').forEach((t) => {
+    const isActive = t.dataset.patientTab === tabName;
+    t.classList.toggle('text-brand-600', isActive);
+    t.classList.toggle('border-b-2', isActive);
+    t.classList.toggle('border-brand-600', isActive);
+    t.classList.toggle('text-slate-500', !isActive);
+  });
+  document.getElementById('bm-patient-tab-profile').classList.toggle('hidden', tabName !== 'profile');
+  document.getElementById('bm-patient-tab-history').classList.toggle('hidden', tabName !== 'history');
+  if (tabName === 'history' && currentPatientId) loadPatientHistory(currentPatientId);
+}
+
+function calculateAge(dobStr) {
+  if (!dobStr) return '';
+  const dob = new Date(dobStr);
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const m = today.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+  return `${age} years old`;
+}
+
+async function loadPatientProfile(patientId) {
+  const saveMsg = document.getElementById('bm-profile-save-msg');
+  saveMsg.textContent = '';
+  try {
+    const { patient } = await callFunction('get_patient_profile', { patient_id: patientId });
+    document.getElementById('bm-patient-overlay-name').textContent = patient.name || 'Patient';
+    document.getElementById('bm-profile-name').value = patient.name || '';
+    document.getElementById('bm-profile-phone').value = patient.phone || '';
+    document.getElementById('bm-profile-dob').value = patient.dob || '';
+    document.getElementById('bm-profile-gender').value = patient.gender || '';
+    document.getElementById('bm-profile-address').value = patient.address || '';
+    document.getElementById('bm-profile-uhid').value = patient.uhid || 'Not yet registered';
+    document.getElementById('bm-profile-age').textContent = calculateAge(patient.dob);
+  } catch (err) {
+    saveMsg.textContent = err.message;
+    saveMsg.className = 'text-sm text-center text-red-600';
+  }
+}
+
+document.getElementById('bm-profile-dob').addEventListener('change', (e) => {
+  document.getElementById('bm-profile-age').textContent = calculateAge(e.target.value);
+});
+
+document.getElementById('bm-save-profile').addEventListener('click', async () => {
+  if (!currentPatientId) return;
+  const saveMsg = document.getElementById('bm-profile-save-msg');
+  const btn = document.getElementById('bm-save-profile');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  try {
+    await callFunction('update_patient_profile', {
+      patient_id: currentPatientId,
+      name: document.getElementById('bm-profile-name').value.trim(),
+      phone: document.getElementById('bm-profile-phone').value.trim(),
+      dob: document.getElementById('bm-profile-dob').value,
+      gender: document.getElementById('bm-profile-gender').value,
+      address: document.getElementById('bm-profile-address').value.trim(),
+    });
+    saveMsg.textContent = 'Saved.';
+    saveMsg.className = 'text-sm text-center text-green-600';
+    await loadAppointments(); // patient name/phone may have changed
+  } catch (err) {
+    saveMsg.textContent = err.message;
+    saveMsg.className = 'text-sm text-center text-red-600';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Profile';
+  }
+});
+
+async function loadPatientHistory(patientId) {
+  const container = document.getElementById('bm-patient-tab-history');
+  container.innerHTML = '<p class="text-slate-400 text-sm text-center py-10">Loading...</p>';
+  try {
+    const { visits } = await callFunction('get_patient_history', { patient_id: patientId });
+    if (visits.length === 0) {
+      container.innerHTML = '<p class="text-slate-400 text-sm text-center py-10">No past visits on record.</p>';
+      return;
+    }
+    container.innerHTML = '';
+    visits.forEach((v) => {
+      const serviceLabel = (v.notes || '').split('|')[0].trim() || 'Appointment';
+      const row = document.createElement('div');
+      row.className = 'bg-white rounded-xl p-3 border border-slate-200';
+      row.innerHTML = `
+        <div class="flex justify-between items-start mb-1">
+          <span class="font-semibold text-slate-800 text-sm">${v.slot_date} · ${formatTime12h(v.slot_time)}</span>
+          <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">${v.status.replace('_', ' ')}</span>
+        </div>
+        <p class="text-sm text-slate-600">${v.doctors?.name || 'Unknown doctor'} · ${serviceLabel}</p>
+      `;
+      container.appendChild(row);
+    });
+  } catch (err) {
+    container.innerHTML = `<p class="text-red-600 text-sm text-center py-10">${err.message}</p>`;
+  }
+}
 
 // ---- Schedule manager ----
 document.getElementById('bm-open-schedule').addEventListener('click', () => {
