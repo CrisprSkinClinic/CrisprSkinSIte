@@ -399,6 +399,71 @@ exports.handler = async (event) => {
         return ok({ success: true });
       }
 
+      // ---- Payments (simple log, not a billing/invoicing system) ----
+
+      case "record_payment": {
+        if (!data?.patient_id || !data?.amount) {
+          return { statusCode: 400, body: JSON.stringify({ error: "patient_id and amount are required." }) };
+        }
+        const amountNum = Number(data.amount);
+        if (Number.isNaN(amountNum) || amountNum <= 0) {
+          return { statusCode: 400, body: JSON.stringify({ error: "Amount must be a positive number." }) };
+        }
+        const validModes = ["cash", "card", "upi", "other"];
+        const mode = validModes.includes(data.mode) ? data.mode : "cash";
+
+        const { data: payment, error } = await supabase
+          .from("payment_entries")
+          .insert({
+            appointment_id: data.appointment_id || null,
+            patient_id: data.patient_id,
+            amount: amountNum,
+            mode,
+            collected_by: profile.id,
+            notes: data.notes || null,
+          })
+          .select("id")
+          .single();
+        if (error) throw error;
+
+        await logAudit("CREATE", `Recorded ₹${amountNum} (${mode}) payment for patient ${data.patient_id}`);
+        return ok({ success: true, paymentId: payment.id });
+      }
+
+      case "list_payments_for_date": {
+        if (!data?.date) {
+          return { statusCode: 400, body: JSON.stringify({ error: "date is required." }) };
+        }
+        // No date column on payment_entries itself (created_at is a
+        // full timestamp) -- bound the query to the given calendar day
+        // using created_at's range rather than a plain equality match.
+        const startOfDay = `${data.date}T00:00:00.000Z`;
+        const endOfDay = `${data.date}T23:59:59.999Z`;
+        const { data: payments, error } = await supabase
+          .from("payment_entries")
+          .select("*, patients(name), collected_by_profile:profiles!payment_entries_collected_by_fkey(full_name)")
+          .gte("created_at", startOfDay)
+          .lte("created_at", endOfDay)
+          .order("created_at", { ascending: true });
+        if (error) throw error;
+        return ok({ payments });
+      }
+
+      case "delete_payment": {
+        const { data: payment, error: fetchErr } = await supabase
+          .from("payment_entries")
+          .select("amount, mode, patients(name)")
+          .eq("id", data.id)
+          .single();
+        if (fetchErr) throw fetchErr;
+
+        const { error } = await supabase.from("payment_entries").delete().eq("id", data.id);
+        if (error) throw error;
+
+        await logAudit("DELETE", `Deleted ₹${payment.amount} (${payment.mode}) payment entry for ${payment.patients?.name || "patient"}`);
+        return ok({ success: true });
+      }
+
       case "whoami": {
         return ok({ profile: { id: profile.id, full_name: profile.full_name, role: profile.role } });
       }
