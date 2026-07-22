@@ -8,10 +8,16 @@
 // staff member. Replaces the clinic's previous Firebase-based scheduler
 // with an equivalent tool built on the same Supabase/AppointmentManager
 // backend the rest of the site's booking system already uses.
-import MainLayout from '../layouts/MainLayout.astro';
+import AppLayout from '../layouts/AppLayout.astro';
 ---
 
-<MainLayout title="Bookings Manager" description="Staff appointment and schedule management" noindex={true}>
+<AppLayout title="Bookings Manager" description="Staff appointment and schedule management">
+  <link slot="head" rel="manifest" href="/bookings-manager.webmanifest" />
+  <meta slot="head" name="theme-color" content="#223154" />
+  <link slot="head" rel="apple-touch-icon" href="/icons/bookings-manager-192.png" />
+  <meta slot="head" name="apple-mobile-web-app-capable" content="yes" />
+  <meta slot="head" name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
 <div id="bm-root" class="min-h-screen bg-slate-100">
 
   <!-- ================= LOGIN SCREEN ================= -->
@@ -265,7 +271,7 @@ import MainLayout from '../layouts/MainLayout.astro';
   </div>
 
 </div>
-</MainLayout>
+</AppLayout>
 
 <script define:vars={{ supabaseUrl: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_URL, supabaseAnonKey: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_ANON_KEY }}>
   window.__BM_SUPABASE_URL__ = supabaseUrl;
@@ -273,3 +279,14 @@ import MainLayout from '../layouts/MainLayout.astro';
 </script>
 <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script is:inline src="/scripts/bookings-manager.js"></script>
+<script is:inline>
+  // Register the service worker so Chrome/Edge offer the install
+  // prompt. Scoped to /bookings-manager only -- this does not affect
+  // any other page on the site.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/bookings-manager-sw.js', { scope: '/bookings-manager' })
+        .catch((err) => console.error('Service worker registration failed:', err));
+    });
+  }
+</script>
