@@ -264,7 +264,94 @@ exports.handler = async (event) => {
         return ok({ logs: rows });
       }
 
+      // ---- Patient lookup & history ----
+
+      case "lookup_patient_by_phone": {
+        if (!data?.phone) {
+          return { statusCode: 400, body: JSON.stringify({ error: "phone is required." }) };
+        }
+        const { data: patients, error } = await supabase
+          .from("patients")
+          .select("id, name, phone")
+          .eq("phone", data.phone)
+          .limit(1);
+        if (error) throw error;
+        if (!patients || patients.length === 0) {
+          return ok({ found: false });
+        }
+        // Also surface the doctor from their most recent non-cancelled
+        // appointment, so the booking form can suggest "last seen by"
+        // for a Review visit without a second round trip.
+        const { data: lastAppt } = await supabase
+          .from("appointments")
+          .select("doctor_id, slot_date, doctors(name)")
+          .eq("patient_id", patients[0].id)
+          .not("status", "in", "(cancelled)")
+          .order("slot_date", { ascending: false })
+          .limit(1);
+        return ok({
+          found: true,
+          patient: patients[0],
+          lastDoctorId: lastAppt?.[0]?.doctor_id || null,
+          lastDoctorName: lastAppt?.[0]?.doctors?.name || null,
+          lastVisitDate: lastAppt?.[0]?.slot_date || null,
+        });
+      }
+
+      case "get_patient_history": {
+        if (!data?.patient_id) {
+          return { statusCode: 400, body: JSON.stringify({ error: "patient_id is required." }) };
+        }
+        const { data: visits, error } = await supabase
+          .from("appointments")
+          .select("*, doctors(name)")
+          .eq("patient_id", data.patient_id)
+          .order("slot_date", { ascending: false })
+          .order("slot_time", { ascending: false });
+        if (error) throw error;
+        return ok({ visits });
+      }
+
       // ---- Whoami (used by the frontend to show staff name/role) ----
+
+      case "get_patient_profile": {
+        if (!data?.patient_id) {
+          return { statusCode: 400, body: JSON.stringify({ error: "patient_id is required." }) };
+        }
+        const { data: patientRow, error } = await supabase
+          .from("patients")
+          .select("*")
+          .eq("id", data.patient_id)
+          .single();
+        if (error) throw error;
+        return ok({ patient: patientRow });
+      }
+
+      case "update_patient_profile": {
+        if (!data?.patient_id) {
+          return { statusCode: 400, body: JSON.stringify({ error: "patient_id is required." }) };
+        }
+        // gender is constrained at the database level to
+        // male/female/other (patients_gender_check) -- validated here
+        // too so a bad value produces a readable error instead of a
+        // raw Postgres constraint violation message.
+        if (data.gender && !["male", "female", "other"].includes(data.gender)) {
+          return { statusCode: 400, body: JSON.stringify({ error: "Gender must be male, female, or other." }) };
+        }
+        const updateFields = {};
+        if (data.name !== undefined) updateFields.name = data.name;
+        if (data.phone !== undefined) updateFields.phone = data.phone || null;
+        if (data.dob !== undefined) updateFields.dob = data.dob || null;
+        if (data.gender !== undefined) updateFields.gender = data.gender || null;
+        if (data.address !== undefined) updateFields.address = data.address || null;
+        updateFields.updated_at = new Date().toISOString();
+
+        const { error } = await supabase.from("patients").update(updateFields).eq("id", data.patient_id);
+        if (error) throw error;
+
+        await logAudit("UPDATE", `Updated patient profile for patient ${data.patient_id}`);
+        return ok({ success: true });
+      }
 
       case "whoami": {
         return ok({ profile: { id: profile.id, full_name: profile.full_name, role: profile.role } });
