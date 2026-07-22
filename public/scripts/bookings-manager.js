@@ -23,6 +23,7 @@ const state = {
   statusFilter: 'all',
   appointments: [],
   editingAppointmentId: null,
+  isReschedule: false,
   selectedSlots: [], // array of "HH:MM" strings
   currentDetailAppointment: null,
   scheduleDoctorId: CLINIC_DOCTORS[0].id,
@@ -352,6 +353,16 @@ document.getElementById('bm-delete-appt').addEventListener('click', async () => 
   }
 });
 
+document.getElementById('bm-edit-appt').addEventListener('click', () => {
+  if (!state.currentDetailAppointment) return;
+  openEditOrReschedule(state.currentDetailAppointment, false);
+});
+
+document.getElementById('bm-reschedule-appt').addEventListener('click', () => {
+  if (!state.currentDetailAppointment) return;
+  openEditOrReschedule(state.currentDetailAppointment, true);
+});
+
 // ---- New/Edit appointment overlay ----
 document.getElementById('bm-fab-new').addEventListener('click', () => openBookingOverlay());
 document.getElementById('bm-close-booking').addEventListener('click', closeBookingOverlay);
@@ -362,6 +373,45 @@ function openBookingOverlay() {
   document.getElementById('bm-booking-overlay').classList.add('flex');
   refreshTimeSlots();
 }
+
+// Pre-fills the booking form from an existing appointment for Edit or
+// Reschedule. `lockSlotOnly` distinguishes the two: Reschedule keeps
+// patient/service fixed and focuses on date/time/doctor, while Edit
+// keeps the same slot selected by default but leaves everything
+// editable, including patient details. Both ultimately submit through
+// the same update_appointment path (see submit handler below), which
+// creates the replacement booking before removing the original.
+function openEditOrReschedule(appt, isReschedule) {
+  state.editingAppointmentId = appt.id;
+  state.isReschedule = isReschedule;
+  document.getElementById('bm-detail-modal').classList.add('hidden');
+  openBookingOverlay();
+
+  document.getElementById('bm-form-date').value = appt.slot_date;
+  document.getElementById('bm-patient-name').value = appt.patients?.name || '';
+  document.getElementById('bm-patient-phone').value = appt.patients?.phone || '';
+
+  const serviceLabel = (appt.notes || '').split('|')[0].trim() || 'New';
+  const knownType = ['New', 'Review'].includes(serviceLabel) ? serviceLabel : 'Procedure';
+  const typeInput = document.querySelector(`input[name="bm-type"][value="${knownType}"]`);
+  if (typeInput) {
+    typeInput.checked = true;
+    document.getElementById('bm-procedure-config').classList.toggle('hidden', knownType !== 'Procedure');
+    if (knownType === 'Procedure') document.getElementById('bm-procedure-name').value = serviceLabel;
+  }
+
+  const doctorInput = document.querySelector(`input[name="bm-doctor"][value="${appt.doctor_id}"]`);
+  if (doctorInput) doctorInput.checked = true;
+
+  state.selectedSlots = [appt.slot_time.slice(0, 5)];
+
+  const banner = document.getElementById('bm-edit-banner');
+  banner.querySelector('span').textContent = isReschedule ? 'Rescheduling Appointment' : 'Editing Appointment';
+  banner.classList.remove('hidden');
+
+  refreshTimeSlots();
+}
+
 function closeBookingOverlay() {
   document.getElementById('bm-booking-overlay').classList.add('hidden');
   document.getElementById('bm-booking-overlay').classList.remove('flex');
@@ -377,6 +427,7 @@ function resetBookingForm() {
   document.getElementById('bm-procedure-config').classList.add('hidden');
   state.selectedSlots = [];
   state.editingAppointmentId = null;
+  state.isReschedule = false;
   document.getElementById('bm-edit-banner').classList.add('hidden');
   document.getElementById('bm-booking-error').textContent = '';
 }
@@ -590,6 +641,10 @@ function updateDurationLabel() {
   }
 }
 
+document.getElementById('bm-cancel-edit').addEventListener('click', () => {
+  closeBookingOverlay();
+});
+
 document.getElementById('bm-submit-booking').addEventListener('click', async () => {
   const errorEl = document.getElementById('bm-booking-error');
   errorEl.textContent = '';
@@ -606,11 +661,12 @@ document.getElementById('bm-submit-booking').addEventListener('click', async () 
 
   const appointmentType = typeEl.value === 'Procedure' ? document.getElementById('bm-procedure-name').value.trim() || 'Procedure' : typeEl.value;
   const btn = document.getElementById('bm-submit-booking');
+  const isEditing = !!state.editingAppointmentId;
   btn.disabled = true;
-  btn.textContent = 'Booking...';
+  btn.textContent = isEditing ? 'Saving...' : 'Booking...';
 
   try {
-    await callFunction('create_appointment', {
+    const payload = {
       patientName,
       patientPhone,
       doctorId: doctorEl.value,
@@ -618,7 +674,14 @@ document.getElementById('bm-submit-booking').addEventListener('click', async () 
       slots: state.selectedSlots.sort(),
       appointmentType,
       notes: `${appointmentType} | Booked via Bookings Manager`,
-    });
+    };
+    if (isEditing) {
+      payload.originalAppointmentId = state.editingAppointmentId;
+      payload.isReschedule = !!state.isReschedule;
+      await callFunction('update_appointment', payload);
+    } else {
+      await callFunction('create_appointment', payload);
+    }
     closeBookingOverlay();
     state.viewDate = dateVal;
     renderDatePills();
