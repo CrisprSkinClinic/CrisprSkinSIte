@@ -72,29 +72,28 @@ import AppLayout from '../layouts/AppLayout.astro';
       <div id="bm-date-pills" class="flex gap-2 overflow-x-auto pb-1"></div>
     </div>
 
-    <!-- Doctor filter -->
-    <div class="bg-white border-b border-slate-200 px-4 py-2 flex gap-2 overflow-x-auto">
-      <button data-doctor-filter="all" class="bm-doctor-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-900 text-white whitespace-nowrap">All Doctors</button>
-      <button data-doctor-filter="514ff136-ee45-4d49-89b5-d128d96aef62" class="bm-doctor-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Dr. Karthik L</button>
-      <button data-doctor-filter="d5372165-fc7e-47e8-aee6-ce02e7fefc71" class="bm-doctor-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Dr. Narayanan A</button>
-      <button data-doctor-filter="519dbd89-d3d9-4ee9-8923-5fabbe51cf2e" class="bm-doctor-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Dr. Narayanan B</button>
-    </div>
-
-    <!-- Appointment type filter -->
-    <div class="bg-white border-b border-slate-200 px-4 py-2 flex gap-2 overflow-x-auto">
-      <button data-type-filter="all" class="bm-type-filter-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-brand-900 text-white whitespace-nowrap">All Types</button>
-      <button data-type-filter="New" class="bm-type-filter-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-600 whitespace-nowrap">New</button>
-      <button data-type-filter="Review" class="bm-type-filter-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Review</button>
-      <button data-type-filter="Procedure" class="bm-type-filter-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Procedure</button>
-    </div>
-
-    <!-- Status filter -->
-    <div class="bg-white border-b border-slate-200 px-4 py-2 flex gap-2 overflow-x-auto">
-      <button data-status-filter="all" class="bm-status-filter-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-brand-900 text-white whitespace-nowrap">All Statuses</button>
-      <button data-status-filter="booked" class="bm-status-filter-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Booked</button>
-      <button data-status-filter="arrived" class="bm-status-filter-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Arrived</button>
-      <button data-status-filter="complete" class="bm-status-filter-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-600 whitespace-nowrap">Complete</button>
-      <button data-status-filter="no_show" class="bm-status-filter-btn px-3 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-600 whitespace-nowrap">No Show</button>
+    <!-- Filters: doctor / type / status, as compact dropdowns rather -->
+    <!-- than button rows that permanently occupy vertical screen space -->
+    <div class="bg-white border-b border-slate-200 px-4 py-2 flex gap-2">
+      <select id="bm-doctor-filter" class="flex-1 min-w-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700">
+        <option value="all">All Doctors</option>
+        <option value="514ff136-ee45-4d49-89b5-d128d96aef62">Dr. Karthik L</option>
+        <option value="d5372165-fc7e-47e8-aee6-ce02e7fefc71">Dr. Narayanan A</option>
+        <option value="519dbd89-d3d9-4ee9-8923-5fabbe51cf2e">Dr. Narayanan B</option>
+      </select>
+      <select id="bm-type-filter" class="flex-1 min-w-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700">
+        <option value="all">All Types</option>
+        <option value="New">New</option>
+        <option value="Review">Review</option>
+        <option value="Procedure">Procedure</option>
+      </select>
+      <select id="bm-status-filter" class="flex-1 min-w-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700">
+        <option value="all">All Statuses</option>
+        <option value="booked">Booked</option>
+        <option value="arrived">Arrived</option>
+        <option value="complete">Complete</option>
+        <option value="no_show">No Show</option>
+      </select>
     </div>
 
     <!-- Appointment feed -->
@@ -284,6 +283,64 @@ import AppLayout from '../layouts/AppLayout.astro';
       </button>
     </div>
     <div id="bm-audit-list" class="flex-1 overflow-y-auto p-4 space-y-2">
+      <p class="text-slate-400 text-sm text-center py-10">Loading...</p>
+    </div>
+  </div>
+
+  <!-- ================= PATIENT DETAIL OVERLAY (Profile + History) ================= -->
+  <div id="bm-patient-overlay" class="hidden fixed inset-0 bg-slate-100 z-50 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-200 justify-between items-center bg-white shadow-sm">
+      <h2 id="bm-patient-overlay-name" class="text-lg font-bold text-slate-900">Patient</h2>
+      <button id="bm-close-patient" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="flex bg-white border-b border-slate-200">
+      <button data-patient-tab="profile" class="bm-patient-tab flex-1 py-3 text-sm font-semibold text-brand-600 border-b-2 border-brand-600">Profile</button>
+      <button data-patient-tab="history" class="bm-patient-tab flex-1 py-3 text-sm font-semibold text-slate-500">Visit History</button>
+    </div>
+
+    <!-- Profile tab -->
+    <div id="bm-patient-tab-profile" class="flex-1 overflow-y-auto p-5 space-y-4">
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Full Name</label>
+        <input type="text" id="bm-profile-name" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Phone</label>
+        <input type="tel" id="bm-profile-phone" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Date of Birth</label>
+        <input type="date" id="bm-profile-dob" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+        <p id="bm-profile-age" class="text-xs text-slate-400 mt-1"></p>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Gender</label>
+        <select id="bm-profile-gender" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl">
+          <option value="">Not specified</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Address</label>
+        <textarea id="bm-profile-address" rows="3" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl"></textarea>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">UHID</label>
+        <input type="text" id="bm-profile-uhid" disabled class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-400" />
+        <p class="text-xs text-slate-400 mt-1">Assigned during patient registration -- not editable here.</p>
+      </div>
+      <button id="bm-save-profile" class="w-full bg-brand-900 text-white font-bold py-3 rounded-xl shadow-lg transition active:scale-[0.98]">
+        Save Profile
+      </button>
+      <p id="bm-profile-save-msg" class="text-sm text-center min-h-[1.25rem]"></p>
+    </div>
+
+    <!-- History tab -->
+    <div id="bm-patient-tab-history" class="hidden flex-1 overflow-y-auto p-5 space-y-2">
       <p class="text-slate-400 text-sm text-center py-10">Loading...</p>
     </div>
   </div>
