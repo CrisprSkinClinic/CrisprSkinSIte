@@ -811,45 +811,246 @@ document.getElementById('bm-submit-booking').addEventListener('click', async () 
   }
 });
 
-// ---- Record Payment ----
-document.getElementById('bm-record-payment-btn').addEventListener('click', () => {
-  const appt = state.currentDetailAppointment;
-  if (!appt) return;
-  document.getElementById('bm-payment-patient-name').textContent = `For ${appt.patients?.name || 'this patient'}`;
-  document.getElementById('bm-payment-amount').value = '';
-  document.getElementById('bm-payment-mode').value = 'cash';
+// ---- Record Payment (categorized, split-mode, standalone-capable) ----
+const CONSULTATION_PRICES = { new: 700, review: 600, free: 0 };
+let paymentContext = null; // { appointmentId, patientId, patientName } or null for standalone entry
+
+function openPaymentModal(context) {
+  paymentContext = context;
+  const isStandalone = !context;
+  document.getElementById('bm-payment-patient-picker').classList.toggle('hidden', !isStandalone);
+  document.getElementById('bm-payment-patient-name').textContent = isStandalone
+    ? 'New payment entry'
+    : `For ${context.patientName || 'this patient'}`;
+
+  if (isStandalone) {
+    document.getElementById('bm-payment-patient-phone').value = '';
+    document.getElementById('bm-payment-patient-name-input').value = '';
+    document.getElementById('bm-payment-phone-lookup-status').textContent = '';
+  }
+
+  document.getElementById('bm-payment-category').value = 'consultation';
+  document.querySelector('input[name="bm-consult-subtype"][value="new"]').checked = true;
   document.getElementById('bm-payment-notes').value = '';
   document.getElementById('bm-payment-error').textContent = '';
+  updatePaymentCategoryUI();
   document.getElementById('bm-payment-modal').classList.remove('hidden');
+}
+
+document.getElementById('bm-record-payment-btn').addEventListener('click', () => {
+  const appt = state.currentDetailAppointment;
+  if (!appt?.patient_id) return;
+  openPaymentModal({ appointmentId: appt.id, patientId: appt.patient_id, patientName: appt.patients?.name });
 });
+
+document.getElementById('bm-fab-payment-only').addEventListener('click', () => openPaymentModal(null));
 
 function closePaymentModal() {
   document.getElementById('bm-payment-modal').classList.add('hidden');
+  paymentContext = null;
 }
 document.getElementById('bm-payment-cancel').addEventListener('click', closePaymentModal);
 document.getElementById('bm-payment-backdrop').addEventListener('click', closePaymentModal);
 
+// Standalone entries need their own phone lookup (same debounced
+// pattern as the booking form, but a separate listener/fields since
+// this modal can be open independently of the booking overlay).
+let paymentPhoneLookupTimeout = null;
+document.getElementById('bm-payment-patient-phone').addEventListener('input', (e) => {
+  clearTimeout(paymentPhoneLookupTimeout);
+  const phone = e.target.value.trim();
+  const statusEl = document.getElementById('bm-payment-phone-lookup-status');
+  if (phone.replace(/\D/g, '').length < 10) {
+    statusEl.textContent = '';
+    return;
+  }
+  statusEl.textContent = 'Looking up...';
+  statusEl.className = 'text-xs min-h-[1rem] mb-2 px-1 text-slate-400';
+  paymentPhoneLookupTimeout = setTimeout(async () => {
+    try {
+      const result = await callFunction('lookup_patient_by_phone', { phone });
+      if (result.found) {
+        document.getElementById('bm-payment-patient-name-input').value = result.patient.name;
+        statusEl.textContent = 'Existing patient found';
+        statusEl.className = 'text-xs min-h-[1rem] mb-2 px-1 text-green-600 font-medium';
+        paymentContext = { appointmentId: null, patientId: result.patient.id, patientName: result.patient.name };
+      } else {
+        statusEl.textContent = 'New patient (no match found) -- enter their name below';
+        statusEl.className = 'text-xs min-h-[1rem] mb-2 px-1 text-slate-400';
+        paymentContext = { appointmentId: null, patientId: null, patientName: null, newPatientPhone: phone };
+      }
+    } catch (err) {
+      statusEl.textContent = '';
+    }
+  }, 500);
+});
+
+document.getElementById('bm-payment-category').addEventListener('change', updatePaymentCategoryUI);
+document.querySelectorAll('input[name="bm-consult-subtype"]').forEach((el) => el.addEventListener('change', updatePaymentCategoryUI));
+
+function updatePaymentCategoryUI() {
+  const category = document.getElementById('bm-payment-category').value;
+  const isConsultation = category === 'consultation';
+  document.getElementById('bm-payment-consultation-section').classList.toggle('hidden', !isConsultation);
+
+  const amountInput = document.getElementById('bm-payment-total-amount');
+  if (isConsultation) {
+    const subtype = document.querySelector('input[name="bm-consult-subtype"]:checked')?.value || 'new';
+    amountInput.value = CONSULTATION_PRICES[subtype];
+    const isFree = subtype === 'free';
+    document.getElementById('bm-payment-amount-section').classList.toggle('hidden', isFree);
+    document.getElementById('bm-payment-splits-section').classList.toggle('hidden', isFree);
+    amountInput.disabled = true;
+    amountInput.className = 'w-full text-lg font-bold px-4 py-3 border border-slate-300 rounded-xl mb-3 bg-slate-50 text-slate-500';
+  } else {
+    document.getElementById('bm-payment-amount-section').classList.remove('hidden');
+    document.getElementById('bm-payment-splits-section').classList.remove('hidden');
+    amountInput.disabled = false;
+    amountInput.className = 'w-full text-lg font-bold px-4 py-3 border border-slate-300 rounded-xl mb-3';
+    if (amountInput.value == 700 || amountInput.value == 600 || amountInput.value == 0) amountInput.value = '';
+  }
+  renderSplitRows();
+}
+
+// Split payment rows: each row is one { mode, amount } pair. Starts
+// with exactly one row (the common case -- a single mode covering the
+// full amount); "+ Split Payment" adds more for genuine splits.
+let splitRows = [{ mode: 'cash', amount: null }];
+
+function renderSplitRows() {
+  const container = document.getElementById('bm-payment-splits-rows');
+  const totalAmount = Number(document.getElementById('bm-payment-total-amount').value) || 0;
+  container.innerHTML = '';
+  splitRows.forEach((row, idx) => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'flex gap-2 items-center';
+    rowEl.innerHTML = `
+      <select data-split-mode="${idx}" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm">
+        <option value="cash" ${row.mode === 'cash' ? 'selected' : ''}>Cash</option>
+        <option value="upi" ${row.mode === 'upi' ? 'selected' : ''}>UPI</option>
+        <option value="card" ${row.mode === 'card' ? 'selected' : ''}>Card</option>
+        <option value="other" ${row.mode === 'other' ? 'selected' : ''}>Other</option>
+      </select>
+      <input data-split-amount="${idx}" type="number" min="1" step="1" value="${row.amount ?? ''}" placeholder="Amount" class="w-28 px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+      ${splitRows.length > 1 ? `<button data-remove-split="${idx}" class="text-red-500 text-xs font-bold px-1">✕</button>` : ''}
+    `;
+    container.appendChild(rowEl);
+  });
+
+  container.querySelectorAll('[data-split-mode]').forEach((el) => {
+    el.addEventListener('change', (e) => {
+      splitRows[Number(e.target.dataset.splitMode)].mode = e.target.value;
+    });
+  });
+  container.querySelectorAll('[data-split-amount]').forEach((el) => {
+    el.addEventListener('input', (e) => {
+      splitRows[Number(e.target.dataset.splitAmount)].amount = Number(e.target.value) || null;
+      updateSplitsRemainder();
+    });
+  });
+  container.querySelectorAll('[data-remove-split]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      splitRows.splice(Number(e.target.dataset.removeSplit), 1);
+      renderSplitRows();
+      updateSplitsRemainder();
+    });
+  });
+
+  // Auto-fill a single split row's amount to match the total, since
+  // that's the common (non-split) case and shouldn't require re-typing
+  // the same number twice.
+  if (splitRows.length === 1 && totalAmount > 0) {
+    splitRows[0].amount = totalAmount;
+    const onlyAmountInput = container.querySelector('[data-split-amount="0"]');
+    if (onlyAmountInput) onlyAmountInput.value = totalAmount;
+  }
+  updateSplitsRemainder();
+}
+
+function updateSplitsRemainder() {
+  const totalAmount = Number(document.getElementById('bm-payment-total-amount').value) || 0;
+  const splitSum = splitRows.reduce((sum, r) => sum + (r.amount || 0), 0);
+  const remainder = totalAmount - splitSum;
+  const remainderEl = document.getElementById('bm-payment-splits-remainder');
+  if (remainder === 0 && totalAmount > 0) {
+    remainderEl.textContent = `✓ Splits match total (₹${totalAmount})`;
+    remainderEl.className = 'text-xs text-green-600 font-medium mb-3';
+  } else if (totalAmount > 0) {
+    remainderEl.textContent = `Splits must add up to ₹${totalAmount} (currently ₹${splitSum}, ${remainder > 0 ? `₹${remainder} short` : `₹${Math.abs(remainder)} over`})`;
+    remainderEl.className = 'text-xs text-amber-600 font-medium mb-3';
+  } else {
+    remainderEl.textContent = '';
+  }
+}
+
+document.getElementById('bm-add-split-row').addEventListener('click', () => {
+  splitRows.push({ mode: 'upi', amount: null });
+  renderSplitRows();
+});
+
+document.getElementById('bm-payment-total-amount').addEventListener('input', () => {
+  // Only auto-sync when there's exactly one split row -- with 2+ rows
+  // (a genuine split), changing the total shouldn't silently overwrite
+  // amounts the staff member already entered per mode.
+  if (splitRows.length === 1) renderSplitRows();
+  else updateSplitsRemainder();
+});
+
 document.getElementById('bm-payment-save').addEventListener('click', async () => {
-  const appt = state.currentDetailAppointment;
   const errorEl = document.getElementById('bm-payment-error');
-  const amount = document.getElementById('bm-payment-amount').value;
-  if (!appt?.patient_id) {
-    errorEl.textContent = 'Could not identify the patient for this appointment.';
+  errorEl.textContent = '';
+  const category = document.getElementById('bm-payment-category').value;
+  const isConsultation = category === 'consultation';
+  const consultSubtype = isConsultation ? document.querySelector('input[name="bm-consult-subtype"]:checked')?.value : undefined;
+  const isFree = consultSubtype === 'free';
+  const totalAmount = Number(document.getElementById('bm-payment-total-amount').value) || 0;
+
+  // Resolve the patient: either the existing appointment context, an
+  // already-found standalone patient, or a brand new one to create.
+  let patientId = paymentContext?.patientId || null;
+  if (!patientId) {
+    const nameInput = document.getElementById('bm-payment-patient-name-input');
+    const phoneInput = document.getElementById('bm-payment-patient-phone');
+    if (!nameInput.value.trim()) {
+      errorEl.textContent = 'Please enter the patient name.';
+      return;
+    }
+    // No dedicated "create patient" action exists yet -- reuse
+    // create_appointment's patient resolution indirectly isn't
+    // possible here (no slot to book), so this calls a lightweight
+    // patient-creation path via record_payment itself, which accepts
+    // an optional newPatientName/newPatientPhone pair when patient_id
+    // is not yet known.
+    paymentContext = {
+      ...paymentContext,
+      newPatientName: nameInput.value.trim(),
+      newPatientPhone: phoneInput.value.trim(),
+    };
+  }
+
+  if (!isFree && splitRows.some((r) => !r.amount || r.amount <= 0)) {
+    errorEl.textContent = 'Please enter a valid amount for every payment row.';
     return;
   }
-  if (!amount || Number(amount) <= 0) {
-    errorEl.textContent = 'Please enter a valid amount.';
+  const splitSum = splitRows.reduce((sum, r) => sum + (r.amount || 0), 0);
+  if (!isFree && Math.abs(splitSum - totalAmount) > 0.01) {
+    errorEl.textContent = `Payment splits (₹${splitSum}) must add up to the total (₹${totalAmount}).`;
     return;
   }
+
   const btn = document.getElementById('bm-payment-save');
   btn.disabled = true;
   btn.textContent = 'Saving...';
   try {
     await callFunction('record_payment', {
-      appointment_id: appt.id,
-      patient_id: appt.patient_id,
-      amount,
-      mode: document.getElementById('bm-payment-mode').value,
+      appointment_id: paymentContext?.appointmentId || null,
+      patient_id: patientId,
+      new_patient_name: paymentContext?.newPatientName || null,
+      new_patient_phone: paymentContext?.newPatientPhone || null,
+      category,
+      consultationSubtype: consultSubtype,
+      totalAmount: isFree ? 0 : totalAmount,
+      splits: isFree ? [] : splitRows.map((r) => ({ mode: r.mode, amount: r.amount })),
       notes: document.getElementById('bm-payment-notes').value.trim(),
     });
     closePaymentModal();
@@ -866,21 +1067,22 @@ document.getElementById('bm-open-dayclose').addEventListener('click', () => {
   document.getElementById('bm-dayclose-overlay').classList.remove('hidden');
   document.getElementById('bm-dayclose-overlay').classList.add('flex');
   document.getElementById('bm-dayclose-date').value = todayStr();
-  document.getElementById('bm-counted-cash').value = '';
   document.getElementById('bm-reconciliation-result').classList.add('hidden');
   loadDayClose(todayStr());
+  loadCashSession(todayStr());
 });
 document.getElementById('bm-close-dayclose').addEventListener('click', () => {
   document.getElementById('bm-dayclose-overlay').classList.add('hidden');
   document.getElementById('bm-dayclose-overlay').classList.remove('flex');
 });
 document.getElementById('bm-dayclose-date').addEventListener('change', (e) => {
-  document.getElementById('bm-counted-cash').value = '';
   document.getElementById('bm-reconciliation-result').classList.add('hidden');
   loadDayClose(e.target.value);
+  loadCashSession(e.target.value);
 });
 
 let currentDayClosePayments = [];
+let currentDayCloseExpenses = [];
 
 async function loadDayClose(date) {
   const totalsEl = document.getElementById('bm-dayclose-totals');
@@ -888,85 +1090,338 @@ async function loadDayClose(date) {
   totalsEl.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
   listEl.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
   try {
-    const { payments } = await callFunction('list_payments_for_date', { date });
+    const [{ payments }, { expenses }] = await Promise.all([
+      callFunction('list_payments_for_date', { date }),
+      callFunction('list_expenses_for_date', { date }),
+    ]);
     currentDayClosePayments = payments;
+    currentDayCloseExpenses = expenses;
 
+    // Totals by mode, computed from each payment's splits (a split
+    // payment contributes to more than one mode's total).
     const totalsByMode = { cash: 0, upi: 0, card: 0, other: 0 };
+    const totalsByCategory = { consultation: 0, pharmacy: 0, lab: 0, vaccination: 0, procedure: 0 };
     payments.forEach((p) => {
-      totalsByMode[p.mode] = (totalsByMode[p.mode] || 0) + Number(p.amount);
+      totalsByCategory[p.category] = (totalsByCategory[p.category] || 0) + Number(p.total_amount);
+      (p.payment_splits || []).forEach((s) => {
+        totalsByMode[s.mode] = (totalsByMode[s.mode] || 0) + Number(s.amount);
+      });
     });
-    const grandTotal = Object.values(totalsByMode).reduce((sum, v) => sum + v, 0);
+    const grandTotal = Object.values(totalsByCategory).reduce((sum, v) => sum + v, 0);
+    const expensesTotal = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
     const modeLabels = { cash: 'Cash', upi: 'UPI', card: 'Card', other: 'Other' };
-    totalsEl.innerHTML = Object.entries(totalsByMode)
-      .map(([mode, amt]) => `
-        <div class="flex justify-between items-center py-1.5 ${mode !== 'other' ? 'border-b border-slate-100' : ''}">
-          <span class="text-sm font-semibold text-slate-600">${modeLabels[mode]}</span>
-          <span class="font-bold text-slate-900">₹${amt.toFixed(2)}</span>
-        </div>
-      `)
-      .join('') + `
-        <div class="flex justify-between items-center pt-2 mt-1 border-t-2 border-slate-800">
-          <span class="text-sm font-bold text-slate-900">Total</span>
-          <span class="font-extrabold text-lg text-slate-900">₹${grandTotal.toFixed(2)}</span>
-        </div>
-      `;
+    const categoryLabels = { consultation: 'Consultation', pharmacy: 'Pharmacy', lab: 'Lab', vaccination: 'Vaccination', procedure: 'Procedure' };
 
+    totalsEl.innerHTML = `
+      <div class="grid grid-cols-2 gap-x-6 gap-y-1 mb-3 pb-3 border-b border-slate-100">
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">By Mode</p>
+          ${Object.entries(modeLabels).map(([mode, label]) => `
+            <div class="flex justify-between text-sm py-0.5"><span class="text-slate-600">${label}</span><span class="font-semibold text-slate-800">₹${totalsByMode[mode].toFixed(2)}</span></div>
+          `).join('')}
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">By Category</p>
+          ${Object.entries(categoryLabels).map(([cat, label]) => `
+            <div class="flex justify-between text-sm py-0.5"><span class="text-slate-600">${label}</span><span class="font-semibold text-slate-800">₹${totalsByCategory[cat].toFixed(2)}</span></div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="flex justify-between items-center py-1">
+        <span class="text-sm font-bold text-slate-900">Total Collected</span>
+        <span class="font-extrabold text-lg text-slate-900">₹${grandTotal.toFixed(2)}</span>
+      </div>
+      <div class="flex justify-between items-center py-1">
+        <span class="text-sm font-bold text-red-600">Total Expenses</span>
+        <span class="font-bold text-red-600">− ₹${expensesTotal.toFixed(2)}</span>
+      </div>
+    `;
+
+    // ---- Reconciliation table ----
     if (payments.length === 0) {
       listEl.innerHTML = '<p class="text-slate-400 text-sm">No payments recorded for this date.</p>';
     } else {
-      listEl.innerHTML = '';
-      payments.forEach((p) => {
-        const row = document.createElement('div');
-        row.className = 'flex justify-between items-center py-2 border-b border-slate-100 last:border-0';
-        const time = new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        row.innerHTML = `
-          <div>
-            <p class="text-sm font-semibold text-slate-800">${p.patients?.name || 'Unknown patient'}</p>
-            <p class="text-xs text-slate-400">${time} · ${p.mode.toUpperCase()} · by ${p.collected_by_profile?.full_name || 'Staff'}</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-slate-900">₹${Number(p.amount).toFixed(2)}</span>
-            <button data-delete-payment="${p.id}" class="text-red-500 text-xs font-bold">✕</button>
-          </div>
-        `;
-        row.querySelector('[data-delete-payment]').addEventListener('click', async () => {
+      const modeSummary = (splits) => (splits || []).map((s) => `${modeLabels[s.mode]} ₹${Number(s.amount).toFixed(0)}`).join(' + ');
+      listEl.innerHTML = `
+        <div class="overflow-x-auto -mx-5 px-5">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-[10px] font-bold text-slate-400 uppercase tracking-wide border-b border-slate-200">
+                <th class="py-2 pr-2">Time</th>
+                <th class="py-2 pr-2">Patient</th>
+                <th class="py-2 pr-2">Category</th>
+                <th class="py-2 pr-2">Mode</th>
+                <th class="py-2 pr-2 text-right">Amount</th>
+                <th class="py-2 pr-2">Staff</th>
+                <th class="py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${payments.map((p) => {
+                const time = new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const categoryDisplay = p.category === 'consultation'
+                  ? `Consultation${p.consultation_subtype ? ` (${p.consultation_subtype})` : ''}`
+                  : categoryLabels[p.category];
+                return `
+                  <tr class="border-b border-slate-50">
+                    <td class="py-2 pr-2 whitespace-nowrap text-slate-500">${time}</td>
+                    <td class="py-2 pr-2 font-medium text-slate-800">${p.patients?.name || 'Unknown'}</td>
+                    <td class="py-2 pr-2 text-slate-600">${categoryDisplay}</td>
+                    <td class="py-2 pr-2 text-slate-500 text-xs">${modeSummary(p.payment_splits) || '—'}</td>
+                    <td class="py-2 pr-2 text-right font-bold text-slate-900">₹${Number(p.total_amount).toFixed(2)}</td>
+                    <td class="py-2 pr-2 text-slate-400 text-xs">${p.collected_by_profile?.full_name || 'Staff'}</td>
+                    <td class="py-2"><button data-delete-payment="${p.id}" class="text-red-500 text-xs font-bold">✕</button></td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      listEl.querySelectorAll('[data-delete-payment]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
           if (!confirm('Delete this payment entry?')) return;
-          await callFunction('delete_payment', { id: p.id });
+          await callFunction('delete_payment', { id: btn.dataset.deletePayment });
           loadDayClose(date);
         });
-        listEl.appendChild(row);
       });
     }
+
+    renderExpensesList(date);
   } catch (err) {
     totalsEl.innerHTML = `<p class="text-red-600 text-sm">${err.message}</p>`;
     listEl.innerHTML = '';
   }
 }
 
-document.getElementById('bm-counted-cash').addEventListener('input', (e) => {
-  const resultEl = document.getElementById('bm-reconciliation-result');
-  const counted = e.target.value;
-  if (counted === '') {
-    resultEl.classList.add('hidden');
+// ---- Expenses ----
+function renderExpensesList(date) {
+  const listEl = document.getElementById('bm-expenses-list');
+  if (currentDayCloseExpenses.length === 0) {
+    listEl.innerHTML = '<p class="text-slate-400 text-sm">No expenses recorded for this date.</p>';
     return;
   }
-  const recordedCash = currentDayClosePayments
-    .filter((p) => p.mode === 'cash')
-    .reduce((sum, p) => sum + Number(p.amount), 0);
-  const diff = Number(counted) - recordedCash;
-  resultEl.classList.remove('hidden');
-  if (diff === 0) {
-    resultEl.className = 'p-4 rounded-xl text-center font-bold bg-green-50 text-green-700';
-    resultEl.textContent = `Matches exactly. Recorded cash: ₹${recordedCash.toFixed(2)}`;
-  } else if (diff > 0) {
-    resultEl.className = 'p-4 rounded-xl text-center font-bold bg-amber-50 text-amber-700';
-    resultEl.textContent = `₹${diff.toFixed(2)} MORE than recorded (recorded: ₹${recordedCash.toFixed(2)})`;
-  } else {
-    resultEl.className = 'p-4 rounded-xl text-center font-bold bg-red-50 text-red-700';
-    resultEl.textContent = `₹${Math.abs(diff).toFixed(2)} SHORT of recorded (recorded: ₹${recordedCash.toFixed(2)})`;
+  const categoryLabels = { bank_deposit: 'Bank Deposit', handed_to_doctor: 'Handed to Doctor', petty_expense: 'Petty Expense', other: 'Other' };
+  listEl.innerHTML = '';
+  currentDayCloseExpenses.forEach((e) => {
+    const time = new Date(e.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const row = document.createElement('div');
+    row.className = 'flex justify-between items-center py-2 border-b border-slate-100 last:border-0';
+    row.innerHTML = `
+      <div>
+        <p class="text-sm font-semibold text-slate-800">${categoryLabels[e.category]}${e.notes ? ` — ${e.notes}` : ''}</p>
+        <p class="text-xs text-slate-400">${time} · by ${e.recorded_by_profile?.full_name || 'Staff'}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-red-600">₹${Number(e.amount).toFixed(2)}</span>
+        <button data-delete-expense="${e.id}" class="text-red-500 text-xs font-bold">✕</button>
+      </div>
+    `;
+    row.querySelector('[data-delete-expense]').addEventListener('click', async () => {
+      if (!confirm('Delete this expense entry?')) return;
+      await callFunction('delete_expense', { id: e.id });
+      loadDayClose(date);
+    });
+    listEl.appendChild(row);
+  });
+}
+
+document.getElementById('bm-add-expense').addEventListener('click', async () => {
+  const errorEl = document.getElementById('bm-expense-error');
+  const amount = document.getElementById('bm-expense-amount').value;
+  const date = document.getElementById('bm-dayclose-date').value;
+  if (!amount || Number(amount) <= 0) {
+    errorEl.textContent = 'Please enter a valid amount.';
+    return;
+  }
+  errorEl.textContent = '';
+  try {
+    await callFunction('record_expense', {
+      category: document.getElementById('bm-expense-category').value,
+      amount,
+      notes: document.getElementById('bm-expense-notes').value.trim(),
+    });
+    document.getElementById('bm-expense-amount').value = '';
+    document.getElementById('bm-expense-notes').value = '';
+    loadDayClose(date);
+  } catch (err) {
+    errorEl.textContent = err.message;
   }
 });
+
+// ---- Cash Session (opening / mid-day recount / closing) ----
+function denomTotal(prefix) {
+  const c50 = Number(document.getElementById(`bm-${prefix}-50`).value) || 0;
+  const c100 = Number(document.getElementById(`bm-${prefix}-100`).value) || 0;
+  const c200 = Number(document.getElementById(`bm-${prefix}-200`).value) || 0;
+  const c500 = Number(document.getElementById(`bm-${prefix}-500`).value) || 0;
+  return c50 * 50 + c100 * 100 + c200 * 200 + c500 * 500;
+}
+
+['open', 'recount', 'close'].forEach((prefix) => {
+  ['50', '100', '200', '500'].forEach((denom) => {
+    document.getElementById(`bm-${prefix}-${denom}`).addEventListener('input', () => {
+      const totalId = prefix === 'open' ? 'bm-opening-total' : prefix === 'recount' ? 'bm-recount-total' : 'bm-closing-total';
+      document.getElementById(totalId).textContent = `Total: ₹${denomTotal(prefix).toFixed(2)}`;
+    });
+  });
+});
+
+async function loadCashSession(date) {
+  const cashErrorEl = document.getElementById('bm-cash-error');
+  cashErrorEl.textContent = '';
+  document.getElementById('bm-reconciliation-result').classList.add('hidden');
+  // Reset all denomination inputs for the newly selected date -- these
+  // are per-day counts, not something that should carry over visually
+  // when switching dates.
+  ['open', 'recount', 'close'].forEach((prefix) => {
+    ['50', '100', '200', '500'].forEach((denom) => (document.getElementById(`bm-${prefix}-${denom}`).value = ''));
+  });
+  document.getElementById('bm-opening-total').textContent = 'Total: ₹0';
+  document.getElementById('bm-recount-total').textContent = 'Total: ₹0';
+  document.getElementById('bm-closing-total').textContent = 'Total: ₹0';
+
+  try {
+    const { session, previousClosingTotal } = await callFunction('get_cash_session', { date });
+
+    const statusEl = document.getElementById('bm-opening-status');
+    const prevNoticeEl = document.getElementById('bm-prev-closing-notice');
+    if (session?.opening_total != null) {
+      statusEl.textContent = 'Recorded';
+      statusEl.className = 'text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700';
+      document.getElementById('bm-open-50').value = session.opening_count_50;
+      document.getElementById('bm-open-100').value = session.opening_count_100;
+      document.getElementById('bm-open-200').value = session.opening_count_200;
+      document.getElementById('bm-open-500').value = session.opening_count_500;
+      document.getElementById('bm-opening-total').textContent = `Total: ₹${Number(session.opening_total).toFixed(2)}`;
+    } else {
+      statusEl.textContent = 'Not yet recorded';
+      statusEl.className = 'text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700';
+    }
+
+    if (previousClosingTotal != null) {
+      const openingVal = session?.opening_total ?? null;
+      const matches = openingVal != null && Math.abs(Number(openingVal) - Number(previousClosingTotal)) < 0.01;
+      prevNoticeEl.classList.remove('hidden');
+      if (openingVal == null) {
+        prevNoticeEl.className = 'text-xs mb-3 p-2.5 rounded-lg bg-slate-50 text-slate-500';
+        prevNoticeEl.textContent = `Previous day closed with ₹${Number(previousClosingTotal).toFixed(2)} -- opening count for today should match this.`;
+      } else if (matches) {
+        prevNoticeEl.className = 'text-xs mb-3 p-2.5 rounded-lg bg-green-50 text-green-700';
+        prevNoticeEl.textContent = `✓ Matches previous day's closing (₹${Number(previousClosingTotal).toFixed(2)})`;
+      } else {
+        prevNoticeEl.className = 'text-xs mb-3 p-2.5 rounded-lg bg-red-50 text-red-700';
+        prevNoticeEl.textContent = `⚠ Does not match previous day's closing (₹${Number(previousClosingTotal).toFixed(2)}) -- till may not have been reconciled properly.`;
+      }
+    } else {
+      prevNoticeEl.classList.add('hidden');
+    }
+
+    if (session?.closing_total != null) {
+      document.getElementById('bm-close-50').value = session.closing_count_50;
+      document.getElementById('bm-close-100').value = session.closing_count_100;
+      document.getElementById('bm-close-200').value = session.closing_count_200;
+      document.getElementById('bm-close-500').value = session.closing_count_500;
+      document.getElementById('bm-closing-total').textContent = `Total: ₹${Number(session.closing_total).toFixed(2)}`;
+      showReconciliationResult(Number(session.discrepancy), Number(session.expected_closing));
+    }
+
+    await loadCashRecounts(date);
+  } catch (err) {
+    cashErrorEl.textContent = err.message;
+  }
+}
+
+function showReconciliationResult(discrepancy, expectedClosing) {
+  const resultEl = document.getElementById('bm-reconciliation-result');
+  resultEl.classList.remove('hidden');
+  if (Math.abs(discrepancy) < 0.01) {
+    resultEl.className = 'p-4 rounded-xl text-center font-bold bg-green-50 text-green-700';
+    resultEl.textContent = `✓ Matches exactly. Expected: ₹${expectedClosing.toFixed(2)}`;
+  } else if (discrepancy > 0) {
+    resultEl.className = 'p-4 rounded-xl text-center font-bold bg-amber-50 text-amber-700';
+    resultEl.textContent = `⚠ ₹${discrepancy.toFixed(2)} MORE than expected (expected ₹${expectedClosing.toFixed(2)})`;
+  } else {
+    resultEl.className = 'p-4 rounded-xl text-center font-bold bg-red-50 text-red-700';
+    resultEl.textContent = `⚠ ₹${Math.abs(discrepancy).toFixed(2)} SHORT of expected (expected ₹${expectedClosing.toFixed(2)})`;
+  }
+}
+
+document.getElementById('bm-save-opening').addEventListener('click', async () => {
+  const date = document.getElementById('bm-dayclose-date').value;
+  const cashErrorEl = document.getElementById('bm-cash-error');
+  cashErrorEl.textContent = '';
+  try {
+    await callFunction('record_cash_opening', {
+      date,
+      count50: document.getElementById('bm-open-50').value,
+      count100: document.getElementById('bm-open-100').value,
+      count200: document.getElementById('bm-open-200').value,
+      count500: document.getElementById('bm-open-500').value,
+    });
+    await loadCashSession(date);
+  } catch (err) {
+    cashErrorEl.textContent = err.message;
+  }
+});
+
+document.getElementById('bm-save-closing').addEventListener('click', async () => {
+  const date = document.getElementById('bm-dayclose-date').value;
+  const cashErrorEl = document.getElementById('bm-cash-error');
+  cashErrorEl.textContent = '';
+  try {
+    await callFunction('record_cash_closing', {
+      date,
+      count50: document.getElementById('bm-close-50').value,
+      count100: document.getElementById('bm-close-100').value,
+      count200: document.getElementById('bm-close-200').value,
+      count500: document.getElementById('bm-close-500').value,
+    });
+    await loadCashSession(date);
+  } catch (err) {
+    cashErrorEl.textContent = err.message;
+  }
+});
+
+document.getElementById('bm-save-recount').addEventListener('click', async () => {
+  const date = document.getElementById('bm-dayclose-date').value;
+  const cashErrorEl = document.getElementById('bm-cash-error');
+  cashErrorEl.textContent = '';
+  try {
+    await callFunction('record_cash_recount', {
+      date,
+      count50: document.getElementById('bm-recount-50').value,
+      count100: document.getElementById('bm-recount-100').value,
+      count200: document.getElementById('bm-recount-200').value,
+      count500: document.getElementById('bm-recount-500').value,
+    });
+    ['50', '100', '200', '500'].forEach((denom) => (document.getElementById(`bm-recount-${denom}`).value = ''));
+    document.getElementById('bm-recount-total').textContent = 'Total: ₹0';
+    await loadCashRecounts(date);
+  } catch (err) {
+    cashErrorEl.textContent = err.message;
+  }
+});
+
+async function loadCashRecounts(date) {
+  const listEl = document.getElementById('bm-recounts-list');
+  try {
+    const { recounts } = await callFunction('list_cash_recounts', { date });
+    if (recounts.length === 0) {
+      listEl.innerHTML = '';
+      return;
+    }
+    listEl.innerHTML = recounts
+      .map((r) => {
+        const time = new Date(r.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `<div class="text-xs text-slate-500 py-1">${time} — ₹${Number(r.counted_total).toFixed(2)} (by ${r.recorded_by_profile?.full_name || 'Staff'})</div>`;
+      })
+      .join('');
+  } catch (err) {
+    listEl.innerHTML = '';
+  }
+}
 
 // ---- Patient Detail (Profile + Visit History) ----
 let currentPatientId = null;
