@@ -234,6 +234,13 @@ function renderAppointmentFeed() {
       cancelled: 'bg-slate-300',
     };
     const serviceLabel = (appt.notes || '').split('|')[0].trim() || 'Appointment';
+    // booked_by is null for public self-service bookings
+    // (public-book-appointment.js always sets it to null) and set to
+    // the staff member's profile id when created here in Bookings
+    // Manager -- this is what actually distinguishes the two sources.
+    const sourceLabel = appt.booked_by
+      ? `Booked by ${appt.booked_by_profile?.full_name || 'Staff'}`
+      : 'Booked online';
     const card = document.createElement('div');
     card.className = `${statusColors[appt.status] || 'bg-slate-800'} text-white rounded-2xl p-4 shadow-sm cursor-pointer transition active:scale-[0.99]`;
     card.innerHTML = `
@@ -242,7 +249,8 @@ function renderAppointmentFeed() {
         <span class="text-xs font-bold bg-white/20 px-2 py-1 rounded-full">${doctor ? doctor.short : '?'}</span>
       </div>
       <p class="font-bold text-base mb-1 truncate">${appt.patients?.name || 'Unknown patient'}</p>
-      <p class="text-sm opacity-90">${serviceLabel}${appt.linked_group_id ? ' · Multi-slot' : ''}</p>
+      <p class="text-sm opacity-90 mb-1">${serviceLabel}${appt.linked_group_id ? ' · Multi-slot' : ''}</p>
+      <p class="text-[11px] opacity-70 font-semibold uppercase tracking-wide">${sourceLabel}</p>
     `;
     card.addEventListener('click', () => openDetailModal(appt));
     feed.appendChild(card);
@@ -254,6 +262,9 @@ function openDetailModal(appt) {
   state.currentDetailAppointment = appt;
   const doctor = CLINIC_DOCTORS.find((d) => d.id === appt.doctor_id);
   const serviceLabel = (appt.notes || '').split('|')[0].trim() || 'Appointment';
+  const sourceLabel = appt.booked_by
+    ? `Staff (${appt.booked_by_profile?.full_name || 'Unknown staff member'})`
+    : 'Online (public website)';
   document.getElementById('bm-detail-body').innerHTML = `
     <h3 class="text-xl font-bold text-slate-900 mb-1">${appt.patients?.name || 'Unknown patient'}</h3>
     <p class="text-sm text-slate-500 mb-4">${appt.patients?.phone || 'No phone on file'}</p>
@@ -262,6 +273,7 @@ function openDetailModal(appt) {
       <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Doctor</span><span class="font-semibold text-slate-800">${doctor ? doctor.name : 'Unknown'}</span></div>
       <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Service</span><span class="font-semibold text-slate-800">${serviceLabel}</span></div>
       <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Status</span><span class="font-semibold text-slate-800 capitalize">${appt.status.replace('_', ' ')}</span></div>
+      <div class="bg-slate-50 p-3 rounded-xl"><span class="text-xs font-bold text-slate-400 uppercase block mb-1">Booked Via</span><span class="font-semibold text-slate-800">${sourceLabel}</span></div>
     </div>
   `;
   document.getElementById('bm-detail-modal').classList.remove('hidden');
