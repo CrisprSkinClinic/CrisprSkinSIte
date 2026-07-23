@@ -1729,7 +1729,16 @@ async function loadPatientProfile(patientId) {
     document.getElementById('bm-profile-phone').value = patient.phone || '';
     document.getElementById('bm-profile-dob').value = patient.dob || '';
     document.getElementById('bm-profile-gender').value = patient.gender || '';
+    document.getElementById('bm-profile-email').value = patient.email || '';
     document.getElementById('bm-profile-address').value = patient.address || '';
+    document.getElementById('bm-profile-area').value = patient.area || '';
+    document.getElementById('bm-profile-pincode').value = patient.pincode || '';
+    document.getElementById('bm-profile-city').value = patient.city || '';
+    document.getElementById('bm-profile-state').value = patient.state || '';
+    document.getElementById('bm-profile-occupation').value = patient.occupation || '';
+    document.getElementById('bm-profile-referral-source').value = patient.referral_source || '';
+    document.getElementById('bm-profile-referral-other').value = patient.referral_other_details || '';
+    document.getElementById('bm-profile-referral-other').classList.toggle('hidden', patient.referral_source !== 'Other');
     document.getElementById('bm-profile-uhid').value = patient.uhid || 'Not yet registered';
     document.getElementById('bm-profile-age').textContent = calculateAge(patient.dob);
   } catch (err) {
@@ -1742,6 +1751,10 @@ document.getElementById('bm-profile-dob').addEventListener('change', (e) => {
   document.getElementById('bm-profile-age').textContent = calculateAge(e.target.value);
 });
 
+document.getElementById('bm-profile-referral-source').addEventListener('change', (e) => {
+  document.getElementById('bm-profile-referral-other').classList.toggle('hidden', e.target.value !== 'Other');
+});
+
 document.getElementById('bm-save-profile').addEventListener('click', async () => {
   if (!currentPatientId) return;
   const saveMsg = document.getElementById('bm-profile-save-msg');
@@ -1749,13 +1762,22 @@ document.getElementById('bm-save-profile').addEventListener('click', async () =>
   btn.disabled = true;
   btn.textContent = 'Saving...';
   try {
+    const referralSource = document.getElementById('bm-profile-referral-source').value;
     await callFunction('update_patient_profile', {
       patient_id: currentPatientId,
       name: document.getElementById('bm-profile-name').value.trim(),
       phone: document.getElementById('bm-profile-phone').value.trim(),
       dob: document.getElementById('bm-profile-dob').value,
       gender: document.getElementById('bm-profile-gender').value,
+      email: document.getElementById('bm-profile-email').value.trim(),
       address: document.getElementById('bm-profile-address').value.trim(),
+      area: document.getElementById('bm-profile-area').value.trim(),
+      pincode: document.getElementById('bm-profile-pincode').value.trim(),
+      city: document.getElementById('bm-profile-city').value.trim(),
+      state: document.getElementById('bm-profile-state').value.trim(),
+      occupation: document.getElementById('bm-profile-occupation').value.trim(),
+      referralSource,
+      referralOtherDetails: referralSource === 'Other' ? document.getElementById('bm-profile-referral-other').value.trim() : '',
     });
     saveMsg.textContent = 'Saved.';
     saveMsg.className = 'text-sm text-center text-green-600';
