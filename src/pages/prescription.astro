@@ -1,0 +1,381 @@
+---
+// src/pages/prescription.astro
+//
+// Standalone Electronic Prescription System, migrated from a Google
+// Apps Script tool (Sheets-backed) into this Astro/Supabase/Netlify
+// stack. Same auth model as /bookings-manager -- real per-staff
+// Supabase Auth logins, JWT re-verified server-side on every request
+// via prescription-manager.js (which additionally requires
+// role = 'doctor', unlike bookings-manager which any active staff
+// role can use).
+//
+// All prescription data lives in derm_rx_* tables, fully separate
+// from CRIS ClinicOS's own medicines/prescriptions/billing schema in
+// this same Supabase project -- a deliberate choice pending a future,
+// explicit reconciliation between the two systems, not something to
+// unify silently here.
+//
+// Patient selection reuses the SAME encrypted patients table and
+// find_patient_by_phone-style lookup already used by /bookings-manager
+// -- there is no separate patient list for this tool.
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Prescription System" description="Electronic prescription system for doctors">
+
+<div id="rx-app-root" class="min-h-screen bg-slate-100">
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="rx-login-screen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
+      <h2 class="text-2xl font-bold text-slate-800 mb-1">Prescription System</h2>
+      <p class="text-slate-500 text-sm mb-6">Sign in with your doctor account.</p>
+      <form id="rx-login-form" class="space-y-4 text-left">
+        <div>
+          <label for="rx-email" class="text-xs font-semibold text-slate-500 mb-1 block">Email</label>
+          <input type="email" id="rx-email" required placeholder="you@crisprdermatology.com"
+                 class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+        </div>
+        <div>
+          <label for="rx-password" class="text-xs font-semibold text-slate-500 mb-1 block">Password</label>
+          <input type="password" id="rx-password" required placeholder="••••••••"
+                 class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+        </div>
+        <button type="submit" id="rx-login-btn"
+                class="w-full bg-brand-900 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-[0.98]">
+          Sign In
+        </button>
+        <p id="rx-login-error" class="text-red-500 text-sm text-center min-h-[1.25rem]"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= PATIENT SELECT SCREEN ================= -->
+  <!-- Shown after login, before entering the Rx workspace itself --
+       this is new relative to the old Apps Script tool, which
+       received the patient as an already-resolved object from a
+       separate queue/search UI. Here we reuse the same phone-lookup
+       pattern as Bookings Manager, since patients live in the same
+       encrypted table. -->
+  <div id="rx-patient-select-screen" class="hidden min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+      <div class="flex justify-between items-center mb-1">
+        <h2 class="text-xl font-bold text-slate-800">Select Patient</h2>
+        <button id="rx-signout-btn" class="text-xs text-slate-400 hover:text-red-500 font-semibold">Sign out</button>
+      </div>
+      <p class="text-slate-500 text-sm mb-6">Enter the patient's phone number to begin.</p>
+      <div>
+        <label for="rx-select-phone" class="text-xs font-semibold text-slate-500 mb-1 block">Phone Number</label>
+        <input type="tel" id="rx-select-phone" inputmode="numeric" maxlength="10" placeholder="9876543210"
+               class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+        <p id="rx-select-status" class="text-xs mt-2 min-h-[1rem]"></p>
+      </div>
+      <div id="rx-select-found" class="hidden mt-4 p-4 bg-brand-50 border border-brand-100 rounded-xl">
+        <p class="font-bold text-slate-900" id="rx-select-found-name"></p>
+        <p class="text-sm text-slate-500" id="rx-select-found-demo"></p>
+        <button id="rx-select-confirm-btn" class="w-full mt-3 bg-brand-900 text-white font-bold py-2.5 rounded-xl">
+          Start Prescription
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RX WORKSPACE (ported from the uploaded prototype) ================= -->
+  <div id="rx-workspace-screen" class="hidden">
+<style>
+:root {
+    --app-header-h: 70px;
+}
+.rx-container {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    overflow: hidden;
+}
+.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.top-strip { height: var(--app-header-h); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header-title { display: flex; flex-direction: column; }
+.header-title h1 { font-size: 20px; font-weight: 700; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 8px; }
+.patient-brief { font-size: 14px; color: #64748b; font-weight: 500; }
+.patient-brief span { color: #4f46e5; font-weight: 600; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.action-btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease; border: 1px solid #e2e8f0; background: white; color: #475569; }
+.action-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+.action-btn.primary { background: #4f46e5; color: white; border-color: #4f46e5; }
+.action-btn.primary:hover { background: #4338ca; border-color: #4338ca; }
+.main-content { flex: 1; display: flex; overflow: hidden; padding: 0; }
+.left-pane, .right-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 20px; max-height: calc(100vh - var(--app-header-h)); }
+.left-pane { border-right: 1px solid #e2e8f0; background: white; }
+.right-pane { background: #f8fafc; }
+.pane-content { flex: 1; overflow-y: auto; padding-right: 8px; margin-top: 16px; }
+.section-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.section-title { font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+.complaints-textarea, .diagnosis-textarea, .advice-textarea { width: 100%; min-height: 80px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; line-height: 1.5; color: #1e293b; resize: vertical; background: #f8fafc; }
+.complaints-textarea:focus, .diagnosis-textarea:focus, .advice-textarea:focus { outline: none; border-color: #4f46e5; background: white; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+.medical-profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.profile-item { padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; }
+.profile-label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.profile-value { font-size: 14px; font-weight: 600; color: #1e293b; }
+.vitals-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.vital-item { display: flex; flex-direction: column; }
+.vital-label { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.vital-input { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; font-weight: 600; color: #1e293b; }
+.vital-input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,0.1); }
+.history-list { display: flex; flex-direction: column; gap: 12px; }
+.history-item { padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+.history-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.history-date { font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 4px; }
+.history-meds { font-size: 13px; color: #475569; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lab-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex-shrink: 0; }
+.lab-item { padding: 10px 12px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; }
+.lab-name { font-size: 13px; color: #1e293b; font-weight: 500; }
+.lab-date { font-size: 11px; color: #64748b; }
+.lab-action { padding: 4px 8px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 11px; color: #475569; cursor: pointer; }
+.lab-action:hover { background: #e2e8f0; }
+.lab-item.active { border-color: #4f46e5; background: #eef2ff; }
+.photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.photo-item { aspect-ratio: 1; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; padding: 0; position: relative; }
+.photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; width: 100%; height: 100%; transition: all 0.2s ease; }
+.photo-placeholder:hover { background-color: #e2e8f0; color: #475569; }
+.photo-zoomable { cursor: zoom-in; transition: transform 0.2s ease; }
+.photo-zoomed { cursor: grab; transform: scale(2); }
+.diagnosis-section, .medicines-section, .lab-tests-section, .advice-section, .review-section { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.differentials { margin-top: 16px; }
+.diff-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.diff-tag { padding: 6px 12px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 12px; color: #475569; cursor: pointer; }
+.diff-tag:hover { background: #e2e8f0; }
+.med-table-header { display: grid; grid-template-columns: 4fr 2fr 2fr 3fr 40px; gap: 12px; margin-bottom: 8px; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+.med-table-container { padding: 10px 20px 20px 20px; }
+.med-row { display: grid; grid-template-columns: 4fr 2fr 2fr 3fr 40px; gap: 12px; align-items: start; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; position: relative; }
+.med-row:last-child { border-bottom: none; }
+.med-input { width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #1e293b; transition: all 0.2s; }
+.med-input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+.med-input.font-bold { font-weight: 600; color: #0f172a; }
+.add-medicine-btn { margin-top: 12px; width: 36px; height: 36px; border-radius: 8px; border: 1px dashed #c7d2fe; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.add-medicine-btn:hover { background: #e0e7ff; }
+.btn-del-row { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #94a3b8; border-radius: 6px; cursor: pointer; background: transparent; border: none; }
+.btn-del-row:hover { background: #fee2e2; color: #ef4444; }
+.autocomplete-wrapper { position: relative; width: 100%; }
+.suggestions-dropdown { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; max-height: 250px; overflow-y: auto; margin-top: 4px; display: none; }
+.suggestion-item { padding: 8px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; }
+.suggestion-item:hover { background: #f8fafc; }
+.suggestion-name { font-size: 13px; font-weight: 500; color: #334155; }
+.stock-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+.badge-ok { background: #dcfce7; color: #166534; }
+.badge-low { background: #fef9c3; color: #854d0e; }
+.badge-out { background: #fee2e2; color: #991b1b; }
+.lab-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.lab-tag { padding: 6px 12px; background: #e0e7ff; border: 1px solid #c7d2fe; border-radius: 20px; font-size: 13px; color: #4f46e5; display: inline-flex; align-items: center; gap: 6px; }
+.remove-tag { width: 16px; height: 16px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; }
+.remove-tag:hover { background: #f1f5f9; }
+.add-lab-btn { margin-top: 12px; padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 6px; background: white; color: #475569; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.add-lab-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.review-input { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; margin-top: 8px; }
+.quick-dates { display: flex; gap: 8px; margin-top: 12px; }
+.quick-date { padding: 6px 12px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; color: #475569; cursor: pointer; }
+.quick-date:hover { background: #e2e8f0; }
+.modal { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+.modal-visible { display: flex !important; animation: modalFadeIn 0.3s ease-out; }
+@keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-content { background: white; border-radius: 16px; width: 100%; max-width: 800px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+.modal-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; background: #f8fafc; }
+.modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc; }
+.btn { padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+.btn-secondary { background: white; border-color: #e2e8f0; color: #475569; }
+.btn-primary { background: #4f46e5; color: white; }
+.btn-success { background: #16a34a; color: white; }
+.icon-btn { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #e2e8f0; color: #64748b; cursor: pointer; }
+@media (max-width: 1024px) {
+    .main-content { flex-direction: column; }
+    .left-pane, .right-pane { max-height: none; }
+    .left-pane { border-right: none; border-bottom: 1px solid #e2e8f0; }
+}
+.lab-expand { margin-top: 12px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc; }
+.lab-expand.hidden { display: none; }
+.lab-frame { width: 100%; border: none; }
+.lab-frame.single { height: 420px; }
+#lab-compare-wrapper { display: flex; flex-direction: column; height: 420px; }
+.lab-frame.half { height: 50%; }
+#lab-compare-wrapper.hidden { display: none; }
+</style>
+
+<div class="rx-container" id="rx-module-root">
+    <div class="top-strip">
+        <div class="header-left">
+            <div class="rx-logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="#4F46E5"/>
+                    <path d="M16 10L21 15L16 20L11 15L16 10Z" fill="white"/>
+                    <path d="M10 21L15 16L10 11" stroke="white" stroke-width="2"/>
+                    <path d="M22 21L17 16L22 11" stroke="white" stroke-width="2"/>
+                </svg>
+            </div>
+            <div class="header-title">
+                <h1>Electronic Prescription System</h1>
+                <div class="patient-brief" id="patient-brief">
+                    Patient: <span id="current-patient-name">--</span> |
+                    Phone: <span id="current-patient-id">--</span> |
+                    Age/Sex: <span id="current-patient-demo">--/--</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+          <span id="save-status-text" style="font-size:12px;color:#64748b;margin-right:12px;">All changes saved</span>
+          <button onclick="window.changePatient()" class="action-btn"><i data-lucide="user-x" class="w-4 h-4"></i> Change Patient</button>
+          <button onclick="saveDraft()" class="action-btn"><i data-lucide="save" class="w-4 h-4"></i> Save Draft</button>
+          <button onclick="previewPrescription()" class="action-btn"><i data-lucide="eye" class="w-4 h-4"></i> Preview</button>
+          <button onclick="savePrescription()" class="action-btn primary"><i data-lucide="printer" class="w-4 h-4"></i> Save & Print</button>
+      </div>
+    </div>
+
+    <div class="main-content">
+        <div class="left-pane">
+            <h2 class="section-title"><i data-lucide="clipboard-list" class="w-5 h-5"></i> Patient Information</h2>
+            <div class="pane-content">
+                <div class="section-card">
+                    <h3 class="section-title"><i data-lucide="message-square" class="w-4 h-4"></i> Chief Complaints</h3>
+                    <textarea id="complaints-input" class="complaints-textarea" placeholder="Describe the patient's symptoms, duration, history..."></textarea>
+                </div>
+                <div class="section-card" id="medical-profile-section">
+                    <h3 class="section-title"><i data-lucide="user" class="w-4 h-4"></i> Medical Profile</h3>
+                    <div class="medical-profile-grid" id="medical-profile-grid"></div>
+                </div>
+                <div class="section-card">
+                    <h3 class="section-title"><i data-lucide="activity" class="w-4 h-4"></i> Vitals</h3>
+                    <div class="vitals-grid">
+                        <div class="vital-item"><label class="vital-label">BP (mmHg)</label><input type="text" id="vital-bp" class="vital-input" placeholder="120/80"></div>
+                        <div class="vital-item"><label class="vital-label">Pulse (bpm)</label><input type="text" id="vital-pulse" class="vital-input" placeholder="72"></div>
+                        <div class="vital-item"><label class="vital-label">Temp (°F)</label><input type="text" id="vital-temp" class="vital-input" placeholder="98.6"></div>
+                        <div class="vital-item"><label class="vital-label">Weight (kg)</label><input type="text" id="vital-weight" class="vital-input" placeholder="65"></div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <h3 class="section-title"><i data-lucide="history" class="w-4 h-4"></i> Last Prescriptions</h3>
+                    <div class="history-list" id="prescription-history"></div>
+                </div>
+                <div class="section-card">
+                    <h3 class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; align-items:center; gap:8px;"><i data-lucide="flask-conical" class="w-4 h-4"></i> Latest Lab Reports</div>
+                        <button onclick="document.getElementById('lab-upload-input').click()" style="font-size:11px; padding:4px 8px; background:#eef2ff; color:#4f46e5; border:1px solid #c7d2fe; border-radius:6px; cursor:pointer; font-weight:600;">+ Upload</button>
+                    </h3>
+                    <input type="file" id="lab-upload-input" accept="application/pdf, image/*" style="display:none;" onchange="handleLabUpload(this)">
+                    <div class="lab-list" id="lab-reports-list"></div>
+                    <div id="lab-expand-panel" class="lab-expand hidden">
+                      <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:#f1f5f9; border-bottom:1px solid #e2e8f0;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <button class="lab-action" onclick="navigateInlineLab(-1)">‹</button>
+                            <button class="lab-action" onclick="navigateInlineLab(1)">›</button>
+                            <strong id="inline-lab-title" style="font-size:12px;"></strong>
+                        </div>
+                        <button onclick="closeLabInline()" style="font-size:11px; padding:4px 8px; border:1px solid #e2e8f0; background:white; border-radius:6px;">Close</button>
+                      </div>
+                      <iframe id="lab-inline-frame" class="lab-frame single"></iframe>
+                      <div style="padding:10px;border-top:1px solid #e2e8f0;background:white;">
+                        <div style="font-size:12px;font-weight:600;color:#475569;margin-bottom:6px;">📝 Lab Notes</div>
+                        <textarea id="lab-note-input" placeholder="E.g. HbA1c improving, continue metformin" style="width:100%;min-height:60px;font-size:13px;padding:8px;border:1px solid #e2e8f0;border-radius:6px;"></textarea>
+                        <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+                          <button class="lab-action" onclick="addLabNoteToRx()">+ Add to Prescription</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <h3 class="section-title"><i data-lucide="image" class="w-4 h-4"></i> Clinical Photos</h3>
+                    <div class="photos-grid" id="photos-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-pane">
+            <h2 class="section-title"><i data-lucide="file-text" class="w-5 h-5"></i> Prescription</h2>
+            <div class="pane-content">
+                <div class="diagnosis-section">
+                    <h3 class="section-title"><div class="flex items-center gap-2"><i data-lucide="stethoscope" class="w-4 h-4"></i> Diagnosis</div></h3>
+                    <textarea id="diagnosis-input" class="diagnosis-textarea" placeholder="Enter primary diagnosis..."></textarea>
+                    <div class="differentials">
+                        <div class="section-title"><i data-lucide="list" class="w-4 h-4"></i> Differentials</div>
+                        <div class="diff-tags" id="differential-tags"></div>
+                    </div>
+                </div>
+                <div class="medicines-section">
+                    <h3 class="section-title"><div class="flex items-center gap-2"><i data-lucide="pill" class="w-4 h-4"></i> Medicines Prescribed</div></h3>
+                    <div id="dx-med-suggestions" style="padding: 0 20px; display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; min-height: 0px"></div>
+                    <div class="medicine-list" id="medicine-list"></div>
+                    <button onclick="addMedicine()" class="add-medicine-btn" title="Add Medicine"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                </div>
+                <div class="lab-tests-section">
+                    <h3 class="section-title"><div class="flex items-center gap-2"><i data-lucide="flask-conical" class="w-4 h-4"></i> Lab Tests Advised</div></h3>
+                    <div class="lab-tags" id="lab-tags"></div>
+                    <button onclick="addLabTest()" class="add-lab-btn"><i data-lucide="plus" class="w-4 h-4"></i> Add Lab Test</button>
+                </div>
+                <div class="advice-section">
+                    <h3 class="section-title"><div class="flex items-center gap-2"><i data-lucide="message-square" class="w-4 h-4"></i> Advice & Instructions</div></h3>
+                    <textarea id="advice-input" class="advice-textarea" placeholder="Dietary instructions, follow-up plan, precautions..."></textarea>
+                </div>
+                <div class="review-section">
+                    <h3 class="section-title"><i data-lucide="calendar" class="w-4 h-4"></i> Next Review</h3>
+                    <input type="date" id="review-date" class="review-input">
+                    <div class="quick-dates">
+                        <button class="quick-date" onclick="setReviewDate(7)">+1 Week</button>
+                        <button class="quick-date" onclick="setReviewDate(14)">+2 Weeks</button>
+                        <button class="quick-date" onclick="setReviewDate(30)">+1 Month</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="preview-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 style="font-size: 18px; font-weight: 600; color: #1e293b; margin: 0;"><i data-lucide="eye" class="w-5 h-5"></i> Prescription Preview</h3>
+            <button onclick="closePreview()" class="icon-btn"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="modal-body" id="preview-content"></div>
+        <div class="modal-footer">
+            <button onclick="closePreview()" class="btn btn-secondary">Close</button>
+            <button onclick="savePrescription()" class="btn btn-success"><i data-lucide="printer" class="w-4 h-4"></i> Print</button>
+        </div>
+    </div>
+</div>
+
+<div id="history-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; flex-direction: column; margin-left: 8px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #1e293b; margin: 0;">Past Prescription</h3>
+                    <span id="hist-modal-date" style="font-size: 11px; color: #64748b; font-weight: 500;">--/--/----</span>
+                </div>
+            </div>
+            <button onclick="closeHistoryModal()" class="icon-btn" style="border: none; background: transparent;"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="modal-body" id="history-content-area" style="background: #ffffff; padding: 20px;"></div>
+        <div class="modal-footer">
+            <button onclick="closeHistoryModal()" class="btn btn-secondary">Close</button>
+            <button id="btn-copy-rx" class="btn btn-primary"><i data-lucide="copy" class="w-4 h-4"></i> Copy to Current</button>
+        </div>
+    </div>
+</div>
+  </div>
+
+</div>
+</AppLayout>
+
+<script define:vars={{ supabaseUrl: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_URL, supabaseAnonKey: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_ANON_KEY }}>
+  window.__RX_SUPABASE_URL__ = supabaseUrl;
+  window.__RX_SUPABASE_ANON_KEY__ = supabaseAnonKey;
+</script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script is:inline src="https://unpkg.com/lucide@latest"></script>
+<script is:inline src="/scripts/prescription-shell.js"></script>
+<script is:inline src="/scripts/prescription-app.js"></script>
