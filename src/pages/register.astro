@@ -1,0 +1,121 @@
+---
+// src/pages/register.astro
+//
+// Public patient self-registration form. Submissions go into
+// patient_registration_requests (via public-patient-registration.js),
+// NOT directly into the real patients table -- every submission
+// requires staff approval in Bookings Manager before becoming a real
+// patient record. This page uses MainLayout (with the site's normal
+// header/footer), unlike bookings-manager.astro's AppLayout, since
+// this is a genuine public-facing page, not an internal staff tool.
+import MainLayout from '../layouts/MainLayout.astro';
+import { siteConfig } from '../config/site.js';
+---
+
+<MainLayout title={`Patient Registration | ${siteConfig.name}`} description="Register as a new patient at CRISPR Skin and Hair Clinic ahead of your visit.">
+  <div class="max-w-2xl mx-auto py-16 px-6">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-3 text-center">Patient Registration</h1>
+    <p class="text-slate-600 text-center mb-10">
+      Register your details ahead of your visit. Our front desk will review and confirm your registration -- there's nothing further you need to do after submitting.
+    </p>
+
+    <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-champagne-200 p-8 md:p-10">
+      <form id="reg-form" class="space-y-5">
+        <div>
+          <label for="reg-name" class="text-sm font-semibold text-slate-700 mb-1 block">Full Name *</label>
+          <input type="text" id="reg-name" required placeholder="Your full name"
+                 class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+        </div>
+
+        <div>
+          <label for="reg-phone" class="text-sm font-semibold text-slate-700 mb-1 block">Phone Number</label>
+          <input type="tel" id="reg-phone" placeholder="+91 XXXXX XXXXX"
+                 class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+        </div>
+
+        <div>
+          <label for="reg-dob" class="text-sm font-semibold text-slate-700 mb-1 block">Date of Birth</label>
+          <input type="date" id="reg-dob"
+                 class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+        </div>
+
+        <div>
+          <label for="reg-gender" class="text-sm font-semibold text-slate-700 mb-1 block">Gender</label>
+          <select id="reg-gender" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+            <option value="">Prefer not to say</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="reg-address" class="text-sm font-semibold text-slate-700 mb-1 block">Address</label>
+          <textarea id="reg-address" rows="3" placeholder="Your address"
+                    class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition"></textarea>
+        </div>
+
+        <button type="submit" id="reg-submit-btn"
+                class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98]">
+          Submit Registration
+        </button>
+        <p id="reg-error" class="text-red-600 text-sm text-center min-h-[1.25rem]"></p>
+      </form>
+    </div>
+
+    <!-- Shown after successful submission, replacing the form -->
+    <div id="reg-success-container" class="hidden bg-white rounded-2xl shadow-sm border border-champagne-200 p-10 text-center">
+      <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h2 class="text-xl font-bold text-slate-900 mb-2">Registration Submitted</h2>
+      <p class="text-slate-600">
+        Thank you -- your registration has been received and is pending review by our front desk. You'll be confirmed as a registered patient at your next visit, or you're welcome to call us at
+        <a href={`tel:${siteConfig.contact.phone}`} class="text-brand-600 font-semibold hover:underline">{siteConfig.contact.phone}</a>
+        if you have any questions in the meantime.
+      </p>
+    </div>
+  </div>
+</MainLayout>
+
+<script is:inline>
+  document.getElementById('reg-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errorEl = document.getElementById('reg-error');
+    const btn = document.getElementById('reg-submit-btn');
+    errorEl.textContent = '';
+
+    const name = document.getElementById('reg-name').value.trim();
+    if (!name) {
+      errorEl.textContent = 'Please enter your name.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+    try {
+      const response = await fetch('/.netlify/functions/public-patient-registration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          phone: document.getElementById('reg-phone').value.trim(),
+          dob: document.getElementById('reg-dob').value,
+          gender: document.getElementById('reg-gender').value,
+          address: document.getElementById('reg-address').value.trim(),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Something went wrong. Please try again.');
+      }
+      document.getElementById('reg-form-container').classList.add('hidden');
+      document.getElementById('reg-success-container').classList.remove('hidden');
+    } catch (err) {
+      errorEl.textContent = err.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Submit Registration';
+    }
+  });
+</script>
