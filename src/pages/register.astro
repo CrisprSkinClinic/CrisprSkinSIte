@@ -18,36 +18,38 @@
 // feature (planned /intake?appointment_id=<uuid> page) and are
 // intentionally NOT part of this page.
 //
-// v2: same field set as v1, no fields removed. UX improvements only:
-//   - DOB text field auto-inserts "/" as the patient types
-//   - native <input type="date"> picker added alongside the text field,
-//     each one updates the other so patients can use whichever they prefer
-//   - fields grouped into 3 collapsible <details> sections (About You /
-//     Contact Details / A Little More) instead of one long scroll, so
-//     the form reads as "3 short things" rather than "9 fields"
-//   - autocomplete + inputmode attributes so mobile keyboards and
-//     browser autofill can do more of the typing for the patient
-//   - first field autofocused on load
+// v2: DOB auto-slash + native date picker (synced both ways), fields
+// grouped into 3 collapsible <details> sections, autocomplete/
+// inputmode attributes, autofocus.
+//
+// v3: wider container (max-w-3xl instead of max-w-2xl); each section
+// auto-opens the next one once all of its own required fields
+// validate (patient can still manually open/close any section);
+// added a review/preview screen between "Submit Registration" and
+// the actual API call, so patients see everything they entered and
+// can go back to edit before confirming; on success, redirects to
+// the site homepage ("/") after a short pause instead of showing an
+// inline success message.
 import MainLayout from '../layouts/MainLayout.astro';
 import { siteConfig } from '../config/site.js';
 ---
 
 <MainLayout title={`Patient Registration | ${siteConfig.name}`} description="Register as a new patient at CRISPR Skin and Hair Clinic ahead of your visit.">
-  <div class="max-w-2xl mx-auto py-16 px-6">
+  <div class="max-w-3xl mx-auto py-16 px-6">
     <h1 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-3 text-center">Patient Registration</h1>
     <p class="text-slate-600 text-center mb-10">
       Register your details ahead of your visit. Our front desk will review and confirm your registration -- there's nothing further you need to do after submitting.
     </p>
 
-    <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-champagne-200 p-8 md:p-10">
+    <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-champagne-200 p-8 md:p-12">
       <form id="reg-form" class="space-y-4">
 
-        <details open class="group border border-slate-200 rounded-xl overflow-hidden">
+        <details open id="section-1" class="group border border-slate-200 rounded-xl overflow-hidden">
           <summary class="cursor-pointer select-none list-none px-5 py-4 bg-slate-50 font-semibold text-brand-900 flex items-center justify-between">
             <span>1. About You</span>
             <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
           </summary>
-          <div class="p-5 space-y-5">
+          <div class="p-5 md:p-6 space-y-5">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label for="reg-salutation" class="text-sm font-semibold text-slate-700 mb-1 block">Salutation *</label>
@@ -103,12 +105,12 @@ import { siteConfig } from '../config/site.js';
           </div>
         </details>
 
-        <details class="group border border-slate-200 rounded-xl overflow-hidden">
+        <details id="section-2" class="group border border-slate-200 rounded-xl overflow-hidden">
           <summary class="cursor-pointer select-none list-none px-5 py-4 bg-slate-50 font-semibold text-brand-900 flex items-center justify-between">
             <span>2. Contact Details</span>
             <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
           </summary>
-          <div class="p-5 space-y-5">
+          <div class="p-5 md:p-6 space-y-5">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label for="reg-email" class="text-sm font-semibold text-slate-700 mb-1 block">Email Address *</label>
@@ -137,12 +139,12 @@ import { siteConfig } from '../config/site.js';
           </div>
         </details>
 
-        <details class="group border border-slate-200 rounded-xl overflow-hidden">
+        <details id="section-3" class="group border border-slate-200 rounded-xl overflow-hidden">
           <summary class="cursor-pointer select-none list-none px-5 py-4 bg-slate-50 font-semibold text-brand-900 flex items-center justify-between">
             <span>3. A Little More</span>
             <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
           </summary>
-          <div class="p-5 space-y-5">
+          <div class="p-5 md:p-6 space-y-5">
             <div>
               <label for="reg-occupation" class="text-sm font-semibold text-slate-700 mb-1 block">Occupation *</label>
               <input type="text" id="reg-occupation" required placeholder="Your occupation" autocomplete="organization-title"
@@ -172,24 +174,43 @@ import { siteConfig } from '../config/site.js';
           </div>
         </details>
 
-        <button type="submit" id="reg-submit-btn"
+        <button type="submit" id="reg-review-btn"
                 class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98] mt-2">
-          Submit Registration
+          Review My Details
         </button>
         <p id="reg-error" class="text-red-600 text-sm text-center min-h-[1.25rem]"></p>
       </form>
     </div>
 
-    <!-- Shown after successful submission, replacing the form -->
+    <!-- Review/preview screen -- shown after "Review My Details" passes validation,
+         before anything is actually submitted to the server -->
+    <div id="reg-review-container" class="hidden bg-white rounded-2xl shadow-sm border border-champagne-200 p-8 md:p-12">
+      <h2 class="text-xl font-bold text-slate-900 mb-1">Review Your Details</h2>
+      <p class="text-slate-500 text-sm mb-6">Please check everything below is correct before submitting.</p>
+
+      <dl id="reg-review-list" class="divide-y divide-slate-100 border-y border-slate-100 mb-8"></dl>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="button" id="reg-back-btn"
+                class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
+          Back to Edit
+        </button>
+        <button type="button" id="reg-confirm-btn"
+                class="w-full flex-1 bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98]">
+          Confirm &amp; Submit
+        </button>
+      </div>
+      <p id="reg-submit-error" class="text-red-600 text-sm text-center min-h-[1.25rem] mt-3"></p>
+    </div>
+
+    <!-- Shown briefly after successful submission, before redirecting home -->
     <div id="reg-success-container" class="hidden bg-white rounded-2xl shadow-sm border border-champagne-200 p-10 text-center">
       <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
       </div>
       <h2 class="text-xl font-bold text-slate-900 mb-2">Registration Submitted</h2>
       <p class="text-slate-600">
-        Thank you -- your registration has been received and is pending review by our front desk. You'll be confirmed as a registered patient at your next visit, or you're welcome to call us at
-        <a href={`tel:${siteConfig.contact.phone}`} class="text-brand-600 font-semibold hover:underline">{siteConfig.contact.phone}</a>
-        if you have any questions in the meantime.
+        Thank you -- your registration has been received and is pending review by our front desk. Taking you back to our homepage...
       </p>
     </div>
   </div>
@@ -226,6 +247,71 @@ import { siteConfig } from '../config/site.js';
     ageDisplay.textContent = `Age: ${age} years.`;
   }
 
+  // --- Section auto-advance: each section's own required fields, used
+  // to detect "this section is now fully and validly filled" ---
+  const SECTION_FIELD_IDS = {
+    'section-1': ['reg-salutation', 'reg-gender', 'reg-first-name', 'reg-last-name', 'reg-dob'],
+    'section-2': ['reg-email', 'reg-phone', 'reg-address', 'reg-pincode'],
+    'section-3': ['reg-occupation', 'reg-referral'], // reg-referral-other checked separately below
+  };
+  const SECTION_ORDER = ['section-1', 'section-2', 'section-3'];
+
+  function isSection1Valid() {
+    return !!document.getElementById('reg-salutation').value
+      && !!document.getElementById('reg-gender').value
+      && !!document.getElementById('reg-first-name').value.trim()
+      && !!document.getElementById('reg-last-name').value.trim()
+      && !!parseDOB(document.getElementById('reg-dob').value);
+  }
+  function isSection2Valid() {
+    const email = document.getElementById('reg-email').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const address = document.getElementById('reg-address').value.trim();
+    const pincode = document.getElementById('reg-pincode').value.trim();
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(email)
+      && /^[6-9][0-9]{9}$/.test(phone)
+      && address.length >= 20
+      && /^[0-9]{6}$/.test(pincode);
+  }
+  function isSection3Valid() {
+    const occupation = document.getElementById('reg-occupation').value.trim();
+    const referralSource = document.getElementById('reg-referral').value;
+    const referralOtherDetails = document.getElementById('reg-referral-other').value.trim();
+    if (!occupation || !referralSource) return false;
+    if (referralSource === 'Other' && !referralOtherDetails) return false;
+    return true;
+  }
+  const SECTION_VALIDATORS = { 'section-1': isSection1Valid, 'section-2': isSection2Valid, 'section-3': isSection3Valid };
+
+  // Tracks which sections have already been auto-advanced past, so we
+  // don't keep forcing a section open again if the patient deliberately
+  // collapses it after finishing (e.g. to review earlier answers).
+  const autoAdvanced = new Set();
+
+  function maybeAutoAdvance(sectionId) {
+    if (autoAdvanced.has(sectionId)) return;
+    if (!SECTION_VALIDATORS[sectionId]()) return;
+    autoAdvanced.add(sectionId);
+    const idx = SECTION_ORDER.indexOf(sectionId);
+    const nextId = SECTION_ORDER[idx + 1];
+    if (nextId) {
+      const nextSection = document.getElementById(nextId);
+      if (!nextSection.open) {
+        nextSection.open = true;
+        const firstField = nextSection.querySelector('input, select, textarea');
+        if (firstField) firstField.focus({ preventScroll: false });
+      }
+    }
+  }
+
+  function attachAutoAdvance(sectionId) {
+    document.getElementById(sectionId).querySelectorAll('input, select, textarea').forEach((el) => {
+      el.addEventListener('input', () => maybeAutoAdvance(sectionId));
+      el.addEventListener('change', () => maybeAutoAdvance(sectionId));
+    });
+  }
+  SECTION_ORDER.forEach(attachAutoAdvance);
+
   // --- Text field: auto-inserts "/" as the patient types digits ---
   const dobInput = document.getElementById('reg-dob');
   dobInput.addEventListener('input', (e) => {
@@ -240,7 +326,6 @@ import { siteConfig } from '../config/site.js';
 
     const dobDate = parseDOB(formatted);
     updateAgeAndError(dobDate);
-    // Keep the native date picker in sync so either input stays valid
     if (dobDate) {
       const iso = `${dobDate.getFullYear()}-${String(dobDate.getMonth() + 1).padStart(2, '0')}-${String(dobDate.getDate()).padStart(2, '0')}`;
       document.getElementById('reg-dob-picker').value = iso;
@@ -275,6 +360,7 @@ import { siteConfig } from '../config/site.js';
     otherInput.required = isOther;
     if (!isOther) otherInput.value = '';
   });
+  document.getElementById('reg-referral-other').addEventListener('input', () => maybeAutoAdvance('section-3'));
 
   // --- Address character counter ---
   document.getElementById('reg-address').addEventListener('input', (e) => {
@@ -296,36 +382,117 @@ import { siteConfig } from '../config/site.js';
     if (details) details.open = true;
   }
 
-  document.getElementById('reg-form').addEventListener('submit', async (e) => {
+  const SALUTATION_LABELS = { 'Mr.': 'Mr.', 'Ms.': 'Ms.', 'Mrs.': 'Mrs.', 'Dr.': 'Dr.', 'Master': 'Master', 'Baby': 'Baby' };
+  const GENDER_LABELS = { male: 'Male', female: 'Female', other: 'Other' };
+
+  function collectFormValues() {
+    return {
+      salutation: document.getElementById('reg-salutation').value,
+      firstName: document.getElementById('reg-first-name').value.trim(),
+      lastName: document.getElementById('reg-last-name').value.trim(),
+      dob: document.getElementById('reg-dob').value.trim(),
+      gender: document.getElementById('reg-gender').value,
+      email: document.getElementById('reg-email').value.trim(),
+      phone: document.getElementById('reg-phone').value.trim(),
+      address: document.getElementById('reg-address').value.trim(),
+      pincode: document.getElementById('reg-pincode').value.trim(),
+      occupation: document.getElementById('reg-occupation').value.trim(),
+      referralSource: document.getElementById('reg-referral').value,
+      referralOtherDetails: document.getElementById('reg-referral-other').value.trim(),
+    };
+  }
+
+  function validateFormValues(v) {
+    if (!v.salutation) { revealFieldSection('reg-salutation'); return 'Please select a salutation.'; }
+    if (!v.firstName || !v.lastName) { revealFieldSection('reg-first-name'); return 'Please enter your first and last name.'; }
+    if (!parseDOB(v.dob)) { revealFieldSection('reg-dob'); return 'Please enter a valid date of birth (DD/MM/YYYY).'; }
+    if (!v.gender) { revealFieldSection('reg-gender'); return 'Please select a gender.'; }
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(v.email)) { revealFieldSection('reg-email'); return 'Please enter a valid email address.'; }
+    if (!/^[6-9][0-9]{9}$/.test(v.phone)) { revealFieldSection('reg-phone'); return 'Please enter a valid 10-digit phone number.'; }
+    if (v.address.length < 20) { revealFieldSection('reg-address'); return 'Address must be at least 20 characters.'; }
+    if (!/^[0-9]{6}$/.test(v.pincode)) { revealFieldSection('reg-pincode'); return 'Please enter a valid 6-digit pincode.'; }
+    if (!v.occupation) { revealFieldSection('reg-occupation'); return 'Please enter your occupation.'; }
+    if (!v.referralSource) { revealFieldSection('reg-referral'); return 'Please let us know how you heard about us.'; }
+    if (v.referralSource === 'Other' && !v.referralOtherDetails) { revealFieldSection('reg-referral-other'); return 'Please specify how you heard about us.'; }
+    return null;
+  }
+
+  function reviewRow(label, value) {
+    return `<div class="py-3 grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4">
+      <dt class="text-sm font-semibold text-slate-500">${label}</dt>
+      <dd class="sm:col-span-2 text-slate-800">${value}</dd>
+    </div>`;
+  }
+
+  function renderReview(v) {
+    const list = document.getElementById('reg-review-list');
+    const dobDate = parseDOB(v.dob);
+    let ageStr = '';
+    if (dobDate) {
+      const today = new Date();
+      let age = today.getFullYear() - dobDate.getFullYear();
+      const monthDiff = today.getMonth() - dobDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) age--;
+      ageStr = ` (${age} years)`;
+    }
+    const referralDisplay = v.referralSource === 'Other'
+      ? `${v.referralSource} -- ${v.referralOtherDetails}`
+      : v.referralSource;
+
+    list.innerHTML = [
+      reviewRow('Name', `${SALUTATION_LABELS[v.salutation] || v.salutation} ${v.firstName} ${v.lastName}`),
+      reviewRow('Gender', GENDER_LABELS[v.gender] || v.gender),
+      reviewRow('Date of Birth', `${v.dob}${ageStr}`),
+      reviewRow('Email', v.email),
+      reviewRow('Phone', v.phone),
+      reviewRow('Address', `${v.address}, ${v.pincode}`),
+      reviewRow('Occupation', v.occupation),
+      reviewRow('How you heard about us', referralDisplay),
+    ].join('');
+  }
+
+  // --- "Review My Details" -> validate, then show the review screen ---
+  document.getElementById('reg-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const errorEl = document.getElementById('reg-error');
-    const btn = document.getElementById('reg-submit-btn');
     errorEl.textContent = '';
 
-    const salutation = document.getElementById('reg-salutation').value;
-    const firstName = document.getElementById('reg-first-name').value.trim();
-    const lastName = document.getElementById('reg-last-name').value.trim();
-    const dob = document.getElementById('reg-dob').value.trim();
-    const gender = document.getElementById('reg-gender').value;
-    const email = document.getElementById('reg-email').value.trim();
-    const phone = document.getElementById('reg-phone').value.trim();
-    const address = document.getElementById('reg-address').value.trim();
-    const pincode = document.getElementById('reg-pincode').value.trim();
-    const occupation = document.getElementById('reg-occupation').value.trim();
-    const referralSource = document.getElementById('reg-referral').value;
-    const referralOtherDetails = document.getElementById('reg-referral-other').value.trim();
+    const values = collectFormValues();
+    const validationError = validateFormValues(values);
+    if (validationError) {
+      errorEl.textContent = validationError;
+      return;
+    }
 
-    if (!salutation) { revealFieldSection('reg-salutation'); errorEl.textContent = 'Please select a salutation.'; return; }
-    if (!firstName || !lastName) { revealFieldSection('reg-first-name'); errorEl.textContent = 'Please enter your first and last name.'; return; }
-    if (!parseDOB(dob)) { revealFieldSection('reg-dob'); errorEl.textContent = 'Please enter a valid date of birth (DD/MM/YYYY).'; return; }
-    if (!gender) { revealFieldSection('reg-gender'); errorEl.textContent = 'Please select a gender.'; return; }
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(email)) { revealFieldSection('reg-email'); errorEl.textContent = 'Please enter a valid email address.'; return; }
-    if (!/^[6-9][0-9]{9}$/.test(phone)) { revealFieldSection('reg-phone'); errorEl.textContent = 'Please enter a valid 10-digit phone number.'; return; }
-    if (address.length < 20) { revealFieldSection('reg-address'); errorEl.textContent = 'Address must be at least 20 characters.'; return; }
-    if (!/^[0-9]{6}$/.test(pincode)) { revealFieldSection('reg-pincode'); errorEl.textContent = 'Please enter a valid 6-digit pincode.'; return; }
-    if (!occupation) { revealFieldSection('reg-occupation'); errorEl.textContent = 'Please enter your occupation.'; return; }
-    if (!referralSource) { revealFieldSection('reg-referral'); errorEl.textContent = 'Please let us know how you heard about us.'; return; }
-    if (referralSource === 'Other' && !referralOtherDetails) { revealFieldSection('reg-referral-other'); errorEl.textContent = 'Please specify how you heard about us.'; return; }
+    renderReview(values);
+    document.getElementById('reg-form-container').classList.add('hidden');
+    document.getElementById('reg-review-container').classList.remove('hidden');
+    document.getElementById('reg-review-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // --- "Back to Edit" -> return to the form with all values intact ---
+  document.getElementById('reg-back-btn').addEventListener('click', () => {
+    document.getElementById('reg-review-container').classList.add('hidden');
+    document.getElementById('reg-form-container').classList.remove('hidden');
+    document.getElementById('reg-form-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // --- "Confirm & Submit" -> actually calls the API, then redirects home ---
+  document.getElementById('reg-confirm-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('reg-confirm-btn');
+    const submitErrorEl = document.getElementById('reg-submit-error');
+    submitErrorEl.textContent = '';
+
+    const values = collectFormValues();
+    const validationError = validateFormValues(values);
+    if (validationError) {
+      // Values shouldn't have changed since the review screen was built,
+      // but re-validate defensively before hitting the network.
+      document.getElementById('reg-review-container').classList.add('hidden');
+      document.getElementById('reg-form-container').classList.remove('hidden');
+      document.getElementById('reg-error').textContent = validationError;
+      return;
+    }
 
     btn.disabled = true;
     btn.textContent = 'Submitting...';
@@ -334,32 +501,26 @@ import { siteConfig } from '../config/site.js';
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          salutation,
-          firstName,
-          lastName,
-          name: `${salutation} ${firstName} ${lastName}`.trim(),
-          dob,
-          gender,
-          email,
-          phone,
-          address,
-          pincode,
-          occupation,
-          referralSource,
-          referralOtherDetails: referralSource === 'Other' ? referralOtherDetails : '',
+          ...values,
+          name: `${values.salutation} ${values.firstName} ${values.lastName}`.trim(),
+          referralOtherDetails: values.referralSource === 'Other' ? values.referralOtherDetails : '',
         }),
       });
       const result = await response.json();
       if (!response.ok || !result.success) {
         throw new Error(result.error || 'Something went wrong. Please try again.');
       }
-      document.getElementById('reg-form-container').classList.add('hidden');
+      document.getElementById('reg-review-container').classList.add('hidden');
       document.getElementById('reg-success-container').classList.remove('hidden');
+      document.getElementById('reg-success-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2200);
     } catch (err) {
-      errorEl.textContent = err.message;
+      submitErrorEl.textContent = err.message;
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Submit Registration';
+      btn.textContent = 'Confirm & Submit';
     }
   });
 </script>
