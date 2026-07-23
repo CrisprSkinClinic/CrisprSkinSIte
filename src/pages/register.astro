@@ -17,6 +17,17 @@
 // diagnosis questions, consent) are a separate, not-yet-built
 // feature (planned /intake?appointment_id=<uuid> page) and are
 // intentionally NOT part of this page.
+//
+// v2: same field set as v1, no fields removed. UX improvements only:
+//   - DOB text field auto-inserts "/" as the patient types
+//   - native <input type="date"> picker added alongside the text field,
+//     each one updates the other so patients can use whichever they prefer
+//   - fields grouped into 3 collapsible <details> sections (About You /
+//     Contact Details / A Little More) instead of one long scroll, so
+//     the form reads as "3 short things" rather than "9 fields"
+//   - autocomplete + inputmode attributes so mobile keyboards and
+//     browser autofill can do more of the typing for the patient
+//   - first field autofocused on load
 import MainLayout from '../layouts/MainLayout.astro';
 import { siteConfig } from '../config/site.js';
 ---
@@ -29,117 +40,140 @@ import { siteConfig } from '../config/site.js';
     </p>
 
     <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-champagne-200 p-8 md:p-10">
-      <form id="reg-form" class="space-y-5">
+      <form id="reg-form" class="space-y-4">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label for="reg-salutation" class="text-sm font-semibold text-slate-700 mb-1 block">Salutation *</label>
-            <select id="reg-salutation" required
-                    class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
-              <option value="">Select</option>
-              <option value="Mr.">Mr.</option>
-              <option value="Ms.">Ms.</option>
-              <option value="Mrs.">Mrs.</option>
-              <option value="Dr.">Dr.</option>
-              <option value="Master">Master</option>
-              <option value="Baby">Baby</option>
-            </select>
-          </div>
-          <div>
-            <label for="reg-gender" class="text-sm font-semibold text-slate-700 mb-1 block">Gender *</label>
-            <select id="reg-gender" required
-                    class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
-              <option value="">Select</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
+        <details open class="group border border-slate-200 rounded-xl overflow-hidden">
+          <summary class="cursor-pointer select-none list-none px-5 py-4 bg-slate-50 font-semibold text-brand-900 flex items-center justify-between">
+            <span>1. About You</span>
+            <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div class="p-5 space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="reg-salutation" class="text-sm font-semibold text-slate-700 mb-1 block">Salutation *</label>
+                <select id="reg-salutation" required autofocus autocomplete="honorific-prefix"
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+                  <option value="">Select</option>
+                  <option value="Mr.">Mr.</option>
+                  <option value="Ms.">Ms.</option>
+                  <option value="Mrs.">Mrs.</option>
+                  <option value="Dr.">Dr.</option>
+                  <option value="Master">Master</option>
+                  <option value="Baby">Baby</option>
+                </select>
+              </div>
+              <div>
+                <label for="reg-gender" class="text-sm font-semibold text-slate-700 mb-1 block">Gender *</label>
+                <select id="reg-gender" required autocomplete="sex"
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label for="reg-first-name" class="text-sm font-semibold text-slate-700 mb-1 block">First Name *</label>
-            <input type="text" id="reg-first-name" required placeholder="First name"
-                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
-          </div>
-          <div>
-            <label for="reg-last-name" class="text-sm font-semibold text-slate-700 mb-1 block">Last Name *</label>
-            <input type="text" id="reg-last-name" required placeholder="Last name"
-                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
-          </div>
-        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="reg-first-name" class="text-sm font-semibold text-slate-700 mb-1 block">First Name *</label>
+                <input type="text" id="reg-first-name" required placeholder="First name" autocomplete="given-name"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+              <div>
+                <label for="reg-last-name" class="text-sm font-semibold text-slate-700 mb-1 block">Last Name *</label>
+                <input type="text" id="reg-last-name" required placeholder="Last name" autocomplete="family-name"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+            </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label for="reg-dob" class="text-sm font-semibold text-slate-700 mb-1 block">Date of Birth *</label>
-            <input type="text" id="reg-dob" required placeholder="DD/MM/YYYY"
-                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
-            <p id="reg-dob-error" class="text-slate-500 text-xs mt-1 min-h-[1rem]"></p>
+            <div>
+              <label for="reg-dob" class="text-sm font-semibold text-slate-700 mb-1 block">Date of Birth *</label>
+              <div class="flex gap-2">
+                <input type="text" id="reg-dob" required placeholder="DD/MM/YYYY" inputmode="numeric" autocomplete="bday" maxlength="10"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+                <label for="reg-dob-picker" class="shrink-0 w-12 flex items-center justify-center border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 transition" aria-label="Pick date from calendar">
+                  <svg class="w-5 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <input type="date" id="reg-dob-picker" class="sr-only" />
+                </label>
+              </div>
+              <p id="reg-dob-error" class="text-slate-500 text-xs mt-1 min-h-[1rem]"></p>
+              <p class="text-slate-400 text-xs mt-1">Type it in, or tap the calendar icon to pick a date. <span id="reg-age-display"></span></p>
+            </div>
           </div>
-          <div>
-            <label for="reg-age" class="text-sm font-semibold text-slate-700 mb-1 block">Age</label>
-            <input type="text" id="reg-age" readonly placeholder="Auto-calculated"
-                   class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-500" />
-          </div>
-        </div>
+        </details>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label for="reg-email" class="text-sm font-semibold text-slate-700 mb-1 block">Email Address *</label>
-            <input type="email" id="reg-email" required placeholder="name@domain.com"
-                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
-          </div>
-          <div>
-            <label for="reg-phone" class="text-sm font-semibold text-slate-700 mb-1 block">Phone Number *</label>
-            <input type="tel" id="reg-phone" required placeholder="9876543210"
-                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
-          </div>
-        </div>
+        <details class="group border border-slate-200 rounded-xl overflow-hidden">
+          <summary class="cursor-pointer select-none list-none px-5 py-4 bg-slate-50 font-semibold text-brand-900 flex items-center justify-between">
+            <span>2. Contact Details</span>
+            <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div class="p-5 space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="reg-email" class="text-sm font-semibold text-slate-700 mb-1 block">Email Address *</label>
+                <input type="email" id="reg-email" required placeholder="name@domain.com" autocomplete="email" inputmode="email"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+              <div>
+                <label for="reg-phone" class="text-sm font-semibold text-slate-700 mb-1 block">Phone Number *</label>
+                <input type="tel" id="reg-phone" required placeholder="9876543210" autocomplete="tel" inputmode="numeric" maxlength="10"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+            </div>
 
-        <div>
-          <label for="reg-address" class="text-sm font-semibold text-slate-700 mb-1 block">Address *</label>
-          <textarea id="reg-address" required rows="3" placeholder="Your complete address (min 20 characters)"
-                    class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition"></textarea>
-          <p id="reg-address-counter" class="text-slate-500 text-xs mt-1">0/20 characters</p>
-        </div>
+            <div>
+              <label for="reg-address" class="text-sm font-semibold text-slate-700 mb-1 block">Address *</label>
+              <textarea id="reg-address" required rows="3" placeholder="Your complete address (min 20 characters)" autocomplete="street-address"
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition"></textarea>
+              <p id="reg-address-counter" class="text-slate-500 text-xs mt-1">0/20 characters</p>
+            </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label for="reg-pincode" class="text-sm font-semibold text-slate-700 mb-1 block">Pincode *</label>
-            <input type="text" id="reg-pincode" required placeholder="600078" maxlength="6"
-                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+            <div>
+              <label for="reg-pincode" class="text-sm font-semibold text-slate-700 mb-1 block">Pincode *</label>
+              <input type="text" id="reg-pincode" required placeholder="600078" inputmode="numeric" autocomplete="postal-code" maxlength="6"
+                     class="w-full max-w-xs px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+            </div>
           </div>
-          <div>
-            <label for="reg-occupation" class="text-sm font-semibold text-slate-700 mb-1 block">Occupation *</label>
-            <input type="text" id="reg-occupation" required placeholder="Your occupation"
-                   class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+        </details>
+
+        <details class="group border border-slate-200 rounded-xl overflow-hidden">
+          <summary class="cursor-pointer select-none list-none px-5 py-4 bg-slate-50 font-semibold text-brand-900 flex items-center justify-between">
+            <span>3. A Little More</span>
+            <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div class="p-5 space-y-5">
+            <div>
+              <label for="reg-occupation" class="text-sm font-semibold text-slate-700 mb-1 block">Occupation *</label>
+              <input type="text" id="reg-occupation" required placeholder="Your occupation" autocomplete="organization-title"
+                     class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+            </div>
+
+            <div>
+              <label for="reg-referral" class="text-sm font-semibold text-slate-700 mb-1 block">How did you hear about us? *</label>
+              <select id="reg-referral" required
+                      class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+                <option value="">Select</option>
+                <option value="Friend/Family Referral">Friend/Family Referral</option>
+                <option value="Doctor Referral">Doctor Referral</option>
+                <option value="Google Search">Google Search</option>
+                <option value="Social Media">Social Media</option>
+                <option value="Practo">Practo</option>
+                <option value="Walk-in">Walk-in</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div id="reg-referral-other-group" class="hidden">
+              <label for="reg-referral-other" class="text-sm font-semibold text-slate-700 mb-1 block">Please specify *</label>
+              <input type="text" id="reg-referral-other" placeholder="How did you hear about us?"
+                     class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+            </div>
           </div>
-        </div>
-
-        <div>
-          <label for="reg-referral" class="text-sm font-semibold text-slate-700 mb-1 block">How did you hear about us? *</label>
-          <select id="reg-referral" required
-                  class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
-            <option value="">Select</option>
-            <option value="Friend/Family Referral">Friend/Family Referral</option>
-            <option value="Doctor Referral">Doctor Referral</option>
-            <option value="Google Search">Google Search</option>
-            <option value="Social Media">Social Media</option>
-            <option value="Practo">Practo</option>
-            <option value="Walk-in">Walk-in</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div id="reg-referral-other-group" class="hidden">
-          <label for="reg-referral-other" class="text-sm font-semibold text-slate-700 mb-1 block">Please specify *</label>
-          <input type="text" id="reg-referral-other" placeholder="How did you hear about us?"
-                 class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
-        </div>
+        </details>
 
         <button type="submit" id="reg-submit-btn"
-                class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98]">
+                class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98] mt-2">
           Submit Registration
         </button>
         <p id="reg-error" class="text-red-600 text-sm text-center min-h-[1.25rem]"></p>
@@ -162,7 +196,7 @@ import { siteConfig } from '../config/site.js';
 </MainLayout>
 
 <script is:inline>
-  // --- DOB -> age, matching the wizard's DD/MM/YYYY parsing ---
+  // --- DOB parsing, shared by both the text field and the date picker ---
   function parseDOB(str) {
     const parts = String(str || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (!parts) return null;
@@ -170,20 +204,13 @@ import { siteConfig } from '../config/site.js';
     return Number.isNaN(d.getTime()) ? null : d;
   }
 
-  function calculateAge() {
-    const dobInput = document.getElementById('reg-dob');
-    const ageInput = document.getElementById('reg-age');
+  function updateAgeAndError(dobDate) {
     const dobError = document.getElementById('reg-dob-error');
-    const dobDate = parseDOB(dobInput.value);
+    const ageDisplay = document.getElementById('reg-age-display');
 
-    if (!dobInput.value) {
-      dobError.textContent = '';
-      ageInput.value = '';
-      return;
-    }
     if (!dobDate) {
-      dobError.textContent = 'Enter a valid date (DD/MM/YYYY)';
-      ageInput.value = '';
+      dobError.textContent = '';
+      ageDisplay.textContent = '';
       return;
     }
     const today = new Date();
@@ -192,15 +219,44 @@ import { siteConfig } from '../config/site.js';
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) age--;
     if (age < 0 || age > 120) {
       dobError.textContent = 'Enter a valid date (DD/MM/YYYY)';
-      ageInput.value = '';
+      ageDisplay.textContent = '';
       return;
     }
     dobError.textContent = '';
-    ageInput.value = `${age} years`;
+    ageDisplay.textContent = `Age: ${age} years.`;
   }
 
-  document.getElementById('reg-dob').addEventListener('input', calculateAge);
-  document.getElementById('reg-dob').addEventListener('blur', calculateAge);
+  // --- Text field: auto-inserts "/" as the patient types digits ---
+  const dobInput = document.getElementById('reg-dob');
+  dobInput.addEventListener('input', (e) => {
+    let digits = e.target.value.replace(/[^0-9]/g, '').slice(0, 8);
+    let formatted = digits;
+    if (digits.length > 4) {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    } else if (digits.length > 2) {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+    e.target.value = formatted;
+
+    const dobDate = parseDOB(formatted);
+    updateAgeAndError(dobDate);
+    // Keep the native date picker in sync so either input stays valid
+    if (dobDate) {
+      const iso = `${dobDate.getFullYear()}-${String(dobDate.getMonth() + 1).padStart(2, '0')}-${String(dobDate.getDate()).padStart(2, '0')}`;
+      document.getElementById('reg-dob-picker').value = iso;
+    }
+  });
+  dobInput.addEventListener('blur', () => updateAgeAndError(parseDOB(dobInput.value)));
+
+  // --- Native date picker: fills the text field when a date is chosen ---
+  document.getElementById('reg-dob-picker').addEventListener('change', (e) => {
+    const iso = e.target.value; // YYYY-MM-DD
+    if (!iso) return;
+    const [yyyy, mm, dd] = iso.split('-');
+    const formatted = `${dd}/${mm}/${yyyy}`;
+    dobInput.value = formatted;
+    updateAgeAndError(parseDOB(formatted));
+  });
 
   // --- Salutation -> gender auto-suggestion, same mapping as the wizard ---
   document.getElementById('reg-salutation').addEventListener('change', (e) => {
@@ -233,6 +289,13 @@ import { siteConfig } from '../config/site.js';
     e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
   });
 
+  // --- Jump to and open the section containing the first invalid field ---
+  function revealFieldSection(fieldId) {
+    const field = document.getElementById(fieldId);
+    const details = field.closest('details');
+    if (details) details.open = true;
+  }
+
   document.getElementById('reg-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const errorEl = document.getElementById('reg-error');
@@ -252,17 +315,17 @@ import { siteConfig } from '../config/site.js';
     const referralSource = document.getElementById('reg-referral').value;
     const referralOtherDetails = document.getElementById('reg-referral-other').value.trim();
 
-    if (!salutation) { errorEl.textContent = 'Please select a salutation.'; return; }
-    if (!firstName || !lastName) { errorEl.textContent = 'Please enter your first and last name.'; return; }
-    if (!parseDOB(dob)) { errorEl.textContent = 'Please enter a valid date of birth (DD/MM/YYYY).'; return; }
-    if (!gender) { errorEl.textContent = 'Please select a gender.'; return; }
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(email)) { errorEl.textContent = 'Please enter a valid email address.'; return; }
-    if (!/^[6-9][0-9]{9}$/.test(phone)) { errorEl.textContent = 'Please enter a valid 10-digit phone number.'; return; }
-    if (address.length < 20) { errorEl.textContent = 'Address must be at least 20 characters.'; return; }
-    if (!/^[0-9]{6}$/.test(pincode)) { errorEl.textContent = 'Please enter a valid 6-digit pincode.'; return; }
-    if (!occupation) { errorEl.textContent = 'Please enter your occupation.'; return; }
-    if (!referralSource) { errorEl.textContent = 'Please let us know how you heard about us.'; return; }
-    if (referralSource === 'Other' && !referralOtherDetails) { errorEl.textContent = 'Please specify how you heard about us.'; return; }
+    if (!salutation) { revealFieldSection('reg-salutation'); errorEl.textContent = 'Please select a salutation.'; return; }
+    if (!firstName || !lastName) { revealFieldSection('reg-first-name'); errorEl.textContent = 'Please enter your first and last name.'; return; }
+    if (!parseDOB(dob)) { revealFieldSection('reg-dob'); errorEl.textContent = 'Please enter a valid date of birth (DD/MM/YYYY).'; return; }
+    if (!gender) { revealFieldSection('reg-gender'); errorEl.textContent = 'Please select a gender.'; return; }
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(email)) { revealFieldSection('reg-email'); errorEl.textContent = 'Please enter a valid email address.'; return; }
+    if (!/^[6-9][0-9]{9}$/.test(phone)) { revealFieldSection('reg-phone'); errorEl.textContent = 'Please enter a valid 10-digit phone number.'; return; }
+    if (address.length < 20) { revealFieldSection('reg-address'); errorEl.textContent = 'Address must be at least 20 characters.'; return; }
+    if (!/^[0-9]{6}$/.test(pincode)) { revealFieldSection('reg-pincode'); errorEl.textContent = 'Please enter a valid 6-digit pincode.'; return; }
+    if (!occupation) { revealFieldSection('reg-occupation'); errorEl.textContent = 'Please enter your occupation.'; return; }
+    if (!referralSource) { revealFieldSection('reg-referral'); errorEl.textContent = 'Please let us know how you heard about us.'; return; }
+    if (referralSource === 'Other' && !referralOtherDetails) { revealFieldSection('reg-referral-other'); errorEl.textContent = 'Please specify how you heard about us.'; return; }
 
     btn.disabled = true;
     btn.textContent = 'Submitting...';
