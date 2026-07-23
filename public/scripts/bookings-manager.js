@@ -424,6 +424,15 @@ async function openWalkInOverlay() {
   document.querySelector('input[name="bm-doctor"][value="any"]').checked = true;
   document.querySelector('input[name="bm-type"][value="Review"]').checked = true;
 
+  // Walk-ins skip picking a date/time entirely -- the system still
+  // assigns a real slot behind the scenes (needed for schedule/capacity
+  // tracking elsewhere), it's just never shown to staff, since a
+  // walk-in is being seen right now, not at a time worth choosing.
+  document.getElementById('bm-form-date-section').classList.add('hidden');
+  document.getElementById('bm-time-slots-section').classList.add('hidden');
+  document.getElementById('bm-walkin-status-section').classList.remove('hidden');
+  document.getElementById('bm-walkin-status-detail').textContent = 'Checking availability...';
+
   await refreshTimeSlots();
 
   // Auto-select the earliest currently-showing slot (refreshTimeSlots
@@ -431,7 +440,29 @@ async function openWalkInOverlay() {
   // consecutive slots for one doctor" logic as a normal click, since
   // Review defaults here but staff may switch to New before confirming.
   const firstSlotBtn = document.querySelector('#bm-time-slots-grid button');
-  if (firstSlotBtn) firstSlotBtn.click();
+  if (firstSlotBtn) {
+    firstSlotBtn.click();
+    document.getElementById('bm-walkin-status-detail').textContent = `Assigned: ${formatTime12h(state.selectedSlots[0])}`;
+  } else {
+    // No free slots at all -- refreshTimeSlots already rendered the
+    // walk-in overbook option into #bm-time-slots-grid (hidden), so
+    // surface that same option here in the visible status section
+    // instead of leaving staff looking at an empty "Checking
+    // availability..." message with no way to proceed.
+    document.getElementById('bm-walkin-status-detail').innerHTML = `
+      No free slots today -- fully booked.
+      <button id="bm-walkin-override-btn" type="button" class="block mx-auto mt-2 bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
+        Book Anyway (Overbook Walk-In)
+      </button>
+    `;
+    document.getElementById('bm-walkin-override-btn')?.addEventListener('click', () => {
+      const overrideBtn = document.getElementById('bm-time-slots-grid').querySelector('#bm-override-slot-btn');
+      overrideBtn?.click();
+      if (state.selectedSlots[0]) {
+        document.getElementById('bm-walkin-status-detail').textContent = `Overbooking: ${formatTime12h(state.selectedSlots[0])} (no free capacity)`;
+      }
+    });
+  }
 }
 
 // Pre-fills the booking form from an existing appointment for Edit or
@@ -494,6 +525,13 @@ function resetBookingForm() {
   state.isOverbook = false;
   document.getElementById('bm-edit-banner').classList.add('hidden');
   document.getElementById('bm-booking-error').textContent = '';
+  // Restore normal (non-walk-in) section visibility, since the same
+  // overlay is reused for regular bookings, edit/reschedule, and
+  // walk-ins -- without this, closing a walk-in booking would leave
+  // the date/time sections hidden for the next normal booking too.
+  document.getElementById('bm-form-date-section').classList.remove('hidden');
+  document.getElementById('bm-time-slots-section').classList.remove('hidden');
+  document.getElementById('bm-walkin-status-section').classList.add('hidden');
 }
 
 // Phone-lookup autofill: typing a phone number looks up an existing
@@ -817,8 +855,11 @@ const CATEGORY_LABELS = { consultation: 'Consultation', pharmacy: 'Pharmacy', la
 let paymentContext = null; // { appointmentId, patientId, patientName } or null for standalone entry
 let categoryLineAmounts = {}; // { consultation: { subtype: 'new', amount: 700 }, pharmacy: { amount: 250 }, ... }
 
-function openPaymentModal(context) {
+let editingPaymentEntryId = null;
+
+async function openPaymentModal(context) {
   paymentContext = context;
+  editingPaymentEntryId = null;
   const isStandalone = !context;
   document.getElementById('bm-payment-patient-picker').classList.toggle('hidden', !isStandalone);
   document.getElementById('bm-payment-patient-name').textContent = isStandalone
@@ -838,10 +879,46 @@ function openPaymentModal(context) {
     el.checked = el.dataset.categoryCheckbox === 'consultation';
   });
   categoryLineAmounts = { consultation: { subtype: 'new', amount: CONSULTATION_PRICES.new } };
+  splitRows = [{ mode: 'cash', amount: null }];
   document.getElementById('bm-payment-notes').value = '';
   document.getElementById('bm-payment-error').textContent = '';
-  renderCategoryLines();
   document.getElementById('bm-payment-modal').classList.remove('hidden');
+  document.getElementById('bm-payment-save').textContent = 'Save';
+
+  // If this appointment already has a payment recorded, load and
+  // pre-fill it instead of the blank default above, so reopening the
+  // modal shows what was actually entered and lets staff edit it in
+  // place rather than accidentally creating a second, duplicate entry.
+  if (context?.appointmentId) {
+    try {
+      const { payment } = await callFunction('get_payment_for_appointment', { appointmentId: context.appointmentId });
+      if (payment) {
+        editingPaymentEntryId = payment.id;
+        document.getElementById('bm-payment-notes').value = payment.notes || '';
+        document.getElementById('bm-payment-save').textContent = 'Update';
+
+        categoryLineAmounts = {};
+        document.querySelectorAll('[data-category-checkbox]').forEach((el) => (el.checked = false));
+        (payment.payment_line_items || []).forEach((li) => {
+          const checkbox = document.querySelector(`[data-category-checkbox="${li.category}"]`);
+          if (checkbox) checkbox.checked = true;
+          categoryLineAmounts[li.category] = li.category === 'consultation'
+            ? { subtype: li.consultation_subtype, amount: Number(li.amount) }
+            : { amount: Number(li.amount) };
+        });
+
+        splitRows = (payment.payment_splits || []).length > 0
+          ? payment.payment_splits.map((s) => ({ mode: s.mode, amount: Number(s.amount) }))
+          : [{ mode: 'cash', amount: null }];
+      }
+    } catch (err) {
+      // Non-fatal -- if the lookup fails, just proceed with the blank
+      // default rather than blocking the whole modal from opening.
+      console.error('Could not load existing payment:', err);
+    }
+  }
+
+  renderCategoryLines();
 }
 
 document.getElementById('bm-record-payment-btn').addEventListener('click', () => {
@@ -855,6 +932,7 @@ document.getElementById('bm-fab-payment-only').addEventListener('click', () => o
 function closePaymentModal() {
   document.getElementById('bm-payment-modal').classList.add('hidden');
   paymentContext = null;
+  editingPaymentEntryId = null;
 }
 document.getElementById('bm-payment-cancel').addEventListener('click', closePaymentModal);
 document.getElementById('bm-payment-backdrop').addEventListener('click', closePaymentModal);
@@ -1103,23 +1181,34 @@ document.getElementById('bm-payment-save').addEventListener('click', async () =>
 
   const btn = document.getElementById('bm-payment-save');
   btn.disabled = true;
-  btn.textContent = 'Saving...';
+  btn.textContent = editingPaymentEntryId ? 'Updating...' : 'Saving...';
   try {
-    await callFunction('record_payment', {
-      appointment_id: paymentContext?.appointmentId || null,
-      patient_id: patientId,
-      new_patient_name: paymentContext?.newPatientName || null,
-      new_patient_phone: paymentContext?.newPatientPhone || null,
-      lineItems,
-      splits: isEntirelyFree ? [] : splitRows.map((r) => ({ mode: r.mode, amount: r.amount })),
-      notes: document.getElementById('bm-payment-notes').value.trim(),
-    });
+    const finalSplits = isEntirelyFree ? [] : splitRows.map((r) => ({ mode: r.mode, amount: r.amount }));
+    const notes = document.getElementById('bm-payment-notes').value.trim();
+    if (editingPaymentEntryId) {
+      await callFunction('update_payment', {
+        paymentEntryId: editingPaymentEntryId,
+        lineItems,
+        splits: finalSplits,
+        notes,
+      });
+    } else {
+      await callFunction('record_payment', {
+        appointment_id: paymentContext?.appointmentId || null,
+        patient_id: patientId,
+        new_patient_name: paymentContext?.newPatientName || null,
+        new_patient_phone: paymentContext?.newPatientPhone || null,
+        lineItems,
+        splits: finalSplits,
+        notes,
+      });
+    }
     closePaymentModal();
   } catch (err) {
     errorEl.textContent = err.message;
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Save';
+    btn.textContent = editingPaymentEntryId ? 'Update' : 'Save';
   }
 });
 
