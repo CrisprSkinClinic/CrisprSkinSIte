@@ -131,7 +131,7 @@ import AppLayout from '../layouts/AppLayout.astro';
 
     <div class="flex-1 overflow-y-auto p-5 space-y-6 pb-32">
       <!-- Date -->
-      <section>
+      <section id="bm-form-date-section">
         <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">1. Date</label>
         <input type="date" id="bm-form-date" class="w-full px-4 py-3 border border-slate-300 rounded-xl" />
       </section>
@@ -186,13 +186,24 @@ import AppLayout from '../layouts/AppLayout.astro';
       </section>
 
       <!-- Time slots -->
-      <section>
+      <section id="bm-time-slots-section">
         <div class="flex justify-between items-end mb-2">
           <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">4. Available Times</label>
           <span id="bm-duration-label" class="text-xs font-bold bg-brand-100 text-brand-800 px-2 py-0.5 rounded-full"></span>
         </div>
         <div id="bm-time-slots-grid" class="grid grid-cols-3 gap-2">
           <p class="col-span-3 text-slate-400 text-sm text-center py-6">Select doctor and type first.</p>
+        </div>
+      </section>
+
+      <!-- Walk-in status: replaces the date/time sections above -- a -->
+      <!-- walk-in is seen now, so there's nothing for staff to pick; -->
+      <!-- the system still assigns a real slot behind the scenes for -->
+      <!-- schedule/capacity purposes, it's just never shown here. -->
+      <section id="bm-walkin-status-section" class="hidden">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+          <p class="text-emerald-800 font-bold text-sm">Walk-In — Today, Now</p>
+          <p id="bm-walkin-status-detail" class="text-emerald-700 text-xs mt-1">Checking availability...</p>
         </div>
       </section>
 
