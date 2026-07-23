@@ -141,6 +141,24 @@ async function onSignedIn(session) {
   document.getElementById('bm-staff-name').textContent = `${state.profile.full_name} (${state.profile.role})`;
   renderDatePills();
   await loadAppointments();
+  await updateRegistrationsBadge();
+}
+
+async function updateRegistrationsBadge() {
+  try {
+    const { requests } = await callFunction('list_registration_requests', { status: 'pending' });
+    const badge = document.getElementById('bm-registrations-badge');
+    if (requests.length > 0) {
+      badge.textContent = requests.length > 9 ? '9+' : String(requests.length);
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  } catch (err) {
+    // Non-fatal -- the badge is a convenience indicator, not core
+    // functionality, so a failed check here shouldn't disrupt sign-in.
+    console.error('Could not check pending registrations:', err);
+  }
 }
 
 document.getElementById('bm-login-form').addEventListener('submit', async (e) => {
@@ -1574,6 +1592,78 @@ async function loadCashRecounts(date) {
       .join('');
   } catch (err) {
     listEl.innerHTML = '';
+  }
+}
+
+// ---- Pending Registrations (self-registration approval) ----
+document.getElementById('bm-open-registrations').addEventListener('click', () => {
+  document.getElementById('bm-registrations-overlay').classList.remove('hidden');
+  document.getElementById('bm-registrations-overlay').classList.add('flex');
+  loadRegistrationRequests();
+});
+document.getElementById('bm-close-registrations').addEventListener('click', () => {
+  document.getElementById('bm-registrations-overlay').classList.add('hidden');
+  document.getElementById('bm-registrations-overlay').classList.remove('flex');
+});
+
+async function loadRegistrationRequests() {
+  const listEl = document.getElementById('bm-registrations-list');
+  listEl.innerHTML = '<p class="text-slate-400 text-sm text-center py-10">Loading...</p>';
+  try {
+    const { requests } = await callFunction('list_registration_requests', { status: 'pending' });
+    if (requests.length === 0) {
+      listEl.innerHTML = '<p class="text-slate-400 text-sm text-center py-10">No pending registrations.</p>';
+      return;
+    }
+    listEl.innerHTML = '';
+    requests.forEach((req) => {
+      const submittedDate = new Date(req.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-slate-200';
+      const genderLabel = req.gender ? req.gender.charAt(0).toUpperCase() + req.gender.slice(1) : 'Not specified';
+      card.innerHTML = `
+        <div class="flex justify-between items-start mb-3">
+          <div>
+            <p class="font-bold text-slate-900">${req.name}</p>
+            <p class="text-xs text-slate-400">Submitted ${submittedDate}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-sm mb-4">
+          <div><span class="text-slate-400 text-xs block">Phone</span><span class="text-slate-700 font-medium">${req.phone || '—'}</span></div>
+          <div><span class="text-slate-400 text-xs block">Date of Birth</span><span class="text-slate-700 font-medium">${req.dob || '—'}</span></div>
+          <div><span class="text-slate-400 text-xs block">Gender</span><span class="text-slate-700 font-medium">${genderLabel}</span></div>
+          <div><span class="text-slate-400 text-xs block">Address</span><span class="text-slate-700 font-medium">${req.address || '—'}</span></div>
+        </div>
+        <div class="flex gap-2">
+          <button data-approve-request="${req.id}" class="flex-1 bg-green-100 hover:bg-green-200 text-green-800 font-bold py-2 rounded-xl text-sm transition">Approve</button>
+          <button data-reject-request="${req.id}" class="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-bold py-2 rounded-xl text-sm border border-red-200 transition">Reject</button>
+        </div>
+      `;
+      card.querySelector('[data-approve-request]').addEventListener('click', async () => {
+        if (!confirm(`Approve registration for ${req.name}? This will create (or update) a real patient record.`)) return;
+        try {
+          await callFunction('approve_registration_request', { requestId: req.id });
+          await loadRegistrationRequests();
+          await updateRegistrationsBadge();
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+      card.querySelector('[data-reject-request]').addEventListener('click', async () => {
+        const reason = prompt(`Reason for rejecting ${req.name}'s registration (optional):`);
+        if (reason === null) return; // user cancelled the prompt
+        try {
+          await callFunction('reject_registration_request', { requestId: req.id, reason: reason || undefined });
+          await loadRegistrationRequests();
+          await updateRegistrationsBadge();
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+      listEl.appendChild(card);
+    });
+  } catch (err) {
+    listEl.innerHTML = `<p class="text-red-600 text-sm text-center py-10">${err.message}</p>`;
   }
 }
 
