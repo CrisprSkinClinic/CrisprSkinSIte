@@ -506,6 +506,25 @@ exports.handler = async (event) => {
         return ok({ success: true, paymentId: entry.id });
       }
 
+      case "get_payment_for_appointment": {
+        if (!data?.appointment_id) {
+          return { statusCode: 400, body: JSON.stringify({ error: "appointment_id is required." }) };
+        }
+        // An appointment could in principle have more than one payment
+        // recorded against it over time (e.g. a correction), but the
+        // Record Payment UI edits exactly one payment per appointment
+        // -- take the most recent if somehow more than one exists,
+        // rather than erroring.
+        const { data: entries, error } = await supabase
+          .from("payment_entries")
+          .select("*, payment_splits(mode, amount), payment_line_items(category, consultation_subtype, amount)")
+          .eq("appointment_id", data.appointment_id)
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (error) throw error;
+        return ok({ payment: entries && entries.length > 0 ? entries[0] : null });
+      }
+
       case "list_payments_for_date": {
         if (!data?.date) {
           return { statusCode: 400, body: JSON.stringify({ error: "date is required." }) };
@@ -522,6 +541,81 @@ exports.handler = async (event) => {
           .order("created_at", { ascending: true });
         if (error) throw error;
         return ok({ payments });
+      }
+
+      case "update_payment": {
+        // Edits an existing payment_entries row in place: updates the
+        // parent's total/notes, then replaces its line-items and
+        // splits entirely (delete + reinsert) rather than trying to
+        // diff and patch individual rows, since a category can be
+        // added/removed/changed on edit and reconciling that
+        // incrementally isn't worth the complexity for what's still a
+        // simple payment log, not a full accounting ledger.
+        if (!data?.paymentEntryId || !Array.isArray(data.lineItems) || data.lineItems.length === 0) {
+          return { statusCode: 400, body: JSON.stringify({ error: "paymentEntryId and at least one category line-item are required." }) };
+        }
+        const validCategories = ["consultation", "pharmacy", "lab", "vaccination", "procedure"];
+        const validSubtypes = ["new", "review", "free"];
+        let lineItemsTotal = 0;
+        for (const item of data.lineItems) {
+          if (!validCategories.includes(item.category)) {
+            return { statusCode: 400, body: JSON.stringify({ error: `Invalid category: ${item.category}` }) };
+          }
+          if (item.category === "consultation" && !validSubtypes.includes(item.consultationSubtype)) {
+            return { statusCode: 400, body: JSON.stringify({ error: "consultationSubtype (new/review/free) is required for a consultation line-item." }) };
+          }
+          if (typeof item.amount !== "number" || item.amount < 0) {
+            return { statusCode: 400, body: JSON.stringify({ error: "Each line-item needs a valid, non-negative amount." }) };
+          }
+          lineItemsTotal += item.amount;
+        }
+
+        const validModes = ["cash", "card", "upi", "other"];
+        const splits = Array.isArray(data.splits) ? data.splits : [];
+        let splitTotal = 0;
+        for (const split of splits) {
+          if (!validModes.includes(split.mode) || typeof split.amount !== "number" || split.amount <= 0) {
+            return { statusCode: 400, body: JSON.stringify({ error: "Each payment split needs a valid mode and a positive amount." }) };
+          }
+          splitTotal += split.amount;
+        }
+        if (lineItemsTotal === 0) {
+          if (splits.length !== 0) {
+            return { statusCode: 400, body: JSON.stringify({ error: "A visit totaling ₹0 should have no payment splits." }) };
+          }
+        } else if (Math.abs(splitTotal - lineItemsTotal) > 0.01) {
+          return { statusCode: 400, body: JSON.stringify({ error: `Payment splits (₹${splitTotal}) must add up to the line-items total (₹${lineItemsTotal}).` }) };
+        }
+
+        const { error: updateError } = await supabase
+          .from("payment_entries")
+          .update({ total_amount: lineItemsTotal, notes: data.notes || null })
+          .eq("id", data.paymentEntryId);
+        if (updateError) throw updateError;
+
+        // Replace line-items and splits entirely.
+        await supabase.from("payment_line_items").delete().eq("payment_entry_id", data.paymentEntryId);
+        await supabase.from("payment_splits").delete().eq("payment_entry_id", data.paymentEntryId);
+
+        const { error: lineItemsError } = await supabase.from("payment_line_items").insert(
+          data.lineItems.map((item) => ({
+            payment_entry_id: data.paymentEntryId,
+            category: item.category,
+            consultation_subtype: item.category === "consultation" ? item.consultationSubtype : null,
+            amount: item.amount,
+          }))
+        );
+        if (lineItemsError) throw lineItemsError;
+
+        if (splits.length > 0) {
+          const { error: splitsError } = await supabase
+            .from("payment_splits")
+            .insert(splits.map((s) => ({ payment_entry_id: data.paymentEntryId, mode: s.mode, amount: s.amount })));
+          if (splitsError) throw splitsError;
+        }
+
+        await logAudit("UPDATE", `Updated payment entry ${data.paymentEntryId}: ₹${lineItemsTotal}`);
+        return ok({ success: true });
       }
 
       case "delete_payment": {
