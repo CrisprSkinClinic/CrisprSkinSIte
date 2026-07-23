@@ -98,6 +98,22 @@ async function updatePatientProfile(supabase, data, logAudit) {
     p_address: data.address || null,
     p_update_is_registered: false,
     p_is_registered: false,
+    p_update_pincode: data.pincode !== undefined,
+    p_pincode: data.pincode || null,
+    p_update_area: data.area !== undefined,
+    p_area: data.area || null,
+    p_update_city: data.city !== undefined,
+    p_city: data.city || null,
+    p_update_state: data.state !== undefined,
+    p_state: data.state || null,
+    p_update_email: data.email !== undefined,
+    p_email: data.email || null,
+    p_update_occupation: data.occupation !== undefined,
+    p_occupation: data.occupation || null,
+    p_update_referral_source: data.referralSource !== undefined,
+    p_referral_source: data.referralSource || null,
+    p_update_referral_other_details: data.referralOtherDetails !== undefined,
+    p_referral_other_details: data.referralOtherDetails || null,
   });
   if (error) throw error;
 

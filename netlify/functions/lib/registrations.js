@@ -59,6 +59,22 @@ async function approveRegistrationRequest(supabase, data, profile, logAudit) {
       p_address: request.address,
       p_update_is_registered: true,
       p_is_registered: true,
+      p_update_pincode: true,
+      p_pincode: request.pincode,
+      p_update_area: true,
+      p_area: request.area,
+      p_update_city: true,
+      p_city: request.city,
+      p_update_state: true,
+      p_state: request.state,
+      p_update_email: true,
+      p_email: request.email,
+      p_update_occupation: true,
+      p_occupation: request.occupation,
+      p_update_referral_source: true,
+      p_referral_source: request.referral_source,
+      p_update_referral_other_details: true,
+      p_referral_other_details: request.referral_other_details,
     });
     if (updateErr) throw updateErr;
   } else {
@@ -69,6 +85,14 @@ async function approveRegistrationRequest(supabase, data, profile, logAudit) {
       p_gender: request.gender,
       p_address: request.address,
       p_is_registered: true,
+      p_pincode: request.pincode,
+      p_area: request.area,
+      p_city: request.city,
+      p_state: request.state,
+      p_email: request.email,
+      p_occupation: request.occupation,
+      p_referral_source: request.referral_source,
+      p_referral_other_details: request.referral_other_details,
     });
     if (insertErr) throw insertErr;
     patientId = newPatientId;
