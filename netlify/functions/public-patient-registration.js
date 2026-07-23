@@ -164,31 +164,33 @@ exports.handler = async (event) => {
   const supabase = createClient(SUPABASE_URL, serviceRoleKey);
 
   try {
-    const { data: request, error } = await supabase
-      .from("patient_registration_requests")
-      .insert({
-        name: fullName,
-        salutation,
-        first_name: String(firstName).trim(),
-        last_name: String(lastName).trim(),
-        phone: String(phone).trim(),
-        dob: isoDob,
-        gender,
-        email: String(email).trim(),
-        pincode: String(pincode).trim(),
-        area: String(area).trim(),
-        city: String(city).trim(),
-        state: String(state).trim(),
-        address: String(address).trim(),
-        occupation: String(occupation).trim(),
-        referral_source: referralSource,
-        referral_other_details: referralSource === "Other" ? String(referralOtherDetails).trim() : null,
-      })
-      .select("id")
-      .single();
+    // patient_registration_requests stores all PII in encrypted
+    // columns (name_enc, phone_enc, etc.) -- a direct .insert() with
+    // plaintext field names would fail since those columns no longer
+    // exist. insert_registration_request_encrypted (SECURITY DEFINER,
+    // service_role only) takes plaintext arguments and handles
+    // encryption + the phone_hash computation server-side.
+    const { data: requestId, error } = await supabase.rpc("insert_registration_request_encrypted", {
+      p_name: fullName,
+      p_salutation: salutation,
+      p_first_name: String(firstName).trim(),
+      p_last_name: String(lastName).trim(),
+      p_phone: String(phone).trim(),
+      p_dob: isoDob,
+      p_gender: gender,
+      p_email: String(email).trim(),
+      p_pincode: String(pincode).trim(),
+      p_area: String(area).trim(),
+      p_city: String(city).trim(),
+      p_state: String(state).trim(),
+      p_address: String(address).trim(),
+      p_occupation: String(occupation).trim(),
+      p_referral_source: referralSource,
+      p_referral_other_details: referralSource === "Other" ? String(referralOtherDetails).trim() : null,
+    });
     if (error) throw error;
 
-    return ok({ success: true, requestId: request.id });
+    return ok({ success: true, requestId });
   } catch (error) {
     console.error("public-patient-registration error:", error);
     return {
