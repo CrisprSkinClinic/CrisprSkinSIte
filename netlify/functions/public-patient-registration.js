@@ -9,6 +9,14 @@
 // list. There is no password gate here -- like public-book-appointment.js,
 // this endpoint is intentionally public, so validation logic (not auth)
 // is what enforces trust boundaries.
+//
+// Field set matches Step 1 ("Personal Information") of the intake
+// wizard prototype: salutation/first/last name, DOB (DD/MM/YYYY from
+// the client, converted to ISO here), gender, email, phone, address,
+// pincode, occupation, referral source(+other). All required, same
+// as the wizard. This does NOT include wizard Steps 2-5 (health
+// background, symptom picker, diagnosis questions, consent) -- those
+// belong to the separate, not-yet-built patient_intake_forms feature.
 
 let createClient;
 try {
@@ -21,6 +29,24 @@ const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 
 function ok(body, statusCode = 200) {
   return { statusCode, body: JSON.stringify(body) };
+}
+
+// Converts a DD/MM/YYYY string to an ISO YYYY-MM-DD date, or null if
+// the input isn't a valid DD/MM/YYYY date. Mirrors the wizard's own
+// parseDOB logic so both surfaces agree on what counts as valid.
+function parseDOBToISO(str) {
+  const match = String(str || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!match) return null;
+  const [, ddStr, mmStr, yyyyStr] = match;
+  const dd = Number(ddStr);
+  const mm = Number(mmStr);
+  const yyyy = Number(yyyyStr);
+  const d = new Date(yyyy, mm - 1, dd);
+  if (Number.isNaN(d.getTime()) || d > new Date()) return null;
+  // Guard against JS Date's auto-rollover (e.g. 31/02/2024 silently
+  // becoming March) by checking the parts round-trip exactly.
+  if (d.getFullYear() !== yyyy || d.getMonth() !== mm - 1 || d.getDate() !== dd) return null;
+  return `${yyyyStr}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
 }
 
 exports.handler = async (event) => {
@@ -51,23 +77,74 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "Invalid request body" }) };
   }
 
-  const { name, phone, dob, gender, address } = payload || {};
+  const {
+    salutation,
+    firstName,
+    lastName,
+    name,
+    dob,
+    gender,
+    email,
+    phone,
+    address,
+    pincode,
+    occupation,
+    referralSource,
+    referralOtherDetails,
+  } = payload || {};
 
-  if (!name || !String(name).trim()) {
-    return { statusCode: 400, body: JSON.stringify({ error: "Name is required." }) };
+  const VALID_SALUTATIONS = ["Mr.", "Ms.", "Mrs.", "Dr.", "Master", "Baby"];
+  const VALID_REFERRAL_SOURCES = [
+    "Friend/Family Referral",
+    "Doctor Referral",
+    "Google Search",
+    "Social Media",
+    "Practo",
+    "Walk-in",
+    "Other",
+  ];
+
+  if (!salutation || !VALID_SALUTATIONS.includes(salutation)) {
+    return { statusCode: 400, body: JSON.stringify({ error: "A valid salutation is required." }) };
   }
-  if (gender && !["male", "female", "other"].includes(gender)) {
+  if (!firstName || !String(firstName).trim()) {
+    return { statusCode: 400, body: JSON.stringify({ error: "First name is required." }) };
+  }
+  if (!lastName || !String(lastName).trim()) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Last name is required." }) };
+  }
+  const isoDob = parseDOBToISO(dob);
+  if (!isoDob) {
+    return { statusCode: 400, body: JSON.stringify({ error: "A valid date of birth (DD/MM/YYYY) is required." }) };
+  }
+  if (!gender || !["male", "female", "other"].includes(gender)) {
     return { statusCode: 400, body: JSON.stringify({ error: "Gender must be male, female, or other." }) };
   }
-  // dob is optional, but if given must be a real, non-future date --
-  // a simple guard against obvious typos (e.g. a future year) without
-  // being unnecessarily strict about exact format edge cases.
-  if (dob) {
-    const dobDate = new Date(dob);
-    if (Number.isNaN(dobDate.getTime()) || dobDate > new Date()) {
-      return { statusCode: 400, body: JSON.stringify({ error: "Please enter a valid date of birth." }) };
-    }
+  if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(String(email).trim())) {
+    return { statusCode: 400, body: JSON.stringify({ error: "A valid email address is required." }) };
   }
+  if (!phone || !/^[6-9][0-9]{9}$/.test(String(phone).trim())) {
+    return { statusCode: 400, body: JSON.stringify({ error: "A valid 10-digit phone number is required." }) };
+  }
+  if (!address || String(address).trim().length < 20) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Address must be at least 20 characters." }) };
+  }
+  if (!pincode || !/^[0-9]{6}$/.test(String(pincode).trim())) {
+    return { statusCode: 400, body: JSON.stringify({ error: "A valid 6-digit pincode is required." }) };
+  }
+  if (!occupation || !String(occupation).trim()) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Occupation is required." }) };
+  }
+  if (!referralSource || !VALID_REFERRAL_SOURCES.includes(referralSource)) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Please let us know how you heard about us." }) };
+  }
+  if (referralSource === "Other" && !String(referralOtherDetails || "").trim()) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Please specify how you heard about us." }) };
+  }
+
+  const fullName = name && String(name).trim()
+    ? String(name).trim()
+    : `${salutation} ${firstName} ${lastName}`.trim();
 
   const supabase = createClient(SUPABASE_URL, serviceRoleKey);
 
@@ -75,11 +152,19 @@ exports.handler = async (event) => {
     const { data: request, error } = await supabase
       .from("patient_registration_requests")
       .insert({
-        name: String(name).trim(),
-        phone: phone ? String(phone).trim() : null,
-        dob: dob || null,
-        gender: gender || null,
-        address: address ? String(address).trim() : null,
+        name: fullName,
+        salutation,
+        first_name: String(firstName).trim(),
+        last_name: String(lastName).trim(),
+        phone: String(phone).trim(),
+        dob: isoDob,
+        gender,
+        email: String(email).trim(),
+        address: String(address).trim(),
+        pincode: String(pincode).trim(),
+        occupation: String(occupation).trim(),
+        referral_source: referralSource,
+        referral_other_details: referralSource === "Other" ? String(referralOtherDetails).trim() : null,
       })
       .select("id")
       .single();
