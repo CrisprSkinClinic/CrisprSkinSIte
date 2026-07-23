@@ -360,6 +360,119 @@ exports.handler = async (event) => {
 
       // ---- Whoami (used by the frontend to show staff name/role) ----
 
+      // ---- Patient self-registration approval ----
+
+      case "list_registration_requests": {
+        const statusFilter = data?.status || "pending";
+        const { data: requests, error } = await supabase
+          .from("patient_registration_requests")
+          .select("*, reviewed_by_profile:profiles!patient_registration_requests_reviewed_by_fkey(full_name)")
+          .eq("status", statusFilter)
+          .order("created_at", { ascending: true });
+        if (error) throw error;
+        return ok({ requests });
+      }
+
+      case "approve_registration_request": {
+        if (!data?.requestId) {
+          return { statusCode: 400, body: JSON.stringify({ error: "requestId is required." }) };
+        }
+        const { data: request, error: fetchErr } = await supabase
+          .from("patient_registration_requests")
+          .select("*")
+          .eq("id", data.requestId)
+          .single();
+        if (fetchErr) throw fetchErr;
+        if (request.status !== "pending") {
+          return { statusCode: 400, body: JSON.stringify({ error: "This request has already been reviewed." }) };
+        }
+
+        // Check for an existing patient with the same phone before
+        // creating a new row -- a self-registration might be for
+        // someone who already has a patient record (e.g. booked online
+        // previously), and approving shouldn't silently create a
+        // duplicate. If found, this approval just links to and
+        // updates that existing patient instead of inserting a new one.
+        let patientId = null;
+        if (request.phone) {
+          const { data: existing } = await supabase.from("patients").select("id").eq("phone", request.phone).limit(1);
+          if (existing && existing.length > 0) patientId = existing[0].id;
+        }
+
+        if (patientId) {
+          const { error: updateErr } = await supabase
+            .from("patients")
+            .update({
+              name: request.name,
+              dob: request.dob,
+              gender: request.gender,
+              address: request.address,
+              is_registered: true,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", patientId);
+          if (updateErr) throw updateErr;
+        } else {
+          const { data: newPatient, error: insertErr } = await supabase
+            .from("patients")
+            .insert({
+              name: request.name,
+              phone: request.phone,
+              dob: request.dob,
+              gender: request.gender,
+              address: request.address,
+              is_registered: true,
+            })
+            .select("id")
+            .single();
+          if (insertErr) throw insertErr;
+          patientId = newPatient.id;
+        }
+
+        const { error: reqUpdateErr } = await supabase
+          .from("patient_registration_requests")
+          .update({
+            status: "approved",
+            approved_patient_id: patientId,
+            reviewed_by: profile.id,
+            reviewed_at: new Date().toISOString(),
+          })
+          .eq("id", data.requestId);
+        if (reqUpdateErr) throw reqUpdateErr;
+
+        await logAudit("APPROVE", `Approved registration for ${request.name}`);
+        return ok({ success: true, patientId });
+      }
+
+      case "reject_registration_request": {
+        if (!data?.requestId) {
+          return { statusCode: 400, body: JSON.stringify({ error: "requestId is required." }) };
+        }
+        const { data: request, error: fetchErr } = await supabase
+          .from("patient_registration_requests")
+          .select("name, status")
+          .eq("id", data.requestId)
+          .single();
+        if (fetchErr) throw fetchErr;
+        if (request.status !== "pending") {
+          return { statusCode: 400, body: JSON.stringify({ error: "This request has already been reviewed." }) };
+        }
+
+        const { error } = await supabase
+          .from("patient_registration_requests")
+          .update({
+            status: "rejected",
+            reviewed_by: profile.id,
+            reviewed_at: new Date().toISOString(),
+            rejection_reason: data.reason || null,
+          })
+          .eq("id", data.requestId);
+        if (error) throw error;
+
+        await logAudit("REJECT", `Rejected registration for ${request.name}${data.reason ? `: ${data.reason}` : ""}`);
+        return ok({ success: true });
+      }
+
       case "get_patient_profile": {
         if (!data?.patient_id) {
           return { statusCode: 400, body: JSON.stringify({ error: "patient_id is required." }) };
