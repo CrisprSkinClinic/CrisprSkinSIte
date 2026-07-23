@@ -12,11 +12,14 @@
 //
 // Field set matches Step 1 ("Personal Information") of the intake
 // wizard prototype: salutation/first/last name, DOB (DD/MM/YYYY from
-// the client, converted to ISO here), gender, email, phone, address,
-// pincode, occupation, referral source(+other). All required, same
-// as the wizard. This does NOT include wizard Steps 2-5 (health
-// background, symptom picker, diagnosis questions, consent) -- those
-// belong to the separate, not-yet-built patient_intake_forms feature.
+// the client, converted to ISO here), gender, email, phone, address
+// (now split into pincode/area/city/state -- auto-filled from the
+// pincode via India Post's API on the client -- plus a door/street
+// free-text field), occupation, referral source(+other). All
+// required, same as the wizard. This does NOT include wizard Steps
+// 2-5 (health background, symptom picker, diagnosis questions,
+// consent) -- those belong to the separate, not-yet-built
+// patient_intake_forms feature.
 
 let createClient;
 try {
@@ -86,8 +89,11 @@ exports.handler = async (event) => {
     gender,
     email,
     phone,
-    address,
     pincode,
+    area,
+    city,
+    state,
+    address,
     occupation,
     referralSource,
     referralOtherDetails,
@@ -126,11 +132,20 @@ exports.handler = async (event) => {
   if (!phone || !/^[6-9][0-9]{9}$/.test(String(phone).trim())) {
     return { statusCode: 400, body: JSON.stringify({ error: "A valid 10-digit phone number is required." }) };
   }
-  if (!address || String(address).trim().length < 20) {
-    return { statusCode: 400, body: JSON.stringify({ error: "Address must be at least 20 characters." }) };
-  }
   if (!pincode || !/^[0-9]{6}$/.test(String(pincode).trim())) {
     return { statusCode: 400, body: JSON.stringify({ error: "A valid 6-digit pincode is required." }) };
+  }
+  if (!area || !String(area).trim()) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Area is required." }) };
+  }
+  if (!city || !String(city).trim()) {
+    return { statusCode: 400, body: JSON.stringify({ error: "City is required." }) };
+  }
+  if (!state || !String(state).trim()) {
+    return { statusCode: 400, body: JSON.stringify({ error: "State is required." }) };
+  }
+  if (!address || String(address).trim().length < 10) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Please enter your door no. / apartment / street." }) };
   }
   if (!occupation || !String(occupation).trim()) {
     return { statusCode: 400, body: JSON.stringify({ error: "Occupation is required." }) };
@@ -160,8 +175,11 @@ exports.handler = async (event) => {
         dob: isoDob,
         gender,
         email: String(email).trim(),
-        address: String(address).trim(),
         pincode: String(pincode).trim(),
+        area: String(area).trim(),
+        city: String(city).trim(),
+        state: String(state).trim(),
+        address: String(address).trim(),
         occupation: String(occupation).trim(),
         referral_source: referralSource,
         referral_other_details: referralSource === "Other" ? String(referralOtherDetails).trim() : null,
