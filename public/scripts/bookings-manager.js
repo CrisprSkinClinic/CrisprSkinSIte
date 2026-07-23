@@ -1621,6 +1621,11 @@ async function loadRegistrationRequests() {
       const card = document.createElement('div');
       card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-slate-200';
       const genderLabel = req.gender ? req.gender.charAt(0).toUpperCase() + req.gender.slice(1) : 'Not specified';
+      const referralLabel = req.referral_source === 'Other' && req.referral_other_details
+        ? `${req.referral_source} — ${req.referral_other_details}`
+        : (req.referral_source || '—');
+      const fullAddress = [req.address, req.area, req.city, req.state].filter(Boolean).join(', ')
+        + (req.pincode ? ` - ${req.pincode}` : '');
       card.innerHTML = `
         <div class="flex justify-between items-start mb-3">
           <div>
@@ -1630,9 +1635,12 @@ async function loadRegistrationRequests() {
         </div>
         <div class="grid grid-cols-2 gap-2 text-sm mb-4">
           <div><span class="text-slate-400 text-xs block">Phone</span><span class="text-slate-700 font-medium">${req.phone || '—'}</span></div>
+          <div><span class="text-slate-400 text-xs block">Email</span><span class="text-slate-700 font-medium break-all">${req.email || '—'}</span></div>
           <div><span class="text-slate-400 text-xs block">Date of Birth</span><span class="text-slate-700 font-medium">${req.dob || '—'}</span></div>
           <div><span class="text-slate-400 text-xs block">Gender</span><span class="text-slate-700 font-medium">${genderLabel}</span></div>
-          <div><span class="text-slate-400 text-xs block">Address</span><span class="text-slate-700 font-medium">${req.address || '—'}</span></div>
+          <div class="col-span-2"><span class="text-slate-400 text-xs block">Address</span><span class="text-slate-700 font-medium">${fullAddress || '—'}</span></div>
+          <div><span class="text-slate-400 text-xs block">Occupation</span><span class="text-slate-700 font-medium">${req.occupation || '—'}</span></div>
+          <div><span class="text-slate-400 text-xs block">Heard about us via</span><span class="text-slate-700 font-medium">${referralLabel}</span></div>
         </div>
         <div class="flex gap-2">
           <button data-approve-request="${req.id}" class="flex-1 bg-green-100 hover:bg-green-200 text-green-800 font-bold py-2 rounded-xl text-sm transition">Approve</button>
