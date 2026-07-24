@@ -132,9 +132,15 @@ exports.handler = async (event) => {
         await logAudit("SETTINGS_CHANGE", `Deactivated billing item ${data.id}`);
         return await rxSettings.deleteBillingItem(supabase, data);
 
-      // ---- Whoami (used by the frontend to show doctor name/role) ----
-      case "whoami":
-        return ok({ profile: { id: profile.id, full_name: profile.full_name, role: profile.role } });
+      // ---- Whoami (used by the frontend to show doctor name/role,
+      // and critically to get the doctors.id -- NOT the same as
+      // profile.id -- that save_prescription's doctorId parameter
+      // needs, since derm_rx_prescriptions.doctor_id references the
+      // doctors table, not profiles) ----
+      case "whoami": {
+        const { data: doctorRow } = await supabase.from("doctors").select("id").eq("profile_id", profile.id).maybeSingle();
+        return ok({ profile: { id: profile.id, full_name: profile.full_name, role: profile.role, doctorId: doctorRow?.id || null } });
+      }
 
       default:
         return { statusCode: 400, body: JSON.stringify({ error: "Unknown action" }) };
