@@ -9,7 +9,7 @@ import { getCollection, getEntry } from 'astro:content';
 import ClinicGallery from '../components/ClinicGallery.astro';
 import BookingSection from '../components/LandingPageSections/BookingSection.astro';
 import { siteConfig } from '../config/site.js';
-import { getServiceImage } from '../utils/serviceImages';
+import { getServiceImage, getServiceImageAlt } from '../utils/serviceImages';
 
 const featuredServices = [
   { slug: 'hair-transplant-fue', alt: 'Hair transplant procedure', title: 'Hair Transplant (FUE)', description: 'Advanced Follicular Unit Extraction for natural, permanent hair restoration performed by a dedicated hair transplant surgeon.', link: '/services/hair-transplant-fue' },
@@ -61,7 +61,7 @@ const latestPosts = allPosts
       {featuredServices.map((service, i) => (
         <ServiceCard 
           image={getServiceImage(service.slug)}
-          alt={service.alt}
+          alt={getServiceImageAlt(service.slug, service.alt)}
           title={service.title} 
           description={service.description}
           link={service.link}
@@ -125,7 +125,7 @@ const latestPosts = allPosts
           <div class="aspect-[3/4] bg-champagne-100 overflow-hidden">
             <img
               src={`/images/doctors/${doctor.slug}.jpg`}
-              alt={doctor.name}
+              alt={`${doctor.name}, ${doctor.designation}`}
               width="400"
               height="533"
               loading="lazy"
