@@ -47,6 +47,9 @@ const relatedDoctor = data.defaultDoctorId
   : null;
 
 const pageUrl = new URL(`/services/${entry.slug}`, siteConfig.url).toString();
+const heroImageAbs = data.heroImage
+  ? new URL(`/images/services/${data.heroImage}.jpg`, siteConfig.url).toString()
+  : new URL('/images/hero-doctor.jpg', siteConfig.url).toString();
 
 const faqSchema = faqEntries.length > 0 ? {
   "@context": "https://schema.org",
@@ -67,22 +70,60 @@ const medicalWebPageSchema = {
   "name": data.title,
   "description": data.metaDescription,
   "url": pageUrl,
+  "image": heroImageAbs,
   "medicalAudience": {
     "@type": "MedicalAudience",
     "audienceType": "Patient",
   },
+  "about": {
+    "@type": "MedicalProcedure",
+    "name": data.title,
+    "description": data.metaDescription,
+    "howPerformed": data.heroSubheadline || data.metaDescription,
+  },
   ...(data.treatments && data.treatments.length > 0 && {
-    "about": data.treatments.map((t) => ({
+    "mentions": data.treatments.map((t) => ({
       "@type": "MedicalTherapy",
       "name": t.name,
       "description": t.description,
     })),
   }),
 };
+
+const medicalServiceSchema = {
+  "@context": "https://schema.org",
+  "@type": "MedicalProcedure",
+  "name": data.title,
+  "description": data.metaDescription,
+  "url": pageUrl,
+  "image": heroImageAbs,
+  "provider": {
+    "@type": "MedicalBusiness",
+    "name": siteConfig.name,
+    "url": siteConfig.url,
+    "telephone": siteConfig.contact.phone,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": siteConfig.contact.address.street,
+      "addressLocality": siteConfig.contact.address.locality,
+      "addressRegion": siteConfig.contact.address.state,
+      "postalCode": siteConfig.contact.address.postalCode,
+      "addressCountry": siteConfig.contact.address.country,
+    },
+  },
+  ...(relatedDoctor && {
+    "recognizingAuthority": {
+      "@type": "Physician",
+      "name": relatedDoctor.name,
+      "url": new URL(`/our-doctors/${relatedDoctor.slug}`, siteConfig.url).toString(),
+    },
+  }),
+};
 ---
 
 <MainLayout title={data.title} description={data.metaDescription}>
   <script type="application/ld+json" set:html={JSON.stringify(medicalWebPageSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(medicalServiceSchema)} />
   {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
   <Breadcrumbs items={[
