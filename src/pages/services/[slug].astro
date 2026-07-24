@@ -1,10 +1,12 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
 import MainLayout from '../../layouts/MainLayout.astro';
 import BookingSection from '../../components/LandingPageSections/BookingSection.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import FAQAccordion from '../../components/FAQAccordion.astro';
 import { siteConfig } from '../../config/site.js';
+import { getServiceImage } from '../../utils/serviceImages';
 
 export async function getStaticPaths() {
   const services = await getCollection('services');
@@ -18,6 +20,7 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 const data = entry.data;
 
+const optimizedHero = getServiceImage(data.heroImage);
 const heroImageSrc = data.heroImage
   ? `/images/services/${data.heroImage}.jpg`
   : null;
@@ -38,7 +41,6 @@ if (data.faqIds && data.faqIds.length > 0) {
     .map((f) => ({ question: f.data.question, answer: f.body }));
 }
 
-// Doctor linked via defaultDoctorId
 const relatedDoctor = data.defaultDoctorId
   ? siteConfig.doctors.find((d) => d.dbId === data.defaultDoctorId)
   : null;
@@ -101,7 +103,24 @@ const medicalWebPageSchema = {
           {data.ctaTitle || `Book a ${data.title} Evaluation`}
         </a>
       </div>
-      {heroImageSrc && (
+
+      {optimizedHero ? (
+        <div class="md:w-1/2 w-full">
+          <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-square">
+            <Image
+              src={optimizedHero}
+              alt={data.heroHeadline}
+              width={700}
+              height={700}
+              widths={[400, 700]}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              format="webp"
+              quality={80}
+              class="w-full h-full object-contain"
+            />
+          </div>
+        </div>
+      ) : heroImageSrc && (
         <div class="md:w-1/2 w-full">
           <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-square">
             <img
@@ -178,7 +197,6 @@ const medicalWebPageSchema = {
     </section>
   )}
 
-  {/* NEW: Service → Doctor link */}
   {relatedDoctor && (
     <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
       <h2 class="text-2xl font-bold text-brand-900 mb-6">Performed by</h2>
