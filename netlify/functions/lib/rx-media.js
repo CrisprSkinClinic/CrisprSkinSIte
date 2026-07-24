@@ -31,20 +31,23 @@ async function getPatientPhotos(supabase, data) {
 }
 
 // Called AFTER drive-upload.js has already put the file on Drive and
-// returned a file id/url -- this just records that reference plus the
-// test name/date. Kept as a separate step (rather than one combined
-// action) so the upload function stays focused purely on talking to
-// Drive, and this one stays focused purely on Postgres.
+// returned a file id -- this just records that reference plus the
+// test name/date. driveFileId is the canonical, stable reference;
+// no URL is stored at all, since files are private (see
+// drive-file-proxy.js) and a URL that embeds a session's access
+// token would go stale the moment that token expires. The frontend
+// regenerates a fresh proxy URL from the stored file id every time
+// it displays a file, rather than storing a URL upfront.
 async function recordLabOrder(supabase, data, profile) {
-  if (!data?.patientId || !data?.testName || !data?.driveFileUrl) {
-    return { statusCode: 400, body: JSON.stringify({ error: "patientId, testName, and driveFileUrl are required." }) };
+  if (!data?.patientId || !data?.testName || !data?.driveFileId) {
+    return { statusCode: 400, body: JSON.stringify({ error: "patientId, testName, and driveFileId are required." }) };
   }
   const { data: newId, error } = await supabase.rpc("insert_derm_rx_lab_order", {
     p_patient_id: data.patientId,
     p_prescription_id: data.prescriptionId || null,
     p_test_name: data.testName,
-    p_drive_file_id: data.driveFileId || null,
-    p_drive_file_url: data.driveFileUrl,
+    p_drive_file_id: data.driveFileId,
+    p_drive_file_url: null,
     p_uploaded_by: profile.id,
   });
   if (error) throw error;
@@ -61,14 +64,14 @@ async function updateLabNote(supabase, data) {
 }
 
 async function recordPhoto(supabase, data, profile) {
-  if (!data?.patientId || !data?.driveFileUrl) {
-    return { statusCode: 400, body: JSON.stringify({ error: "patientId and driveFileUrl are required." }) };
+  if (!data?.patientId || !data?.driveFileId) {
+    return { statusCode: 400, body: JSON.stringify({ error: "patientId and driveFileId are required." }) };
   }
   const { data: newId, error } = await supabase.rpc("insert_derm_rx_photo", {
     p_patient_id: data.patientId,
     p_prescription_id: data.prescriptionId || null,
-    p_drive_file_id: data.driveFileId || null,
-    p_drive_file_url: data.driveFileUrl,
+    p_drive_file_id: data.driveFileId,
+    p_drive_file_url: null,
     p_uploaded_by: profile.id,
   });
   if (error) throw error;
