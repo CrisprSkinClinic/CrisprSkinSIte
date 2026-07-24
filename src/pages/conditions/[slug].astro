@@ -20,12 +20,11 @@ const data = entry.data;
 
 const parentService = await getEntry('services', data.parentService);
 const relatedConditionEntries = data.relatedConditions
-  ? await Promise.all(
+  ? (await Promise.all(
       data.relatedConditions.map((slug) => getEntry('conditions', slug))
-    )
+    )).filter(Boolean)
   : [];
 
-// Resolve faqIds against the central faqs collection.
 let faqEntries = [];
 if (data.faqIds && data.faqIds.length > 0) {
   const resolved = await Promise.all(
@@ -36,12 +35,22 @@ if (data.faqIds && data.faqIds.length > 0) {
     .map((f) => ({ question: f.data.question, answer: f.body }));
 }
 
-// Structured data (JSON-LD). MedicalCondition schema maps this page's
-// existing risk factors / symptoms / treatment overview into the
-// Schema.org properties built for exactly this content type, so search
-// engines can understand it as condition-specific medical information
-// rather than a generic page. FAQPage reuses the same faqEntries already
-// resolved above for the visible accordion, so the two can't drift.
+// Doctors relevant to this condition (based on parent service category)
+const parentCategory = parentService?.data.category;
+const relevantDoctors = siteConfig.doctors.filter((d) => {
+  if (parentCategory === 'hair') {
+    return d.expertise.some((e) => /hair|transplant|alopecia/i.test(e));
+  }
+  if (parentCategory === 'pediatric') {
+    return d.expertise.some((e) => /paediatric|pediatric|child|birthmark/i.test(e));
+  }
+  if (parentCategory === 'cosmetic') {
+    return d.expertise.some((e) => /cosmetic|aesthetic|botox|filler|peel/i.test(e));
+  }
+  // skin / clinical — show all doctors
+  return true;
+});
+
 const pageUrl = new URL(`/conditions/${entry.slug}`, siteConfig.url).toString();
 
 const faqSchema = faqEntries.length > 0 ? {
@@ -187,6 +196,34 @@ const conditionSchema = {
           <a href={`/conditions/${c.slug}`} class="block p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 transition-colors">
             <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Related Condition</p>
             <p class="font-semibold text-slate-900">{c.data.title}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {/* NEW: Condition → Doctors */}
+  {relevantDoctors.length > 0 && (
+    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
+      <h2 class="text-2xl font-bold text-brand-900 mb-6">Our Specialists</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {relevantDoctors.map((doc) => (
+          <a
+            href={`/our-doctors/${doc.slug}`}
+            class="flex items-center gap-4 p-4 rounded-xl bg-champagne-50 hover:bg-slate-100 border border-champagne-200 transition-colors group"
+          >
+            <img
+              src={`/images/doctors/${doc.slug}.jpg`}
+              alt={doc.name}
+              width="56"
+              height="56"
+              class="w-14 h-14 rounded-full object-cover border-2 border-white shadow"
+              onerror={`this.src='https://placehold.co/56x56/223154/FAF8F5?text=${encodeURIComponent(doc.name.split(' ').pop())}'`}
+            />
+            <div>
+              <p class="font-semibold text-slate-900 group-hover:text-brand-700 transition-colors">{doc.name}</p>
+              <p class="text-xs text-brand-600 font-medium">{doc.designation}</p>
+            </div>
           </a>
         ))}
       </div>
