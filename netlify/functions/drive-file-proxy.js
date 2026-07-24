@@ -9,10 +9,16 @@
 // a doctor's account and their access to every past upload is gone
 // immediately, unlike a permanent "anyone with the link" URL.
 //
+// Uses OAuth as a real Google account (lib/drive-oauth.js) rather
+// than a service account -- see drive-upload.js's header comment for
+// why (service accounts have no Drive storage quota, and the
+// Workspace-only fixes aren't available here).
+//
 // Frontend usage: an <img> or <iframe> src can't send a POST body or
-// custom Authorization header, so the access token is passed as a
-// query parameter instead. This is the standard, accepted workaround
-// for authenticating direct browser navigations/media loads (same
+// custom Authorization header, so the access token (the app's own
+// Supabase session token, NOT the Google one) is passed as a query
+// parameter instead. This is the standard, accepted workaround for
+// authenticating direct browser navigations/media loads (same
 // tradeoff Supabase's own signed URLs make) -- it's still short-lived
 // (a Supabase access token expires on its own) and still requires an
 // active, valid session, unlike a Drive "anyone with the link" grant
@@ -20,46 +26,11 @@
 
 const { createServiceRoleClient } = require("./lib/supabase-client");
 const { verifyStaffAuth } = require("./lib/auth");
-
-const CLIENT_EMAIL = process.env.GOOGLE_DRIVE_CLIENT_EMAIL;
-const PRIVATE_KEY = process.env.GOOGLE_DRIVE_PRIVATE_KEY ? process.env.GOOGLE_DRIVE_PRIVATE_KEY.replace(/\\n/g, "\n") : null;
-
-const crypto = require("crypto");
-
-function base64url(input) {
-  return Buffer.from(input).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-async function getDriveAccessToken() {
-  const header = { alg: "RS256", typ: "JWT" };
-  const now = Math.floor(Date.now() / 1000);
-  const claims = {
-    iss: CLIENT_EMAIL,
-    scope: "https://www.googleapis.com/auth/drive.file",
-    aud: "https://oauth2.googleapis.com/token",
-    iat: now,
-    exp: now + 3600,
-  };
-  const unsigned = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(claims))}`;
-  const signature = crypto.createSign("RSA-SHA256").update(unsigned).sign(PRIVATE_KEY);
-  const jwt = `${unsigned}.${base64url(signature)}`;
-
-  const response = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: jwt }),
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error_description || data.error || "Drive authentication failed.");
-  return data.access_token;
-}
+const { getDriveAccessToken } = require("./lib/drive-oauth");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "GET") {
     return { statusCode: 405, body: "Method Not Allowed" };
-  }
-  if (!CLIENT_EMAIL || !PRIVATE_KEY) {
-    return { statusCode: 500, body: JSON.stringify({ error: "Google Drive is not configured." }) };
   }
 
   const { fileId, accessToken } = event.queryStringParameters || {};
@@ -102,11 +73,6 @@ exports.handler = async (event) => {
       headers: {
         "Content-Type": meta.mimeType || "application/octet-stream",
         "Content-Disposition": `inline; filename="${meta.name || "file"}"`,
-        // Short cache on the CDN edge only (not the browser) -- keeps
-        // repeated views of the same lab report snappy within a
-        // session without weakening the auth check meaningfully,
-        // since a fresh accessToken is still required to even reach
-        // this far after the token expires.
         "Cache-Control": "private, max-age=60",
       },
       body: base64Body,
