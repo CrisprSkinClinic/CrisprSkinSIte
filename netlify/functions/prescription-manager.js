@@ -22,6 +22,7 @@ const { makeLogAudit } = require("./lib/audit");
 const rx = require("./lib/rx");
 const rxMedia = require("./lib/rx-media");
 const rxSettings = require("./lib/rx-settings");
+const rxQueue = require("./lib/rx-queue");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -59,6 +60,12 @@ exports.handler = async (event) => {
         return await rx.getInitData(supabase);
       case "get_inventory":
         return await rx.getInventory(supabase);
+
+      // ---- Doctor's daily queue + patient search (landing screen) ----
+      case "get_doctor_queue":
+        return await rxQueue.getDoctorQueue(supabase, data);
+      case "search_patients":
+        return await rxQueue.searchPatients(supabase, data);
 
       // ---- Prescriptions ----
       case "get_patient_rx_history":
