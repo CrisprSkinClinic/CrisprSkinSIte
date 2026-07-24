@@ -1,18 +1,12 @@
 ---
-// Optimized ServiceCard
-// - Uses aspect-square + object-contain (full image, no crop)
-// - loading="lazy" + decoding="async"
-// - width/height hints for layout stability
-// - sizes attribute for responsive loading
 const { title, description, link, image, alt, priority = false } = Astro.props;
 ---
 <a href={link} class="bg-white rounded-2xl shadow-sm border border-champagne-200 overflow-hidden hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full">
   
-  <!-- Image Header Container -->
   <div class="relative aspect-square overflow-hidden bg-champagne-50">
     <img 
       src={image} 
-      alt={alt || title} 
+      alt={alt || title}
       width="500"
       height="500"
       loading={priority ? "eager" : "lazy"}
@@ -24,11 +18,9 @@ const { title, description, link, image, alt, priority = false } = Astro.props;
     />
   </div>
   
-  <!-- Text Content Container -->
   <div class="p-6 md:p-8 flex flex-col flex-grow">
     <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-brand-600 transition-colors">{title}</h3>
     <p class="text-slate-600 text-sm leading-relaxed mb-6 flex-grow">{description}</p>
-    
     <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
       Learn More <span aria-hidden="true">&rarr;</span>
     </span>
