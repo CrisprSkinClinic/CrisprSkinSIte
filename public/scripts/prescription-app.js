@@ -53,9 +53,9 @@ window.changePatient = function () {
     resetForm();
     document.getElementById('rx-workspace-screen').classList.add('hidden');
     document.getElementById('rx-patient-select-screen').classList.remove('hidden');
-    document.getElementById('rx-select-phone').value = '';
-    document.getElementById('rx-select-status').textContent = '';
-    document.getElementById('rx-select-found').classList.add('hidden');
+    document.getElementById('rx-patient-search').value = '';
+    document.getElementById('rx-search-results').classList.add('hidden');
+    if (typeof window.rxReloadQueue === 'function') window.rxReloadQueue();
 };
 
 function initPrescriptionSystem() {

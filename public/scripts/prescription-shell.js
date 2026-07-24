@@ -89,10 +89,11 @@ function showRxPatientSelectScreen() {
   document.getElementById('rx-login-screen').classList.add('hidden');
   document.getElementById('rx-patient-select-screen').classList.remove('hidden');
   document.getElementById('rx-workspace-screen').classList.add('hidden');
-  document.getElementById('rx-select-phone').value = '';
-  document.getElementById('rx-select-status').textContent = '';
-  document.getElementById('rx-select-found').classList.add('hidden');
+  document.getElementById('rx-patient-search').value = '';
+  document.getElementById('rx-search-results').classList.add('hidden');
+  document.getElementById('rx-landing-doctor-name').textContent = rxShellState.profile?.full_name || '';
   rxShellState.selectedPatient = null;
+  loadRxDoctorQueue();
 }
 
 function showRxWorkspaceScreen() {
@@ -130,66 +131,142 @@ document.getElementById('rx-signout-btn').addEventListener('click', async () => 
   showRxLoginScreen();
 });
 
-// ---- Patient lookup, reusing the same encrypted-patients phone
-// lookup RPC already used by Bookings Manager (via bookings-manager.js,
-// action lookup_patient_by_phone) -- called here through
-// prescription-manager.js is NOT possible since that endpoint requires
-// role='doctor' and rejects non-Rx actions; patient lookup instead
-// goes through the SAME bookings-manager Netlify function, since
-// looking up a patient by phone isn't itself a "clinical" action and
-// bookings-manager.js already exposes it correctly. ----
-let rxPhoneLookupTimeout = null;
-document.getElementById('rx-select-phone').addEventListener('input', (e) => {
-  e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
-  clearTimeout(rxPhoneLookupTimeout);
-  const statusEl = document.getElementById('rx-select-status');
-  const foundEl = document.getElementById('rx-select-found');
-  foundEl.classList.add('hidden');
-  rxShellState.selectedPatient = null;
+// ---- Today's queue, replacing the old bare phone-number entry.
+// Clicking a queue row or a search result both funnel into the same
+// selectPatientAndEnterWorkspace() so there's exactly one path into
+// the Rx workspace regardless of how the patient was found. ----
+window.rxReloadQueue = loadRxDoctorQueue;
+async function loadRxDoctorQueue() {
+  const listEl = document.getElementById('rx-queue-list');
+  const emptyEl = document.getElementById('rx-queue-empty');
+  const loadingEl = document.getElementById('rx-queue-loading');
+  const countEl = document.getElementById('rx-queue-count');
 
-  if (e.target.value.length !== 10) {
-    statusEl.textContent = '';
+  listEl.innerHTML = '';
+  emptyEl.classList.add('hidden');
+  loadingEl.classList.remove('hidden');
+
+  if (!rxShellState.profile?.doctorId) {
+    loadingEl.classList.add('hidden');
+    emptyEl.classList.remove('hidden');
+    emptyEl.querySelector('p').textContent = 'Your account isn\'t linked to a doctor record yet -- contact the site administrator.';
     return;
   }
-  statusEl.textContent = 'Looking up...';
-  statusEl.className = 'text-xs mt-2 min-h-[1rem] text-slate-400';
 
-  rxPhoneLookupTimeout = setTimeout(async () => {
-    try {
-      const response = await fetch('/.netlify/functions/bookings-manager', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessToken: rxShellState.session.access_token, action: 'lookup_patient_by_phone', data: { phone: e.target.value } }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Lookup failed.');
+  try {
+    const { queue } = await window.rxCallFunction('get_doctor_queue', { doctorId: rxShellState.profile.doctorId });
+    loadingEl.classList.add('hidden');
+    countEl.textContent = `${queue.length} ${queue.length === 1 ? 'patient' : 'patients'}`;
 
-      if (result.found) {
-        rxShellState.selectedPatient = result.patient;
-        statusEl.textContent = '';
-        document.getElementById('rx-select-found-name').textContent = result.patient.name;
-        document.getElementById('rx-select-found-demo').textContent = result.patient.phone;
-        foundEl.classList.remove('hidden');
-      } else {
-        statusEl.textContent = 'No patient found with this phone number. Please register them first via Bookings Manager.';
-        statusEl.className = 'text-xs mt-2 min-h-[1rem] text-amber-600';
-      }
-    } catch (err) {
-      statusEl.textContent = err.message;
-      statusEl.className = 'text-xs mt-2 min-h-[1rem] text-red-600';
+    if (!queue || queue.length === 0) {
+      emptyEl.classList.remove('hidden');
+      return;
     }
-  }, 400);
-});
 
-document.getElementById('rx-select-confirm-btn').addEventListener('click', () => {
-  if (!rxShellState.selectedPatient) return;
-  showRxWorkspaceScreen();
-  // Defined in prescription-app.js -- the ported Rx workspace itself,
-  // which needs the doctor profile (for save attribution) and the
-  // selected patient (to load their history/labs/photos).
-  if (typeof window.mountPrescriptionWorkspace === 'function') {
-    window.mountPrescriptionWorkspace(rxShellState.selectedPatient, rxShellState.profile);
+    const statusColors = {
+      booked: 'bg-champagne-100 text-brand-700',
+      arrived: 'bg-blue-50 text-blue-700',
+      seen: 'bg-green-50 text-green-700',
+      complete: 'bg-slate-100 text-slate-500',
+      no_show: 'bg-red-50 text-red-600',
+    };
+
+    listEl.innerHTML = queue.map((appt) => {
+      const timeLabel = formatTime12h(appt.slot_time);
+      const statusClass = statusColors[appt.status] || 'bg-slate-100 text-slate-500';
+      return `
+        <button class="w-full text-left bg-white border border-champagne-200 rounded-2xl p-4 flex items-center justify-between hover:border-brand-300 hover:shadow-md transition-all group"
+                onclick="window.rxSelectPatientFromQueue('${appt.patient_id}', '${escapeAttr(appt.patient_name)}', '${appt.patient_phone || ''}', '${appt.patient_dob || ''}', '${appt.patient_gender || ''}')">
+          <div class="flex items-center gap-4">
+            <div class="w-11 h-11 rounded-xl bg-champagne-100 text-brand-700 font-bold flex items-center justify-center text-sm">
+              ${timeLabel.replace(/[^0-9:]/g, '').split(':')[0]}
+            </div>
+            <div>
+              <p class="font-bold text-brand-900 group-hover:text-brand-700 transition">${escapeHtmlShell(appt.patient_name || 'Patient')}</p>
+              <p class="text-xs text-charcoal/50">${timeLabel} &middot; ${escapeHtmlShell(appt.notes || 'Consultation')}</p>
+            </div>
+          </div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${statusClass} capitalize">${appt.status.replace('_', ' ')}</span>
+        </button>`;
+    }).join('');
+  } catch (err) {
+    loadingEl.classList.add('hidden');
+    emptyEl.classList.remove('hidden');
+    emptyEl.querySelector('p').textContent = 'Error: ' + err.message;
   }
+}
+
+function formatTime12h(timeStr) {
+  if (!timeStr) return '';
+  const [h, m] = timeStr.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+function escapeHtmlShell(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function escapeAttr(text) {
+  return (text || '').replace(/'/g, "\\'");
+}
+
+// Called from the inline onclick handlers built above (queue rows)
+window.rxSelectPatientFromQueue = function (id, name, phone, dob, gender) {
+  selectPatientAndEnterWorkspace({ id, name, phone, dob: dob || null, gender: gender || null });
+};
+
+function selectPatientAndEnterWorkspace(patient) {
+  rxShellState.selectedPatient = patient;
+  showRxWorkspaceScreen();
+  if (typeof window.mountPrescriptionWorkspace === 'function') {
+    window.mountPrescriptionWorkspace(patient, rxShellState.profile);
+  }
+}
+
+// ---- Search: any patient by name or phone, via search_patients
+// (through prescription-manager.js -- unlike the old phone-only
+// version, this doesn't need to cross-call bookings-manager.js since
+// search_patients handles both name and phone lookups itself). ----
+let rxSearchTimeout = null;
+document.getElementById('rx-patient-search').addEventListener('input', (e) => {
+  clearTimeout(rxSearchTimeout);
+  const query = e.target.value.trim();
+  const resultsEl = document.getElementById('rx-search-results');
+
+  if (query.length < 2) {
+    resultsEl.classList.add('hidden');
+    resultsEl.innerHTML = '';
+    return;
+  }
+
+  rxSearchTimeout = setTimeout(async () => {
+    try {
+      const { patients } = await window.rxCallFunction('search_patients', { query });
+      if (!patients || patients.length === 0) {
+        resultsEl.innerHTML = '<div class="p-4 text-sm text-charcoal/40 text-center">No matching patients found.</div>';
+        resultsEl.classList.remove('hidden');
+        return;
+      }
+      resultsEl.innerHTML = patients.map((p) => `
+        <button class="w-full text-left px-4 py-3 hover:bg-champagne-50 transition flex items-center justify-between"
+                onclick="window.rxSelectPatientFromQueue('${p.id}', '${escapeAttr(p.name)}', '${p.phone || ''}', '${p.dob || ''}', '${p.gender || ''}')">
+          <div>
+            <p class="font-semibold text-brand-900 text-sm">${escapeHtmlShell(p.name || 'Patient')}</p>
+            <p class="text-xs text-charcoal/50">${p.phone || 'No phone on file'}</p>
+          </div>
+          <span class="text-xs text-charcoal/40">${p.gender || ''}</span>
+        </button>`).join('');
+      resultsEl.classList.remove('hidden');
+    } catch (err) {
+      resultsEl.innerHTML = `<div class="p-4 text-sm text-red-600">${err.message}</div>`;
+      resultsEl.classList.remove('hidden');
+    }
+  }, 350);
 });
 
 document.addEventListener('DOMContentLoaded', initRxAuth);
