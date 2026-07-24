@@ -119,12 +119,12 @@ const medicalWebPageSchema = {
       </div>
      {heroImageSrc && (
   <div class="md:w-1/2 w-full">
-    <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-[5/4]">
+    <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-square">
       <img
         src={heroImageSrc}
         alt={data.heroHeadline}
         class="w-full h-full object-contain"
-        onerror={`this.onerror=null;this.src='https://placehold.co/800x640/0f172a/ffffff?text=${encodeURIComponent(data.title)}'`}
+        onerror={`this.onerror=null;this.src='https://placehold.co/700x700/0f172a/ffffff?text=${encodeURIComponent(data.title)}'`}
       />
     </div>
   </div>
