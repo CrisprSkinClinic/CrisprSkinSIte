@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Connect Google Drive</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f8fafc; }
+    .card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; max-width: 420px; }
+    button { background: #4f46e5; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 16px; }
+    button:hover { background: #4338ca; }
+    p { color: #64748b; font-size: 14px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Connect Google Drive</h2>
+    <p>
+      One-time setup: this grants the prescription system permission to upload lab
+      reports and clinical photos to your Google Drive, using your own account's
+      storage.
+    </p>
+    <p>
+      You only need to do this once. If it ever needs redoing (e.g. access was
+      revoked), come back to this page.
+    </p>
+    <button id="connect-btn">Connect Google Drive</button>
+  </div>
+
+  <script>
+    // CLIENT_ID and REDIRECT_URI are public identifiers, not secrets
+    // (see the chat discussion this was built from) -- safe to
+    // reference directly in this static page rather than needing a
+    // server round-trip just to fetch them.
+    const CLIENT_ID = "REPLACE_WITH_YOUR_CLIENT_ID"; // <-- paste your OAuth Client ID here
+    const REDIRECT_URI = "https://melodious-buttercream-bd844d.netlify.app/.netlify/functions/drive-oauth-callback";
+    const SCOPE = "https://www.googleapis.com/auth/drive.file";
+
+    document.getElementById("connect-btn").addEventListener("click", () => {
+      const params = new URLSearchParams({
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI,
+        response_type: "code",
+        scope: SCOPE,
+        access_type: "offline", // required to get a refresh_token back at all
+        prompt: "consent",      // forces a fresh refresh_token even on repeat connections
+      });
+      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+    });
+  </script>
+</body>
+</html>
