@@ -229,6 +229,7 @@ import AppLayout from '../layouts/AppLayout.astro';
         </div>
         <div class="header-actions">
           <span id="save-status-text" style="font-size:12px;color:#64748b;margin-right:12px;">All changes saved</span>
+          <button onclick="window.openRxSettings()" class="action-btn"><i data-lucide="settings" class="w-4 h-4"></i> Settings</button>
           <button onclick="window.changePatient()" class="action-btn"><i data-lucide="user-x" class="w-4 h-4"></i> Change Patient</button>
           <button onclick="saveDraft()" class="action-btn"><i data-lucide="save" class="w-4 h-4"></i> Save Draft</button>
           <button onclick="previewPrescription()" class="action-btn"><i data-lucide="eye" class="w-4 h-4"></i> Preview</button>
@@ -363,6 +364,81 @@ import AppLayout from '../layouts/AppLayout.astro';
         <div class="modal-footer">
             <button onclick="closeHistoryModal()" class="btn btn-secondary">Close</button>
             <button id="btn-copy-rx" class="btn btn-primary"><i data-lucide="copy" class="w-4 h-4"></i> Copy to Current</button>
+        </div>
+    </div>
+</div>
+
+<div id="rx-settings-modal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-header">
+            <h3 style="font-size: 18px; font-weight: 600; color: #1e293b; margin: 0;"><i data-lucide="settings" class="w-5 h-5"></i> Settings</h3>
+            <button onclick="closeRxSettings()" class="icon-btn"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="modal-body">
+            <div style="display:flex; gap:8px; border-bottom:1px solid #e2e8f0; margin-bottom:20px;">
+                <button class="rx-settings-tab-btn" data-tab="medicines" onclick="switchSettingsTab('medicines')" style="padding:8px 16px; border:none; background:none; cursor:pointer; font-weight:600; font-size:13px; border-bottom:2px solid #4f46e5; color:#4f46e5;">Medicines</button>
+                <button class="rx-settings-tab-btn" data-tab="templates" onclick="switchSettingsTab('templates')" style="padding:8px 16px; border:none; background:none; cursor:pointer; font-weight:600; font-size:13px; border-bottom:2px solid transparent; color:#64748b;">Templates</button>
+                <button class="rx-settings-tab-btn" data-tab="dxProtocols" onclick="switchSettingsTab('dxProtocols')" style="padding:8px 16px; border:none; background:none; cursor:pointer; font-weight:600; font-size:13px; border-bottom:2px solid transparent; color:#64748b;">Dx Protocols</button>
+                <button class="rx-settings-tab-btn" data-tab="billing" onclick="switchSettingsTab('billing')" style="padding:8px 16px; border:none; background:none; cursor:pointer; font-weight:600; font-size:13px; border-bottom:2px solid transparent; color:#64748b;">Billing Master</button>
+            </div>
+
+            <!-- Medicines tab -->
+            <div id="rx-settings-tab-medicines" class="rx-settings-tab">
+                <div style="display:grid; grid-template-columns: 2fr 2fr auto; gap:10px; margin-bottom:16px;">
+                    <input type="text" id="rx-new-med-name" placeholder="Medicine name" class="med-input">
+                    <input type="text" id="rx-new-med-dosages" placeholder="Dosages, comma-separated (e.g. 1-0-0, 1-0-1, SOS)" class="med-input">
+                    <button onclick="addSettingsMedicine()" class="btn btn-primary">Add</button>
+                </div>
+                <div id="rx-settings-medicines-list" style="max-height:320px; overflow-y:auto;"></div>
+            </div>
+
+            <!-- Templates tab -->
+            <div id="rx-settings-tab-templates" class="rx-settings-tab" style="display:none;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 2fr auto; gap:10px; margin-bottom:16px;">
+                    <select id="rx-new-tpl-type" class="med-input">
+                        <option value="clinical">Clinical</option>
+                        <option value="meds">Meds</option>
+                        <option value="advice">Advice</option>
+                        <option value="labs">Labs</option>
+                    </select>
+                    <input type="text" id="rx-new-tpl-name" placeholder="Template name" class="med-input">
+                    <input type="text" id="rx-new-tpl-content" placeholder="Content (plain text -- see help below)" class="med-input">
+                    <button onclick="addSettingsTemplate()" class="btn btn-primary">Add</button>
+                </div>
+                <p style="font-size:12px; color:#94a3b8; margin-bottom:16px;">
+                    Clinical/Advice: free text. Meds: comma-separated "Name|Dose|Duration|Instructions" entries. Labs: comma-separated test names.
+                </p>
+                <div id="rx-settings-templates-list" style="max-height:320px; overflow-y:auto;"></div>
+            </div>
+
+            <!-- Dx Protocols tab -->
+            <div id="rx-settings-tab-dxProtocols" class="rx-settings-tab" style="display:none;">
+                <div style="display:grid; grid-template-columns: 2fr 2fr auto; gap:10px; margin-bottom:16px;">
+                    <input type="text" id="rx-new-proto-keyword" placeholder="Diagnosis keyword (e.g. acne)" class="med-input">
+                    <input type="text" id="rx-new-proto-meds" placeholder="Suggested medicines, comma-separated" class="med-input">
+                    <button onclick="addSettingsDxProtocol()" class="btn btn-primary">Add</button>
+                </div>
+                <div id="rx-settings-protocols-list" style="max-height:320px; overflow-y:auto;"></div>
+            </div>
+
+            <!-- Billing Master tab -->
+            <div id="rx-settings-tab-billing" class="rx-settings-tab" style="display:none;">
+                <div style="display:grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap:10px; margin-bottom:16px;">
+                    <select id="rx-new-bill-type" class="med-input">
+                        <option value="Lab">Lab</option>
+                        <option value="Procedure">Procedure</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="rx-new-bill-name" placeholder="Name (e.g. CBC)" class="med-input">
+                    <input type="number" id="rx-new-bill-price" placeholder="Price (₹)" class="med-input">
+                    <input type="number" id="rx-new-bill-gst" placeholder="GST %" class="med-input">
+                    <button onclick="addSettingsBillingItem()" class="btn btn-primary">Add</button>
+                </div>
+                <div id="rx-settings-billing-list" style="max-height:320px; overflow-y:auto;"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeRxSettings()" class="btn btn-secondary">Close</button>
         </div>
     </div>
 </div>
