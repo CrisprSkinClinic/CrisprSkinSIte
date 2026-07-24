@@ -1,6 +1,6 @@
 ---
-title: "Vitiligo Treatment"
-metaDescription: "Vitiligo diagnosis and treatment in KK Nagar, Chennai. Honest, comprehensive management from AIIMS-trained dermatologists."
+title: "Vitiligo Treatment in Chennai | KK Nagar"
+metaDescription: "Vitiligo treatment in KK Nagar, Chennai. Honest diagnosis, realistic goals, medical + phototherapy options. AIIMS-trained dermatologists."
 heroEyebrow: "Clinical Dermatology"
 heroHeadline: "Vitiligo Treatment"
 heroSubheadline: "An accurate diagnosis and an honest conversation about realistic treatment goals -- vitiligo management works best with both."
