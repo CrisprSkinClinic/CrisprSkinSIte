@@ -240,7 +240,7 @@ function updatePhotos() {
     }
     let html = '';
     RxApp.state.photos.slice(0, 5).forEach((photo) => {
-        html += `<div class="photo-item"><img src="${photo.drive_file_url}" alt="Clinical photo"></div>`;
+        html += `<div class="photo-item"><img src="${driveProxyUrl(photo.drive_file_id)}" alt="Clinical photo"></div>`;
     });
     if (RxApp.state.photos.length < 6) {
         html += `<div class="photo-item" onclick="triggerPhotoUpload()"><div class="photo-placeholder"><i data-lucide="plus" class="w-6 h-6 mb-1"></i><span style="font-size: 9px; font-weight: 600;">ADD NEW</span></div></div>`;
@@ -250,14 +250,106 @@ function updatePhotos() {
 }
 
 function triggerPhotoUpload() {
-    // Actual upload to Google Drive happens via a separate
-    // drive-upload Netlify function (not yet built as of this port --
-    // requires the Drive service account to be finalized first).
-    alert('Photo upload is not yet connected -- this needs the Google Drive integration to be finished first.');
+    if (!RxApp.state.patient) { alert('No patient selected'); return; }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) uploadClinicalFile(file, 'photo');
+    };
+    input.click();
 }
 
-function handleLabUpload() {
-    alert('Lab report upload is not yet connected -- this needs the Google Drive integration to be finished first.');
+function handleLabUpload(inputEl) {
+    if (!RxApp.state.patient) { alert('Please select a patient first.'); inputEl.value = ''; return; }
+    const file = inputEl.files[0];
+    if (!file) return;
+
+    // Old system prompted for the test name at upload time -- kept
+    // the same UX here rather than adding a new modal for it.
+    const testName = prompt('What is this lab test/report called? (e.g. "CBC", "Lipid Profile")');
+    if (!testName || !testName.trim()) { inputEl.value = ''; return; }
+
+    uploadClinicalFile(file, 'lab_report', testName.trim(), () => { inputEl.value = ''; });
+}
+
+async function uploadClinicalFile(file, uploadType, testName, onDone) {
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File too large (max 5MB).');
+        if (onDone) onDone();
+        return;
+    }
+
+    updateSaveStatus('Uploading ' + file.name + '...');
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const base64Data = e.target.result.split(',')[1];
+        try {
+            // Step 1: upload the raw file to Drive via the service
+            // account (drive-upload.js). This function is separate
+            // from prescription-manager.js since it talks to Google,
+            // not Supabase, and doesn't need the doctor-only
+            // restriction -- any signed-in staff member's session is
+            // enough to prove they're allowed to upload, the doctor
+            // check happens on the VIEWING side (drive-file-proxy.js)
+            // instead, since that's where clinical content is
+            // actually exposed.
+            const uploadResponse = await fetch('/.netlify/functions/drive-upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uploadType, fileName: file.name, mimeType: file.type, fileData: base64Data }),
+            });
+            const uploadResult = await uploadResponse.json();
+            if (!uploadResponse.ok || !uploadResult.success) {
+                throw new Error(uploadResult.error || 'Upload failed.');
+            }
+
+            // Step 2: record the Drive file id + metadata in Postgres
+            // via prescription-manager.js (doctor-only, matches every
+            // other write in this system).
+            if (uploadType === 'photo') {
+                await window.rxCallFunction('record_photo', {
+                    patientId: RxApp.state.patient.id,
+                    driveFileId: uploadResult.driveFileId,
+                });
+                const { photos } = await window.rxCallFunction('get_patient_photos', { patientId: RxApp.state.patient.id });
+                RxApp.state.photos = photos || [];
+                updatePhotos();
+            } else {
+                await window.rxCallFunction('record_lab_order', {
+                    patientId: RxApp.state.patient.id,
+                    testName,
+                    driveFileId: uploadResult.driveFileId,
+                });
+                const { reports } = await window.rxCallFunction('get_patient_lab_history', { patientId: RxApp.state.patient.id, limit: 5 });
+                RxApp.state.labReports = reports || [];
+                updateLabReports();
+            }
+            updateSaveStatus('Upload complete');
+        } catch (err) {
+            alert('Upload failed: ' + err.message);
+        } finally {
+            if (onDone) onDone();
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+// Builds a URL to drive-file-proxy.js carrying the CURRENT session's
+// access token as a query parameter -- see that function's header
+// comment for why a query param is used here (query params are the
+// only way to authenticate a direct <img>/<iframe> navigation). This
+// is regenerated fresh each time a file is displayed (see
+// updatePhotos/updateLabReports/viewLabInline below) rather than
+// stored once, since a stored token would go stale after the
+// session's own token naturally rotates/expires.
+function driveProxyUrl(driveFileId) {
+    if (!driveFileId) return '';
+    const token = window.rxGetCurrentAccessToken ? window.rxGetCurrentAccessToken() : '';
+    return `/.netlify/functions/drive-file-proxy?fileId=${encodeURIComponent(driveFileId)}&accessToken=${encodeURIComponent(token)}`;
 }
 
 // ---- MEDICINE MANAGEMENT ----
@@ -659,7 +751,7 @@ function updateLabReports() {
                 </div>
                 <div style="display:flex; gap:6px;">
                     <button class="lab-action" onclick="viewLabInline(${index})">Inline</button>
-                    <button class="lab-action" onclick="openLabInNewTab('${escapeHtml(report.drive_file_url || '')}')">↗</button>
+                    <button class="lab-action" onclick="openLabInNewTab('${escapeHtml(report.drive_file_id || '')}')">↗</button>
                 </div>
             </div>`;
     });
@@ -675,7 +767,7 @@ function viewLabInline(index) {
     const panel = document.getElementById('lab-expand-panel');
     const title = document.getElementById('inline-lab-title');
     const iframe = document.getElementById('lab-inline-frame');
-    iframe.src = normalizeLabUrl(reports[index].drive_file_url);
+    iframe.src = normalizeLabUrl(driveProxyUrl(reports[index].drive_file_id));
     title.textContent = `${reports[index].test_name} • ${new Date(reports[index].report_date).toLocaleDateString()}`;
     document.getElementById('lab-note-input').value = reports[index].note || '';
     panel.classList.remove('hidden');
@@ -684,8 +776,11 @@ function viewLabInline(index) {
 }
 
 function normalizeLabUrl(url) {
-    if (!url) return '';
-    return url.includes('/view') ? url.replace('/view', '/preview') : url;
+    // No-op now that files are served directly as bytes via
+    // drive-file-proxy.js rather than linking to a Drive viewer page
+    // (which is where the old /view -> /preview rewrite mattered).
+    // Kept as a passthrough so callers don't need updating.
+    return url || '';
 }
 
 function navigateInlineLab(direction) {
@@ -709,9 +804,9 @@ function highlightActiveLab(index) {
     document.querySelectorAll('.lab-item').forEach((el, i) => el.classList.toggle('active', i === index));
 }
 
-function openLabInNewTab(url) {
-    if (!url) { alert('Lab report not available'); return; }
-    window.open(url, '_blank', 'noopener,noreferrer');
+function openLabInNewTab(driveFileId) {
+    if (!driveFileId) { alert('Lab report not available'); return; }
+    window.open(driveProxyUrl(driveFileId), '_blank', 'noopener,noreferrer');
 }
 
 async function addLabNoteToRx() {

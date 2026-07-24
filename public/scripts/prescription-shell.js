@@ -27,6 +27,17 @@ window.rxCallFunction = async function rxCallFunction(action, data = {}) {
   return result;
 };
 
+// Exposes the current session's access token for prescription-app.js's
+// driveProxyUrl() helper -- direct <img>/<iframe> src attributes can't
+// carry an Authorization header, so the token has to be embedded in
+// the URL itself (see drive-file-proxy.js's header comment). Reading
+// it fresh through this function each time (rather than prescription-app.js
+// capturing rxShellState.session.access_token once) means a token
+// refresh mid-session is picked up automatically.
+window.rxGetCurrentAccessToken = function () {
+  return rxShellState.session ? rxShellState.session.access_token : '';
+};
+
 // ---- Auth ----
 async function initRxAuth() {
   if (typeof window.supabase === 'undefined' || !window.supabase) {
