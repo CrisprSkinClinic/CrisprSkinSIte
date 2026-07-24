@@ -6,15 +6,6 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import FAQAccordion from '../../components/FAQAccordion.astro';
 import { siteConfig } from '../../config/site.js';
 
-// Hero images: each service's heroImage frontmatter field is a slug
-// (e.g. "hair-transplant-fue") that maps to /public/images/services/<slug>.jpg
-// if present. Unlike the eye-care site's build-time optimized-asset map
-// (which failed the build on a missing image), this falls back to a
-// placeholder -- with 25-40 dermatology service pages and photography
-// still being sourced, a missing photo should never block a deploy.
-// Once real photos are added to public/images/services/, this can be
-// swapped back to astro:assets Image imports for optimization.
-
 export async function getStaticPaths() {
   const services = await getCollection('services');
   return services.map((entry) => ({
@@ -31,18 +22,12 @@ const heroImageSrc = data.heroImage
   ? `/images/services/${data.heroImage}.jpg`
   : null;
 
-// Resolve linked condition entries (if any) for the "Conditions We
-// Manage" section, so links and titles stay in sync with the
-// conditions collection automatically.
 const conditionEntries = data.conditionsManaged
   ? (await Promise.all(
       data.conditionsManaged.map((slug) => getEntry('conditions', slug))
     )).filter(Boolean)
   : [];
 
-// Resolve faqIds against the central faqs collection. Each FAQ's
-// answer lives in its markdown body (matching the existing FAQ.astro
-// pattern), so we render it to a string here.
 let faqEntries = [];
 if (data.faqIds && data.faqIds.length > 0) {
   const resolved = await Promise.all(
@@ -53,12 +38,11 @@ if (data.faqIds && data.faqIds.length > 0) {
     .map((f) => ({ question: f.data.question, answer: f.body }));
 }
 
-// Structured data (JSON-LD) for search engines. FAQPage schema mirrors
-// the same faqEntries already resolved above for the visible accordion
-// -- reusing that data rather than re-deriving it, so the two can never
-// drift out of sync. MedicalWebPage identifies this as patient-facing
-// medical content and folds in the treatments already listed on the
-// page as MedicalTherapy sub-entities.
+// Doctor linked via defaultDoctorId
+const relatedDoctor = data.defaultDoctorId
+  ? siteConfig.doctors.find((d) => d.dbId === data.defaultDoctorId)
+  : null;
+
 const pageUrl = new URL(`/services/${entry.slug}`, siteConfig.url).toString();
 
 const faqSchema = faqEntries.length > 0 ? {
@@ -117,18 +101,20 @@ const medicalWebPageSchema = {
           {data.ctaTitle || `Book a ${data.title} Evaluation`}
         </a>
       </div>
-     {heroImageSrc && (
-  <div class="md:w-1/2 w-full">
-    <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-square">
-      <img
-        src={heroImageSrc}
-        alt={data.heroHeadline}
-        class="w-full h-full object-contain"
-        onerror={`this.onerror=null;this.src='https://placehold.co/700x700/0f172a/ffffff?text=${encodeURIComponent(data.title)}'`}
-      />
-    </div>
-  </div>
-)}
+      {heroImageSrc && (
+        <div class="md:w-1/2 w-full">
+          <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-square">
+            <img
+              src={heroImageSrc}
+              alt={data.heroHeadline}
+              width="700"
+              height="700"
+              class="w-full h-full object-contain"
+              onerror={`this.onerror=null;this.src='https://placehold.co/700x700/0f172a/ffffff?text=${encodeURIComponent(data.title)}'`}
+            />
+          </div>
+        </div>
+      )}
     </div>
   </section>
 
@@ -189,6 +175,32 @@ const medicalWebPageSchema = {
           </a>
         ))}
       </div>
+    </section>
+  )}
+
+  {/* NEW: Service → Doctor link */}
+  {relatedDoctor && (
+    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
+      <h2 class="text-2xl font-bold text-brand-900 mb-6">Performed by</h2>
+      <a
+        href={`/our-doctors/${relatedDoctor.slug}`}
+        class="flex items-center gap-5 p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 border border-champagne-200 transition-colors group"
+      >
+        <img
+          src={`/images/doctors/${relatedDoctor.slug}.jpg`}
+          alt={relatedDoctor.name}
+          width="80"
+          height="80"
+          class="w-20 h-20 rounded-full object-cover border-2 border-white shadow"
+          onerror={`this.src='https://placehold.co/80x80/223154/FAF8F5?text=${encodeURIComponent(relatedDoctor.name.split(' ').pop())}'`}
+        />
+        <div>
+          <p class="font-bold text-slate-900 group-hover:text-brand-700 transition-colors">{relatedDoctor.name}</p>
+          <p class="text-sm text-brand-600 font-semibold">{relatedDoctor.designation}</p>
+          <p class="text-xs text-slate-500 mt-1">{relatedDoctor.qualificationsShort}</p>
+        </div>
+        <span class="ml-auto text-brand-600 font-semibold text-sm hidden sm:inline">View profile →</span>
+      </a>
     </section>
   )}
 
