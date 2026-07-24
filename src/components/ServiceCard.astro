@@ -1,24 +1,28 @@
 ---
-// Plain <img> with onerror fallback instead of astro:assets Image --
-// this component now receives public-path strings (e.g.
-// "/images/services/acne.jpg") rather than imported ImageMetadata
-// objects, since dermatology service photography doesn't exist yet.
-// Once real photos are added under public/images/services/, this can
-// be swapped back to optimized Image imports.
-const { title, description, link, image, alt } = Astro.props;
+// Optimized ServiceCard
+// - Uses aspect-square + object-contain (full image, no crop)
+// - loading="lazy" + decoding="async"
+// - width/height hints for layout stability
+// - sizes attribute for responsive loading
+const { title, description, link, image, alt, priority = false } = Astro.props;
 ---
 <a href={link} class="bg-white rounded-2xl shadow-sm border border-champagne-200 overflow-hidden hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full">
   
   <!-- Image Header Container -->
-<div class="relative aspect-square overflow-hidden bg-champagne-50">
-  <img 
-    src={image} 
-    alt={alt || title} 
-    loading="lazy"
-    class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]"
-    onerror={`this.onerror=null;this.src='https://placehold.co/500x500/F7F2EB/223154?text=${encodeURIComponent(title)}'`}
-  />
-</div>
+  <div class="relative aspect-square overflow-hidden bg-champagne-50">
+    <img 
+      src={image} 
+      alt={alt || title} 
+      width="500"
+      height="500"
+      loading={priority ? "eager" : "lazy"}
+      decoding="async"
+      fetchpriority={priority ? "high" : "auto"}
+      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]"
+      onerror={`this.onerror=null;this.src='https://placehold.co/500x500/F7F2EB/223154?text=${encodeURIComponent(title)}'`}
+    />
+  </div>
   
   <!-- Text Content Container -->
   <div class="p-6 md:p-8 flex flex-col flex-grow">
