@@ -149,6 +149,7 @@ async function loadPreviousPrescription(rxId) {
     const contentArea = document.getElementById('history-content-area');
     const dateLabel = document.getElementById('hist-modal-date');
     const viewPdfBtn = document.getElementById('btn-view-rx-pdf');
+    const sharePdfBtn = document.getElementById('btn-share-rx-pdf');
 
     contentArea.innerHTML = '<div style="text-align:center; padding:40px; color:#cbd5e1;"><i data-lucide="loader-2" class="w-8 h-8 animate-spin"></i></div>';
     if (window.lucide) lucide.createIcons();
@@ -160,8 +161,11 @@ async function loadPreviousPrescription(rxId) {
         dateLabel.textContent = new Date(rxData.created_at || Date.now()).toLocaleDateString();
         document.getElementById('btn-copy-rx').onclick = () => copyHistoryToActive(rxData);
 
-        viewPdfBtn.style.display = rxData.pdf_url ? 'inline-flex' : 'none';
+        const hasPdf = !!rxData.pdf_url;
+        viewPdfBtn.style.display = hasPdf ? 'inline-flex' : 'none';
         viewPdfBtn.onclick = () => viewPrescriptionPdf(rxId, viewPdfBtn);
+        sharePdfBtn.style.display = hasPdf ? 'inline-flex' : 'none';
+        sharePdfBtn.onclick = () => shareRxPdfViaWhatsapp(rxId, sharePdfBtn);
     } catch (err) {
         contentArea.innerHTML = `<div style="text-align:center; padding:20px; color:red;">Error: ${escapeHtml(err.message)}</div>`;
     }
@@ -182,6 +186,43 @@ async function viewPrescriptionPdf(rxId, btn) {
         window.open(result.url, '_blank');
     } catch (err) {
         alert('Failed to open PDF: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+// Mints a FRESH signed URL right at share time (rather than reusing
+// one obtained earlier), since signed URLs expire (1 hour, see
+// get-prescription-pdf-url.js) -- a link generated when the doctor
+// first viewed the PDF could easily be stale by the time they decide
+// to share it a few minutes later. Uses the same wa.me pattern and
+// India-country-code assumption already used for appointment
+// confirmations in bookings-manager.js, for consistency.
+async function shareRxPdfViaWhatsapp(rxId, btn) {
+    if (!RxApp.state.patient) return;
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Preparing...';
+    try {
+        const response = await fetch('/.netlify/functions/get-prescription-pdf-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken: window.rxGetCurrentAccessToken(), rxId }),
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not prepare PDF link.');
+
+        const rawPhone = (RxApp.state.patient.phone || '').replace(/[^\d]/g, '');
+        if (!rawPhone) {
+            alert('This patient has no phone number on file to share with.');
+            return;
+        }
+        const fullNumber = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+        const message = `Hi ${RxApp.state.patient.name || ''}, here is your prescription from CRISPR Skin and Hair Clinic: ${result.url}\n\nThis link is valid for a limited time -- please save a copy if you need it later. Call us at +91 96984 44888 if you have any questions.`;
+        window.open(`https://wa.me/${fullNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    } catch (err) {
+        alert('Failed to share PDF: ' + err.message);
     } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;
@@ -584,6 +625,14 @@ async function savePrescription() {
             const urlResult = await urlResponse.json();
             if (urlResult.success) {
                 window.open(urlResult.url, '_blank');
+                // Offer to share immediately -- most doctors will want
+                // to do this right after writing the prescription, but
+                // it's still an explicit yes/no rather than an
+                // automatic WhatsApp send, since not every patient
+                // wants/needs it sent this way.
+                if (RxApp.state.patient.phone && confirm('Share this prescription with the patient via WhatsApp now?')) {
+                    shareRxPdfViaWhatsapp(result.rxId, { disabled: false, innerHTML: '' });
+                }
             }
             updateSaveStatus('Prescription saved and PDF ready');
         } catch (pdfErr) {
