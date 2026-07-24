@@ -6,7 +6,7 @@ import BookingSection from '../../components/LandingPageSections/BookingSection.
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import FAQAccordion from '../../components/FAQAccordion.astro';
 import { siteConfig } from '../../config/site.js';
-import { getServiceImage } from '../../utils/serviceImages';
+import { getServiceImage, getServiceImageAlt } from '../../utils/serviceImages';
 
 export async function getStaticPaths() {
   const services = await getCollection('services');
@@ -21,6 +21,7 @@ const { Content } = await entry.render();
 const data = entry.data;
 
 const optimizedHero = getServiceImage(data.heroImage);
+const heroAlt = getServiceImageAlt(data.heroImage, data.heroHeadline);
 const heroImageSrc = data.heroImage
   ? `/images/services/${data.heroImage}.jpg`
   : null;
@@ -109,7 +110,7 @@ const medicalWebPageSchema = {
           <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-square">
             <Image
               src={optimizedHero}
-              alt={data.heroHeadline}
+              alt={heroAlt}
               width={700}
               height={700}
               widths={[400, 700]}
@@ -126,9 +127,11 @@ const medicalWebPageSchema = {
           <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-square">
             <img
               src={heroImageSrc}
-              alt={data.heroHeadline}
+              alt={heroAlt}
               width="700"
               height="700"
+              loading="eager"
+              decoding="async"
               class="w-full h-full object-contain"
               onerror={`this.onerror=null;this.src='https://placehold.co/700x700/0f172a/ffffff?text=${encodeURIComponent(data.title)}'`}
             />
@@ -207,9 +210,11 @@ const medicalWebPageSchema = {
       >
         <img
           src={`/images/doctors/${relatedDoctor.slug}.jpg`}
-          alt={relatedDoctor.name}
+          alt={`${relatedDoctor.name}, ${relatedDoctor.designation}`}
           width="80"
           height="80"
+          loading="lazy"
+          decoding="async"
           class="w-20 h-20 rounded-full object-cover border-2 border-white shadow"
           onerror={`this.src='https://placehold.co/80x80/223154/FAF8F5?text=${encodeURIComponent(relatedDoctor.name.split(' ').pop())}'`}
         />
