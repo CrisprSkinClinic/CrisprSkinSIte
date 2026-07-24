@@ -21,6 +21,7 @@ const { makeLogAudit } = require("./lib/audit");
 
 const rx = require("./lib/rx");
 const rxMedia = require("./lib/rx-media");
+const rxSettings = require("./lib/rx-settings");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -84,6 +85,52 @@ exports.handler = async (event) => {
         return await rxMedia.updateLabNote(supabase, data);
       case "record_photo":
         return await rxMedia.recordPhoto(supabase, data, profile);
+
+      // ---- Settings: medicines, templates, dx protocols, billing master ----
+      case "list_medicines":
+        return await rxSettings.listMedicines(supabase);
+      case "upsert_medicine": {
+        const result = await rxSettings.upsertMedicine(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("SETTINGS_CHANGE", `Saved medicine: ${data.name}`);
+        return result;
+      }
+      case "delete_medicine":
+        await logAudit("SETTINGS_CHANGE", `Deactivated medicine ${data.id}`);
+        return await rxSettings.deleteMedicine(supabase, data);
+      case "list_templates":
+        return await rxSettings.listTemplates(supabase);
+      case "upsert_template": {
+        const result = await rxSettings.upsertTemplate(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("SETTINGS_CHANGE", `Saved ${data.templateType} template: ${data.name}`);
+        return result;
+      }
+      case "delete_template":
+        await logAudit("SETTINGS_CHANGE", `Deleted template ${data.id}`);
+        return await rxSettings.deleteTemplate(supabase, data);
+      case "list_dx_protocols":
+        return await rxSettings.listDxProtocols(supabase);
+      case "upsert_dx_protocol": {
+        const result = await rxSettings.upsertDxProtocol(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("SETTINGS_CHANGE", `Saved dx protocol: ${data.keyword}`);
+        return result;
+      }
+      case "delete_dx_protocol":
+        await logAudit("SETTINGS_CHANGE", `Deleted dx protocol ${data.id}`);
+        return await rxSettings.deleteDxProtocol(supabase, data);
+      case "list_billing_items":
+        return await rxSettings.listBillingItems(supabase);
+      case "upsert_billing_item": {
+        const result = await rxSettings.upsertBillingItem(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("SETTINGS_CHANGE", `Saved billing item: ${data.name}`);
+        return result;
+      }
+      case "delete_billing_item":
+        await logAudit("SETTINGS_CHANGE", `Deactivated billing item ${data.id}`);
+        return await rxSettings.deleteBillingItem(supabase, data);
 
       // ---- Whoami (used by the frontend to show doctor name/role) ----
       case "whoami":
