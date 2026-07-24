@@ -830,3 +830,260 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') navigateInlineLab(1);
     if (e.key === 'Escape') closeLabInline();
 });
+
+/**
+ * ==========================================
+ * SETTINGS SCREEN
+ * Medicines / Templates / Dx Protocols / Billing Master CRUD.
+ * Added because the user chose to start with zero seed data and add
+ * these through a real UI rather than pre-seeding placeholder
+ * clinical content.
+ * ==========================================
+ */
+
+window.openRxSettings = function () {
+    document.getElementById('rx-settings-modal').classList.add('modal-visible');
+    switchSettingsTab('medicines');
+};
+
+function closeRxSettings() {
+    document.getElementById('rx-settings-modal').classList.remove('modal-visible');
+    // Master data may have changed -- refresh what the current
+    // prescription session uses, so new medicines/protocols are
+    // usable immediately without a full page reload.
+    loadRxMasterData();
+}
+
+function switchSettingsTab(tab) {
+    document.querySelectorAll('.rx-settings-tab').forEach((el) => { el.style.display = 'none'; });
+    document.getElementById(`rx-settings-tab-${tab}`).style.display = 'block';
+    document.querySelectorAll('.rx-settings-tab-btn').forEach((btn) => {
+        const active = btn.dataset.tab === tab;
+        btn.style.borderBottomColor = active ? '#4f46e5' : 'transparent';
+        btn.style.color = active ? '#4f46e5' : '#64748b';
+    });
+
+    if (tab === 'medicines') loadSettingsMedicines();
+    if (tab === 'templates') loadSettingsTemplates();
+    if (tab === 'dxProtocols') loadSettingsDxProtocols();
+    if (tab === 'billing') loadSettingsBillingItems();
+}
+
+// ---- Medicines ----
+async function loadSettingsMedicines() {
+    const container = document.getElementById('rx-settings-medicines-list');
+    container.innerHTML = '<p style="color:#94a3b8; font-size:13px;">Loading...</p>';
+    try {
+        const { medicines } = await window.rxCallFunction('list_medicines');
+        const active = (medicines || []).filter((m) => m.is_active);
+        if (active.length === 0) {
+            container.innerHTML = '<p style="color:#94a3b8; font-size:13px; font-style:italic;">No medicines added yet.</p>';
+            return;
+        }
+        container.innerHTML = active.map((m) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+                <div>
+                    <div style="font-weight:600; font-size:14px;">${escapeHtml(m.name)}</div>
+                    <div style="font-size:12px; color:#64748b;">${(m.suggested_dosages || []).map(escapeHtml).join(', ') || 'No dosage suggestions'}</div>
+                </div>
+                <button class="btn-del-row" onclick="deleteSettingsMedicine('${m.id}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </div>`).join('');
+        if (window.lucide) lucide.createIcons();
+    } catch (err) {
+        container.innerHTML = `<p style="color:#dc2626; font-size:13px;">${escapeHtml(err.message)}</p>`;
+    }
+}
+
+async function addSettingsMedicine() {
+    const name = document.getElementById('rx-new-med-name').value.trim();
+    const dosagesRaw = document.getElementById('rx-new-med-dosages').value.trim();
+    if (!name) { alert('Medicine name is required.'); return; }
+    const suggestedDosages = dosagesRaw ? dosagesRaw.split(',').map((s) => s.trim()).filter(Boolean) : null;
+    try {
+        await window.rxCallFunction('upsert_medicine', { name, suggestedDosages });
+        document.getElementById('rx-new-med-name').value = '';
+        document.getElementById('rx-new-med-dosages').value = '';
+        loadSettingsMedicines();
+    } catch (err) {
+        alert('Failed to save medicine: ' + err.message);
+    }
+}
+
+async function deleteSettingsMedicine(id) {
+    if (!confirm('Remove this medicine from the list?')) return;
+    try {
+        await window.rxCallFunction('delete_medicine', { id });
+        loadSettingsMedicines();
+    } catch (err) {
+        alert('Failed to remove medicine: ' + err.message);
+    }
+}
+
+// ---- Templates ----
+async function loadSettingsTemplates() {
+    const container = document.getElementById('rx-settings-templates-list');
+    container.innerHTML = '<p style="color:#94a3b8; font-size:13px;">Loading...</p>';
+    try {
+        const { templates } = await window.rxCallFunction('list_templates');
+        if (!templates || templates.length === 0) {
+            container.innerHTML = '<p style="color:#94a3b8; font-size:13px; font-style:italic;">No templates added yet.</p>';
+            return;
+        }
+        container.innerHTML = templates.map((t) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+                <div>
+                    <div style="font-weight:600; font-size:14px;">${escapeHtml(t.name)} <span style="font-size:11px; color:#94a3b8; text-transform:uppercase;">${escapeHtml(t.template_type)}</span></div>
+                    <div style="font-size:12px; color:#64748b; max-width:500px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(JSON.stringify(t.data))}</div>
+                </div>
+                <button class="btn-del-row" onclick="deleteSettingsTemplate('${t.id}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </div>`).join('');
+        if (window.lucide) lucide.createIcons();
+    } catch (err) {
+        container.innerHTML = `<p style="color:#dc2626; font-size:13px;">${escapeHtml(err.message)}</p>`;
+    }
+}
+
+// Converts the plain-text content field into the jsonb shape each
+// template type expects (matching what prescription-app.js's
+// applySelectedTemplate() -- ported from the old system -- reads):
+// clinical/advice want { diagnosis/complaints } or { advice } as free
+// text; meds want an array of {name, dose, dur, instr}; labs want an
+// array of test name strings.
+function buildTemplateData(templateType, content) {
+    if (templateType === 'clinical') return { diagnosis: content };
+    if (templateType === 'advice') return { advice: content };
+    if (templateType === 'labs') return { labs: content.split(',').map((s) => s.trim()).filter(Boolean) };
+    if (templateType === 'meds') {
+        return content.split(',').map((entry) => {
+            const [name, dose, dur, instr] = entry.split('|').map((s) => (s || '').trim());
+            return { name: name || entry.trim(), dose: dose || '1-0-0', dur: dur || '5 Days', instr: instr || '' };
+        });
+    }
+    return {};
+}
+
+async function addSettingsTemplate() {
+    const templateType = document.getElementById('rx-new-tpl-type').value;
+    const name = document.getElementById('rx-new-tpl-name').value.trim();
+    const content = document.getElementById('rx-new-tpl-content').value.trim();
+    if (!name || !content) { alert('Template name and content are required.'); return; }
+    try {
+        await window.rxCallFunction('upsert_template', { templateType, name, data: buildTemplateData(templateType, content) });
+        document.getElementById('rx-new-tpl-name').value = '';
+        document.getElementById('rx-new-tpl-content').value = '';
+        loadSettingsTemplates();
+    } catch (err) {
+        alert('Failed to save template: ' + err.message);
+    }
+}
+
+async function deleteSettingsTemplate(id) {
+    if (!confirm('Delete this template?')) return;
+    try {
+        await window.rxCallFunction('delete_template', { id });
+        loadSettingsTemplates();
+    } catch (err) {
+        alert('Failed to delete template: ' + err.message);
+    }
+}
+
+// ---- Dx Protocols ----
+async function loadSettingsDxProtocols() {
+    const container = document.getElementById('rx-settings-protocols-list');
+    container.innerHTML = '<p style="color:#94a3b8; font-size:13px;">Loading...</p>';
+    try {
+        const { protocols } = await window.rxCallFunction('list_dx_protocols');
+        if (!protocols || protocols.length === 0) {
+            container.innerHTML = '<p style="color:#94a3b8; font-size:13px; font-style:italic;">No dx protocols added yet.</p>';
+            return;
+        }
+        container.innerHTML = protocols.map((p) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+                <div>
+                    <div style="font-weight:600; font-size:14px;">${escapeHtml(p.keyword)}</div>
+                    <div style="font-size:12px; color:#64748b;">${(p.suggested_medicines || []).map(escapeHtml).join(', ')}</div>
+                </div>
+                <button class="btn-del-row" onclick="deleteSettingsDxProtocol('${p.id}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </div>`).join('');
+        if (window.lucide) lucide.createIcons();
+    } catch (err) {
+        container.innerHTML = `<p style="color:#dc2626; font-size:13px;">${escapeHtml(err.message)}</p>`;
+    }
+}
+
+async function addSettingsDxProtocol() {
+    const keyword = document.getElementById('rx-new-proto-keyword').value.trim();
+    const medsRaw = document.getElementById('rx-new-proto-meds').value.trim();
+    if (!keyword || !medsRaw) { alert('Keyword and at least one medicine are required.'); return; }
+    const suggestedMedicines = medsRaw.split(',').map((s) => s.trim()).filter(Boolean);
+    try {
+        await window.rxCallFunction('upsert_dx_protocol', { keyword, suggestedMedicines });
+        document.getElementById('rx-new-proto-keyword').value = '';
+        document.getElementById('rx-new-proto-meds').value = '';
+        loadSettingsDxProtocols();
+    } catch (err) {
+        alert('Failed to save dx protocol: ' + err.message);
+    }
+}
+
+async function deleteSettingsDxProtocol(id) {
+    if (!confirm('Delete this dx protocol?')) return;
+    try {
+        await window.rxCallFunction('delete_dx_protocol', { id });
+        loadSettingsDxProtocols();
+    } catch (err) {
+        alert('Failed to delete dx protocol: ' + err.message);
+    }
+}
+
+// ---- Billing Master ----
+async function loadSettingsBillingItems() {
+    const container = document.getElementById('rx-settings-billing-list');
+    container.innerHTML = '<p style="color:#94a3b8; font-size:13px;">Loading...</p>';
+    try {
+        const { items } = await window.rxCallFunction('list_billing_items');
+        const active = (items || []).filter((i) => i.is_active);
+        if (active.length === 0) {
+            container.innerHTML = '<p style="color:#94a3b8; font-size:13px; font-style:italic;">No billing items added yet.</p>';
+            return;
+        }
+        container.innerHTML = active.map((i) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+                <div>
+                    <div style="font-weight:600; font-size:14px;">${escapeHtml(i.name)} <span style="font-size:11px; color:#94a3b8; text-transform:uppercase;">${escapeHtml(i.service_type)}</span></div>
+                    <div style="font-size:12px; color:#64748b;">₹${i.price}${i.gst_rate ? ` + ${i.gst_rate}% GST` : ''}</div>
+                </div>
+                <button class="btn-del-row" onclick="deleteSettingsBillingItem('${i.id}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </div>`).join('');
+        if (window.lucide) lucide.createIcons();
+    } catch (err) {
+        container.innerHTML = `<p style="color:#dc2626; font-size:13px;">${escapeHtml(err.message)}</p>`;
+    }
+}
+
+async function addSettingsBillingItem() {
+    const serviceType = document.getElementById('rx-new-bill-type').value;
+    const name = document.getElementById('rx-new-bill-name').value.trim();
+    const price = document.getElementById('rx-new-bill-price').value;
+    const gstRate = document.getElementById('rx-new-bill-gst').value;
+    if (!name || !price) { alert('Name and price are required.'); return; }
+    try {
+        await window.rxCallFunction('upsert_billing_item', { serviceType, name, price, gstRate });
+        document.getElementById('rx-new-bill-name').value = '';
+        document.getElementById('rx-new-bill-price').value = '';
+        document.getElementById('rx-new-bill-gst').value = '';
+        loadSettingsBillingItems();
+    } catch (err) {
+        alert('Failed to save billing item: ' + err.message);
+    }
+}
+
+async function deleteSettingsBillingItem(id) {
+    if (!confirm('Remove this billing item?')) return;
+    try {
+        await window.rxCallFunction('delete_billing_item', { id });
+        loadSettingsBillingItems();
+    } catch (err) {
+        alert('Failed to remove billing item: ' + err.message);
+    }
+}
