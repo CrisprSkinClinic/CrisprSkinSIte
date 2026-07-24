@@ -4,6 +4,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import ServiceCard from '../../components/ServiceCard.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '../../config/site.js';
+import { getServiceImage } from '../../utils/serviceImages';
 
 const pageTitle = "All Services";
 const pageDescription = `Complete list of dermatology, hair, and cosmetic services offered at ${siteConfig.name}, KK Nagar, Chennai.`;
@@ -47,7 +48,7 @@ const servicesByCategory = categoryOrder.map((cat) => ({
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
               <ServiceCard
-                image={service.data.heroImage ? `/images/services/${service.data.heroImage}.jpg` : '/images/services/placeholder.jpg'}
+                image={getServiceImage(service.data.heroImage) ?? (service.data.heroImage ? `/images/services/${service.data.heroImage}.jpg` : undefined)}
                 alt={service.data.title}
                 title={service.data.title}
                 description={service.data.heroSubheadline || service.data.metaDescription || ''}
