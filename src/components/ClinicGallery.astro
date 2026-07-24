@@ -1,10 +1,4 @@
 ---
-// src/components/ClinicGallery.astro
-// Clinic interior photos, sourced from public/images/clinic/ once real
-// photography is available. Uses plain <img> with onerror fallback
-// (rather than eye-care site's astro:assets Image imports of files
-// that don't exist for this clinic) so the site builds cleanly before
-// photos are supplied -- swap to Image imports once real files land.
 import { siteConfig } from '../config/site.js';
 
 const photos = [
@@ -31,8 +25,11 @@ const photos = [
           <img
             src={photo.src}
             alt={photo.alt}
-            class="w-full h-56 object-cover rounded-2xl shadow-md border border-champagne-200 bg-champagne-50"
+            width="320"
+            height="224"
             loading="lazy"
+            decoding="async"
+            class="w-full h-56 object-cover rounded-2xl shadow-md border border-champagne-200 bg-champagne-50"
             onerror={`this.onerror=null;this.src='https://placehold.co/480x360/E9DDCF/223154?text=${encodeURIComponent(siteConfig.name)}'`}
           />
         </div>
