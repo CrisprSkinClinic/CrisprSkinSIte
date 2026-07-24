@@ -1,0 +1,641 @@
+---
+// src/pages/register.astro
+//
+// Public patient self-registration form. Submissions go into
+// patient_registration_requests (via public-patient-registration.js),
+// NOT directly into the real patients table -- every submission
+// requires staff approval in Bookings Manager before becoming a real
+// patient record. This page uses MainLayout (with the site's normal
+// header/footer), unlike bookings-manager.astro's AppLayout, since
+// this is a genuine public-facing page, not an internal staff tool.
+//
+// Field set is Step 1 ("Personal Information") of the intake wizard
+// prototype -- salutation/first/last name, DOB with auto-age, gender
+// (auto-suggested from salutation), email, phone, address, pincode,
+// occupation, referral source. All required, matching the wizard.
+// Steps 2-5 of the wizard (health background, symptom picker,
+// diagnosis questions, consent) are a separate, not-yet-built
+// feature (planned /intake?appointment_id=<uuid> page) and are
+// intentionally NOT part of this page.
+//
+// v2: DOB auto-slash + native date picker (synced both ways), fields
+// grouped into 3 collapsible <details> sections, autocomplete/
+// inputmode attributes, autofocus.
+//
+// v3: wider container (max-w-3xl instead of max-w-2xl); each section
+// auto-opens the next one once all of its own required fields
+// validate (patient can still manually open/close any section);
+// added a review/preview screen between "Submit Registration" and
+// the actual API call, so patients see everything they entered and
+// can go back to edit before confirming; on success, redirects to
+// the site homepage ("/") after a short pause instead of showing an
+// inline success message.
+import MainLayout from '../layouts/MainLayout.astro';
+import { siteConfig } from '../config/site.js';
+---
+
+<MainLayout title={`Patient Registration | ${siteConfig.name}`} description="Register as a new patient at CRISPR Skin and Hair Clinic ahead of your visit.">
+  <div class="max-w-3xl mx-auto py-16 px-6">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-3 text-center">Patient Registration</h1>
+    <p class="text-slate-600 text-center mb-10">
+      Register your details ahead of your visit. Our front desk will review and confirm your registration -- there's nothing further you need to do after submitting.
+    </p>
+
+    <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-champagne-200 p-8 md:p-12">
+      <form id="reg-form" class="space-y-4">
+
+        <details open id="section-1" class="group border border-slate-200 rounded-xl overflow-hidden">
+          <summary class="cursor-pointer select-none list-none px-5 py-4 bg-slate-50 font-semibold text-brand-900 flex items-center justify-between">
+            <span>1. About You</span>
+            <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div class="p-5 md:p-6 space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="reg-salutation" class="text-sm font-semibold text-slate-700 mb-1 block">Salutation *</label>
+                <select id="reg-salutation" required autofocus autocomplete="honorific-prefix"
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+                  <option value="">Select</option>
+                  <option value="Mr.">Mr.</option>
+                  <option value="Ms.">Ms.</option>
+                  <option value="Mrs.">Mrs.</option>
+                  <option value="Dr.">Dr.</option>
+                  <option value="Master">Master</option>
+                  <option value="Baby">Baby</option>
+                </select>
+              </div>
+              <div>
+                <label for="reg-gender" class="text-sm font-semibold text-slate-700 mb-1 block">Gender *</label>
+                <select id="reg-gender" required autocomplete="sex"
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="reg-first-name" class="text-sm font-semibold text-slate-700 mb-1 block">First Name *</label>
+                <input type="text" id="reg-first-name" required placeholder="First name" autocomplete="given-name"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+              <div>
+                <label for="reg-last-name" class="text-sm font-semibold text-slate-700 mb-1 block">Last Name *</label>
+                <input type="text" id="reg-last-name" required placeholder="Last name" autocomplete="family-name"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+            </div>
+
+            <div>
+              <label for="reg-dob" class="text-sm font-semibold text-slate-700 mb-1 block">Date of Birth *</label>
+              <div class="flex gap-2">
+                <input type="text" id="reg-dob" required placeholder="DD/MM/YYYY" inputmode="numeric" autocomplete="bday" maxlength="10"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+                <label for="reg-dob-picker" class="shrink-0 w-12 flex items-center justify-center border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 transition" aria-label="Pick date from calendar">
+                  <svg class="w-5 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <input type="date" id="reg-dob-picker" class="sr-only" />
+                </label>
+              </div>
+              <p id="reg-dob-error" class="text-slate-500 text-xs mt-1 min-h-[1rem]"></p>
+              <p class="text-slate-400 text-xs mt-1">Type it in, or tap the calendar icon to pick a date. <span id="reg-age-display"></span></p>
+            </div>
+          </div>
+        </details>
+
+        <details id="section-2" class="group border border-slate-200 rounded-xl overflow-hidden">
+          <summary class="cursor-pointer select-none list-none px-5 py-4 bg-slate-50 font-semibold text-brand-900 flex items-center justify-between">
+            <span>2. Contact Details</span>
+            <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div class="p-5 md:p-6 space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="reg-email" class="text-sm font-semibold text-slate-700 mb-1 block">Email Address *</label>
+                <input type="email" id="reg-email" required placeholder="name@domain.com" autocomplete="email" inputmode="email"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+              <div>
+                <label for="reg-phone" class="text-sm font-semibold text-slate-700 mb-1 block">Phone Number *</label>
+                <input type="tel" id="reg-phone" required placeholder="9876543210" autocomplete="tel" inputmode="numeric" maxlength="10"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+            </div>
+
+            <div>
+              <label for="reg-pincode" class="text-sm font-semibold text-slate-700 mb-1 block">Pincode *</label>
+              <input type="text" id="reg-pincode" required placeholder="600078" inputmode="numeric" autocomplete="postal-code" maxlength="6"
+                     class="w-full max-w-xs px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              <p id="reg-pincode-status" class="text-slate-500 text-xs mt-1 min-h-[1rem]"></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <label for="reg-area" class="text-sm font-semibold text-slate-700 mb-1 block">Area *</label>
+                <select id="reg-area" required disabled
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition disabled:bg-slate-50 disabled:text-slate-400">
+                  <option value="">Enter pincode first</option>
+                </select>
+              </div>
+              <div>
+                <label for="reg-city" class="text-sm font-semibold text-slate-700 mb-1 block">City / District *</label>
+                <input type="text" id="reg-city" required placeholder="Auto-filled from pincode" autocomplete="address-level2"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+              <div>
+                <label for="reg-state" class="text-sm font-semibold text-slate-700 mb-1 block">State *</label>
+                <input type="text" id="reg-state" required placeholder="Auto-filled from pincode" autocomplete="address-level1"
+                       class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+              </div>
+            </div>
+
+            <div>
+              <label for="reg-address" class="text-sm font-semibold text-slate-700 mb-1 block">Door No. / Apartment / Street *</label>
+              <textarea id="reg-address" required rows="2" placeholder="e.g. Flat 4B, Sunrise Apartments, 3rd Cross Street" autocomplete="address-line1"
+                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition"></textarea>
+              <p id="reg-address-counter" class="text-slate-500 text-xs mt-1">0/10 characters</p>
+            </div>
+          </div>
+        </details>
+
+        <details id="section-3" class="group border border-slate-200 rounded-xl overflow-hidden">
+          <summary class="cursor-pointer select-none list-none px-5 py-4 bg-slate-50 font-semibold text-brand-900 flex items-center justify-between">
+            <span>3. A Little More</span>
+            <svg class="w-4 h-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div class="p-5 md:p-6 space-y-5">
+            <div>
+              <label for="reg-occupation" class="text-sm font-semibold text-slate-700 mb-1 block">Occupation *</label>
+              <input type="text" id="reg-occupation" required placeholder="Your occupation" autocomplete="organization-title"
+                     class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+            </div>
+
+            <div>
+              <label for="reg-referral" class="text-sm font-semibold text-slate-700 mb-1 block">How did you hear about us? *</label>
+              <select id="reg-referral" required
+                      class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+                <option value="">Select</option>
+                <option value="Friend/Family Referral">Friend/Family Referral</option>
+                <option value="Doctor Referral">Doctor Referral</option>
+                <option value="Google Search">Google Search</option>
+                <option value="Social Media">Social Media</option>
+                <option value="Practo">Practo</option>
+                <option value="Walk-in">Walk-in</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div id="reg-referral-other-group" class="hidden">
+              <label for="reg-referral-other" class="text-sm font-semibold text-slate-700 mb-1 block">Please specify *</label>
+              <input type="text" id="reg-referral-other" placeholder="How did you hear about us?"
+                     class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition" />
+            </div>
+          </div>
+        </details>
+
+        <button type="submit" id="reg-review-btn"
+                class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98] mt-2">
+          Review My Details
+        </button>
+        <p id="reg-error" class="text-red-600 text-sm text-center min-h-[1.25rem]"></p>
+      </form>
+    </div>
+
+    <!-- Review/preview screen -- shown after "Review My Details" passes validation,
+         before anything is actually submitted to the server -->
+    <div id="reg-review-container" class="hidden bg-white rounded-2xl shadow-sm border border-champagne-200 p-8 md:p-12">
+      <h2 class="text-xl font-bold text-slate-900 mb-1">Review Your Details</h2>
+      <p class="text-slate-500 text-sm mb-6">Please check everything below is correct before submitting.</p>
+
+      <dl id="reg-review-list" class="divide-y divide-slate-100 border-y border-slate-100 mb-8"></dl>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="button" id="reg-back-btn"
+                class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
+          Back to Edit
+        </button>
+        <button type="button" id="reg-confirm-btn"
+                class="w-full flex-1 bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98]">
+          Confirm &amp; Submit
+        </button>
+      </div>
+      <p id="reg-submit-error" class="text-red-600 text-sm text-center min-h-[1.25rem] mt-3"></p>
+    </div>
+
+    <!-- Shown briefly after successful submission, before redirecting home -->
+    <div id="reg-success-container" class="hidden bg-white rounded-2xl shadow-sm border border-champagne-200 p-10 text-center">
+      <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h2 class="text-xl font-bold text-slate-900 mb-2">Registration Submitted</h2>
+      <p class="text-slate-600">
+        Thank you -- your registration has been received and is pending review by our front desk. Taking you back to our homepage...
+      </p>
+    </div>
+  </div>
+</MainLayout>
+
+<script is:inline>
+  // --- DOB parsing, shared by both the text field and the date picker ---
+  function parseDOB(str) {
+    const parts = String(str || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (!parts) return null;
+    const d = new Date(parts[3], parts[2] - 1, parts[1]);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  function updateAgeAndError(dobDate) {
+    const dobError = document.getElementById('reg-dob-error');
+    const ageDisplay = document.getElementById('reg-age-display');
+
+    if (!dobDate) {
+      dobError.textContent = '';
+      ageDisplay.textContent = '';
+      return;
+    }
+    const today = new Date();
+    let age = today.getFullYear() - dobDate.getFullYear();
+    const monthDiff = today.getMonth() - dobDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) age--;
+    if (age < 0 || age > 120) {
+      dobError.textContent = 'Enter a valid date (DD/MM/YYYY)';
+      ageDisplay.textContent = '';
+      return;
+    }
+    dobError.textContent = '';
+    ageDisplay.textContent = `Age: ${age} years.`;
+  }
+
+  // --- Section auto-advance: each section's own required fields, used
+  // to detect "this section is now fully and validly filled" ---
+  const SECTION_FIELD_IDS = {
+    'section-1': ['reg-salutation', 'reg-gender', 'reg-first-name', 'reg-last-name', 'reg-dob'],
+    'section-2': ['reg-email', 'reg-phone', 'reg-pincode', 'reg-area', 'reg-city', 'reg-state', 'reg-address'],
+    'section-3': ['reg-occupation', 'reg-referral'], // reg-referral-other checked separately below
+  };
+  const SECTION_ORDER = ['section-1', 'section-2', 'section-3'];
+
+  function isSection1Valid() {
+    return !!document.getElementById('reg-salutation').value
+      && !!document.getElementById('reg-gender').value
+      && !!document.getElementById('reg-first-name').value.trim()
+      && !!document.getElementById('reg-last-name').value.trim()
+      && !!parseDOB(document.getElementById('reg-dob').value);
+  }
+  function isSection2Valid() {
+    const email = document.getElementById('reg-email').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const pincode = document.getElementById('reg-pincode').value.trim();
+    const area = document.getElementById('reg-area').value;
+    const city = document.getElementById('reg-city').value.trim();
+    const state = document.getElementById('reg-state').value.trim();
+    const address = document.getElementById('reg-address').value.trim();
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(email)
+      && /^[6-9][0-9]{9}$/.test(phone)
+      && /^[0-9]{6}$/.test(pincode)
+      && !!area
+      && !!city
+      && !!state
+      && address.length >= 10;
+  }
+  function isSection3Valid() {
+    const occupation = document.getElementById('reg-occupation').value.trim();
+    const referralSource = document.getElementById('reg-referral').value;
+    const referralOtherDetails = document.getElementById('reg-referral-other').value.trim();
+    if (!occupation || !referralSource) return false;
+    if (referralSource === 'Other' && !referralOtherDetails) return false;
+    return true;
+  }
+  const SECTION_VALIDATORS = { 'section-1': isSection1Valid, 'section-2': isSection2Valid, 'section-3': isSection3Valid };
+
+  // Tracks which sections have already been auto-advanced past, so we
+  // don't keep forcing a section open again if the patient deliberately
+  // collapses it after finishing (e.g. to review earlier answers).
+  const autoAdvanced = new Set();
+
+  function maybeAutoAdvance(sectionId) {
+    if (autoAdvanced.has(sectionId)) return;
+    if (!SECTION_VALIDATORS[sectionId]()) return;
+    autoAdvanced.add(sectionId);
+    const idx = SECTION_ORDER.indexOf(sectionId);
+    const nextId = SECTION_ORDER[idx + 1];
+    if (nextId) {
+      const nextSection = document.getElementById(nextId);
+      if (!nextSection.open) {
+        nextSection.open = true;
+        const firstField = nextSection.querySelector('input, select, textarea');
+        if (firstField) firstField.focus({ preventScroll: false });
+      }
+    }
+  }
+
+  function attachAutoAdvance(sectionId) {
+    document.getElementById(sectionId).querySelectorAll('input, select, textarea').forEach((el) => {
+      el.addEventListener('input', () => maybeAutoAdvance(sectionId));
+      el.addEventListener('change', () => maybeAutoAdvance(sectionId));
+    });
+  }
+  SECTION_ORDER.forEach(attachAutoAdvance);
+
+  // --- Text field: auto-inserts "/" as the patient types digits ---
+  const dobInput = document.getElementById('reg-dob');
+  dobInput.addEventListener('input', (e) => {
+    let digits = e.target.value.replace(/[^0-9]/g, '').slice(0, 8);
+    let formatted = digits;
+    if (digits.length > 4) {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    } else if (digits.length > 2) {
+      formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+    e.target.value = formatted;
+
+    const dobDate = parseDOB(formatted);
+    updateAgeAndError(dobDate);
+    if (dobDate) {
+      const iso = `${dobDate.getFullYear()}-${String(dobDate.getMonth() + 1).padStart(2, '0')}-${String(dobDate.getDate()).padStart(2, '0')}`;
+      document.getElementById('reg-dob-picker').value = iso;
+    }
+  });
+  dobInput.addEventListener('blur', () => updateAgeAndError(parseDOB(dobInput.value)));
+
+  // --- Native date picker: fills the text field when a date is chosen ---
+  document.getElementById('reg-dob-picker').addEventListener('change', (e) => {
+    const iso = e.target.value; // YYYY-MM-DD
+    if (!iso) return;
+    const [yyyy, mm, dd] = iso.split('-');
+    const formatted = `${dd}/${mm}/${yyyy}`;
+    dobInput.value = formatted;
+    updateAgeAndError(parseDOB(formatted));
+  });
+
+  // --- Salutation -> gender auto-suggestion, same mapping as the wizard ---
+  document.getElementById('reg-salutation').addEventListener('change', (e) => {
+    const genderSelect = document.getElementById('reg-gender');
+    const s = e.target.value;
+    if (s === 'Mr.' || s === 'Master') genderSelect.value = 'male';
+    else if (s === 'Ms.' || s === 'Mrs.' || s === 'Baby') genderSelect.value = 'female';
+  });
+
+  // --- Referral "Other" follow-up ---
+  document.getElementById('reg-referral').addEventListener('change', (e) => {
+    const group = document.getElementById('reg-referral-other-group');
+    const otherInput = document.getElementById('reg-referral-other');
+    const isOther = e.target.value === 'Other';
+    group.classList.toggle('hidden', !isOther);
+    otherInput.required = isOther;
+    if (!isOther) otherInput.value = '';
+  });
+  document.getElementById('reg-referral-other').addEventListener('input', () => maybeAutoAdvance('section-3'));
+
+  // --- Address character counter ---
+  document.getElementById('reg-address').addEventListener('input', (e) => {
+    document.getElementById('reg-address-counter').textContent = `${e.target.value.length}/10 characters`;
+  });
+
+  // --- Phone / pincode: digits only, length-capped ---
+  document.getElementById('reg-phone').addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+  });
+
+  // --- Pincode -> Area/City/State auto-fill, via India Post's free
+  // public API. Debounced so it only fires once a full 6-digit pincode
+  // is typed. When a pincode maps to multiple localities, the patient
+  // picks the right one from the Area dropdown; City/State are the
+  // same across all of them for a given pincode, so those fill in
+  // directly as editable text (in case the API result is wrong/stale).
+  // On any lookup failure, Area/City/State are simply left for the
+  // patient to fill in manually -- pincode itself stays valid either way. ---
+  let pincodeLookupTimer = null;
+  let lastLookedUpPincode = '';
+
+  function resetAreaDropdown(placeholderText) {
+    const areaSelect = document.getElementById('reg-area');
+    areaSelect.innerHTML = `<option value="">${placeholderText}</option>`;
+    areaSelect.disabled = true;
+  }
+
+  async function lookupPincodeArea(pincode) {
+    const statusEl = document.getElementById('reg-pincode-status');
+    const areaSelect = document.getElementById('reg-area');
+    const cityInput = document.getElementById('reg-city');
+    const stateInput = document.getElementById('reg-state');
+
+    if (pincode === lastLookedUpPincode) return; // already looked up, avoid repeat calls
+    lastLookedUpPincode = pincode;
+    statusEl.textContent = 'Looking up area...';
+
+    try {
+      const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+      const data = await response.json();
+      const result = Array.isArray(data) ? data[0] : null;
+      const postOffices = result && result.Status === 'Success' ? result.PostOffice : null;
+
+      if (!postOffices || postOffices.length === 0) {
+        statusEl.textContent = "Couldn't find that pincode -- please fill in Area, City and State manually.";
+        resetAreaDropdown('Select area');
+        areaSelect.disabled = false;
+        return;
+      }
+
+      statusEl.textContent = postOffices.length > 1
+        ? 'Multiple areas found for this pincode -- please select yours.'
+        : '';
+
+      areaSelect.innerHTML = '<option value="">Select area</option>'
+        + postOffices.map((po) => `<option value="${po.Name}">${po.Name}</option>`).join('');
+      areaSelect.disabled = false;
+      if (postOffices.length === 1) {
+        areaSelect.value = postOffices[0].Name;
+      }
+
+      // District/State are consistent across all post offices sharing a
+      // pincode, so these fill in regardless of which area is picked.
+      cityInput.value = postOffices[0].District;
+      stateInput.value = postOffices[0].State;
+      cityInput.dispatchEvent(new Event('input'));
+      stateInput.dispatchEvent(new Event('input'));
+      areaSelect.dispatchEvent(new Event('change'));
+    } catch {
+      statusEl.textContent = "Couldn't look up that pincode -- please fill in Area, City and State manually.";
+      resetAreaDropdown('Select area');
+      areaSelect.disabled = false;
+    }
+  }
+
+  document.getElementById('reg-pincode').addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+    const statusEl = document.getElementById('reg-pincode-status');
+    clearTimeout(pincodeLookupTimer);
+    if (e.target.value.length !== 6) {
+      statusEl.textContent = '';
+      lastLookedUpPincode = '';
+      resetAreaDropdown('Enter pincode first');
+      document.getElementById('reg-city').value = '';
+      document.getElementById('reg-state').value = '';
+      return;
+    }
+    pincodeLookupTimer = setTimeout(() => lookupPincodeArea(e.target.value), 400);
+  });
+
+  // Area/City/State also participate in section auto-advance
+  document.getElementById('reg-area').addEventListener('change', () => maybeAutoAdvance('section-2'));
+  document.getElementById('reg-city').addEventListener('input', () => maybeAutoAdvance('section-2'));
+  document.getElementById('reg-state').addEventListener('input', () => maybeAutoAdvance('section-2'));
+
+  // --- Jump to and open the section containing the first invalid field ---
+  function revealFieldSection(fieldId) {
+    const field = document.getElementById(fieldId);
+    const details = field.closest('details');
+    if (details) details.open = true;
+  }
+
+  const SALUTATION_LABELS = { 'Mr.': 'Mr.', 'Ms.': 'Ms.', 'Mrs.': 'Mrs.', 'Dr.': 'Dr.', 'Master': 'Master', 'Baby': 'Baby' };
+  const GENDER_LABELS = { male: 'Male', female: 'Female', other: 'Other' };
+
+  function collectFormValues() {
+    return {
+      salutation: document.getElementById('reg-salutation').value,
+      firstName: document.getElementById('reg-first-name').value.trim(),
+      lastName: document.getElementById('reg-last-name').value.trim(),
+      dob: document.getElementById('reg-dob').value.trim(),
+      gender: document.getElementById('reg-gender').value,
+      email: document.getElementById('reg-email').value.trim(),
+      phone: document.getElementById('reg-phone').value.trim(),
+      pincode: document.getElementById('reg-pincode').value.trim(),
+      area: document.getElementById('reg-area').value,
+      city: document.getElementById('reg-city').value.trim(),
+      state: document.getElementById('reg-state').value.trim(),
+      address: document.getElementById('reg-address').value.trim(),
+      occupation: document.getElementById('reg-occupation').value.trim(),
+      referralSource: document.getElementById('reg-referral').value,
+      referralOtherDetails: document.getElementById('reg-referral-other').value.trim(),
+    };
+  }
+
+  function validateFormValues(v) {
+    if (!v.salutation) { revealFieldSection('reg-salutation'); return 'Please select a salutation.'; }
+    if (!v.firstName || !v.lastName) { revealFieldSection('reg-first-name'); return 'Please enter your first and last name.'; }
+    if (!parseDOB(v.dob)) { revealFieldSection('reg-dob'); return 'Please enter a valid date of birth (DD/MM/YYYY).'; }
+    if (!v.gender) { revealFieldSection('reg-gender'); return 'Please select a gender.'; }
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(v.email)) { revealFieldSection('reg-email'); return 'Please enter a valid email address.'; }
+    if (!/^[6-9][0-9]{9}$/.test(v.phone)) { revealFieldSection('reg-phone'); return 'Please enter a valid 10-digit phone number.'; }
+    if (!/^[0-9]{6}$/.test(v.pincode)) { revealFieldSection('reg-pincode'); return 'Please enter a valid 6-digit pincode.'; }
+    if (!v.area) { revealFieldSection('reg-area'); return 'Please select your area.'; }
+    if (!v.city) { revealFieldSection('reg-city'); return 'Please enter your city.'; }
+    if (!v.state) { revealFieldSection('reg-state'); return 'Please enter your state.'; }
+    if (v.address.length < 10) { revealFieldSection('reg-address'); return 'Please enter your door no. / apartment / street.'; }
+    if (!v.occupation) { revealFieldSection('reg-occupation'); return 'Please enter your occupation.'; }
+    if (!v.referralSource) { revealFieldSection('reg-referral'); return 'Please let us know how you heard about us.'; }
+    if (v.referralSource === 'Other' && !v.referralOtherDetails) { revealFieldSection('reg-referral-other'); return 'Please specify how you heard about us.'; }
+    return null;
+  }
+
+  function reviewRow(label, value) {
+    return `<div class="py-3 grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4">
+      <dt class="text-sm font-semibold text-slate-500">${label}</dt>
+      <dd class="sm:col-span-2 text-slate-800">${value}</dd>
+    </div>`;
+  }
+
+  function renderReview(v) {
+    const list = document.getElementById('reg-review-list');
+    const dobDate = parseDOB(v.dob);
+    let ageStr = '';
+    if (dobDate) {
+      const today = new Date();
+      let age = today.getFullYear() - dobDate.getFullYear();
+      const monthDiff = today.getMonth() - dobDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) age--;
+      ageStr = ` (${age} years)`;
+    }
+    const referralDisplay = v.referralSource === 'Other'
+      ? `${v.referralSource} -- ${v.referralOtherDetails}`
+      : v.referralSource;
+
+    list.innerHTML = [
+      reviewRow('Name', `${SALUTATION_LABELS[v.salutation] || v.salutation} ${v.firstName} ${v.lastName}`),
+      reviewRow('Gender', GENDER_LABELS[v.gender] || v.gender),
+      reviewRow('Date of Birth', `${v.dob}${ageStr}`),
+      reviewRow('Email', v.email),
+      reviewRow('Phone', v.phone),
+      reviewRow('Address', `${v.address}, ${v.area}, ${v.city}, ${v.state} - ${v.pincode}`),
+      reviewRow('Occupation', v.occupation),
+      reviewRow('How you heard about us', referralDisplay),
+    ].join('');
+  }
+
+  // --- "Review My Details" -> validate, then show the review screen ---
+  document.getElementById('reg-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const errorEl = document.getElementById('reg-error');
+    errorEl.textContent = '';
+
+    const values = collectFormValues();
+    const validationError = validateFormValues(values);
+    if (validationError) {
+      errorEl.textContent = validationError;
+      return;
+    }
+
+    renderReview(values);
+    document.getElementById('reg-form-container').classList.add('hidden');
+    document.getElementById('reg-review-container').classList.remove('hidden');
+    document.getElementById('reg-review-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // --- "Back to Edit" -> return to the form with all values intact ---
+  document.getElementById('reg-back-btn').addEventListener('click', () => {
+    document.getElementById('reg-review-container').classList.add('hidden');
+    document.getElementById('reg-form-container').classList.remove('hidden');
+    document.getElementById('reg-form-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // --- "Confirm & Submit" -> actually calls the API, then redirects home ---
+  document.getElementById('reg-confirm-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('reg-confirm-btn');
+    const submitErrorEl = document.getElementById('reg-submit-error');
+    submitErrorEl.textContent = '';
+
+    const values = collectFormValues();
+    const validationError = validateFormValues(values);
+    if (validationError) {
+      // Values shouldn't have changed since the review screen was built,
+      // but re-validate defensively before hitting the network.
+      document.getElementById('reg-review-container').classList.add('hidden');
+      document.getElementById('reg-form-container').classList.remove('hidden');
+      document.getElementById('reg-error').textContent = validationError;
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+    try {
+      const response = await fetch('/.netlify/functions/public-patient-registration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...values,
+          name: `${values.salutation} ${values.firstName} ${values.lastName}`.trim(),
+          referralOtherDetails: values.referralSource === 'Other' ? values.referralOtherDetails : '',
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Something went wrong. Please try again.');
+      }
+      document.getElementById('reg-review-container').classList.add('hidden');
+      document.getElementById('reg-success-container').classList.remove('hidden');
+      document.getElementById('reg-success-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2200);
+    } catch (err) {
+      submitErrorEl.textContent = err.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Confirm & Submit';
+    }
+  });
+</script>

@@ -1,24 +1,12 @@
 ---
-// src/pages/[category].astro
-//
-// One reusable page per top-level service category (Hair, Skin, Cosmetic,
-// Pediatric) -- matches the 4 category values in the services content
-// schema, and is what the Navbar mega-menu's category headers link to
-// (/hair, /skin, /cosmetic, /pediatric). Built as a single dynamic router
-// rather than 4 near-identical files, since the only thing that differs
-// between them is which services get filtered in and the page copy.
 import MainLayout from '../layouts/MainLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ServiceCard from '../components/ServiceCard.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '../config/site.js';
+import { getServiceImage, getServiceImageAlt } from '../utils/serviceImages';
 
 export async function getStaticPaths() {
-  // Defined inside getStaticPaths (not as an outer const) because Astro
-  // runs this function in an isolated scope during static route
-  // generation -- it does not close over top-level frontmatter variables
-  // the way the render body below it does. Referencing an outer const
-  // here fails the build with "categoryContent is not defined" even
-  // though the same reference works fine in the page body.
   const categoryContent = {
     hair: {
       label: 'Hair',
@@ -71,19 +59,16 @@ const pageDescription = `${content.subheadline} Available at ${siteConfig.name},
     <p class="text-lg text-brand-200 max-w-2xl mx-auto">{content.subheadline}</p>
   </div>
 
-  <div class="max-w-6xl mx-auto py-16 px-6">
+  <div class="max-w-7xl mx-auto py-16 px-6">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {services.map((service) => (
-        <a
-          href={`/services/${service.slug}`}
-          class="bg-white rounded-2xl border border-champagne-200 p-6 hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full"
-        >
-          <h2 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-brand-700 transition-colors">{service.data.title}</h2>
-          <p class="text-sm text-slate-600 leading-relaxed mb-4 flex-grow">{service.data.heroSubheadline}</p>
-          <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
-            Learn More <span aria-hidden="true">&rarr;</span>
-          </span>
-        </a>
+        <ServiceCard
+          image={getServiceImage(service.data.heroImage) ?? (service.data.heroImage ? `/images/services/${service.data.heroImage}.jpg` : undefined)}
+          alt={getServiceImageAlt(service.data.heroImage, service.data.title)}
+          title={service.data.title}
+          description={service.data.heroSubheadline || service.data.metaDescription || ''}
+          link={`/services/${service.slug}`}
+        />
       ))}
     </div>
 

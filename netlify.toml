@@ -5,6 +5,12 @@
 [functions]
   directory = "netlify/functions"
 
+[functions."backup-database"]
+  # Runs daily at 20:30 UTC = 2:00 AM IST -- overnight, when the clinic
+  # is closed (per the site's own listed hours, latest close is 9 PM
+  # IST) and unlikely to collide with real usage.
+  schedule = "30 20 * * *"
+
 [build.environment]
   NODE_VERSION = "20"
   NODE_OPTIONS = "--max-old-space-size=4096"
