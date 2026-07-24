@@ -9,25 +9,17 @@ import { getCollection, getEntry } from 'astro:content';
 import ClinicGallery from '../components/ClinicGallery.astro';
 import BookingSection from '../components/LandingPageSections/BookingSection.astro';
 import { siteConfig } from '../config/site.js';
+import { getServiceImage } from '../utils/serviceImages';
 
-// Service card images: plain public-path strings with onerror fallback
-// (see services/[slug].astro for the same pattern) rather than
-// astro:assets imports of files that don't exist yet for this clinic.
-// Swap to optimized Image imports once real photography lands in
-// public/images/services/.
 const featuredServices = [
-  { image: '/images/services/hair-transplant-fue.jpg', alt: 'Hair transplant procedure', title: 'Hair Transplant (FUE)', description: 'Advanced Follicular Unit Extraction for natural, permanent hair restoration performed by a dedicated hair transplant surgeon.', link: '/services/hair-transplant-fue' },
-  { image: '/images/services/acne.jpg', alt: 'Acne treatment consultation', title: 'Acne & Acne Scars', description: 'Evidence-based treatment for active acne and the scarring it leaves behind, tailored to your skin type.', link: '/services/acne' },
-  { image: '/images/services/pigmentation.jpg', alt: 'Skin pigmentation treatment', title: 'Pigmentation & Melasma', description: 'Targeted treatment for stubborn pigmentation and melasma using dermatologist-guided regimens.', link: '/services/pigmentation' },
-  { image: '/images/services/vitiligo.jpg', alt: 'Vitiligo treatment', title: 'Vitiligo', description: 'Comprehensive evaluation and long-term management of vitiligo with realistic, honest expectations.', link: '/services/vitiligo' },
-  { image: '/images/services/botox.jpg', alt: 'Cosmetic dermatology treatment', title: 'Botox & Fillers', description: 'Subtle, natural-looking anti-ageing and rejuvenation treatments administered by trained dermatologists.', link: '/services/botox' },
-  { image: '/images/services/pediatric-dermatology.jpg', alt: 'Pediatric dermatology consultation', title: 'Pediatric Dermatology', description: "A child-friendly approach to eczema, birthmarks, and other skin conditions in infants and children.", link: '/services/pediatric-dermatology' },
+  { slug: 'hair-transplant-fue', alt: 'Hair transplant procedure', title: 'Hair Transplant (FUE)', description: 'Advanced Follicular Unit Extraction for natural, permanent hair restoration performed by a dedicated hair transplant surgeon.', link: '/services/hair-transplant-fue' },
+  { slug: 'acne', alt: 'Acne treatment consultation', title: 'Acne & Acne Scars', description: 'Evidence-based treatment for active acne and the scarring it leaves behind, tailored to your skin type.', link: '/services/acne' },
+  { slug: 'pigmentation', alt: 'Skin pigmentation treatment', title: 'Pigmentation & Melasma', description: 'Targeted treatment for stubborn pigmentation and melasma using dermatologist-guided regimens.', link: '/services/pigmentation' },
+  { slug: 'vitiligo', alt: 'Vitiligo treatment', title: 'Vitiligo', description: 'Comprehensive evaluation and long-term management of vitiligo with realistic, honest expectations.', link: '/services/vitiligo' },
+  { slug: 'botox', alt: 'Cosmetic dermatology treatment', title: 'Botox & Fillers', description: 'Subtle, natural-looking anti-ageing and rejuvenation treatments administered by trained dermatologists.', link: '/services/botox' },
+  { slug: 'pediatric-dermatology', alt: 'Pediatric dermatology consultation', title: 'Pediatric Dermatology', description: "A child-friendly approach to eczema, birthmarks, and other skin conditions in infants and children.", link: '/services/pediatric-dermatology' },
 ];
 
-// A representative spread of conditions across categories (Hair, Skin,
-// Cosmetic-adjacent, Pediatric), pulled from the real conditions
-// collection by slug -- title/description come from the actual content
-// files, not hardcoded copy, so this stays correct if those files change.
 const featuredConditionSlugs = [
   'androgenetic-alopecia',
   'melasma',
@@ -40,11 +32,9 @@ const featuredConditions = (
   await Promise.all(featuredConditionSlugs.map((slug) => getEntry('conditions', slug)))
 ).filter(Boolean);
 
-// SEO Optimized Meta Data (Ranking Booster)
 const pageTitle = "Best Skin & Hair Clinic in KK Nagar, Chennai";
 const pageDescription = siteConfig.description;
 
-// SAFE FETCH: Get posts, but default to an empty array if none exist to prevent crashes
 const allPosts = await getCollection('blog') || [];
 const latestPosts = allPosts
   .sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf())
@@ -68,13 +58,14 @@ const latestPosts = allPosts
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {featuredServices.map((service) => (
+      {featuredServices.map((service, i) => (
         <ServiceCard 
-          image={service.image}
+          image={getServiceImage(service.slug)}
           alt={service.alt}
           title={service.title} 
           description={service.description}
           link={service.link}
+          priority={i < 3}
         />
       ))}
     </div>
@@ -135,6 +126,10 @@ const latestPosts = allPosts
             <img
               src={`/images/doctors/${doctor.slug}.jpg`}
               alt={doctor.name}
+              width="400"
+              height="533"
+              loading="lazy"
+              decoding="async"
               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               onerror={`this.onerror=null;this.src='https://placehold.co/400x533/EEF0F6/223154?text=${encodeURIComponent(doctor.name)}'`}
             />
@@ -155,9 +150,6 @@ const latestPosts = allPosts
   </section>
 
   <script>
-    // Shuffle order on each visit (static build -- a build-time shuffle
-    // would freeze the same order for every visitor until the next
-    // deploy, so this runs client-side instead).
     document.addEventListener('astro:page-load', () => {
       const grid = document.getElementById('doctorGridHome');
       if (!grid) return;
@@ -217,7 +209,7 @@ const latestPosts = allPosts
 
   <FAQ limit={5} />
 
- <ClinicGallery />
+  <ClinicGallery />
 
   <section class="py-16 px-6 max-w-7xl mx-auto">
     <div class="text-center mb-10">
