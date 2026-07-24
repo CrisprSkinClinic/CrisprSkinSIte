@@ -1,21 +1,48 @@
 ---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  title: string;
+  description: string;
+  link: string;
+  image?: ImageMetadata | string;
+  alt?: string;
+  priority?: boolean;
+}
+
 const { title, description, link, image, alt, priority = false } = Astro.props;
+
+const isOptimized = image && typeof image === 'object' && 'src' in image;
 ---
 <a href={link} class="bg-white rounded-2xl shadow-sm border border-champagne-200 overflow-hidden hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full">
   
   <div class="relative aspect-square overflow-hidden bg-champagne-50">
-    <img 
-      src={image} 
-      alt={alt || title}
-      width="500"
-      height="500"
-      loading={priority ? "eager" : "lazy"}
-      decoding="async"
-      fetchpriority={priority ? "high" : "auto"}
-      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-      class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]"
-      onerror={`this.onerror=null;this.src='https://placehold.co/500x500/F7F2EB/223154?text=${encodeURIComponent(title)}'`}
-    />
+    {isOptimized ? (
+      <Image
+        src={image}
+        alt={alt || title}
+        width={500}
+        height={500}
+        widths={[300, 400, 500]}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        format="webp"
+        quality={80}
+        loading={priority ? "eager" : "lazy"}
+        class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]"
+      />
+    ) : (
+      <img 
+        src={typeof image === 'string' ? image : 'https://placehold.co/500x500/F7F2EB/223154?text=Service'}
+        alt={alt || title}
+        width="500"
+        height="500"
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
+        class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]"
+        onerror={`this.onerror=null;this.src='https://placehold.co/500x500/F7F2EB/223154?text=${encodeURIComponent(title)}'`}
+      />
+    )}
   </div>
   
   <div class="p-6 md:p-8 flex flex-col flex-grow">
