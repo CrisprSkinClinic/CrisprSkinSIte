@@ -148,6 +148,7 @@ async function loadPreviousPrescription(rxId) {
     const modal = document.getElementById('history-modal');
     const contentArea = document.getElementById('history-content-area');
     const dateLabel = document.getElementById('hist-modal-date');
+    const viewPdfBtn = document.getElementById('btn-view-rx-pdf');
 
     contentArea.innerHTML = '<div style="text-align:center; padding:40px; color:#cbd5e1;"><i data-lucide="loader-2" class="w-8 h-8 animate-spin"></i></div>';
     if (window.lucide) lucide.createIcons();
@@ -158,8 +159,32 @@ async function loadPreviousPrescription(rxId) {
         contentArea.innerHTML = generateStaticRxHtml(rxData);
         dateLabel.textContent = new Date(rxData.created_at || Date.now()).toLocaleDateString();
         document.getElementById('btn-copy-rx').onclick = () => copyHistoryToActive(rxData);
+
+        viewPdfBtn.style.display = rxData.pdf_url ? 'inline-flex' : 'none';
+        viewPdfBtn.onclick = () => viewPrescriptionPdf(rxId, viewPdfBtn);
     } catch (err) {
         contentArea.innerHTML = `<div style="text-align:center; padding:20px; color:red;">Error: ${escapeHtml(err.message)}</div>`;
+    }
+}
+
+async function viewPrescriptionPdf(rxId, btn) {
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Loading...';
+    try {
+        const response = await fetch('/.netlify/functions/get-prescription-pdf-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken: window.rxGetCurrentAccessToken(), rxId }),
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not open PDF.');
+        window.open(result.url, '_blank');
+    } catch (err) {
+        alert('Failed to open PDF: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
     }
 }
 
@@ -533,14 +558,45 @@ async function saveDraft() {
 
 async function savePrescription() {
     if (!RxApp.state.patient) { alert('Please select a patient first'); return; }
+    const btn = document.querySelector('.action-btn.primary');
     try {
         const result = await window.rxCallFunction('save_prescription', getPrescriptionData('final'));
-        updateSaveStatus('Prescription saved successfully');
-        // PDF generation is a separate, not-yet-built step (private
-        // Supabase Storage, per the explicit decision against public
-        // Drive links) -- for now, the saved prescription is
-        // confirmed via the on-screen status message, and can be
-        // reviewed via Preview or the patient's Rx history.
+        updateSaveStatus('Prescription saved -- generating PDF...');
+
+        // PDF generation is a separate call (not folded into
+        // save_prescription itself) so a slow PDF render never risks
+        // the actual clinical save failing or rolling back -- the
+        // prescription is already durably saved by this point
+        // regardless of what happens next.
+        if (btn) { btn.disabled = true; btn.textContent = 'Generating PDF...'; }
+        try {
+            await fetch('/.netlify/functions/generate-prescription-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accessToken: window.rxGetCurrentAccessToken(), rxId: result.rxId }),
+            }).then((r) => r.json()).then((r) => { if (!r.success) throw new Error(r.error || 'PDF generation failed.'); });
+
+            const urlResponse = await fetch('/.netlify/functions/get-prescription-pdf-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accessToken: window.rxGetCurrentAccessToken(), rxId: result.rxId }),
+            });
+            const urlResult = await urlResponse.json();
+            if (urlResult.success) {
+                window.open(urlResult.url, '_blank');
+            }
+            updateSaveStatus('Prescription saved and PDF ready');
+        } catch (pdfErr) {
+            // The prescription itself is already saved successfully at
+            // this point -- a PDF failure is a real problem worth
+            // surfacing, but shouldn't be presented as if the whole save
+            // failed, since it didn't.
+            console.error('PDF generation/link error:', pdfErr);
+            updateSaveStatus('Prescription saved (PDF failed -- retry from Rx history)');
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="printer" class="w-4 h-4"></i> Save & Print'; if (window.lucide) lucide.createIcons(); }
+        }
+
         resetForm();
     } catch (err) {
         alert('Error: ' + err.message);
