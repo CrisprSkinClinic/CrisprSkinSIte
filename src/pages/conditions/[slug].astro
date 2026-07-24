@@ -35,22 +35,6 @@ if (data.faqIds && data.faqIds.length > 0) {
     .map((f) => ({ question: f.data.question, answer: f.body }));
 }
 
-// Doctors relevant to this condition (based on parent service category)
-const parentCategory = parentService?.data.category;
-const relevantDoctors = siteConfig.doctors.filter((d) => {
-  if (parentCategory === 'hair') {
-    return d.expertise.some((e) => /hair|transplant|alopecia/i.test(e));
-  }
-  if (parentCategory === 'pediatric') {
-    return d.expertise.some((e) => /paediatric|pediatric|child|birthmark/i.test(e));
-  }
-  if (parentCategory === 'cosmetic') {
-    return d.expertise.some((e) => /cosmetic|aesthetic|botox|filler|peel/i.test(e));
-  }
-  // skin / clinical — show all doctors
-  return true;
-});
-
 const pageUrl = new URL(`/conditions/${entry.slug}`, siteConfig.url).toString();
 
 const faqSchema = faqEntries.length > 0 ? {
@@ -202,33 +186,47 @@ const conditionSchema = {
     </section>
   )}
 
-  {/* NEW: Condition → Doctors */}
-  {relevantDoctors.length > 0 && (
+  {siteConfig.doctors.length > 0 && (
     <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
       <h2 class="text-2xl font-bold text-brand-900 mb-6">Our Specialists</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {relevantDoctors.map((doc) => (
+      <div id="conditionDoctorsGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {siteConfig.doctors.map((doc) => (
           <a
             href={`/our-doctors/${doc.slug}`}
-            class="flex items-center gap-4 p-4 rounded-xl bg-champagne-50 hover:bg-slate-100 border border-champagne-200 transition-colors group"
+            class="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-xl bg-champagne-50 hover:bg-slate-100 border border-champagne-200 transition-colors group text-center sm:text-left"
           >
             <img
               src={`/images/doctors/${doc.slug}.jpg`}
-              alt={doc.name}
-              width="56"
-              height="56"
-              class="w-14 h-14 rounded-full object-cover border-2 border-white shadow"
-              onerror={`this.src='https://placehold.co/56x56/223154/FAF8F5?text=${encodeURIComponent(doc.name.split(' ').pop())}'`}
+              alt={`${doc.name}, ${doc.designation}`}
+              width="72"
+              height="72"
+              loading="lazy"
+              decoding="async"
+              class="w-[72px] h-[72px] rounded-full object-cover border-2 border-white shadow shrink-0"
+              onerror={`this.src='https://placehold.co/72x72/223154/FAF8F5?text=${encodeURIComponent(doc.name.split(' ').pop())}'`}
             />
-            <div>
+            <div class="min-w-0">
               <p class="font-semibold text-slate-900 group-hover:text-brand-700 transition-colors">{doc.name}</p>
-              <p class="text-xs text-brand-600 font-medium">{doc.designation}</p>
+              <p class="text-xs text-brand-600 font-medium leading-snug mt-1">{doc.designation}</p>
             </div>
           </a>
         ))}
       </div>
     </section>
   )}
+
+  <script>
+    document.addEventListener('astro:page-load', () => {
+      const grid = document.getElementById('conditionDoctorsGrid');
+      if (!grid) return;
+      const cards = Array.from(grid.children);
+      for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cards[i], cards[j]] = [cards[j], cards[i]];
+      }
+      cards.forEach((card) => grid.appendChild(card));
+    });
+  </script>
 
   <FAQAccordion entries={faqEntries} />
 
