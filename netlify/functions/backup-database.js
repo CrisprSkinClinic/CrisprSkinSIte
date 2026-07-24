@@ -34,32 +34,17 @@ const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 const SERVICE_ROLE_KEY = process.env.APPOINTMENT_MANAGER_SUPABASE_SERVICE_ROLE_KEY;
 const BACKUP_FOLDER_ID = process.env.GOOGLE_DRIVE_BACKUP_FOLDER_ID;
 
-// All 78 public-schema tables as of this backup's creation (see the
-// derm-clinic-website memory note / chat history for the query used
-// to enumerate these). If new tables are added later, this list needs
-// updating -- there's no way to introspect "all tables" generically
-// through the anon/service-role client the same way a raw SQL
-// connection could, without an extra RPC exposing that, which felt
-// like unnecessary surface area for a backup script to carry.
-const TABLES_TO_BACKUP = [
-  "appointments", "attendance_corrections", "attendance_logs", "bill_counter", "bill_items", "bills",
-  "booking_audit_log", "branches", "cash_recounts", "clinic_settings", "contact_lens_rx",
-  "daily_cash_sessions", "daily_collection_summary", "department_billing_rules", "departments",
-  "derm_rx_billing_master", "derm_rx_draft_bills", "derm_rx_dx_protocols", "derm_rx_exam_templates",
-  "derm_rx_lab_orders", "derm_rx_medicine_batches", "derm_rx_medicines", "derm_rx_photos",
-  "derm_rx_prescriptions", "derm_rx_templates", "doctor_price_overrides", "doctors",
-  "expense_categories", "expense_entries", "expenses", "external_labs", "fundus_findings",
-  "glasses_rx", "glasses_rx_lines", "iop_entries", "keratometry_entries", "lab_counter",
-  "lab_order_items", "lab_orders", "lab_tests", "leave_applications", "leave_balances", "leave_types",
-  "medicine_batches", "medicine_margins", "medicine_stock", "medicines", "monthly_pl",
-  "near_vision_entries", "notification_log", "ophtho_investigations", "ophtho_macros", "ophtho_visits",
-  "patient_intake_forms", "patient_registration_requests", "patients", "payment_entries",
-  "payment_line_items", "payment_splits", "payroll_items", "payroll_months", "pharmacy_dispense_items",
-  "pharmacy_dispenses", "po_counter", "prescription_items", "prescriptions", "profiles",
-  "purchase_order_items", "purchase_orders", "push_subscriptions", "recurring_expenses",
-  "refraction_entries", "schedule_overrides", "service_departments", "services", "slit_lamp_findings",
-  "slot_templates", "staff_details", "supplier_outstanding", "suppliers", "uhid_counter",
-];
+// Table list is fetched LIVE from Postgres on every run (via
+// list_all_public_tables, a SECURITY DEFINER RPC querying
+// information_schema.tables) rather than hardcoded here -- a fixed
+// list would silently go stale the moment any new table is added,
+// either by this codebase or by CRIS ClinicOS independently (which
+// shares this database and isn't necessarily visible to changes made
+// here). This also naturally excludes VIEWS (e.g.
+// daily_collection_summary, medicine_margins) since those are derived
+// from other tables' data, not their own stored rows -- nothing to
+// back up there that isn't already covered by backing up their
+// underlying tables.
 
 async function uploadToDrive(accessToken, folderId, fileName, content) {
   const boundary = "db_backup_boundary_" + Date.now();
@@ -97,10 +82,20 @@ exports.handler = async () => {
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
   const backup = { exportedAt: new Date().toISOString(), tables: {}, errors: [] };
 
+  let tablesToBackup;
+  try {
+    const { data: tableRows, error: tableListError } = await supabase.rpc("list_all_public_tables");
+    if (tableListError) throw tableListError;
+    tablesToBackup = (tableRows || []).map((r) => r.table_name);
+  } catch (err) {
+    console.error("backup-database: failed to fetch live table list:", err);
+    return { statusCode: 500, body: JSON.stringify({ error: "Could not determine which tables to back up: " + err.message }) };
+  }
+
   // Sequential, not parallel -- keeps this well within Supabase's
   // connection/rate limits for what's meant to be a background job,
   // not a latency-sensitive user-facing request.
-  for (const table of TABLES_TO_BACKUP) {
+  for (const table of tablesToBackup) {
     try {
       const { data, error } = await supabase.from(table).select("*");
       if (error) throw error;
