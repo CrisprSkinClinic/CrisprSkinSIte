@@ -23,6 +23,7 @@ const { verifyStaffAuth } = require("./lib/auth");
 const { makeLogAudit } = require("./lib/audit");
 
 const pharmacy = require("./lib/pharmacy");
+const pharmacyAi = require("./lib/pharmacy-ai");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -194,6 +195,26 @@ exports.handler = async (event) => {
         await logAudit("PHARMACY_INVOICE_COMMIT", `Committed invoice ${data?.invoice?.invoice_number || ""}`);
         return result;
       }
+
+      // ---- AI reconciliation (Gemini-backed, synchronous/on-demand) ----
+      case "extract_invoice_from_image": {
+        const result = await pharmacyAi.extractInvoiceFromImage(data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_AI_EXTRACT_INVOICE", `AI-extracted an invoice from an uploaded image`);
+        return result;
+      }
+      case "extract_payment_screenshot": {
+        const result = await pharmacyAi.extractPaymentScreenshot(data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_AI_EXTRACT_PAYMENT", `AI-extracted a payment screenshot`);
+        return result;
+      }
+      case "auto_fill_medicine_details":
+        return await pharmacyAi.autoFillMedicineDetails(data);
+      case "extract_pamphlet_data":
+        return await pharmacyAi.extractPamphletData(data);
+      case "get_predictive_reorder":
+        return await pharmacyAi.getPredictiveReorder(supabase);
 
       default:
         return { statusCode: 400, body: JSON.stringify({ error: `Unknown action: ${action}` }) };
