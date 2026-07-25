@@ -247,14 +247,17 @@ document.getElementById('ph-add-to-cart-btn').addEventListener('click', () => {
 
 function renderPhCart() {
   const listEl = document.getElementById('ph-cart-list');
-  const emptyEl = document.getElementById('ph-cart-empty');
   const totalEl = document.getElementById('ph-cart-total');
   const checkoutBtn = document.getElementById('ph-checkout-btn');
 
   if (phState.cart.length === 0) {
-    listEl.innerHTML = '';
-    listEl.appendChild(emptyEl);
-    emptyEl.classList.remove('hidden');
+    // Don't try to preserve/reuse the original #ph-cart-empty node --
+    // once listEl.innerHTML is replaced below (on the first non-empty
+    // render), that original node is gone from the live DOM, so a
+    // later getElementById('ph-cart-empty') + appendChild would throw
+    // on a stale/detached reference. Just render the empty state
+    // fresh each time, same as every other list in this file.
+    listEl.innerHTML = '<p id="ph-cart-empty" class="text-charcoal/30 text-sm text-center py-8">No items added yet.</p>';
     totalEl.textContent = formatRupees(0);
     checkoutBtn.disabled = true;
     return;
