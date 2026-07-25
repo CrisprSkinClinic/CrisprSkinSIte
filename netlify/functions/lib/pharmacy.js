@@ -202,6 +202,12 @@ async function voidPharmacySale(supabase, data, profile) {
   return ok({ success: true, ...rows[0] });
 }
 
+async function getTodaysPharmacySummary(supabase) {
+  const { data: rows, error } = await supabase.rpc("get_todays_pharmacy_summary");
+  if (error) throw error;
+  return ok({ summary: rows[0] });
+}
+
 async function getDispenseItems(supabase, data) {
   if (!data?.dispenseId) {
     return { statusCode: 400, body: JSON.stringify({ error: "dispenseId is required." }) };
@@ -413,6 +419,7 @@ module.exports = {
   voidPharmacySale,
   returnPharmacySaleItems,
   getDispenseItems,
+  getTodaysPharmacySummary,
   getMedicinesWithWac,
   upsertMedicineFull,
   upsertSupplierFull,
