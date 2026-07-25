@@ -1,0 +1,42 @@
+---
+// src/components/StatsBar.astro
+const googleReviewsUrl = 'https://www.google.com/search?q=CRISPR+Skin+and+Hair+Clinic+KK+Nagar'; // replace with exact GBP reviews link
+
+const primary = {
+  value: '4.9',
+  label: 'Google rating',
+  sub: '370+ patient reviews',
+  href: googleReviewsUrl,
+};
+
+const secondary = [
+  { value: '3', label: 'AIIMS-trained consultant dermatologists' },
+  { value: '5,000+', label: 'Patients counselled and treated' },
+  { value: '20+', label: 'Years combined clinical experience' },
+];
+---
+
+<section class="bg-brand-900 text-white py-12 px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-center text-center lg:text-left">
+      <!-- Primary: Google -->
+      <a href={primary.href} target="_blank" rel="noopener noreferrer" class="lg:col-span-1 group">
+        <p class="text-4xl md:text-5xl font-extrabold tracking-tight group-hover:text-brand-200 transition-colors">
+          {primary.value}
+        </p>
+        <p class="mt-1 text-brand-100 font-semibold">{primary.label}</p>
+        <p class="mt-1 text-sm text-brand-300">{primary.sub}</p>
+      </a>
+
+      <!-- Secondary -->
+      <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+        {secondary.map((stat) => (
+          <div>
+            <p class="text-3xl md:text-4xl font-extrabold tracking-tight">{stat.value}</p>
+            <p class="mt-2 text-sm text-brand-200 font-medium leading-snug">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
