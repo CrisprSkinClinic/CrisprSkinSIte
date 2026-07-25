@@ -316,6 +316,19 @@ async function listPendingApprovals(supabase) {
   return ok({ pendingApprovals: data });
 }
 
+async function createPendingApproval(supabase, data) {
+  if (!data?.fileName || !data?.aiData) {
+    return { statusCode: 400, body: JSON.stringify({ error: "fileName and aiData are required." }) };
+  }
+  const { data: id, error } = await supabase.rpc("create_pending_approval", {
+    p_file_name: data.fileName,
+    p_drive_url: data.driveUrl || null,
+    p_ai_data: data.aiData,
+  });
+  if (error) throw error;
+  return ok({ success: true, id });
+}
+
 async function rejectPendingApproval(supabase, data, profile) {
   if (!data?.id) return { statusCode: 400, body: JSON.stringify({ error: "id is required." }) };
   const { error } = await supabase.rpc("reject_pending_approval", { p_id: data.id, p_reviewed_by: profile.id });
@@ -396,6 +409,7 @@ module.exports = {
   manualStockAdjustment,
   runPhysicalAudit,
   listPendingApprovals,
+  createPendingApproval,
   rejectPendingApproval,
   listMedicalReps,
   upsertMedicalRep,
