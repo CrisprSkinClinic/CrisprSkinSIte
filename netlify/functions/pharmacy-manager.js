@@ -51,6 +51,9 @@ exports.handler = async (event) => {
 
   try {
     switch (action) {
+      case "whoami":
+        return await pharmacy.whoami(profile);
+
       // ---- Suppliers ----
       case "list_suppliers":
         return await pharmacy.listSuppliers(supabase);
