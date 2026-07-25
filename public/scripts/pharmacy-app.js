@@ -607,6 +607,7 @@ async function loadPhInventoryStats() {
   } catch { /* stats supplementary */ }
 }
 
+let phCurrentInvView = 'all';
 document.querySelectorAll('.ph-inv-view-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.ph-inv-view-btn').forEach((b) => {
@@ -615,7 +616,9 @@ document.querySelectorAll('.ph-inv-view-btn').forEach((btn) => {
     });
     btn.classList.remove('bg-champagne-100', 'text-brand-700');
     btn.classList.add('bg-brand-700', 'text-white');
-    loadPhInventory(btn.dataset.phInvView);
+    phCurrentInvView = btn.dataset.phInvView;
+    document.getElementById('ph-new-medicine-btn-label').textContent = phCurrentInvView === 'suppliers' ? 'New Supplier' : 'New Medicine';
+    loadPhInventory(phCurrentInvView);
   });
 });
 
@@ -648,6 +651,20 @@ async function loadPhInventory(view) {
           </div>
           ${expiryChip(b.expiry_date)}
         </div>`).join('');
+    } else if (view === 'suppliers') {
+      const { suppliers } = await window.phCallFunction('list_suppliers');
+      if (!suppliers || suppliers.length === 0) {
+        listEl.innerHTML = emptyState('No suppliers yet — add one to get started.', ICONS.box);
+        return;
+      }
+      listEl.innerHTML = suppliers.map((s) => `
+        <button onclick="window.phOpenSupplierEdit('${s.id}')" class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
+          <div>
+            <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(s.name)}</p>
+            <p class="text-xs text-charcoal/40">${[s.gstin, s.phone].filter(Boolean).map(escapePhHtml).join(' &middot; ') || 'No contact details yet'}</p>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-charcoal/20"><path d="m9 18 6-6-6-6"/></svg>
+        </button>`).join('');
     } else {
       const { inventory } = await window.phCallFunction('get_inventory');
       if (!inventory || inventory.length === 0) {
@@ -657,20 +674,20 @@ async function loadPhInventory(view) {
       const byMedicine = {};
       inventory.forEach((row) => {
         if (!byMedicine[row.medicine_id]) {
-          byMedicine[row.medicine_id] = { name: row.medicine_name, category: row.category, reorder: row.reorder_level, batches: [] };
+          byMedicine[row.medicine_id] = { id: row.medicine_id, name: row.medicine_name, category: row.category, reorder: row.reorder_level, batches: [] };
         }
         if (row.batch_id) byMedicine[row.medicine_id].batches.push(row);
       });
       listEl.innerHTML = Object.values(byMedicine).map((m) => {
         const totalStock = m.batches.reduce((sum, b) => sum + (b.quantity_remaining || 0), 0);
         return `
-          <div class="px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
+          <button onclick="window.phOpenMedicineEdit('${m.id}')" class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
             <div>
               <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(m.name)}</p>
               <p class="text-xs text-charcoal/40">${escapePhHtml(m.category || '')} &middot; ${m.batches.length} batch(es)</p>
             </div>
             ${stockChip(totalStock, m.reorder || 10)}
-          </div>`;
+          </button>`;
       }).join('');
     }
   } catch (err) {
@@ -678,44 +695,206 @@ async function loadPhInventory(view) {
   }
 }
 
+window.phOpenMedicineEdit = async function (medicineId) {
+  try {
+    const { medicines } = await window.phCallFunction('list_medicines');
+    const medicine = (medicines || []).find((m) => m.id === medicineId);
+    if (!medicine) return showPhToast('Medicine not found.', 'error');
+    openPhMedicineModal(medicine);
+  } catch (err) {
+    showPhToast(err.message, 'error');
+  }
+};
+
 document.getElementById('ph-new-medicine-btn').addEventListener('click', () => {
-  showPhModal(`
-    <div class="p-6">
-      <h3 class="text-lg font-bold text-brand-900 mb-4">New Medicine</h3>
-      <div class="space-y-3">
-        <input type="text" id="ph-new-med-name" placeholder="Name" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-        <input type="text" id="ph-new-med-generic" placeholder="Generic name" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-        <input type="text" id="ph-new-med-category" placeholder="Category" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-        <select id="ph-new-med-formulation" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
-          <option value="tablet">Tablet</option>
-          <option value="capsule">Capsule</option>
-          <option value="syrup">Syrup</option>
-          <option value="cream">Cream</option>
-          <option value="injection">Injection</option>
-          <option value="drops">Drops</option>
-          <option value="inhaler">Inhaler</option>
-          <option value="powder">Powder</option>
-          <option value="other">Other</option>
-        </select>
-        <select id="ph-new-med-unit" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
-          <option value="strip">Strip</option>
-          <option value="bottle">Bottle</option>
-          <option value="tube">Tube</option>
-          <option value="vial">Vial</option>
-          <option value="sachet">Sachet</option>
-          <option value="piece">Piece</option>
-        </select>
-        <input type="number" id="ph-new-med-reorder" placeholder="Reorder level" value="10" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-      </div>
-      <p id="ph-new-med-error" class="text-red-600 text-sm mt-2 min-h-[1.25rem]"></p>
-      <div class="flex gap-2 mt-4">
-        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
-        <button onclick="window.phSaveNewMedicine()" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Save</button>
-      </div>
-    </div>`);
+  if (phCurrentInvView === 'suppliers') {
+    openPhSupplierModal(null);
+  } else {
+    openPhMedicineModal(null);
+  }
 });
 
-window.phSaveNewMedicine = async function () {
+// ---- Supplier create/edit modal ----
+window.phOpenSupplierEdit = async function (supplierId) {
+  try {
+    const { suppliers } = await window.phCallFunction('list_suppliers');
+    const supplier = (suppliers || []).find((s) => s.id === supplierId);
+    if (!supplier) return showPhToast('Supplier not found.', 'error');
+    openPhSupplierModal(supplier);
+  } catch (err) {
+    showPhToast(err.message, 'error');
+  }
+};
+
+function openPhSupplierModal(existingSupplier) {
+  const isEdit = !!existingSupplier;
+  const s = existingSupplier || {};
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-1">${isEdit ? 'Edit Supplier' : 'New Supplier'}</h3>
+      <p class="text-xs text-charcoal/40 mb-4">${isEdit ? escapePhHtml(s.name) : 'Fill in what you know — everything but the name is optional.'}</p>
+      <div class="space-y-3">
+        <input type="text" id="ph-new-sup-name" placeholder="Supplier name" value="${escapePhAttr(s.name || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-sup-contact" placeholder="Contact person" value="${escapePhAttr(s.contact_person || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="ph-new-sup-phone" placeholder="Phone" value="${escapePhAttr(s.phone || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <input type="text" id="ph-new-sup-email" placeholder="Email" value="${escapePhAttr(s.email || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="ph-new-sup-gstin" placeholder="GSTIN" value="${escapePhAttr(s.gstin || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <input type="text" id="ph-new-sup-dl" placeholder="Drug license no." value="${escapePhAttr(s.dl_number || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+        <input type="text" id="ph-new-sup-address" placeholder="Address" value="${escapePhAttr(s.address || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <div class="grid grid-cols-3 gap-2">
+          <input type="text" id="ph-new-sup-city" placeholder="City" value="${escapePhAttr(s.city || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <input type="text" id="ph-new-sup-state" placeholder="State" value="${escapePhAttr(s.state || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <input type="number" id="ph-new-sup-credit-days" placeholder="Credit days" value="${s.credit_days || ''}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+        <p class="text-[11px] font-bold text-charcoal/40 uppercase tracking-wide pt-1">Bank details</p>
+        <input type="text" id="ph-new-sup-bank-name" placeholder="Bank name" value="${escapePhAttr(s.bank_name || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="ph-new-sup-bank-account" placeholder="Account number" value="${escapePhAttr(s.bank_account || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <input type="text" id="ph-new-sup-bank-ifsc" placeholder="IFSC" value="${escapePhAttr(s.bank_ifsc || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+        <input type="text" id="ph-new-sup-upi" placeholder="UPI ID" value="${escapePhAttr(s.upi_id || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+      </div>
+      <p id="ph-new-sup-error" class="text-red-600 text-sm mt-3 min-h-[1.25rem]"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phSaveSupplier(${isEdit ? `'${s.id}'` : 'null'})" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">${isEdit ? 'Save Changes' : 'Save'}</button>
+      </div>
+    </div>`);
+}
+
+window.phSaveSupplier = async function (existingId) {
+  const errorEl = document.getElementById('ph-new-sup-error');
+  const name = document.getElementById('ph-new-sup-name').value.trim();
+  if (!name) {
+    errorEl.textContent = 'Supplier name is required.';
+    return;
+  }
+  try {
+    await window.phCallFunction('upsert_supplier_full', {
+      id: existingId || null,
+      name,
+      contactPerson: document.getElementById('ph-new-sup-contact').value.trim() || null,
+      phone: document.getElementById('ph-new-sup-phone').value.trim() || null,
+      email: document.getElementById('ph-new-sup-email').value.trim() || null,
+      gstin: document.getElementById('ph-new-sup-gstin').value.trim() || null,
+      dlNumber: document.getElementById('ph-new-sup-dl').value.trim() || null,
+      address: document.getElementById('ph-new-sup-address').value.trim() || null,
+      city: document.getElementById('ph-new-sup-city').value.trim() || null,
+      state: document.getElementById('ph-new-sup-state').value.trim() || null,
+      creditDays: parseInt(document.getElementById('ph-new-sup-credit-days').value, 10) || 0,
+      bankName: document.getElementById('ph-new-sup-bank-name').value.trim() || null,
+      bankAccount: document.getElementById('ph-new-sup-bank-account').value.trim() || null,
+      bankIfsc: document.getElementById('ph-new-sup-bank-ifsc').value.trim() || null,
+      upiId: document.getElementById('ph-new-sup-upi').value.trim() || null,
+    });
+    closePhModal();
+    loadPhInventory('suppliers');
+    showPhToast(existingId ? `${name} updated.` : `${name} added.`, 'success');
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+};
+
+// Opens the medicine modal either empty (new) or pre-filled (edit).
+// existingMedicine is a row shape from list_medicines/get_medicines_with_wac
+// (snake_case columns) or null for a brand-new medicine.
+async function openPhMedicineModal(existingMedicine) {
+  const isEdit = !!existingMedicine;
+  let suppliers = [];
+  try {
+    const result = await window.phCallFunction('list_suppliers');
+    suppliers = result.suppliers || [];
+  } catch { /* supplier dropdown is optional, don't block the modal on it */ }
+
+  const m = existingMedicine || {};
+  const supplierOptions = suppliers.map((s) => `<option value="${s.id}" ${m.preferred_supplier_id === s.id ? 'selected' : ''}>${escapePhHtml(s.name)}</option>`).join('');
+
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-1">${isEdit ? 'Edit Medicine' : 'New Medicine'}</h3>
+      <p class="text-xs text-charcoal/40 mb-4">${isEdit ? escapePhHtml(m.name) : 'Fill in what you know — everything but the name is optional.'}</p>
+
+      <div class="flex gap-1 mb-4 border-b border-champagne-200">
+        <button type="button" data-med-modal-tab="basic" class="ph-med-modal-tab px-3 py-2 text-xs font-bold border-b-2 border-brand-700 text-brand-900">Basic</button>
+        <button type="button" data-med-modal-tab="tax" class="ph-med-modal-tab px-3 py-2 text-xs font-bold border-b-2 border-transparent text-charcoal/40">Purchasing &amp; Tax</button>
+      </div>
+
+      <div data-med-modal-panel="basic" class="space-y-3">
+        <input type="text" id="ph-new-med-name" placeholder="Name" value="${escapePhAttr(m.name || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-med-generic" placeholder="Generic name" value="${escapePhAttr(m.generic_name || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-med-manufacturer" placeholder="Manufacturer" value="${escapePhAttr(m.manufacturer || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-med-category" placeholder="Category" value="${escapePhAttr(m.category || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <div class="grid grid-cols-2 gap-2">
+          <select id="ph-new-med-formulation" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
+            ${['tablet', 'capsule', 'syrup', 'cream', 'injection', 'drops', 'inhaler', 'powder', 'other'].map((f) =>
+              `<option value="${f}" ${m.formulation === f ? 'selected' : ''}>${f[0].toUpperCase() + f.slice(1)}</option>`).join('')}
+          </select>
+          <select id="ph-new-med-unit" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
+            ${['strip', 'bottle', 'tube', 'vial', 'sachet', 'piece'].map((u) =>
+              `<option value="${u}" ${m.unit === u ? 'selected' : ''}>${u[0].toUpperCase() + u.slice(1)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="number" id="ph-new-med-reorder" placeholder="Reorder level" value="${m.reorder_level ?? 10}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <select id="ph-new-med-schedule" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
+            ${['NONE', 'H', 'H1', 'X', 'G'].map((s) => `<option value="${s}" ${m.drug_schedule === s ? 'selected' : ''}>Schedule ${s}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div data-med-modal-panel="tax" class="space-y-3 hidden">
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="ph-new-med-hsn" placeholder="HSN code" value="${escapePhAttr(m.hsn_code || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <input type="number" id="ph-new-med-gst" placeholder="GST %" value="${m.gst_percent ?? ''}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+        <select id="ph-new-med-supplier" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
+          <option value="">Preferred supplier (optional)</option>
+          ${supplierOptions}
+        </select>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="ph-new-med-rep-name" placeholder="Rep name" value="${escapePhAttr(m.rep_name || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <input type="text" id="ph-new-med-rep-phone" placeholder="Rep phone" value="${escapePhAttr(m.rep_phone || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+        <p class="text-[11px] font-bold text-charcoal/40 uppercase tracking-wide pt-1">Scheme &amp; discount</p>
+        <div class="grid grid-cols-3 gap-2">
+          <input type="number" id="ph-new-med-scheme-buy" placeholder="Buy" value="${m.scheme_buy || ''}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <input type="number" id="ph-new-med-scheme-free" placeholder="Free" value="${m.scheme_free || ''}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <input type="number" id="ph-new-med-brand-discount" placeholder="Disc %" value="${m.brand_discount || ''}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+        <select id="ph-new-med-discount-type" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
+          <option value="PTR" ${m.discount_type === 'PTR' ? 'selected' : ''}>Discount on PTR</option>
+          <option value="MRP" ${m.discount_type === 'MRP' ? 'selected' : ''}>Discount on MRP</option>
+        </select>
+      </div>
+
+      <p id="ph-new-med-error" class="text-red-600 text-sm mt-3 min-h-[1.25rem]"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phSaveMedicine(${isEdit ? `'${m.id}'` : 'null'})" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">${isEdit ? 'Save Changes' : 'Save'}</button>
+      </div>
+    </div>`);
+
+  document.querySelectorAll('.ph-med-modal-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ph-med-modal-tab').forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle('border-brand-700', active);
+        b.classList.toggle('text-brand-900', active);
+        b.classList.toggle('border-transparent', !active);
+        b.classList.toggle('text-charcoal/40', !active);
+      });
+      document.querySelectorAll('[data-med-modal-panel]').forEach((panel) => {
+        panel.classList.toggle('hidden', panel.dataset.medModalPanel !== btn.dataset.medModalTab);
+      });
+    });
+  });
+}
+
+window.phSaveMedicine = async function (existingId) {
   const errorEl = document.getElementById('ph-new-med-error');
   const name = document.getElementById('ph-new-med-name').value.trim();
   if (!name) {
@@ -723,19 +902,31 @@ window.phSaveNewMedicine = async function () {
     return;
   }
   try {
-    await window.phCallFunction('upsert_medicine', {
+    await window.phCallFunction('upsert_medicine_full', {
+      id: existingId || null,
       name,
       genericName: document.getElementById('ph-new-med-generic').value.trim() || null,
+      manufacturer: document.getElementById('ph-new-med-manufacturer').value.trim() || null,
       category: document.getElementById('ph-new-med-category').value.trim() || null,
       formulation: document.getElementById('ph-new-med-formulation').value,
       unit: document.getElementById('ph-new-med-unit').value,
       reorderLevel: parseInt(document.getElementById('ph-new-med-reorder').value, 10) || 10,
+      drugSchedule: document.getElementById('ph-new-med-schedule').value,
+      hsnCode: document.getElementById('ph-new-med-hsn').value.trim() || null,
+      gstPercent: parseFloat(document.getElementById('ph-new-med-gst').value) || 0,
+      preferredSupplierId: document.getElementById('ph-new-med-supplier').value || null,
+      repName: document.getElementById('ph-new-med-rep-name').value.trim() || null,
+      repPhone: document.getElementById('ph-new-med-rep-phone').value.trim() || null,
+      schemeBuy: parseFloat(document.getElementById('ph-new-med-scheme-buy').value) || 0,
+      schemeFree: parseFloat(document.getElementById('ph-new-med-scheme-free').value) || 0,
+      brandDiscount: parseFloat(document.getElementById('ph-new-med-brand-discount').value) || 0,
+      discountType: document.getElementById('ph-new-med-discount-type').value,
     });
     closePhModal();
     loadPhInventory('all');
     loadPhInventoryStats();
     refreshPhBadges();
-    showPhToast(`${name} added to inventory.`, 'success');
+    showPhToast(existingId ? `${name} updated.` : `${name} added to inventory.`, 'success');
   } catch (err) {
     errorEl.textContent = err.message;
   }
