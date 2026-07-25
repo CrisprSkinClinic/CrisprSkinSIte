@@ -64,6 +64,7 @@ import AppLayout from '../layouts/AppLayout.astro';
       <button data-ph-tab="checkout" class="ph-tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-brand-700 text-brand-900">Checkout</button>
       <button data-ph-tab="inventory" class="ph-tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-charcoal/50 hover:text-brand-700">Inventory</button>
       <button data-ph-tab="purchasing" class="ph-tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-charcoal/50 hover:text-brand-700">Purchase Orders</button>
+      <button data-ph-tab="reconcile" class="ph-tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-charcoal/50 hover:text-brand-700">Reconcile</button>
     </div>
 
     <div class="max-w-5xl mx-auto px-6 py-8">
@@ -151,6 +152,59 @@ import AppLayout from '../layouts/AppLayout.astro';
         </div>
         <div id="ph-po-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
           <p class="text-charcoal/30 text-sm text-center py-8">Loading purchase orders...</p>
+        </div>
+      </div>
+
+      <!-- ============ RECONCILE TAB (Phase 2: AI invoice review, physical audit, reorder, reps) ============ -->
+      <div id="ph-tab-reconcile" class="ph-tab-panel hidden">
+        <div class="flex gap-2 mb-4">
+          <button data-ph-rec-view="invoices" class="ph-rec-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-brand-700 text-white">Invoice Review</button>
+          <button data-ph-rec-view="audit" class="ph-rec-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-champagne-100 text-brand-700">Physical Audit</button>
+          <button data-ph-rec-view="reorder" class="ph-rec-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-champagne-100 text-brand-700">Reorder Suggestions</button>
+          <button data-ph-rec-view="reps" class="ph-rec-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-champagne-100 text-brand-700">Reps</button>
+        </div>
+
+        <!-- Invoice Review sub-view -->
+        <div id="ph-rec-invoices" class="ph-rec-subview">
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-xs text-charcoal/50">Upload an invoice photo/PDF to extract it with AI, or review drafts already waiting.</p>
+            <label class="text-xs font-bold px-4 py-2 rounded-lg bg-brand-900 text-white cursor-pointer">
+              + Upload Invoice
+              <input type="file" id="ph-invoice-upload-input" accept="image/*,.pdf" class="hidden" />
+            </label>
+          </div>
+          <p id="ph-invoice-upload-status" class="text-xs text-charcoal/50 mb-3"></p>
+          <div id="ph-pending-approvals-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
+            <p class="text-charcoal/30 text-sm text-center py-8">Loading pending invoices...</p>
+          </div>
+        </div>
+
+        <!-- Physical Audit sub-view -->
+        <div id="ph-rec-audit" class="ph-rec-subview hidden">
+          <p class="text-xs text-charcoal/50 mb-3">Count what's actually on the shelf and enter it below — only medicines with a real discrepancy will be adjusted.</p>
+          <div id="ph-audit-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden mb-4">
+            <p class="text-charcoal/30 text-sm text-center py-8">Loading medicines...</p>
+          </div>
+          <button id="ph-submit-audit-btn" class="bg-brand-900 text-white font-bold px-6 py-3 rounded-xl">Submit Audit</button>
+          <p id="ph-audit-result" class="text-sm text-charcoal/60 mt-3"></p>
+        </div>
+
+        <!-- Reorder Suggestions sub-view -->
+        <div id="ph-rec-reorder" class="ph-rec-subview hidden">
+          <div id="ph-reorder-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
+            <p class="text-charcoal/30 text-sm text-center py-8">Loading suggestions...</p>
+          </div>
+        </div>
+
+        <!-- Reps sub-view -->
+        <div id="ph-rec-reps" class="ph-rec-subview hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-bold text-brand-700 uppercase tracking-wide">Medical Reps</h2>
+            <button id="ph-new-rep-btn" class="text-xs font-bold px-4 py-2 rounded-lg bg-brand-900 text-white">+ New Rep</button>
+          </div>
+          <div id="ph-reps-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
+            <p class="text-charcoal/30 text-sm text-center py-8">Loading reps...</p>
+          </div>
         </div>
       </div>
 
