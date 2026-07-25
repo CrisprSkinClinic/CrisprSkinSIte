@@ -399,7 +399,7 @@ document.getElementById('ph-med-search').addEventListener('input', (e) => {
         return;
       }
       resultsEl.innerHTML = matches.map((m) => `
-        <button class="w-full text-left px-4 py-3 hover:bg-champagne-50 transition" onclick="window.phSelectMedicine('${m.id}', '${escapePhAttr(m.name)}')">
+        <button class="w-full text-left px-4 py-3 hover:bg-champagne-50 transition" onclick="window.phSelectMedicine('${m.id}', '${escapePhAttr(m.name)}', ${m.gst_percent || 0})">
           <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(m.name)}</p>
           <p class="text-xs text-charcoal/50">${escapePhHtml(m.category || '')}</p>
         </button>`).join('');
@@ -411,7 +411,7 @@ document.getElementById('ph-med-search').addEventListener('input', (e) => {
   }, 300);
 });
 
-window.phSelectMedicine = async function (medicineId, medicineName) {
+window.phSelectMedicine = async function (medicineId, medicineName, gstPercent = 0) {
   document.getElementById('ph-med-results').classList.add('hidden');
   document.getElementById('ph-med-search').value = medicineName;
   const selectedEl = document.getElementById('ph-med-selected');
@@ -425,13 +425,16 @@ window.phSelectMedicine = async function (medicineId, medicineName) {
     const { batches } = await window.phCallFunction('get_fifo_batches', { medicineId, quantity: qty });
     if (!batches || batches.length === 0) {
       batchesEl.innerHTML = `<p class="text-xs text-red-600 font-medium">No stock available for this medicine.</p>`;
-      phState.selectedMedicine = { id: medicineId, name: medicineName, batches: [] };
+      phState.selectedMedicine = { id: medicineId, name: medicineName, gstPercent, batches: [] };
       return;
     }
-    phState.selectedMedicine = { id: medicineId, name: medicineName, batches };
-    batchesEl.innerHTML = batches.map((b) => `
-      <p class="text-xs text-charcoal/60">Batch <span class="font-semibold text-charcoal/80">${escapePhHtml(b.batch_number)}</span> — ${b.to_dispense} unit(s) @ ${formatRupees(b.unit_price)} <span class="text-charcoal/40">(exp ${b.expiry_date})</span></p>
-    `).join('');
+    phState.selectedMedicine = { id: medicineId, name: medicineName, gstPercent, batches };
+    batchesEl.innerHTML = batches.map((b) => {
+      const gstAmount = b.unit_price * b.to_dispense * (gstPercent / 100);
+      return `
+      <p class="text-xs text-charcoal/60">Batch <span class="font-semibold text-charcoal/80">${escapePhHtml(b.batch_number)}</span> — ${b.to_dispense} unit(s) @ ${formatRupees(b.unit_price)}${gstPercent > 0 ? ` <span class="text-charcoal/40">+ ${gstPercent}% GST (${formatRupees(gstAmount)})</span>` : ''} <span class="text-charcoal/40">(exp ${b.expiry_date})</span></p>
+    `;
+    }).join('');
   } catch (err) {
     batchesEl.innerHTML = `<p class="text-xs text-red-600">${escapePhHtml(err.message)}</p>`;
   }
@@ -439,7 +442,7 @@ window.phSelectMedicine = async function (medicineId, medicineName) {
 
 document.getElementById('ph-med-qty').addEventListener('change', () => {
   if (phState.selectedMedicine) {
-    window.phSelectMedicine(phState.selectedMedicine.id, phState.selectedMedicine.name);
+    window.phSelectMedicine(phState.selectedMedicine.id, phState.selectedMedicine.name, phState.selectedMedicine.gstPercent);
   }
 });
 
@@ -456,7 +459,7 @@ document.getElementById('ph-add-to-cart-btn').addEventListener('click', () => {
       batchNumber: b.batch_number,
       quantity: b.to_dispense,
       unitPrice: b.unit_price,
-      gstPercent: 0,
+      gstPercent: med.gstPercent || 0,
     });
   });
 
@@ -472,29 +475,56 @@ function renderPhCart() {
   const listEl = document.getElementById('ph-cart-list');
   const totalEl = document.getElementById('ph-cart-total');
   const checkoutBtn = document.getElementById('ph-checkout-btn');
+  const subtotalRow = document.getElementById('ph-cart-subtotal-row');
+  const gstRow = document.getElementById('ph-cart-gst-row');
 
   if (phState.cart.length === 0) {
     listEl.innerHTML = `<p id="ph-cart-empty" class="text-charcoal/30 text-sm text-center py-8">No items added yet.</p>`;
     totalEl.textContent = formatRupees(0);
+    subtotalRow.classList.add('hidden');
+    subtotalRow.classList.remove('flex');
+    gstRow.classList.add('hidden');
+    gstRow.classList.remove('flex');
     checkoutBtn.disabled = true;
     return;
   }
 
-  const total = phState.cart.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-  listEl.innerHTML = phState.cart.map((item, idx) => `
+  const subtotal = phState.cart.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+  const gstTotal = phState.cart.reduce((sum, item) => sum + item.quantity * item.unitPrice * ((item.gstPercent || 0) / 100), 0);
+  const grandTotal = subtotal + gstTotal;
+
+  listEl.innerHTML = phState.cart.map((item, idx) => {
+    const lineBase = item.quantity * item.unitPrice;
+    const lineGst = lineBase * ((item.gstPercent || 0) / 100);
+    return `
     <div class="flex items-center justify-between bg-champagne-50 rounded-lg px-3 py-2.5">
       <div>
         <p class="text-sm font-semibold text-brand-900">${escapePhHtml(item.medicineName)}</p>
-        <p class="text-xs text-charcoal/50">Batch ${escapePhHtml(item.batchNumber)} &middot; ${item.quantity} &times; ${formatRupees(item.unitPrice)}</p>
+        <p class="text-xs text-charcoal/50">Batch ${escapePhHtml(item.batchNumber)} &middot; ${item.quantity} &times; ${formatRupees(item.unitPrice)}${item.gstPercent > 0 ? ` &middot; GST ${item.gstPercent}%` : ''}</p>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-sm font-bold text-brand-900 tabular-nums">${formatRupees(item.quantity * item.unitPrice)}</span>
+        <span class="text-sm font-bold text-brand-900 tabular-nums">${formatRupees(lineBase + lineGst)}</span>
         <button onclick="window.phRemoveFromCart(${idx})" class="text-charcoal/30 hover:text-red-600 transition" aria-label="Remove">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
-    </div>`).join('');
-  totalEl.textContent = formatRupees(total);
+    </div>`;
+  }).join('');
+
+  if (gstTotal > 0) {
+    subtotalRow.classList.remove('hidden');
+    subtotalRow.classList.add('flex');
+    gstRow.classList.remove('hidden');
+    gstRow.classList.add('flex');
+    document.getElementById('ph-cart-subtotal').textContent = formatRupees(subtotal);
+    document.getElementById('ph-cart-gst').textContent = formatRupees(gstTotal);
+  } else {
+    subtotalRow.classList.add('hidden');
+    subtotalRow.classList.remove('flex');
+    gstRow.classList.add('hidden');
+    gstRow.classList.remove('flex');
+  }
+  totalEl.textContent = formatRupees(grandTotal);
   checkoutBtn.disabled = false;
 }
 
@@ -998,6 +1028,48 @@ window.phReceivePO = async function (poId, totalAmount) {
   }
 };
 
+let phPoLineItemCounter = 0;
+
+function phPoLineItemRowHtml(rowId) {
+  return `
+    <div id="ph-po-line-${rowId}" class="border border-champagne-200 rounded-xl p-3 mb-2 relative">
+      <button type="button" onclick="window.phRemovePoLineItem(${rowId})" class="absolute top-2 right-2 text-charcoal/30 hover:text-red-600 transition" aria-label="Remove line">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <input type="text" data-po-field="medName" placeholder="Medicine name" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm mb-2 pr-8" />
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <input type="text" data-po-field="batch" placeholder="Batch number" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="date" data-po-field="expiry" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <input type="number" data-po-field="qty" placeholder="Quantity" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="number" data-po-field="free" placeholder="Free qty" value="0" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        <input type="number" data-po-field="purchasePrice" placeholder="Cost ₹" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="number" data-po-field="sellingPrice" placeholder="Sell ₹" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="number" data-po-field="gst" placeholder="GST %" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+      </div>
+    </div>`;
+}
+
+window.phAddPoLineItem = function () {
+  const rowId = ++phPoLineItemCounter;
+  document.getElementById('ph-po-line-items').insertAdjacentHTML('beforeend', phPoLineItemRowHtml(rowId));
+};
+
+window.phRemovePoLineItem = function (rowId) {
+  const container = document.getElementById('ph-po-line-items');
+  // Never let the last remaining line be removed -- a PO needs at
+  // least one item, and re-adding one immediately after would just
+  // confuse the flow.
+  if (container.children.length <= 1) {
+    showPhToast('A purchase order needs at least one line item.', 'info');
+    return;
+  }
+  document.getElementById(`ph-po-line-${rowId}`)?.remove();
+};
+
 document.getElementById('ph-new-po-btn').addEventListener('click', async () => {
   let suppliers = [];
   try {
@@ -1008,38 +1080,36 @@ document.getElementById('ph-new-po-btn').addEventListener('click', async () => {
     return;
   }
 
+  phPoLineItemCounter = 0;
   showPhModal(`
     <div class="p-6">
       <h3 class="text-lg font-bold text-brand-900 mb-4">New Purchase Order</h3>
-      <div class="space-y-3">
+      <div class="space-y-3 mb-3">
         <select id="ph-new-po-supplier" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
           <option value="">Select supplier...</option>
           ${suppliers.map((s) => `<option value="${s.id}">${escapePhHtml(s.name)}</option>`).join('')}
           <option value="__new__">+ Add new supplier</option>
         </select>
         <input type="text" id="ph-new-po-invoice" placeholder="Invoice number (optional)" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-        <div class="border-t border-champagne-200 pt-3">
-          <p class="text-xs font-bold text-brand-700 uppercase tracking-wide mb-2">Line Item</p>
-          <input type="text" id="ph-new-po-med-name" placeholder="Medicine name" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-2" />
-          <input type="text" id="ph-new-po-batch" placeholder="Batch number" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-2" />
-          <input type="date" id="ph-new-po-expiry" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-2" />
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <input type="number" id="ph-new-po-qty" placeholder="Quantity" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-            <input type="number" id="ph-new-po-free" placeholder="Free qty" value="0" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-          </div>
-          <div class="grid grid-cols-3 gap-2">
-            <input type="number" id="ph-new-po-purchase-price" placeholder="Cost ₹" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-            <input type="number" id="ph-new-po-selling-price" placeholder="Sell ₹" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-            <input type="number" id="ph-new-po-gst" placeholder="GST %" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
-          </div>
+      </div>
+      <div class="border-t border-champagne-200 pt-3">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs font-bold text-brand-700 uppercase tracking-wide">Line Items</p>
+          <button type="button" onclick="window.phAddPoLineItem()" class="text-xs font-bold text-brand-700 hover:text-brand-900 transition flex items-center gap-1">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Add Line
+          </button>
         </div>
+        <div id="ph-po-line-items" class="max-h-[40vh] overflow-y-auto pr-1"></div>
       </div>
       <p id="ph-new-po-error" class="text-red-600 text-sm mt-2 min-h-[1.25rem]"></p>
-      <div class="flex gap-2 mt-4">
+      <div class="flex gap-2 mt-2">
         <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
         <button onclick="window.phSaveNewPO()" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Create PO</button>
       </div>
     </div>`);
+
+  window.phAddPoLineItem();
 
   document.getElementById('ph-new-po-supplier').addEventListener('change', async (e) => {
     if (e.target.value !== '__new__') return;
@@ -1062,42 +1132,60 @@ document.getElementById('ph-new-po-btn').addEventListener('click', async () => {
 window.phSaveNewPO = async function () {
   const errorEl = document.getElementById('ph-new-po-error');
   const supplierId = document.getElementById('ph-new-po-supplier').value;
-  const medicineName = document.getElementById('ph-new-po-med-name').value.trim();
 
   if (!supplierId || supplierId === '__new__') {
     errorEl.textContent = 'Please select a supplier.';
     return;
   }
-  if (!medicineName) {
-    errorEl.textContent = 'Medicine name is required.';
+
+  const lineRows = Array.from(document.querySelectorAll('#ph-po-line-items > div'));
+  const rawLines = lineRows.map((row) => ({
+    medName: row.querySelector('[data-po-field="medName"]').value.trim(),
+    batch: row.querySelector('[data-po-field="batch"]').value.trim(),
+    expiry: row.querySelector('[data-po-field="expiry"]').value,
+    qty: parseInt(row.querySelector('[data-po-field="qty"]').value, 10) || 0,
+    free: parseInt(row.querySelector('[data-po-field="free"]').value, 10) || 0,
+    purchasePrice: parseFloat(row.querySelector('[data-po-field="purchasePrice"]').value) || 0,
+    sellingPrice: parseFloat(row.querySelector('[data-po-field="sellingPrice"]').value) || 0,
+    gst: parseFloat(row.querySelector('[data-po-field="gst"]').value) || 0,
+  }));
+
+  const validLines = rawLines.filter((l) => l.medName);
+  if (validLines.length === 0) {
+    errorEl.textContent = 'At least one line item needs a medicine name.';
     return;
   }
 
   try {
     const { medicines } = await window.phCallFunction('list_medicines');
-    let medicine = medicines.find((m) => m.name.toLowerCase() === medicineName.toLowerCase());
-    let medicineId;
-    if (medicine) {
-      medicineId = medicine.id;
-    } else {
-      const created = await window.phCallFunction('upsert_medicine', { name: medicineName });
-      medicineId = created.id;
+    const items = [];
+    for (const line of validLines) {
+      let medicine = medicines.find((m) => m.name.toLowerCase() === line.medName.toLowerCase());
+      let medicineId;
+      if (medicine) {
+        medicineId = medicine.id;
+      } else {
+        const created = await window.phCallFunction('upsert_medicine', { name: line.medName });
+        medicineId = created.id;
+        medicines.push({ id: medicineId, name: line.medName }); // avoid re-creating if the same new name appears twice in this PO
+      }
+      items.push({
+        medicine_id: medicineId,
+        medicine_name: line.medName,
+        batch_number: line.batch,
+        expiry_date: line.expiry,
+        quantity: line.qty,
+        free_quantity: line.free,
+        purchase_price: line.purchasePrice,
+        selling_price: line.sellingPrice,
+        gst_percent: line.gst,
+      });
     }
 
     await window.phCallFunction('create_purchase_order', {
       supplierId,
       invoiceNumber: document.getElementById('ph-new-po-invoice').value.trim() || null,
-      items: [{
-        medicine_id: medicineId,
-        medicine_name: medicineName,
-        batch_number: document.getElementById('ph-new-po-batch').value.trim(),
-        expiry_date: document.getElementById('ph-new-po-expiry').value,
-        quantity: parseInt(document.getElementById('ph-new-po-qty').value, 10) || 0,
-        free_quantity: parseInt(document.getElementById('ph-new-po-free').value, 10) || 0,
-        purchase_price: parseFloat(document.getElementById('ph-new-po-purchase-price').value) || 0,
-        selling_price: parseFloat(document.getElementById('ph-new-po-selling-price').value) || 0,
-        gst_percent: parseFloat(document.getElementById('ph-new-po-gst').value) || 0,
-      }],
+      items,
     });
     closePhModal();
     loadPhPurchaseOrders();
