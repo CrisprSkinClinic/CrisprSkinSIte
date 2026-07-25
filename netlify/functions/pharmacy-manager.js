@@ -126,6 +126,8 @@ exports.handler = async (event) => {
         await logAudit("PHARMACY_VOID", `Voided dispense ${data?.originalDispenseId || ""}: ${data?.reason || "no reason given"}`);
         return result;
       }
+      case "get_dispense_items":
+        return await pharmacy.getDispenseItems(supabase, data);
       case "return_pharmacy_sale_items": {
         const result = await pharmacy.returnPharmacySaleItems(supabase, data, profile);
         if (result.statusCode && result.statusCode !== 200) return result;
