@@ -243,8 +243,10 @@ function showPhLoginScreen() {
 function showPhAppScreen() {
   document.getElementById('ph-login-screen').classList.add('hidden');
   document.getElementById('ph-app-screen').classList.remove('hidden');
-  document.getElementById('ph-user-name').textContent =
-    `${phState.profile?.full_name || ''} · ${phState.profile?.role || ''}`;
+  const fullName = phState.profile?.full_name || '';
+  document.getElementById('ph-user-name-primary').textContent = fullName;
+  document.getElementById('ph-user-name-role').textContent = phState.profile?.role || '';
+  document.getElementById('ph-user-avatar').textContent = fullName ? fullName.trim()[0].toUpperCase() : '–';
   switchPhTab('checkout');
   refreshPhBadges();
 }
@@ -278,25 +280,45 @@ document.getElementById('ph-signout-btn').addEventListener('click', async () => 
   showPhLoginScreen();
 });
 
-// ---- Tabs ----
+// ---- Sidebar navigation ----
 function switchPhTab(tab) {
   document.querySelectorAll('.ph-tab-panel').forEach((el) => el.classList.add('hidden'));
   document.getElementById(`ph-tab-${tab}`).classList.remove('hidden');
   document.querySelectorAll('.ph-tab-btn').forEach((el) => {
     const active = el.dataset.phTab === tab;
-    el.classList.toggle('border-brand-700', active);
-    el.classList.toggle('text-brand-900', active);
-    el.classList.toggle('border-transparent', !active);
-    el.classList.toggle('text-charcoal/50', !active);
+    el.classList.toggle('bg-brand-900', active);
+    el.classList.toggle('text-white', active);
+    el.classList.toggle('text-charcoal/60', !active);
+    el.classList.toggle('hover:bg-champagne-50', !active);
   });
   if (tab === 'checkout') loadPhCheckoutStats();
   if (tab === 'inventory') { loadPhInventoryStats(); loadPhInventory('all'); }
   if (tab === 'purchasing') { loadPhPoStats(); loadPhPurchaseOrders(); }
   if (tab === 'reconcile') switchPhRecView('invoices');
+  closeMobileSidebar();
 }
 document.querySelectorAll('.ph-tab-btn').forEach((btn) => {
   btn.addEventListener('click', () => switchPhTab(btn.dataset.phTab));
 });
+
+// Mobile sidebar drawer (desktop keeps the sidebar permanently visible
+// via md:translate-x-0 in the markup; this only matters below the md
+// breakpoint).
+function openMobileSidebar() {
+  document.getElementById('ph-sidebar').classList.remove('-translate-x-full');
+  document.getElementById('ph-sidebar-backdrop').classList.remove('hidden');
+}
+function closeMobileSidebar() {
+  const sidebar = document.getElementById('ph-sidebar');
+  const backdrop = document.getElementById('ph-sidebar-backdrop');
+  if (window.innerWidth < 768) {
+    sidebar.classList.add('-translate-x-full');
+    backdrop.classList.add('hidden');
+  }
+}
+document.getElementById('ph-mobile-nav-toggle')?.addEventListener('click', openMobileSidebar);
+document.getElementById('ph-mobile-nav-close')?.addEventListener('click', closeMobileSidebar);
+document.getElementById('ph-sidebar-backdrop')?.addEventListener('click', closeMobileSidebar);
 
 // Badge counts on the tab bar (the one signature element tying the
 // app together) -- low stock count on Inventory, pending invoices on
