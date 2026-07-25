@@ -163,6 +163,12 @@ exports.handler = async (event) => {
       }
       case "list_pending_approvals":
         return await pharmacy.listPendingApprovals(supabase);
+      case "create_pending_approval": {
+        const result = await pharmacy.createPendingApproval(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_CREATE_PENDING_APPROVAL", `Created a pending approval from ${data?.fileName || "an uploaded file"}`);
+        return result;
+      }
       case "reject_pending_approval": {
         const result = await pharmacy.rejectPendingApproval(supabase, data, profile);
         if (result.statusCode && result.statusCode !== 200) return result;
