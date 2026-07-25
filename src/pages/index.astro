@@ -2,6 +2,7 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import Hero from '../components/Hero.astro';
 import ServiceCard from '../components/ServiceCard.astro';
+import StatsBar from '../components/StatsBar.astro';
 import Testimonials from '../components/Testimonials.astro';
 import FAQ from '../components/FAQ.astro';
 import CTA from '../components/CTA.astro';
@@ -50,6 +51,8 @@ const latestPosts = allPosts
     ctaText="Book Consultation"
     whatsappText="Chat on WhatsApp"
   />
+
+  <StatsBar />
 
   <section class="py-16 px-6 max-w-7xl mx-auto" id="services">
     <div class="text-center mb-12">
