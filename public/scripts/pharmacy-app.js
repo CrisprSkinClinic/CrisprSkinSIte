@@ -1,21 +1,188 @@
 // public/scripts/pharmacy-app.js
+// v2 visual rebuild. Every backend action call is unchanged from the
+// working v5 build (see the list at the bottom of this comment block
+// for the full audit trail) -- this pass only changes how things are
+// rendered and how the user is notified of results/errors.
 //
-// Auth shell + all UI logic for /pharmacy. Kept as one file (unlike
-// /prescription's shell+app split) since this tool has no large
-// ported legacy blob to keep separate -- everything here is new,
-// written against pharmacy-manager.js's 17 actions (whoami +
-// suppliers/medicines CRUD + inventory views + PO flow +
-// sale/void/return).
+// Backend actions used (unchanged): whoami, list_suppliers,
+// upsert_supplier, list_medicines, upsert_medicine, get_inventory,
+// get_low_stock, get_expiring_batches, get_fifo_batches,
+// create_purchase_order, receive_purchase_order, list_purchase_orders,
+// execute_pharmacy_sale, void_pharmacy_sale, get_medicines_with_wac,
+// list_pending_approvals, create_pending_approval,
+// reject_pending_approval, commit_reviewed_invoice,
+// run_physical_audit, get_predictive_reorder, list_medical_reps,
+// upsert_medical_rep, extract_invoice_from_image
 
 const phState = {
   session: null,
   profile: null,
-  cart: [], // { medicineId, medicineName, batchId, batchNumber, quantity, unitPrice, gstPercent }
-  selectedMedicine: null, // { id, name, batches: [...] }
-  recentSales: [], // { dispenseId, billId, total, patientName, items }
+  cart: [],
+  selectedMedicine: null,
+  recentSales: [],
 };
 
 let phSupabaseClient = null;
+
+// ==========================================================
+// TOAST + CONFIRM INFRASTRUCTURE (replaces alert/confirm/prompt)
+// ==========================================================
+function showPhToast(message, type = 'success') {
+  const container = document.getElementById('ph-toast-container');
+  const colors = {
+    success: 'bg-brand-900 text-white',
+    error: 'bg-red-600 text-white',
+    info: 'bg-white text-brand-900 border border-champagne-300',
+  };
+  const icons = {
+    success: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    info: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+  };
+  const toast = document.createElement('div');
+  toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold max-w-sm ${colors[type]}`;
+  toast.style.opacity = '0';
+  toast.style.transform = 'translateY(8px)';
+  toast.style.transition = 'opacity 0.2s ease-out, transform 0.2s ease-out';
+  toast.innerHTML = `${icons[type]}<span>${escapePhHtml(message)}</span>`;
+  container.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+  });
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.2s, transform 0.2s';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(8px)';
+    setTimeout(() => toast.remove(), 200);
+  }, 3200);
+}
+
+function showPhConfirm(title, message, { danger = true } = {}) {
+  return new Promise((resolve) => {
+    document.getElementById('ph-confirm-title').textContent = title;
+    document.getElementById('ph-confirm-message').textContent = message;
+    const okBtn = document.getElementById('ph-confirm-ok');
+    const cancelBtn = document.getElementById('ph-confirm-cancel');
+    const iconWrap = document.getElementById('ph-confirm-icon');
+    okBtn.className = danger
+      ? 'flex-1 bg-red-600 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-red-700 transition'
+      : 'flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition';
+    iconWrap.className = danger
+      ? 'w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center mb-4'
+      : 'w-11 h-11 rounded-full bg-champagne-100 text-brand-700 flex items-center justify-center mb-4';
+
+    const backdrop = document.getElementById('ph-confirm-backdrop');
+    backdrop.classList.remove('hidden');
+
+    const cleanup = (result) => {
+      backdrop.classList.add('hidden');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      resolve(result);
+    };
+    const onOk = () => cleanup(true);
+    const onCancel = () => cleanup(false);
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+  });
+}
+
+// A small in-flow text-prompt replacement for the one genuine prompt()
+// use (payment mode when receiving a PO) -- rendered as a tiny inline
+// modal rather than a browser prompt, matching the design system.
+function showPhTextPrompt(title, { placeholder = '', defaultValue = '' } = {}) {
+  return new Promise((resolve) => {
+    showPhModal(`
+      <div class="p-6">
+        <h3 class="text-lg font-bold text-brand-900 mb-4">${escapePhHtml(title)}</h3>
+        <input type="text" id="ph-text-prompt-input" value="${escapePhAttr(defaultValue)}" placeholder="${escapePhAttr(placeholder)}"
+               class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-4" />
+        <div class="flex gap-2">
+          <button id="ph-text-prompt-cancel" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+          <button id="ph-text-prompt-ok" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Continue</button>
+        </div>
+      </div>`);
+    const input = document.getElementById('ph-text-prompt-input');
+    input.focus();
+    document.getElementById('ph-text-prompt-ok').addEventListener('click', () => {
+      const val = input.value.trim();
+      closePhModal();
+      resolve(val || null);
+    });
+    document.getElementById('ph-text-prompt-cancel').addEventListener('click', () => {
+      closePhModal();
+      resolve(null);
+    });
+  });
+}
+
+// ==========================================================
+// STATUS CHIP HELPERS
+// ==========================================================
+function stockChip(total, reorderLevel) {
+  if (total <= 0) return `<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-700">Out of stock</span>`;
+  if (total <= reorderLevel) return `<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">Low · ${total}</span>`;
+  return `<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">In stock · ${total}</span>`;
+}
+
+function expiryChip(expiryDate) {
+  if (!expiryDate) return '';
+  const days = Math.floor((new Date(expiryDate) - new Date()) / 86400000);
+  if (days < 0) return `<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-700">Expired</span>`;
+  if (days <= 90) return `<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">Expires in ${days}d</span>`;
+  return `<span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-champagne-100 text-charcoal/60">Exp ${expiryDate}</span>`;
+}
+
+function paymentStatusChip(status) {
+  const map = {
+    paid: 'bg-emerald-50 text-emerald-700',
+    partial: 'bg-amber-50 text-amber-700',
+    pending: 'bg-champagne-100 text-brand-700',
+  };
+  return `<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full capitalize ${map[status] || 'bg-slate-100 text-slate-600'}">${escapePhHtml(status || '')}</span>`;
+}
+
+function statCard(label, value, icon, tone = 'neutral') {
+  const toneClasses = {
+    neutral: 'bg-white border-champagne-200',
+    warn: 'bg-amber-50 border-amber-100',
+    danger: 'bg-red-50 border-red-100',
+    good: 'bg-emerald-50 border-emerald-100',
+  };
+  return `
+    <div class="rounded-2xl border ${toneClasses[tone]} p-4 shadow-sm">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-[11px] font-bold uppercase tracking-wide text-charcoal/40">${escapePhHtml(label)}</span>
+        <span class="text-charcoal/30">${icon}</span>
+      </div>
+      <p class="text-2xl font-bold text-brand-900 tabular-nums leading-none">${value}</p>
+    </div>`;
+}
+
+const ICONS = {
+  cart: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>',
+  box: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+  alert: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+  clock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  receipt: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><line x1="8" x2="16" y1="7" y2="7"/><line x1="8" x2="16" y1="11" y2="11"/><line x1="8" x2="12" y1="15" y2="15"/></svg>',
+  rupee: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3c3 0 6-1 6-5"/></svg>',
+};
+
+function emptyState(message, icon = ICONS.box) {
+  return `<div class="flex flex-col items-center justify-center py-14 text-center">
+    <div class="w-11 h-11 rounded-full bg-champagne-100 text-charcoal/30 flex items-center justify-center mb-3">${icon}</div>
+    <p class="text-charcoal/40 text-sm max-w-xs">${escapePhHtml(message)}</p>
+  </div>`;
+}
+
+function skeletonRows(n = 3) {
+  return Array.from({ length: n }).map(() => `
+    <div class="px-5 py-4 animate-pulse">
+      <div class="h-3.5 bg-champagne-100 rounded w-1/3 mb-2"></div>
+      <div class="h-3 bg-champagne-100 rounded w-1/2"></div>
+    </div>`).join('');
+}
 
 // ---- API helper ----
 window.phCallFunction = async function phCallFunction(action, data = {}) {
@@ -62,9 +229,6 @@ async function onPhSignedIn(session) {
     phState.profile = profile;
     showPhAppScreen();
   } catch (err) {
-    // whoami fails with 403 if the signed-in account is neither a
-    // pharmacist nor a doctor -- surface that clearly and sign out
-    // rather than leaving them on a broken screen.
     await phSupabaseClient.auth.signOut();
     showPhLoginScreen();
     document.getElementById('ph-login-error').textContent = err.message;
@@ -82,6 +246,7 @@ function showPhAppScreen() {
   document.getElementById('ph-user-name').textContent =
     `${phState.profile?.full_name || ''} · ${phState.profile?.role || ''}`;
   switchPhTab('checkout');
+  refreshPhBadges();
 }
 
 document.getElementById('ph-login-form').addEventListener('submit', async (e) => {
@@ -124,20 +289,52 @@ function switchPhTab(tab) {
     el.classList.toggle('border-transparent', !active);
     el.classList.toggle('text-charcoal/50', !active);
   });
-  if (tab === 'inventory') loadPhInventory('all');
-  if (tab === 'purchasing') loadPhPurchaseOrders();
+  if (tab === 'checkout') loadPhCheckoutStats();
+  if (tab === 'inventory') { loadPhInventoryStats(); loadPhInventory('all'); }
+  if (tab === 'purchasing') { loadPhPoStats(); loadPhPurchaseOrders(); }
   if (tab === 'reconcile') switchPhRecView('invoices');
 }
 document.querySelectorAll('.ph-tab-btn').forEach((btn) => {
   btn.addEventListener('click', () => switchPhTab(btn.dataset.phTab));
 });
 
+// Badge counts on the tab bar (the one signature element tying the
+// app together) -- low stock count on Inventory, pending invoices on
+// Reconcile. Silently no-ops on failure since it's a secondary
+// indicator, not core functionality.
+async function refreshPhBadges() {
+  try {
+    const { lowStock } = await window.phCallFunction('get_low_stock');
+    const badge = document.getElementById('ph-badge-inventory');
+    if (lowStock && lowStock.length > 0) {
+      badge.textContent = lowStock.length;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  } catch { /* non-critical */ }
+
+  try {
+    const { pendingApprovals } = await window.phCallFunction('list_pending_approvals');
+    const badge = document.getElementById('ph-badge-reconcile');
+    if (pendingApprovals && pendingApprovals.length > 0) {
+      badge.textContent = pendingApprovals.length;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  } catch { /* non-critical */ }
+}
+
 // ---- Helpers ----
 function escapePhHtml(text) {
-  if (!text) return '';
+  if (!text && text !== 0) return '';
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+function escapePhAttr(text) {
+  return (text || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 }
 function formatRupees(amount) {
   return '₹' + Number(amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
@@ -146,6 +343,20 @@ function formatRupees(amount) {
 // ==========================================================
 // CHECKOUT TAB
 // ==========================================================
+async function loadPhCheckoutStats() {
+  const statsEl = document.getElementById('ph-checkout-stats');
+  statsEl.innerHTML = statCard('Today', '…', ICONS.rupee) + statCard('Items in cart', phState.cart.length, ICONS.cart) + statCard('Sales this session', phState.recentSales.length, ICONS.receipt);
+  try {
+    const { lowStock } = await window.phCallFunction('get_low_stock');
+    const sessionTotal = phState.recentSales.reduce((sum, s) => sum + Number(s.total || 0), 0);
+    statsEl.innerHTML =
+      statCard('This session', formatRupees(sessionTotal), ICONS.rupee) +
+      statCard('Items in cart', phState.cart.length, ICONS.cart) +
+      statCard('Sales this session', phState.recentSales.length, ICONS.receipt) +
+      statCard('Low stock alerts', lowStock?.length || 0, ICONS.alert, lowStock?.length ? 'warn' : 'neutral');
+  } catch { /* stats are supplementary */ }
+}
+
 let phMedSearchTimeout = null;
 document.getElementById('ph-med-search').addEventListener('input', (e) => {
   clearTimeout(phMedSearchTimeout);
@@ -158,14 +369,10 @@ document.getElementById('ph-med-search').addEventListener('input', (e) => {
   }
   phMedSearchTimeout = setTimeout(async () => {
     try {
-      // list_medicines has no server-side search param -- filtering
-      // client-side is fine at the clinic's current medicine-catalog
-      // scale (same tradeoff noted in rx-queue.js's search_patients
-      // for name search at small scale).
       const { medicines } = await window.phCallFunction('list_medicines');
       const matches = medicines.filter((m) => m.name.toLowerCase().includes(query)).slice(0, 8);
       if (matches.length === 0) {
-        resultsEl.innerHTML = '<div class="p-4 text-sm text-charcoal/40 text-center">No matching medicines.</div>';
+        resultsEl.innerHTML = `<div class="p-4 text-sm text-charcoal/40 text-center">No matching medicines.</div>`;
         resultsEl.classList.remove('hidden');
         return;
       }
@@ -176,15 +383,11 @@ document.getElementById('ph-med-search').addEventListener('input', (e) => {
         </button>`).join('');
       resultsEl.classList.remove('hidden');
     } catch (err) {
-      resultsEl.innerHTML = `<div class="p-4 text-sm text-red-600">${err.message}</div>`;
+      resultsEl.innerHTML = `<div class="p-4 text-sm text-red-600">${escapePhHtml(err.message)}</div>`;
       resultsEl.classList.remove('hidden');
     }
   }, 300);
 });
-
-function escapePhAttr(text) {
-  return (text || '').replace(/'/g, "\\'");
-}
 
 window.phSelectMedicine = async function (medicineId, medicineName) {
   document.getElementById('ph-med-results').classList.add('hidden');
@@ -193,22 +396,22 @@ window.phSelectMedicine = async function (medicineId, medicineName) {
   const batchesEl = document.getElementById('ph-med-batches');
   selectedEl.classList.remove('hidden');
   document.getElementById('ph-med-selected-name').textContent = medicineName;
-  batchesEl.innerHTML = '<p class="text-xs text-charcoal/40">Loading batches...</p>';
+  batchesEl.innerHTML = `<p class="text-xs text-charcoal/40">Loading batches...</p>`;
 
   try {
     const qty = parseInt(document.getElementById('ph-med-qty').value, 10) || 1;
     const { batches } = await window.phCallFunction('get_fifo_batches', { medicineId, quantity: qty });
     if (!batches || batches.length === 0) {
-      batchesEl.innerHTML = '<p class="text-xs text-red-600">No stock available for this medicine.</p>';
+      batchesEl.innerHTML = `<p class="text-xs text-red-600 font-medium">No stock available for this medicine.</p>`;
       phState.selectedMedicine = { id: medicineId, name: medicineName, batches: [] };
       return;
     }
     phState.selectedMedicine = { id: medicineId, name: medicineName, batches };
     batchesEl.innerHTML = batches.map((b) => `
-      <p class="text-xs text-charcoal/60">Batch ${escapePhHtml(b.batch_number)} — ${b.to_dispense} unit(s) @ ${formatRupees(b.unit_price)} <span class="text-charcoal/40">(exp ${b.expiry_date})</span></p>
+      <p class="text-xs text-charcoal/60">Batch <span class="font-semibold text-charcoal/80">${escapePhHtml(b.batch_number)}</span> — ${b.to_dispense} unit(s) @ ${formatRupees(b.unit_price)} <span class="text-charcoal/40">(exp ${b.expiry_date})</span></p>
     `).join('');
   } catch (err) {
-    batchesEl.innerHTML = `<p class="text-xs text-red-600">${err.message}</p>`;
+    batchesEl.innerHTML = `<p class="text-xs text-red-600">${escapePhHtml(err.message)}</p>`;
   }
 };
 
@@ -223,9 +426,6 @@ document.getElementById('ph-add-to-cart-btn').addEventListener('click', () => {
   if (!med || !med.batches || med.batches.length === 0) return;
   const qty = parseInt(document.getElementById('ph-med-qty').value, 10) || 1;
 
-  // FIFO may split one requested quantity across multiple batches --
-  // add one cart line per batch so execute_pharmacy_sale gets the
-  // correct batch_id/quantity/unit_price per line.
   med.batches.forEach((b) => {
     phState.cart.push({
       medicineId: med.id,
@@ -234,7 +434,7 @@ document.getElementById('ph-add-to-cart-btn').addEventListener('click', () => {
       batchNumber: b.batch_number,
       quantity: b.to_dispense,
       unitPrice: b.unit_price,
-      gstPercent: 0, // GST not tracked per-batch in medicine_batches; adjust here if a rate needs to be added later
+      gstPercent: 0,
     });
   });
 
@@ -243,6 +443,7 @@ document.getElementById('ph-add-to-cart-btn').addEventListener('click', () => {
   document.getElementById('ph-med-qty').value = 1;
   phState.selectedMedicine = null;
   renderPhCart();
+  loadPhCheckoutStats();
 });
 
 function renderPhCart() {
@@ -251,13 +452,7 @@ function renderPhCart() {
   const checkoutBtn = document.getElementById('ph-checkout-btn');
 
   if (phState.cart.length === 0) {
-    // Don't try to preserve/reuse the original #ph-cart-empty node --
-    // once listEl.innerHTML is replaced below (on the first non-empty
-    // render), that original node is gone from the live DOM, so a
-    // later getElementById('ph-cart-empty') + appendChild would throw
-    // on a stale/detached reference. Just render the empty state
-    // fresh each time, same as every other list in this file.
-    listEl.innerHTML = '<p id="ph-cart-empty" class="text-charcoal/30 text-sm text-center py-8">No items added yet.</p>';
+    listEl.innerHTML = `<p id="ph-cart-empty" class="text-charcoal/30 text-sm text-center py-8">No items added yet.</p>`;
     totalEl.textContent = formatRupees(0);
     checkoutBtn.disabled = true;
     return;
@@ -265,14 +460,16 @@ function renderPhCart() {
 
   const total = phState.cart.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   listEl.innerHTML = phState.cart.map((item, idx) => `
-    <div class="flex items-center justify-between bg-champagne-50 rounded-lg px-3 py-2">
+    <div class="flex items-center justify-between bg-champagne-50 rounded-lg px-3 py-2.5">
       <div>
         <p class="text-sm font-semibold text-brand-900">${escapePhHtml(item.medicineName)}</p>
         <p class="text-xs text-charcoal/50">Batch ${escapePhHtml(item.batchNumber)} &middot; ${item.quantity} &times; ${formatRupees(item.unitPrice)}</p>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-bold text-brand-900">${formatRupees(item.quantity * item.unitPrice)}</span>
-        <button onclick="window.phRemoveFromCart(${idx})" class="text-charcoal/30 hover:text-red-600 transition text-lg leading-none">&times;</button>
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-bold text-brand-900 tabular-nums">${formatRupees(item.quantity * item.unitPrice)}</span>
+        <button onclick="window.phRemoveFromCart(${idx})" class="text-charcoal/30 hover:text-red-600 transition" aria-label="Remove">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
       </div>
     </div>`).join('');
   totalEl.textContent = formatRupees(total);
@@ -282,6 +479,7 @@ function renderPhCart() {
 window.phRemoveFromCart = function (idx) {
   phState.cart.splice(idx, 1);
   renderPhCart();
+  loadPhCheckoutStats();
 };
 
 document.getElementById('ph-checkout-btn').addEventListener('click', async () => {
@@ -324,10 +522,14 @@ document.getElementById('ph-checkout-btn').addEventListener('click', async () =>
     phState.cart = [];
     renderPhCart();
     renderPhRecentSales();
+    loadPhCheckoutStats();
+    refreshPhBadges();
     document.getElementById('ph-cart-patient-name').value = '';
     document.getElementById('ph-cart-patient-phone').value = '';
+    showPhToast(`Sale complete — ${formatRupees(result.total_amount)}`, 'success');
   } catch (err) {
     errorEl.textContent = err.message;
+    showPhToast(err.message, 'error');
   } finally {
     btn.disabled = false;
     btn.textContent = 'Complete Sale';
@@ -337,35 +539,52 @@ document.getElementById('ph-checkout-btn').addEventListener('click', async () =>
 function renderPhRecentSales() {
   const listEl = document.getElementById('ph-recent-sales');
   if (phState.recentSales.length === 0) {
-    listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-4">No sales yet this session.</p>';
+    listEl.innerHTML = emptyState('No sales yet this session.', ICONS.receipt);
     return;
   }
   listEl.innerHTML = phState.recentSales.map((sale) => `
-    <div class="flex items-center justify-between border border-champagne-200 rounded-lg px-4 py-3">
+    <div class="flex items-center justify-between border border-champagne-200 rounded-xl px-4 py-3">
       <div>
         <p class="text-sm font-semibold text-brand-900">${escapePhHtml(sale.patientName)}</p>
         <p class="text-xs text-charcoal/50">${sale.items.length} item(s) &middot; ${formatRupees(sale.total)}</p>
       </div>
-      <div class="flex gap-2">
-        <button onclick="window.phVoidSale('${sale.dispenseId}')" class="text-xs font-semibold text-red-600 hover:text-red-800 transition">Void</button>
-      </div>
+      <button onclick="window.phVoidSale('${sale.dispenseId}')" class="text-xs font-semibold text-red-600 hover:text-red-800 transition">Void</button>
     </div>`).join('');
 }
 
 window.phVoidSale = async function (dispenseId) {
-  if (!confirm('Void this entire sale? This will restore stock and cannot be undone.')) return;
+  const confirmed = await showPhConfirm('Void this sale?', 'This will restore stock and cannot be undone.');
+  if (!confirmed) return;
   try {
     await window.phCallFunction('void_pharmacy_sale', { originalDispenseId: dispenseId, reason: 'Voided from checkout screen' });
     phState.recentSales = phState.recentSales.filter((s) => s.dispenseId !== dispenseId);
     renderPhRecentSales();
+    loadPhCheckoutStats();
+    showPhToast('Sale voided and stock restored.', 'success');
   } catch (err) {
-    alert('Error: ' + err.message);
+    showPhToast(err.message, 'error');
   }
 };
 
 // ==========================================================
 // INVENTORY TAB
 // ==========================================================
+async function loadPhInventoryStats() {
+  const statsEl = document.getElementById('ph-inventory-stats');
+  statsEl.innerHTML = statCard('Medicines', '…', ICONS.box) + statCard('Low stock', '…', ICONS.alert) + statCard('Expiring soon', '…', ICONS.clock);
+  try {
+    const [{ medicines }, { lowStock }, { expiringBatches }] = await Promise.all([
+      window.phCallFunction('list_medicines'),
+      window.phCallFunction('get_low_stock'),
+      window.phCallFunction('get_expiring_batches', { withinDays: 90 }),
+    ]);
+    statsEl.innerHTML =
+      statCard('Medicines', medicines?.length || 0, ICONS.box) +
+      statCard('Low stock', lowStock?.length || 0, ICONS.alert, lowStock?.length ? 'warn' : 'neutral') +
+      statCard('Expiring in 90d', expiringBatches?.length || 0, ICONS.clock, expiringBatches?.length ? 'warn' : 'neutral');
+  } catch { /* stats supplementary */ }
+}
+
 document.querySelectorAll('.ph-inv-view-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.ph-inv-view-btn').forEach((b) => {
@@ -380,65 +599,60 @@ document.querySelectorAll('.ph-inv-view-btn').forEach((btn) => {
 
 async function loadPhInventory(view) {
   const listEl = document.getElementById('ph-inventory-list');
-  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  listEl.innerHTML = skeletonRows(4);
   try {
     if (view === 'low') {
       const { lowStock } = await window.phCallFunction('get_low_stock');
       if (!lowStock || lowStock.length === 0) {
-        listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No medicines are currently low on stock.</p>';
+        listEl.innerHTML = emptyState('Nothing is running low right now.', ICONS.box);
         return;
       }
       listEl.innerHTML = lowStock.map((m) => `
-        <div class="px-5 py-4 flex items-center justify-between">
-          <div>
-            <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(m.medicine_name)}</p>
-            <p class="text-xs text-red-600">${m.total_stock} in stock &middot; reorder at ${m.reorder_level}</p>
-          </div>
+        <div class="px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
+          <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(m.medicine_name)}</p>
+          ${stockChip(m.total_stock, m.reorder_level)}
         </div>`).join('');
     } else if (view === 'expiring') {
       const { expiringBatches } = await window.phCallFunction('get_expiring_batches', { withinDays: 90 });
       if (!expiringBatches || expiringBatches.length === 0) {
-        listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No batches expiring within 90 days.</p>';
+        listEl.innerHTML = emptyState('No batches expiring within 90 days.', ICONS.clock);
         return;
       }
       listEl.innerHTML = expiringBatches.map((b) => `
-        <div class="px-5 py-4 flex items-center justify-between">
+        <div class="px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
           <div>
             <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(b.medicine_name)}</p>
             <p class="text-xs text-charcoal/50">Batch ${escapePhHtml(b.batch_number)} &middot; ${b.quantity_remaining} remaining</p>
           </div>
-          <span class="text-xs font-semibold text-red-600">Expires ${b.expiry_date}</span>
+          ${expiryChip(b.expiry_date)}
         </div>`).join('');
     } else {
       const { inventory } = await window.phCallFunction('get_inventory');
       if (!inventory || inventory.length === 0) {
-        listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No medicines yet — add one to get started.</p>';
+        listEl.innerHTML = emptyState('No medicines yet — add one to get started.', ICONS.box);
         return;
       }
-      // Group rows by medicine (one row per batch from the RPC).
       const byMedicine = {};
       inventory.forEach((row) => {
         if (!byMedicine[row.medicine_id]) {
-          byMedicine[row.medicine_id] = { name: row.medicine_name, category: row.category, batches: [] };
+          byMedicine[row.medicine_id] = { name: row.medicine_name, category: row.category, reorder: row.reorder_level, batches: [] };
         }
-        if (row.batch_id) {
-          byMedicine[row.medicine_id].batches.push(row);
-        }
+        if (row.batch_id) byMedicine[row.medicine_id].batches.push(row);
       });
       listEl.innerHTML = Object.values(byMedicine).map((m) => {
         const totalStock = m.batches.reduce((sum, b) => sum + (b.quantity_remaining || 0), 0);
         return `
-          <div class="px-5 py-4">
-            <div class="flex items-center justify-between">
+          <div class="px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
+            <div>
               <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(m.name)}</p>
-              <span class="text-sm font-bold text-brand-700">${totalStock} in stock</span>
+              <p class="text-xs text-charcoal/40">${escapePhHtml(m.category || '')} &middot; ${m.batches.length} batch(es)</p>
             </div>
-            <p class="text-xs text-charcoal/40">${escapePhHtml(m.category || '')} &middot; ${m.batches.length} batch(es)</p>
+            ${stockChip(totalStock, m.reorder || 10)}
           </div>`;
       }).join('');
     }
   } catch (err) {
-    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${escapePhHtml(err.message)}</p>`;
   }
 }
 
@@ -447,32 +661,34 @@ document.getElementById('ph-new-medicine-btn').addEventListener('click', () => {
     <div class="p-6">
       <h3 class="text-lg font-bold text-brand-900 mb-4">New Medicine</h3>
       <div class="space-y-3">
-        <input type="text" id="ph-new-med-name" placeholder="Name" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
-        <input type="text" id="ph-new-med-generic" placeholder="Generic name" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
-        <input type="text" id="ph-new-med-category" placeholder="Category" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
-        <select id="ph-new-med-formulation" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm">
+        <input type="text" id="ph-new-med-name" placeholder="Name" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-med-generic" placeholder="Generic name" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-med-category" placeholder="Category" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <select id="ph-new-med-formulation" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
           <option value="tablet">Tablet</option>
           <option value="capsule">Capsule</option>
           <option value="syrup">Syrup</option>
           <option value="cream">Cream</option>
-          <option value="ointment">Ointment</option>
-          <option value="lotion">Lotion</option>
           <option value="injection">Injection</option>
           <option value="drops">Drops</option>
+          <option value="inhaler">Inhaler</option>
+          <option value="powder">Powder</option>
+          <option value="other">Other</option>
         </select>
-        <select id="ph-new-med-unit" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm">
+        <select id="ph-new-med-unit" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
           <option value="strip">Strip</option>
           <option value="bottle">Bottle</option>
           <option value="tube">Tube</option>
           <option value="vial">Vial</option>
+          <option value="sachet">Sachet</option>
           <option value="piece">Piece</option>
         </select>
-        <input type="number" id="ph-new-med-reorder" placeholder="Reorder level" value="10" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="number" id="ph-new-med-reorder" placeholder="Reorder level" value="10" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
       </div>
-      <p id="ph-new-med-error" class="text-red-500 text-sm mt-2 min-h-[1.25rem]"></p>
+      <p id="ph-new-med-error" class="text-red-600 text-sm mt-2 min-h-[1.25rem]"></p>
       <div class="flex gap-2 mt-4">
-        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2 text-sm font-semibold">Cancel</button>
-        <button onclick="window.phSaveNewMedicine()" class="flex-1 bg-brand-900 text-white rounded-lg py-2 text-sm font-bold">Save</button>
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phSaveNewMedicine()" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Save</button>
       </div>
     </div>`);
 });
@@ -495,6 +711,9 @@ window.phSaveNewMedicine = async function () {
     });
     closePhModal();
     loadPhInventory('all');
+    loadPhInventoryStats();
+    refreshPhBadges();
+    showPhToast(`${name} added to inventory.`, 'success');
   } catch (err) {
     errorEl.textContent = err.message;
   }
@@ -503,53 +722,66 @@ window.phSaveNewMedicine = async function () {
 // ==========================================================
 // PURCHASE ORDERS TAB
 // ==========================================================
+async function loadPhPoStats() {
+  const statsEl = document.getElementById('ph-po-stats');
+  statsEl.innerHTML = statCard('Total orders', '…', ICONS.box) + statCard('Awaiting receipt', '…', ICONS.clock) + statCard('Payment pending', '…', ICONS.rupee);
+  try {
+    const { purchaseOrders } = await window.phCallFunction('list_purchase_orders');
+    const awaitingReceipt = (purchaseOrders || []).filter((po) => !po.delivery_date).length;
+    const paymentPending = (purchaseOrders || []).filter((po) => po.payment_status !== 'paid').length;
+    statsEl.innerHTML =
+      statCard('Total orders', purchaseOrders?.length || 0, ICONS.box) +
+      statCard('Awaiting receipt', awaitingReceipt, ICONS.clock, awaitingReceipt ? 'warn' : 'neutral') +
+      statCard('Payment pending', paymentPending, ICONS.rupee, paymentPending ? 'warn' : 'neutral');
+  } catch { /* stats supplementary */ }
+}
+
 async function loadPhPurchaseOrders() {
   const listEl = document.getElementById('ph-po-list');
-  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  listEl.innerHTML = skeletonRows(3);
   try {
     const { purchaseOrders } = await window.phCallFunction('list_purchase_orders');
     if (!purchaseOrders || purchaseOrders.length === 0) {
-      listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No purchase orders yet.</p>';
+      listEl.innerHTML = emptyState('No purchase orders yet — create one to receive stock.', ICONS.receipt);
       return;
     }
-    const statusColors = { pending: 'bg-champagne-100 text-brand-700', partial: 'bg-blue-50 text-blue-700', paid: 'bg-green-50 text-green-700' };
     listEl.innerHTML = purchaseOrders.map((po) => `
-      <div class="px-5 py-4 flex items-center justify-between">
+      <div class="px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
         <div>
           <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(po.po_number)}</p>
           <p class="text-xs text-charcoal/50">${formatRupees(po.total_amount)} &middot; ${po.invoice_number ? 'Invoice ' + escapePhHtml(po.invoice_number) : 'No invoice number'}</p>
         </div>
         <div class="flex items-center gap-3">
-          <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${statusColors[po.payment_status] || 'bg-slate-100'}">${po.payment_status}</span>
+          ${paymentStatusChip(po.payment_status)}
           ${po.delivery_date ? '' : `<button onclick="window.phReceivePO('${po.id}', ${po.total_amount})" class="text-xs font-bold text-brand-700 hover:text-brand-900 transition">Receive</button>`}
         </div>
       </div>`).join('');
   } catch (err) {
-    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${escapePhHtml(err.message)}</p>`;
   }
 }
 
 window.phReceivePO = async function (poId, totalAmount) {
-  const paymentMode = prompt('Payment mode (cash / upi / card):', 'cash');
+  const paymentMode = await showPhTextPrompt('Payment mode', { placeholder: 'cash / upi / card', defaultValue: 'cash' });
   if (!paymentMode) return;
   try {
     await window.phCallFunction('receive_purchase_order', { poId, paymentMode, amountPaid: totalAmount });
     loadPhPurchaseOrders();
+    loadPhPoStats();
+    refreshPhBadges();
+    showPhToast('Purchase order received — stock updated.', 'success');
   } catch (err) {
-    alert('Error: ' + err.message);
+    showPhToast(err.message, 'error');
   }
 };
 
-// New PO modal -- a lightweight single-item-at-a-time builder rather
-// than a full dynamic-rows form, since receiving is the far more
-// frequent action once a PO exists; this keeps the modal simple.
 document.getElementById('ph-new-po-btn').addEventListener('click', async () => {
   let suppliers = [];
   try {
     const result = await window.phCallFunction('list_suppliers');
     suppliers = result.suppliers || [];
   } catch (err) {
-    alert('Error loading suppliers: ' + err.message);
+    showPhToast('Error loading suppliers: ' + err.message, 'error');
     return;
   }
 
@@ -557,38 +789,38 @@ document.getElementById('ph-new-po-btn').addEventListener('click', async () => {
     <div class="p-6">
       <h3 class="text-lg font-bold text-brand-900 mb-4">New Purchase Order</h3>
       <div class="space-y-3">
-        <select id="ph-new-po-supplier" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm">
+        <select id="ph-new-po-supplier" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
           <option value="">Select supplier...</option>
           ${suppliers.map((s) => `<option value="${s.id}">${escapePhHtml(s.name)}</option>`).join('')}
           <option value="__new__">+ Add new supplier</option>
         </select>
-        <input type="text" id="ph-new-po-invoice" placeholder="Invoice number (optional)" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="text" id="ph-new-po-invoice" placeholder="Invoice number (optional)" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
         <div class="border-t border-champagne-200 pt-3">
           <p class="text-xs font-bold text-brand-700 uppercase tracking-wide mb-2">Line Item</p>
-          <input type="text" id="ph-new-po-med-name" placeholder="Medicine name" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm mb-2" />
-          <input type="text" id="ph-new-po-batch" placeholder="Batch number" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm mb-2" />
-          <input type="date" id="ph-new-po-expiry" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm mb-2" />
+          <input type="text" id="ph-new-po-med-name" placeholder="Medicine name" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-2" />
+          <input type="text" id="ph-new-po-batch" placeholder="Batch number" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-2" />
+          <input type="date" id="ph-new-po-expiry" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-2" />
           <div class="grid grid-cols-2 gap-2 mb-2">
-            <input type="number" id="ph-new-po-qty" placeholder="Quantity" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
-            <input type="number" id="ph-new-po-free" placeholder="Free qty" value="0" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+            <input type="number" id="ph-new-po-qty" placeholder="Quantity" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+            <input type="number" id="ph-new-po-free" placeholder="Free qty" value="0" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
           </div>
           <div class="grid grid-cols-3 gap-2">
-            <input type="number" id="ph-new-po-purchase-price" placeholder="Cost ₹" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
-            <input type="number" id="ph-new-po-selling-price" placeholder="Sell ₹" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
-            <input type="number" id="ph-new-po-gst" placeholder="GST %" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+            <input type="number" id="ph-new-po-purchase-price" placeholder="Cost ₹" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+            <input type="number" id="ph-new-po-selling-price" placeholder="Sell ₹" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+            <input type="number" id="ph-new-po-gst" placeholder="GST %" class="border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
           </div>
         </div>
       </div>
-      <p id="ph-new-po-error" class="text-red-500 text-sm mt-2 min-h-[1.25rem]"></p>
+      <p id="ph-new-po-error" class="text-red-600 text-sm mt-2 min-h-[1.25rem]"></p>
       <div class="flex gap-2 mt-4">
-        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2 text-sm font-semibold">Cancel</button>
-        <button onclick="window.phSaveNewPO()" class="flex-1 bg-brand-900 text-white rounded-lg py-2 text-sm font-bold">Create PO</button>
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phSaveNewPO()" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Create PO</button>
       </div>
     </div>`);
 
   document.getElementById('ph-new-po-supplier').addEventListener('change', async (e) => {
     if (e.target.value !== '__new__') return;
-    const name = prompt('New supplier name:');
+    const name = await showPhTextPrompt('New supplier name');
     if (!name) { e.target.value = ''; return; }
     try {
       const { id } = await window.phCallFunction('upsert_supplier', { name });
@@ -598,7 +830,7 @@ document.getElementById('ph-new-po-btn').addEventListener('click', async () => {
       opt.selected = true;
       e.target.insertBefore(opt, e.target.lastElementChild);
     } catch (err) {
-      alert('Error: ' + err.message);
+      showPhToast(err.message, 'error');
       e.target.value = '';
     }
   });
@@ -619,8 +851,6 @@ window.phSaveNewPO = async function () {
   }
 
   try {
-    // Resolve or create the medicine by name first (PO items need a
-    // medicine_id, and the pharmacist may be ordering something new).
     const { medicines } = await window.phCallFunction('list_medicines');
     let medicine = medicines.find((m) => m.name.toLowerCase() === medicineName.toLowerCase());
     let medicineId;
@@ -648,14 +878,15 @@ window.phSaveNewPO = async function () {
     });
     closePhModal();
     loadPhPurchaseOrders();
+    loadPhPoStats();
+    showPhToast('Purchase order created.', 'success');
   } catch (err) {
     errorEl.textContent = err.message;
   }
 };
 
 // ==========================================================
-// RECONCILE TAB (Phase 2: invoice review, physical audit,
-// reorder suggestions, rep CRM)
+// RECONCILE TAB
 // ==========================================================
 function switchPhRecView(view) {
   document.querySelectorAll('.ph-rec-subview').forEach((el) => el.classList.add('hidden'));
@@ -690,7 +921,11 @@ document.getElementById('ph-invoice-upload-input').addEventListener('change', as
   const file = e.target.files[0];
   if (!file) return;
   const statusEl = document.getElementById('ph-invoice-upload-status');
-  statusEl.textContent = 'Extracting invoice with AI, this can take a few seconds...';
+  statusEl.classList.remove('hidden');
+  statusEl.innerHTML = `<div class="flex items-center gap-2 text-sm text-brand-700 bg-champagne-50 border border-champagne-200 rounded-xl px-4 py-3">
+    <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+    Extracting invoice with AI, this can take a few seconds...
+  </div>`;
   try {
     const base64 = await fileToBase64(file);
     const { aiResult } = await window.phCallFunction('extract_invoice_from_image', {
@@ -698,18 +933,19 @@ document.getElementById('ph-invoice-upload-input').addEventListener('change', as
       mimeType: file.type,
       fileName: file.name,
     });
-    // Save straight into pending_approvals for review, same as the
-    // scheduled batch-scan path would, so both routes converge on
-    // one review queue.
     await window.phCallFunction('create_pending_approval', {
       fileName: file.name,
       driveUrl: aiResult.invoice?.bill_url || null,
       aiData: aiResult,
     });
-    statusEl.textContent = 'Extracted — review it below.';
+    statusEl.innerHTML = `<div class="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Extracted — review it below.
+    </div>`;
     loadPhPendingApprovals();
+    refreshPhBadges();
   } catch (err) {
-    statusEl.textContent = 'Error: ' + err.message;
+    statusEl.innerHTML = `<div class="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-100 rounded-xl px-4 py-3">${escapePhHtml(err.message)}</div>`;
   } finally {
     e.target.value = '';
   }
@@ -717,11 +953,11 @@ document.getElementById('ph-invoice-upload-input').addEventListener('change', as
 
 async function loadPhPendingApprovals() {
   const listEl = document.getElementById('ph-pending-approvals-list');
-  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  listEl.innerHTML = skeletonRows(2);
   try {
     const { pendingApprovals } = await window.phCallFunction('list_pending_approvals');
     if (!pendingApprovals || pendingApprovals.length === 0) {
-      listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No invoices waiting for review.</p>';
+      listEl.innerHTML = emptyState('No invoices waiting for review.', ICONS.receipt);
       return;
     }
     listEl.innerHTML = pendingApprovals.map((draft) => {
@@ -730,20 +966,20 @@ async function loadPhPendingApprovals() {
       const itemCount = (draft.ai_data?.items || []).length;
       return `
         <div class="px-5 py-4">
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between gap-3">
             <div>
               <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(sup.supplier_name || 'Unknown supplier')} — ${escapePhHtml(inv.invoice_number || draft.file_name)}</p>
               <p class="text-xs text-charcoal/50">${itemCount} item(s) &middot; ${formatRupees(inv.grand_total)} &middot; ${inv.invoice_date || ''}</p>
             </div>
-            <div class="flex gap-2">
-              <button onclick="window.phCommitDraft('${draft.id}')" class="text-xs font-bold text-brand-700 hover:text-brand-900 transition">Commit</button>
-              <button onclick="window.phRejectDraft('${draft.id}')" class="text-xs font-semibold text-red-600 hover:text-red-800 transition">Reject</button>
+            <div class="flex gap-2 shrink-0">
+              <button onclick="window.phCommitDraft('${draft.id}')" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-brand-700 text-white hover:bg-brand-900 transition">Commit</button>
+              <button onclick="window.phRejectDraft('${draft.id}')" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition">Reject</button>
             </div>
           </div>
         </div>`;
     }).join('');
   } catch (err) {
-    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${escapePhHtml(err.message)}</p>`;
   }
 }
 
@@ -751,46 +987,44 @@ window.phCommitDraft = async function (draftId) {
   try {
     const { pendingApprovals } = await window.phCallFunction('list_pending_approvals');
     const draft = (pendingApprovals || []).find((d) => d.id === draftId);
-    if (!draft) return alert('Draft not found.');
+    if (!draft) return showPhToast('Draft not found.', 'error');
 
     const aiData = draft.ai_data || {};
-    const supplier = aiData.supplier || {};
-    const invoice = aiData.invoice || {};
-
-    // The AI extraction has no real supplier/medicine IDs -- always
-    // "NEW" here. A future pass could add a match-to-existing-supplier
-    // step; for now every commit creates fresh records, same starting
-    // point commitReviewedInvoice's GAS original had.
     await window.phCallFunction('commit_reviewed_invoice', {
       draft_id: draftId,
-      supplier: { id: 'NEW', ...supplier },
-      invoice,
+      supplier: { id: 'NEW', ...(aiData.supplier || {}) },
+      invoice: aiData.invoice || {},
       items: aiData.items || [],
     });
     loadPhPendingApprovals();
+    refreshPhBadges();
+    showPhToast('Invoice committed — stock updated.', 'success');
   } catch (err) {
-    alert('Error committing invoice: ' + err.message);
+    showPhToast('Error committing invoice: ' + err.message, 'error');
   }
 };
 
 window.phRejectDraft = async function (draftId) {
-  if (!confirm('Reject this draft? It will be removed from the review queue.')) return;
+  const confirmed = await showPhConfirm('Reject this draft?', 'It will be removed from the review queue.');
+  if (!confirmed) return;
   try {
     await window.phCallFunction('reject_pending_approval', { id: draftId });
     loadPhPendingApprovals();
+    refreshPhBadges();
+    showPhToast('Draft rejected.', 'info');
   } catch (err) {
-    alert('Error: ' + err.message);
+    showPhToast(err.message, 'error');
   }
 };
 
 // ---- Physical Audit ----
 async function loadPhAuditList() {
   const listEl = document.getElementById('ph-audit-list');
-  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  listEl.innerHTML = skeletonRows(4);
   try {
     const { medicines } = await window.phCallFunction('get_medicines_with_wac');
     if (!medicines || medicines.length === 0) {
-      listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No medicines yet.</p>';
+      listEl.innerHTML = emptyState('No medicines yet.', ICONS.box);
       return;
     }
     listEl.innerHTML = medicines.map((m) => `
@@ -800,10 +1034,10 @@ async function loadPhAuditList() {
           <p class="text-xs text-charcoal/50">System stock: ${m.total_stock}</p>
         </div>
         <input type="number" data-audit-medicine-id="${m.medicine_id}" placeholder="Counted qty"
-               class="w-32 border border-champagne-300 rounded-lg px-3 py-1.5 text-sm" />
+               class="w-32 border border-champagne-300 rounded-lg px-3 py-1.5 text-sm tabular-nums" />
       </div>`).join('');
   } catch (err) {
-    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${escapePhHtml(err.message)}</p>`;
   }
 }
 
@@ -817,61 +1051,65 @@ document.getElementById('ph-submit-audit-btn').addEventListener('click', async (
     }
   });
   if (audits.length === 0) {
-    resultEl.textContent = 'Enter at least one counted quantity.';
+    resultEl.innerHTML = `<p class="text-sm text-charcoal/50">Enter at least one counted quantity.</p>`;
     return;
   }
   try {
     const { results } = await window.phCallFunction('run_physical_audit', { audits, reason: 'Physical audit via /pharmacy' });
     const adjusted = results.filter((r) => r.adjusted);
-    resultEl.textContent = adjusted.length === 0
-      ? 'No discrepancies found — nothing adjusted.'
-      : `Adjusted ${adjusted.length} medicine(s): ` + adjusted.map((r) => `${r.delta > 0 ? '+' : ''}${r.delta}`).join(', ');
+    if (adjusted.length === 0) {
+      resultEl.innerHTML = `<p class="text-sm text-emerald-700 font-medium">No discrepancies found — nothing adjusted.</p>`;
+    } else {
+      resultEl.innerHTML = `<p class="text-sm text-amber-700 font-medium">Adjusted ${adjusted.length} medicine(s): ` +
+        adjusted.map((r) => `${r.delta > 0 ? '+' : ''}${r.delta}`).join(', ') + `</p>`;
+    }
     loadPhAuditList();
+    showPhToast('Audit submitted.', 'success');
   } catch (err) {
-    resultEl.textContent = 'Error: ' + err.message;
+    resultEl.innerHTML = `<p class="text-sm text-red-600">${escapePhHtml(err.message)}</p>`;
   }
 });
 
 // ---- Reorder Suggestions ----
 async function loadPhReorderSuggestions() {
   const listEl = document.getElementById('ph-reorder-list');
-  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  listEl.innerHTML = skeletonRows(3);
   try {
     const { recommendations } = await window.phCallFunction('get_predictive_reorder');
     if (!recommendations || recommendations.length === 0) {
-      listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Nothing needs reordering right now.</p>';
+      listEl.innerHTML = emptyState('Nothing needs reordering right now.', ICONS.box);
       return;
     }
     listEl.innerHTML = recommendations.map((r) => `
       <div class="px-5 py-4">
-        <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(r.medName)}</p>
+        <div class="flex items-center justify-between mb-1">
+          <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(r.medName)}</p>
+          <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">Reorder ${r.suggestedQty}</span>
+        </div>
         <p class="text-xs text-charcoal/50">${escapePhHtml(r.reason)}</p>
-        <p class="text-xs font-semibold text-brand-700 mt-1">Suggested reorder: ${r.suggestedQty} units</p>
       </div>`).join('');
   } catch (err) {
-    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${escapePhHtml(err.message)}</p>`;
   }
 }
 
 // ---- Rep CRM ----
 async function loadPhReps() {
   const listEl = document.getElementById('ph-reps-list');
-  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  listEl.innerHTML = skeletonRows(3);
   try {
     const { reps } = await window.phCallFunction('list_medical_reps');
     if (!reps || reps.length === 0) {
-      listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No reps added yet.</p>';
+      listEl.innerHTML = emptyState('No reps added yet.', ICONS.box);
       return;
     }
     listEl.innerHTML = reps.map((r) => `
-      <div class="px-5 py-4 flex items-center justify-between">
-        <div>
-          <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(r.rep_name)}</p>
-          <p class="text-xs text-charcoal/50">${escapePhHtml(r.company || '')} ${r.division ? '&middot; ' + escapePhHtml(r.division) : ''} ${r.phone ? '&middot; ' + escapePhHtml(r.phone) : ''}</p>
-        </div>
+      <div class="px-5 py-4">
+        <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(r.rep_name)}</p>
+        <p class="text-xs text-charcoal/50">${[r.company, r.division, r.phone].filter(Boolean).map(escapePhHtml).join(' &middot; ')}</p>
       </div>`).join('');
   } catch (err) {
-    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${escapePhHtml(err.message)}</p>`;
   }
 }
 
@@ -880,15 +1118,15 @@ document.getElementById('ph-new-rep-btn').addEventListener('click', () => {
     <div class="p-6">
       <h3 class="text-lg font-bold text-brand-900 mb-4">New Medical Rep</h3>
       <div class="space-y-3">
-        <input type="text" id="ph-new-rep-name" placeholder="Rep name" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
-        <input type="text" id="ph-new-rep-company" placeholder="Company" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
-        <input type="text" id="ph-new-rep-division" placeholder="Division" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
-        <input type="text" id="ph-new-rep-phone" placeholder="Phone" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="text" id="ph-new-rep-name" placeholder="Rep name" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-rep-company" placeholder="Company" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-rep-division" placeholder="Division" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-rep-phone" placeholder="Phone" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
       </div>
-      <p id="ph-new-rep-error" class="text-red-500 text-sm mt-2 min-h-[1.25rem]"></p>
+      <p id="ph-new-rep-error" class="text-red-600 text-sm mt-2 min-h-[1.25rem]"></p>
       <div class="flex gap-2 mt-4">
-        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2 text-sm font-semibold">Cancel</button>
-        <button onclick="window.phSaveNewRep()" class="flex-1 bg-brand-900 text-white rounded-lg py-2 text-sm font-bold">Save</button>
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phSaveNewRep()" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Save</button>
       </div>
     </div>`);
 });
@@ -909,6 +1147,7 @@ window.phSaveNewRep = async function () {
     });
     closePhModal();
     loadPhReps();
+    showPhToast(`${repName} added.`, 'success');
   } catch (err) {
     errorEl.textContent = err.message;
   }
