@@ -2,60 +2,81 @@
 // src/components/StatsBar.astro
 const googleReviewsUrl = 'https://www.google.com/search?q=CRISPR+Skin+and+Hair+Clinic+KK+Nagar'; // replace with exact GBP reviews link
 
-const primary = {
-  value: '4.9',
-  label: 'Google rating',
-  sub: '370+ patient reviews',
-  href: googleReviewsUrl,
-};
-
-const secondary = [
-  { value: '3', label: 'AIIMS-trained consultant dermatologists' },
-  { value: '5,000+', label: 'Patients counselled and treated' },
-  { value: '20+', label: 'Years combined clinical experience' },
+const stats = [
+  {
+    value: '4.9',
+    label: 'Google rating',
+    sub: '370+ patient reviews',
+    href: googleReviewsUrl,
+    featured: true,
+  },
+  {
+    value: '3',
+    label: 'AIIMS-trained consultant dermatologists',
+  },
+  {
+    value: '5,000+',
+    label: 'Patients counselled and treated',
+  },
+  {
+    value: '20+',
+    label: 'Years combined clinical experience',
+  },
 ];
 ---
 
-<section class="bg-brand-900 text-white py-14 md:py-16 px-6 border-y border-brand-800">
+<section class="bg-champagne-50 py-14 md:py-16 px-6 border-y border-champagne-200">
   <div class="max-w-7xl mx-auto">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-      
-      <!-- Primary: Google rating -->
-      <a
-        href={primary.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="lg:col-span-4 group text-center lg:text-left lg:border-r lg:border-white/10 lg:pr-8"
-      >
-        <div class="flex items-baseline justify-center lg:justify-start gap-2">
-          <p class="text-5xl md:text-6xl font-extrabold tracking-tight group-hover:text-brand-200 transition-colors">
-            {primary.value}
-          </p>
-          <span class="text-2xl text-gold-400" aria-hidden="true">★</span>
-        </div>
-        <p class="mt-2 text-base font-semibold text-brand-100">{primary.label}</p>
-        <p class="mt-1 text-sm text-brand-300 group-hover:text-brand-200 transition-colors">
-          {primary.sub} <span class="inline-block transition-transform group-hover:translate-x-0.5">→</span>
-        </p>
-      </a>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      {stats.map((stat) => {
+        const cardClass = `rounded-2xl border p-6 md:p-8 text-center h-full flex flex-col items-center justify-center transition-all duration-300 ${
+          stat.featured
+            ? 'bg-brand-900 border-brand-800 text-white shadow-lg hover:shadow-xl'
+            : 'bg-white border-champagne-200 text-slate-900 shadow-sm hover:shadow-md hover:border-brand-200'
+        }`;
 
-      <!-- Secondary stats -->
-      <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 text-center">
-        {secondary.map((stat, i) => (
-          <div class={`px-2 ${i > 0 ? 'sm:border-l sm:border-white/10' : ''}`}>
-            <p class="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-              {stat.value}
-            </p>
-            <p class="mt-2 text-sm text-brand-200 font-medium leading-snug max-w-[12rem] mx-auto">
+        const inner = (
+          <>
+            <div class="flex items-baseline justify-center gap-1.5">
+              <p class={`text-4xl md:text-5xl font-extrabold tracking-tight ${stat.featured ? 'text-white' : 'text-brand-900'}`}>
+                {stat.value}
+              </p>
+              {stat.featured && (
+                <span class="text-xl text-amber-300" aria-hidden="true">★</span>
+              )}
+            </div>
+            <p class={`mt-3 text-sm font-semibold leading-snug ${stat.featured ? 'text-brand-100' : 'text-slate-800'}`}>
               {stat.label}
             </p>
+            {stat.sub && (
+              <p class={`mt-1 text-xs ${stat.featured ? 'text-brand-300' : 'text-slate-500'}`}>
+                {stat.sub}
+              </p>
+            )}
+          </>
+        );
+
+        return stat.href ? (
+          <a
+            href={stat.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class={`${cardClass} group`}
+          >
+            {inner}
+            <span class={`mt-3 text-xs font-medium ${stat.featured ? 'text-brand-200 group-hover:text-white' : 'text-brand-600'} transition-colors`}>
+              View reviews →
+            </span>
+          </a>
+        ) : (
+          <div class={cardClass}>
+            {inner}
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>
 
-    <!-- Tagline -->
-    <p class="mt-10 pt-8 border-t border-white/10 text-center text-sm md:text-base text-brand-200 font-medium tracking-wide">
+    <p class="mt-8 text-center text-sm text-slate-600 font-medium">
       Evaluation first. Procedures only when they fit.
     </p>
   </div>
