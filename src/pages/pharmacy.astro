@@ -185,7 +185,8 @@ import AppLayout from '../layouts/AppLayout.astro';
           </div>
 
           <div class="mt-6 bg-white rounded-2xl border border-champagne-200 shadow-sm p-6">
-            <h3 class="text-sm font-bold text-brand-700 uppercase tracking-wide mb-4">Recent Sales</h3>
+            <h3 class="text-sm font-bold text-brand-700 uppercase tracking-wide">This Session</h3>
+            <p class="text-xs text-charcoal/40 mb-4">Sales made since you opened this page — for the day's full total, see the stat above.</p>
             <div id="ph-recent-sales" class="space-y-2">
               <p class="text-charcoal/30 text-sm text-center py-4">No sales yet this session.</p>
             </div>
@@ -326,9 +327,41 @@ import AppLayout from '../layouts/AppLayout.astro';
 </div>
 </AppLayout>
 
+<style>
+  /* Print stylesheet for the receipt view (window.phShowReceipt).
+     Hides everything except #ph-receipt-content when printing --
+     the modal backdrop, sidebar, and action buttons would otherwise
+     print as dark overlays / irrelevant chrome. */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #ph-receipt-content, #ph-receipt-content * {
+      visibility: visible;
+    }
+    #ph-receipt-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    #ph-modal-backdrop {
+      position: static !important;
+      background: none !important;
+      backdrop-filter: none !important;
+    }
+    #ph-modal-content {
+      box-shadow: none !important;
+      max-height: none !important;
+      overflow: visible !important;
+    }
+  }
+</style>
+
 <script define:vars={{ supabaseUrl: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_URL, supabaseAnonKey: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_ANON_KEY }}>
   window.__PH_SUPABASE_URL__ = supabaseUrl;
   window.__PH_SUPABASE_ANON_KEY__ = supabaseAnonKey;
 </script>
 <script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script is:inline src="/scripts/pharmacy-app.js"></script>
+
