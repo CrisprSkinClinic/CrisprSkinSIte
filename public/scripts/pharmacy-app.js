@@ -658,13 +658,17 @@ async function loadPhInventory(view) {
         return;
       }
       listEl.innerHTML = suppliers.map((s) => `
-        <button onclick="window.phOpenSupplierEdit('${s.id}')" class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
-          <div>
-            <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(s.name)}</p>
-            <p class="text-xs text-charcoal/40">${[s.gstin, s.phone].filter(Boolean).map(escapePhHtml).join(' &middot; ') || 'No contact details yet'}</p>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-charcoal/20"><path d="m9 18 6-6-6-6"/></svg>
-        </button>`).join('');
+        <div class="px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
+          <button onclick="window.phOpenSupplierEdit('${s.id}')" class="flex-1 text-left min-w-0">
+            <p class="font-semibold text-brand-900 text-sm truncate">${escapePhHtml(s.name)}</p>
+            <p class="text-xs text-charcoal/40 truncate">${[s.gstin, s.phone].filter(Boolean).map(escapePhHtml).join(' &middot; ') || 'No contact details yet'}</p>
+          </button>
+          ${phOverflowMenuHtml([
+            { label: 'Edit', onclick: `window.phOpenSupplierEdit('${s.id}')` },
+            { label: 'Merge into another supplier...', onclick: `window.phOpenMergeSupplier('${s.id}', '${escapePhAttr(s.name)}')` },
+            { label: 'Deactivate', onclick: `window.phDeactivateSupplier('${s.id}', '${escapePhAttr(s.name)}')`, danger: true },
+          ])}
+        </div>`).join('');
     } else {
       const { inventory } = await window.phCallFunction('get_inventory');
       if (!inventory || inventory.length === 0) {
@@ -681,13 +685,19 @@ async function loadPhInventory(view) {
       listEl.innerHTML = Object.values(byMedicine).map((m) => {
         const totalStock = m.batches.reduce((sum, b) => sum + (b.quantity_remaining || 0), 0);
         return `
-          <button onclick="window.phOpenMedicineEdit('${m.id}')" class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
-            <div>
-              <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(m.name)}</p>
-              <p class="text-xs text-charcoal/40">${escapePhHtml(m.category || '')} &middot; ${m.batches.length} batch(es)</p>
-            </div>
-            ${stockChip(totalStock, m.reorder || 10)}
-          </button>`;
+          <div class="px-5 py-4 flex items-center justify-between hover:bg-champagne-50/50 transition">
+            <button onclick="window.phOpenMedicineEdit('${m.id}')" class="flex-1 text-left min-w-0 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <p class="font-semibold text-brand-900 text-sm truncate">${escapePhHtml(m.name)}</p>
+                <p class="text-xs text-charcoal/40 truncate">${escapePhHtml(m.category || '')} &middot; ${m.batches.length} batch(es)</p>
+              </div>
+              ${stockChip(totalStock, m.reorder || 10)}
+            </button>
+            ${phOverflowMenuHtml([
+              { label: 'Edit', onclick: `window.phOpenMedicineEdit('${m.id}')` },
+              { label: 'Deactivate', onclick: `window.phDeactivateMedicine('${m.id}', '${escapePhAttr(m.name)}')`, danger: true },
+            ])}
+          </div>`;
       }).join('');
     }
   } catch (err) {
@@ -1317,9 +1327,14 @@ async function loadPhReps() {
       return;
     }
     listEl.innerHTML = reps.map((r) => `
-      <div class="px-5 py-4">
-        <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(r.rep_name)}</p>
-        <p class="text-xs text-charcoal/50">${[r.company, r.division, r.phone].filter(Boolean).map(escapePhHtml).join(' &middot; ')}</p>
+      <div class="px-5 py-4 flex items-center justify-between">
+        <div class="min-w-0">
+          <p class="font-semibold text-brand-900 text-sm truncate">${escapePhHtml(r.rep_name)}</p>
+          <p class="text-xs text-charcoal/50 truncate">${[r.company, r.division, r.phone].filter(Boolean).map(escapePhHtml).join(' &middot; ')}</p>
+        </div>
+        ${phOverflowMenuHtml([
+          { label: 'Deactivate', onclick: `window.phDeactivateRep('${r.id}', '${escapePhAttr(r.rep_name)}')`, danger: true },
+        ])}
       </div>`).join('');
   } catch (err) {
     listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${escapePhHtml(err.message)}</p>`;
@@ -1361,6 +1376,128 @@ window.phSaveNewRep = async function () {
     closePhModal();
     loadPhReps();
     showPhToast(`${repName} added.`, 'success');
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+};
+
+// ==========================================================
+// OVERFLOW MENU (⋮) — reused on medicine/supplier/rep rows for
+// Edit/Deactivate/Merge actions that don't need their own button
+// crowding the row.
+// ==========================================================
+let phOverflowMenuCounter = 0;
+function phOverflowMenuHtml(items) {
+  const menuId = `ph-overflow-${++phOverflowMenuCounter}`;
+  const itemsHtml = items.map((item) => `
+    <button onclick="document.getElementById('${menuId}').classList.add('hidden'); ${item.onclick}"
+            class="w-full text-left px-4 py-2 text-sm ${item.danger ? 'text-red-600 hover:bg-red-50' : 'text-charcoal/70 hover:bg-champagne-50'} transition">
+      ${escapePhHtml(item.label)}
+    </button>`).join('');
+  return `
+    <div class="relative shrink-0">
+      <button onclick="event.stopPropagation(); window.phToggleOverflowMenu('${menuId}')" class="p-1.5 text-charcoal/30 hover:text-charcoal/60 hover:bg-champagne-100 rounded-lg transition">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+      </button>
+      <div id="${menuId}" class="hidden absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-champagne-200 py-1 min-w-[180px] z-20">
+        ${itemsHtml}
+      </div>
+    </div>`;
+}
+window.phToggleOverflowMenu = function (menuId) {
+  const menu = document.getElementById(menuId);
+  const wasHidden = menu.classList.contains('hidden');
+  document.querySelectorAll('[id^="ph-overflow-"]').forEach((m) => m.classList.add('hidden'));
+  if (wasHidden) menu.classList.remove('hidden');
+};
+document.addEventListener('click', () => {
+  document.querySelectorAll('[id^="ph-overflow-"]').forEach((m) => m.classList.add('hidden'));
+});
+
+// ---- Deactivate actions ----
+window.phDeactivateMedicine = async function (id, name) {
+  const confirmed = await showPhConfirm(`Deactivate ${name}?`, 'It will be hidden from inventory and checkout, but its history is kept.');
+  if (!confirmed) return;
+  try {
+    await window.phCallFunction('deactivate_medicine', { id });
+    loadPhInventory('all');
+    loadPhInventoryStats();
+    showPhToast(`${name} deactivated.`, 'success');
+  } catch (err) {
+    showPhToast(err.message, 'error');
+  }
+};
+
+window.phDeactivateSupplier = async function (id, name) {
+  const confirmed = await showPhConfirm(`Deactivate ${name}?`, 'It will no longer appear when creating purchase orders.');
+  if (!confirmed) return;
+  try {
+    await window.phCallFunction('deactivate_supplier', { id });
+    loadPhInventory('suppliers');
+    showPhToast(`${name} deactivated.`, 'success');
+  } catch (err) {
+    showPhToast(err.message, 'error');
+  }
+};
+
+window.phDeactivateRep = async function (id, name) {
+  const confirmed = await showPhConfirm(`Deactivate ${name}?`, 'They will be removed from the active reps list.');
+  if (!confirmed) return;
+  try {
+    await window.phCallFunction('deactivate_medical_rep', { id });
+    loadPhReps();
+    showPhToast(`${name} deactivated.`, 'success');
+  } catch (err) {
+    showPhToast(err.message, 'error');
+  }
+};
+
+// ---- Merge duplicate supplier ----
+window.phOpenMergeSupplier = async function (duplicateId, duplicateName) {
+  let suppliers = [];
+  try {
+    const result = await window.phCallFunction('list_suppliers');
+    suppliers = (result.suppliers || []).filter((s) => s.id !== duplicateId);
+  } catch (err) {
+    showPhToast('Error loading suppliers: ' + err.message, 'error');
+    return;
+  }
+  if (suppliers.length === 0) {
+    showPhToast('No other suppliers to merge into.', 'info');
+    return;
+  }
+
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-1">Merge Supplier</h3>
+      <p class="text-xs text-charcoal/50 mb-4">
+        Every medicine and purchase order pointing to <span class="font-semibold text-charcoal/70">${escapePhHtml(duplicateName)}</span>
+        will be moved to the supplier you pick below, and <span class="font-semibold text-charcoal/70">${escapePhHtml(duplicateName)}</span> will be deleted. This can't be undone.
+      </p>
+      <select id="ph-merge-target-supplier" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-2">
+        <option value="">Merge into...</option>
+        ${suppliers.map((s) => `<option value="${s.id}">${escapePhHtml(s.name)}</option>`).join('')}
+      </select>
+      <p id="ph-merge-error" class="text-red-600 text-sm min-h-[1.25rem]"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phConfirmMergeSupplier('${duplicateId}', '${escapePhAttr(duplicateName)}')" class="flex-1 bg-red-600 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-red-700 transition">Merge &amp; Delete</button>
+      </div>
+    </div>`);
+};
+
+window.phConfirmMergeSupplier = async function (duplicateId, duplicateName) {
+  const errorEl = document.getElementById('ph-merge-error');
+  const masterId = document.getElementById('ph-merge-target-supplier').value;
+  if (!masterId) {
+    errorEl.textContent = 'Please choose a supplier to merge into.';
+    return;
+  }
+  try {
+    await window.phCallFunction('merge_duplicate_suppliers', { duplicateId, masterId });
+    closePhModal();
+    loadPhInventory('suppliers');
+    showPhToast(`${duplicateName} merged and removed.`, 'success');
   } catch (err) {
     errorEl.textContent = err.message;
   }
