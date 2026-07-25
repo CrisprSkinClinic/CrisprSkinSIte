@@ -367,14 +367,16 @@ function formatRupees(amount) {
 // ==========================================================
 async function loadPhCheckoutStats() {
   const statsEl = document.getElementById('ph-checkout-stats');
-  statsEl.innerHTML = statCard('Today', '…', ICONS.rupee) + statCard('Items in cart', phState.cart.length, ICONS.cart) + statCard('Sales this session', phState.recentSales.length, ICONS.receipt);
+  statsEl.innerHTML = statCard('Today', '…', ICONS.rupee) + statCard('Items in cart', phState.cart.length, ICONS.cart) + statCard('Sales today', '…', ICONS.receipt);
   try {
-    const { lowStock } = await window.phCallFunction('get_low_stock');
-    const sessionTotal = phState.recentSales.reduce((sum, s) => sum + Number(s.total || 0), 0);
+    const [{ lowStock }, { summary }] = await Promise.all([
+      window.phCallFunction('get_low_stock'),
+      window.phCallFunction('get_todays_pharmacy_summary'),
+    ]);
     statsEl.innerHTML =
-      statCard('This session', formatRupees(sessionTotal), ICONS.rupee) +
+      statCard('Today', formatRupees(summary?.net_revenue || 0), ICONS.rupee) +
       statCard('Items in cart', phState.cart.length, ICONS.cart) +
-      statCard('Sales this session', phState.recentSales.length, ICONS.receipt) +
+      statCard('Sales today', summary?.sale_count || 0, ICONS.receipt) +
       statCard('Low stock alerts', lowStock?.length || 0, ICONS.alert, lowStock?.length ? 'warn' : 'neutral');
   } catch { /* stats are supplementary */ }
 }
@@ -567,8 +569,11 @@ document.getElementById('ph-checkout-btn').addEventListener('click', async () =>
     phState.recentSales.unshift({
       dispenseId: result.dispense_id,
       billId: result.bill_id,
+      billNumber: result.bill_number,
       total: result.total_amount,
       patientName,
+      patientPhone: patientPhone || null,
+      paymentMode,
       items: [...phState.cart],
     });
     phState.cart = [];
@@ -579,6 +584,7 @@ document.getElementById('ph-checkout-btn').addEventListener('click', async () =>
     document.getElementById('ph-cart-patient-name').value = '';
     document.getElementById('ph-cart-patient-phone').value = '';
     showPhToast(`Sale complete — ${formatRupees(result.total_amount)}`, 'success');
+    window.phShowReceipt(result.dispense_id);
   } catch (err) {
     errorEl.textContent = err.message;
     showPhToast(err.message, 'error');
@@ -601,13 +607,71 @@ function renderPhRecentSales() {
         <p class="text-xs text-charcoal/50">${sale.items.length} item(s) &middot; ${formatRupees(sale.total)}</p>
       </div>
       <div class="flex items-center gap-3">
+        <button onclick="window.phShowReceipt('${sale.dispenseId}')" class="text-xs font-semibold text-charcoal/50 hover:text-brand-900 transition">Receipt</button>
         <button onclick="window.phOpenPartialReturn('${sale.dispenseId}')" class="text-xs font-semibold text-brand-700 hover:text-brand-900 transition">Return</button>
         <button onclick="window.phVoidSale('${sale.dispenseId}')" class="text-xs font-semibold text-red-600 hover:text-red-800 transition">Void</button>
       </div>
     </div>`).join('');
 }
 
-// ---- Partial return ----
+// ---- Receipt ----
+// Renders from the in-memory sale record (this session only, same
+// scoping note as partial return) into a print-friendly view. Uses
+// window.print() with a dedicated print stylesheet rather than a
+// server-generated PDF, since the clinic already has a receipt
+// printer workflow at the counter and this needs to be instant.
+window.phShowReceipt = function (dispenseId) {
+  const sale = phState.recentSales.find((s) => s.dispenseId === dispenseId);
+  if (!sale) return showPhToast('Receipt not available for this sale.', 'error');
+
+  const lineRows = sale.items.map((item) => `
+    <tr>
+      <td class="ph-receipt-cell">${escapePhHtml(item.medicineName)}<br><span class="ph-receipt-sub">Batch ${escapePhHtml(item.batchNumber)}</span></td>
+      <td class="ph-receipt-cell ph-receipt-right">${item.quantity}</td>
+      <td class="ph-receipt-cell ph-receipt-right">${formatRupees(item.unitPrice)}</td>
+      <td class="ph-receipt-cell ph-receipt-right">${formatRupees(item.quantity * item.unitPrice * (1 + (item.gstPercent || 0) / 100))}</td>
+    </tr>`).join('');
+
+  const subtotal = sale.items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
+  const gstTotal = sale.total - subtotal;
+
+  showPhModal(`
+    <div class="p-6" id="ph-receipt-content">
+      <div class="text-center mb-4">
+        <p class="font-bold text-brand-900">CRISPR Skin and Hair Clinic — Pharmacy</p>
+        <p class="text-xs text-charcoal/50">${escapePhHtml(sale.billNumber || '')}</p>
+      </div>
+      <div class="text-xs text-charcoal/60 mb-3 space-y-0.5">
+        <p>Patient: ${escapePhHtml(sale.patientName)}${sale.patientPhone ? ' &middot; ' + escapePhHtml(sale.patientPhone) : ''}</p>
+        <p>Payment: ${escapePhHtml(sale.paymentMode || '')}</p>
+        <p>${new Date().toLocaleString('en-IN')}</p>
+      </div>
+      <table class="w-full text-xs mb-3" style="border-collapse: collapse;">
+        <thead>
+          <tr class="border-b border-champagne-300">
+            <th class="ph-receipt-cell text-left">Item</th>
+            <th class="ph-receipt-cell ph-receipt-right">Qty</th>
+            <th class="ph-receipt-cell ph-receipt-right">Rate</th>
+            <th class="ph-receipt-cell ph-receipt-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>${lineRows}</tbody>
+      </table>
+      <div class="border-t border-champagne-300 pt-2 text-sm space-y-1">
+        ${gstTotal > 0.01 ? `
+          <div class="flex justify-between text-xs text-charcoal/50"><span>Subtotal</span><span>${formatRupees(subtotal)}</span></div>
+          <div class="flex justify-between text-xs text-charcoal/50"><span>GST</span><span>${formatRupees(gstTotal)}</span></div>
+        ` : ''}
+        <div class="flex justify-between font-bold text-brand-900"><span>Total</span><span>${formatRupees(sale.total)}</span></div>
+      </div>
+    </div>
+    <div class="px-6 pb-6 flex gap-2 print:hidden">
+      <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Close</button>
+      <button onclick="window.print()" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Print</button>
+    </div>`);
+};
+
+
 window.phOpenPartialReturn = async function (dispenseId) {
   let items = [];
   try {
@@ -1095,16 +1159,44 @@ async function loadPhPurchaseOrders() {
 }
 
 window.phReceivePO = async function (poId, totalAmount) {
-  const paymentMode = await showPhTextPrompt('Payment mode', { placeholder: 'cash / upi / card', defaultValue: 'cash' });
-  if (!paymentMode) return;
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-1">Receive Purchase Order</h3>
+      <p class="text-xs text-charcoal/40 mb-4">Confirm how this order was paid for.</p>
+      <div class="space-y-3">
+        <select id="ph-receive-po-payment-mode" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="card">Card</option>
+          <option value="other">Other / On Credit</option>
+        </select>
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Amount paid</label>
+          <input type="number" id="ph-receive-po-amount" value="${totalAmount}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          <p class="text-[11px] text-charcoal/40 mt-1">Invoice total is ${formatRupees(totalAmount)}. Enter less if this is a partial payment.</p>
+        </div>
+      </div>
+      <p id="ph-receive-po-error" class="text-red-600 text-sm mt-3 min-h-[1.25rem]"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phConfirmReceivePO('${poId}')" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Confirm Receipt</button>
+      </div>
+    </div>`);
+};
+
+window.phConfirmReceivePO = async function (poId) {
+  const errorEl = document.getElementById('ph-receive-po-error');
+  const paymentMode = document.getElementById('ph-receive-po-payment-mode').value;
+  const amountPaid = parseFloat(document.getElementById('ph-receive-po-amount').value) || 0;
   try {
-    await window.phCallFunction('receive_purchase_order', { poId, paymentMode, amountPaid: totalAmount });
+    await window.phCallFunction('receive_purchase_order', { poId, paymentMode, amountPaid });
+    closePhModal();
     loadPhPurchaseOrders();
     loadPhPoStats();
     refreshPhBadges();
     showPhToast('Purchase order received — stock updated.', 'success');
   } catch (err) {
-    showPhToast(err.message, 'error');
+    errorEl.textContent = err.message;
   }
 };
 
