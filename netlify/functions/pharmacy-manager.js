@@ -128,6 +128,8 @@ exports.handler = async (event) => {
       }
       case "get_dispense_items":
         return await pharmacy.getDispenseItems(supabase, data);
+      case "get_todays_pharmacy_summary":
+        return await pharmacy.getTodaysPharmacySummary(supabase);
       case "return_pharmacy_sale_items": {
         const result = await pharmacy.returnPharmacySaleItems(supabase, data, profile);
         if (result.statusCode && result.statusCode !== 200) return result;
