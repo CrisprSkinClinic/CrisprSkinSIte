@@ -1,22 +1,22 @@
 ---
 // src/pages/pharmacy.astro
 //
-// Standalone Pharmacy System, for pharmacist OR doctor accounts (see
-// pharmacy-manager.js's role check). Same auth model as
-// /bookings-manager and /prescription -- real per-staff Supabase Auth,
-// JWT re-verified server-side on every request.
+// v2 visual rebuild (Checkpoint: mature pharmacy dashboard design).
+// Purely presentational — every backend action name below is
+// unchanged from the working v5 build, only re-skinned. Same auth
+// model (doctor OR pharmacist) as before.
 //
-// Unlike /prescription's derm_rx_* tables (kept fully separate from
-// CRIS ClinicOS), this tool deliberately REUSES ClinicOS's existing
-// suppliers/medicines/medicine_batches/purchase_orders/
-// pharmacy_dispenses/bills schema -- see pharmacy-manager.js's header
-// comment for why. Ported from a mature Google Apps Script "CRISPR
-// Pharmacy OS" (executeStockOut/voidEntireSale/processPartialReturn
-// -> execute_pharmacy_sale/void_pharmacy_sale/return_pharmacy_sale_items).
-//
-// Built from the start with the site's real Warm Luxury design system
-// (Plus Jakarta Sans, brand navy, champagne, warmwhite) -- unlike
-// /prescription, which needed a later re-skin pass.
+// Design language for this pass:
+// - Every tab opens with a small stat-strip (2-4 cards) for instant
+//   orientation, before the detail list -- matches how a real
+//   pharmacy/POS dashboard is scanned at a glance, not a plain list.
+// - Status chips (in-stock / low / expiring / paid / pending) replace
+//   plain text everywhere a state matters.
+// - A live badge count on the Inventory and Reconcile tabs (low stock
+//   + pending invoices) is the one signature element tying the whole
+//   app together -- functional, not decorative.
+// - All alert()/confirm()/prompt() replaced with in-page toast +
+//   confirm-modal components (built once, reused everywhere).
 import AppLayout from '../layouts/AppLayout.astro';
 ---
 
@@ -26,8 +26,11 @@ import AppLayout from '../layouts/AppLayout.astro';
 
   <!-- ================= LOGIN SCREEN ================= -->
   <div id="ph-login-screen" class="min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center border border-champagne-200">
-      <h2 class="text-2xl font-bold text-brand-900 mb-1">Pharmacy</h2>
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm border border-champagne-200">
+      <div class="w-11 h-11 rounded-xl bg-brand-900 flex items-center justify-center mb-5">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5 21 10a2.12 2.12 0 0 0-3-3L7.5 17.5a2.12 2.12 0 0 1-3 0v0a2.12 2.12 0 0 1 0-3L15 4"/><path d="m6 12 4 4"/></svg>
+      </div>
+      <h2 class="text-2xl font-bold text-brand-900 mb-1 tracking-tight">Pharmacy</h2>
       <p class="text-charcoal/50 text-sm mb-6">Sign in with your pharmacist or doctor account.</p>
       <form id="ph-login-form" class="space-y-4 text-left">
         <div>
@@ -41,67 +44,93 @@ import AppLayout from '../layouts/AppLayout.astro';
                  class="w-full text-base border border-champagne-300 rounded-xl px-4 py-3 bg-champagne-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition-all" />
         </div>
         <button type="submit" id="ph-login-btn"
-                class="w-full bg-brand-900 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-[0.98]">
+                class="w-full bg-brand-900 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-brand-700 transition-all active:scale-[0.98]">
           Sign In
         </button>
-        <p id="ph-login-error" class="text-red-500 text-sm text-center min-h-[1.25rem]"></p>
+        <p id="ph-login-error" class="text-red-600 text-sm text-center min-h-[1.25rem]"></p>
       </form>
     </div>
   </div>
 
   <!-- ================= MAIN APP ================= -->
   <div id="ph-app-screen" class="hidden min-h-screen bg-warmwhite">
+
+    <!-- Header -->
     <div class="bg-white border-b border-champagne-200 sticky top-0 z-20 px-6 py-4 flex items-center justify-between shadow-sm">
-      <div>
-        <h1 class="text-xl font-bold text-brand-900">Pharmacy</h1>
-        <p id="ph-user-name" class="text-sm text-charcoal/60"></p>
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-brand-900 flex items-center justify-center shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5 21 10a2.12 2.12 0 0 0-3-3L7.5 17.5a2.12 2.12 0 0 1-3 0v0a2.12 2.12 0 0 1 0-3L15 4"/><path d="m6 12 4 4"/></svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-brand-900 leading-tight tracking-tight">Pharmacy</h1>
+          <p id="ph-user-name" class="text-xs text-charcoal/50 leading-tight"></p>
+        </div>
       </div>
       <button id="ph-signout-btn" class="text-xs font-semibold text-charcoal/40 hover:text-red-600 transition">Sign out</button>
     </div>
 
     <!-- Tab bar -->
-    <div class="bg-white border-b border-champagne-200 px-6 flex gap-1 sticky top-[69px] z-10">
-      <button data-ph-tab="checkout" class="ph-tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-brand-700 text-brand-900">Checkout</button>
-      <button data-ph-tab="inventory" class="ph-tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-charcoal/50 hover:text-brand-700">Inventory</button>
-      <button data-ph-tab="purchasing" class="ph-tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-charcoal/50 hover:text-brand-700">Purchase Orders</button>
-      <button data-ph-tab="reconcile" class="ph-tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-charcoal/50 hover:text-brand-700">Reconcile</button>
+    <div class="bg-white border-b border-champagne-200 px-6 flex gap-1 sticky top-[65px] z-10 overflow-x-auto">
+      <button data-ph-tab="checkout" class="ph-tab-btn relative px-4 py-3 text-sm font-semibold border-b-2 border-brand-700 text-brand-900 whitespace-nowrap">Checkout</button>
+      <button data-ph-tab="inventory" class="ph-tab-btn relative px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-charcoal/50 hover:text-brand-700 whitespace-nowrap">
+        Inventory
+        <span id="ph-badge-inventory" class="hidden absolute top-1.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">0</span>
+      </button>
+      <button data-ph-tab="purchasing" class="ph-tab-btn relative px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-charcoal/50 hover:text-brand-700 whitespace-nowrap">Purchase Orders</button>
+      <button data-ph-tab="reconcile" class="ph-tab-btn relative px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-charcoal/50 hover:text-brand-700 whitespace-nowrap">
+        Reconcile
+        <span id="ph-badge-reconcile" class="hidden absolute top-1.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-700 text-white text-[10px] font-bold flex items-center justify-center">0</span>
+      </button>
     </div>
 
-    <div class="max-w-5xl mx-auto px-6 py-8">
+    <div class="max-w-6xl mx-auto px-6 py-8">
 
       <!-- ============ CHECKOUT TAB ============ -->
       <div id="ph-tab-checkout" class="ph-tab-panel">
+
+        <!-- Stat strip -->
+        <div id="ph-checkout-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
+
         <div class="grid md:grid-cols-2 gap-6">
           <!-- Add items -->
           <div class="bg-white rounded-2xl border border-champagne-200 shadow-sm p-6">
-            <h2 class="text-sm font-bold text-brand-700 uppercase tracking-wide mb-4">Add Medicine</h2>
+            <div class="flex items-center gap-2 mb-4">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-700"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <h2 class="text-sm font-bold text-brand-700 uppercase tracking-wide">Add Medicine</h2>
+            </div>
             <div class="relative mb-3">
               <input type="text" id="ph-med-search" placeholder="Search medicine by name..."
                      class="w-full text-base border border-champagne-300 rounded-xl px-4 py-3 bg-champagne-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition-all" />
               <div id="ph-med-results" class="hidden absolute mt-1 w-full bg-white rounded-xl border border-champagne-200 shadow-lg overflow-hidden divide-y divide-champagne-100 z-10 max-h-64 overflow-y-auto"></div>
             </div>
-            <div id="ph-med-selected" class="hidden bg-champagne-50 rounded-xl p-4 mb-3">
+            <div id="ph-med-selected" class="hidden bg-champagne-50 rounded-xl p-4 mb-3 border border-champagne-200">
               <p id="ph-med-selected-name" class="font-bold text-brand-900 text-sm"></p>
               <div id="ph-med-batches" class="mt-2 space-y-1"></div>
               <div class="flex items-center gap-2 mt-3">
                 <label class="text-xs font-semibold text-charcoal/50">Quantity</label>
-                <input type="number" id="ph-med-qty" min="1" value="1" class="w-20 border border-champagne-300 rounded-lg px-2 py-1.5 text-sm" />
+                <input type="number" id="ph-med-qty" min="1" value="1" class="w-20 border border-champagne-300 rounded-lg px-2 py-1.5 text-sm tabular-nums" />
                 <button id="ph-add-to-cart-btn" class="ml-auto bg-brand-700 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-900 transition">Add to Sale</button>
               </div>
             </div>
-            <p class="text-xs text-charcoal/40">Batches are suggested oldest-first (FIFO) automatically.</p>
+            <p class="text-xs text-charcoal/40 flex items-center gap-1.5">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              Batches are suggested oldest-first (FIFO) automatically.
+            </p>
           </div>
 
           <!-- Cart / checkout -->
           <div class="bg-white rounded-2xl border border-champagne-200 shadow-sm p-6 flex flex-col">
-            <h2 class="text-sm font-bold text-brand-700 uppercase tracking-wide mb-4">Current Sale</h2>
+            <div class="flex items-center gap-2 mb-4">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-700"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+              <h2 class="text-sm font-bold text-brand-700 uppercase tracking-wide">Current Sale</h2>
+            </div>
             <div id="ph-cart-list" class="flex-1 space-y-2 mb-4 min-h-[80px]">
               <p id="ph-cart-empty" class="text-charcoal/30 text-sm text-center py-8">No items added yet.</p>
             </div>
             <div class="border-t border-champagne-200 pt-4 space-y-3">
               <div class="flex items-center justify-between text-sm">
                 <span class="text-charcoal/60">Total</span>
-                <span id="ph-cart-total" class="text-xl font-bold text-brand-900">₹0</span>
+                <span id="ph-cart-total" class="text-2xl font-bold text-brand-900 tabular-nums">₹0</span>
               </div>
               <input type="text" id="ph-cart-patient-name" placeholder="Patient name (walk-in OK)"
                      class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2 bg-champagne-50 focus:bg-white focus:border-brand-500 outline-none" />
@@ -112,15 +141,15 @@ import AppLayout from '../layouts/AppLayout.astro';
                 <option value="upi">UPI</option>
                 <option value="card">Card</option>
               </select>
-              <button id="ph-checkout-btn" class="w-full bg-brand-900 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-40" disabled>
+              <button id="ph-checkout-btn" class="w-full bg-brand-900 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-brand-700 transition-all active:scale-[0.98] disabled:opacity-40 disabled:hover:bg-brand-900" disabled>
                 Complete Sale
               </button>
-              <p id="ph-checkout-error" class="text-red-500 text-sm text-center min-h-[1.25rem]"></p>
+              <p id="ph-checkout-error" class="text-red-600 text-sm text-center min-h-[1.25rem]"></p>
             </div>
           </div>
         </div>
 
-        <!-- Recent sales / void / return -->
+        <!-- Recent sales -->
         <div class="mt-6 bg-white rounded-2xl border border-champagne-200 shadow-sm p-6">
           <h2 class="text-sm font-bold text-brand-700 uppercase tracking-wide mb-4">Recent Sales</h2>
           <div id="ph-recent-sales" class="space-y-2">
@@ -131,13 +160,18 @@ import AppLayout from '../layouts/AppLayout.astro';
 
       <!-- ============ INVENTORY TAB ============ -->
       <div id="ph-tab-inventory" class="ph-tab-panel hidden">
-        <div class="flex items-center justify-between mb-4">
+        <div id="ph-inventory-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
+
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div class="flex gap-2">
-            <button data-ph-inv-view="all" class="ph-inv-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-brand-700 text-white">All Stock</button>
-            <button data-ph-inv-view="low" class="ph-inv-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-champagne-100 text-brand-700">Low Stock</button>
-            <button data-ph-inv-view="expiring" class="ph-inv-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-champagne-100 text-brand-700">Expiring Soon</button>
+            <button data-ph-inv-view="all" class="ph-inv-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-brand-700 text-white transition">All Stock</button>
+            <button data-ph-inv-view="low" class="ph-inv-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Low Stock</button>
+            <button data-ph-inv-view="expiring" class="ph-inv-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Expiring Soon</button>
           </div>
-          <button id="ph-new-medicine-btn" class="text-xs font-bold px-4 py-2 rounded-lg bg-brand-900 text-white">+ New Medicine</button>
+          <button id="ph-new-medicine-btn" class="text-xs font-bold px-4 py-2.5 rounded-lg bg-brand-900 text-white hover:bg-brand-700 transition flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            New Medicine
+          </button>
         </div>
         <div id="ph-inventory-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
           <p class="text-charcoal/30 text-sm text-center py-8">Loading inventory...</p>
@@ -146,61 +180,70 @@ import AppLayout from '../layouts/AppLayout.astro';
 
       <!-- ============ PURCHASE ORDERS TAB ============ -->
       <div id="ph-tab-purchasing" class="ph-tab-panel hidden">
+        <div id="ph-po-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
+
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-sm font-bold text-brand-700 uppercase tracking-wide">Purchase Orders</h2>
-          <button id="ph-new-po-btn" class="text-xs font-bold px-4 py-2 rounded-lg bg-brand-900 text-white">+ New Purchase Order</button>
+          <button id="ph-new-po-btn" class="text-xs font-bold px-4 py-2.5 rounded-lg bg-brand-900 text-white hover:bg-brand-700 transition flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            New Purchase Order
+          </button>
         </div>
         <div id="ph-po-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
           <p class="text-charcoal/30 text-sm text-center py-8">Loading purchase orders...</p>
         </div>
       </div>
 
-      <!-- ============ RECONCILE TAB (Phase 2: AI invoice review, physical audit, reorder, reps) ============ -->
+      <!-- ============ RECONCILE TAB ============ -->
       <div id="ph-tab-reconcile" class="ph-tab-panel hidden">
-        <div class="flex gap-2 mb-4">
-          <button data-ph-rec-view="invoices" class="ph-rec-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-brand-700 text-white">Invoice Review</button>
-          <button data-ph-rec-view="audit" class="ph-rec-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-champagne-100 text-brand-700">Physical Audit</button>
-          <button data-ph-rec-view="reorder" class="ph-rec-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-champagne-100 text-brand-700">Reorder Suggestions</button>
-          <button data-ph-rec-view="reps" class="ph-rec-view-btn text-xs font-bold px-3 py-1.5 rounded-full bg-champagne-100 text-brand-700">Reps</button>
+        <div class="flex gap-2 mb-6 flex-wrap">
+          <button data-ph-rec-view="invoices" class="ph-rec-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-brand-700 text-white transition">Invoice Review</button>
+          <button data-ph-rec-view="audit" class="ph-rec-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Physical Audit</button>
+          <button data-ph-rec-view="reorder" class="ph-rec-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Reorder Suggestions</button>
+          <button data-ph-rec-view="reps" class="ph-rec-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Reps</button>
         </div>
 
-        <!-- Invoice Review sub-view -->
+        <!-- Invoice Review -->
         <div id="ph-rec-invoices" class="ph-rec-subview">
-          <div class="flex items-center justify-between mb-4">
-            <p class="text-xs text-charcoal/50">Upload an invoice photo/PDF to extract it with AI, or review drafts already waiting.</p>
-            <label class="text-xs font-bold px-4 py-2 rounded-lg bg-brand-900 text-white cursor-pointer">
-              + Upload Invoice
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+            <p class="text-xs text-charcoal/50 max-w-xs">Upload an invoice photo or PDF to extract it with AI, or review drafts already waiting.</p>
+            <label class="text-xs font-bold px-4 py-2.5 rounded-lg bg-brand-900 text-white cursor-pointer hover:bg-brand-700 transition flex items-center gap-1.5 shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              Upload Invoice
               <input type="file" id="ph-invoice-upload-input" accept="image/*,.pdf" class="hidden" />
             </label>
           </div>
-          <p id="ph-invoice-upload-status" class="text-xs text-charcoal/50 mb-3"></p>
+          <div id="ph-invoice-upload-status" class="hidden mb-4"></div>
           <div id="ph-pending-approvals-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
             <p class="text-charcoal/30 text-sm text-center py-8">Loading pending invoices...</p>
           </div>
         </div>
 
-        <!-- Physical Audit sub-view -->
+        <!-- Physical Audit -->
         <div id="ph-rec-audit" class="ph-rec-subview hidden">
           <p class="text-xs text-charcoal/50 mb-3">Count what's actually on the shelf and enter it below — only medicines with a real discrepancy will be adjusted.</p>
           <div id="ph-audit-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden mb-4">
             <p class="text-charcoal/30 text-sm text-center py-8">Loading medicines...</p>
           </div>
-          <button id="ph-submit-audit-btn" class="bg-brand-900 text-white font-bold px-6 py-3 rounded-xl">Submit Audit</button>
-          <p id="ph-audit-result" class="text-sm text-charcoal/60 mt-3"></p>
+          <button id="ph-submit-audit-btn" class="bg-brand-900 text-white font-bold px-6 py-3 rounded-xl hover:bg-brand-700 transition">Submit Audit</button>
+          <div id="ph-audit-result" class="mt-3"></div>
         </div>
 
-        <!-- Reorder Suggestions sub-view -->
+        <!-- Reorder -->
         <div id="ph-rec-reorder" class="ph-rec-subview hidden">
           <div id="ph-reorder-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
             <p class="text-charcoal/30 text-sm text-center py-8">Loading suggestions...</p>
           </div>
         </div>
 
-        <!-- Reps sub-view -->
+        <!-- Reps -->
         <div id="ph-rec-reps" class="ph-rec-subview hidden">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-sm font-bold text-brand-700 uppercase tracking-wide">Medical Reps</h2>
-            <button id="ph-new-rep-btn" class="text-xs font-bold px-4 py-2 rounded-lg bg-brand-900 text-white">+ New Rep</button>
+            <button id="ph-new-rep-btn" class="text-xs font-bold px-4 py-2.5 rounded-lg bg-brand-900 text-white hover:bg-brand-700 transition flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              New Rep
+            </button>
           </div>
           <div id="ph-reps-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
             <p class="text-charcoal/30 text-sm text-center py-8">Loading reps...</p>
@@ -211,10 +254,28 @@ import AppLayout from '../layouts/AppLayout.astro';
     </div>
   </div>
 
-  <!-- ================= MODALS ================= -->
-  <div id="ph-modal-backdrop" class="hidden fixed inset-0 bg-black/40 z-30 flex items-center justify-center p-4">
-    <div id="ph-modal-content" class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-y-auto"></div>
+  <!-- ================= MODAL ================= -->
+  <div id="ph-modal-backdrop" class="hidden fixed inset-0 bg-brand-950/50 backdrop-blur-sm z-30 flex items-center justify-center p-4">
+    <div id="ph-modal-content" class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto"></div>
   </div>
+
+  <!-- ================= CONFIRM DIALOG (replaces confirm()) ================= -->
+  <div id="ph-confirm-backdrop" class="hidden fixed inset-0 bg-brand-950/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+      <div id="ph-confirm-icon" class="w-11 h-11 rounded-full bg-red-50 text-red-600 flex items-center justify-center mb-4">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      </div>
+      <h3 id="ph-confirm-title" class="text-lg font-bold text-brand-900 mb-1">Are you sure?</h3>
+      <p id="ph-confirm-message" class="text-sm text-charcoal/60 mb-5"></p>
+      <div class="flex gap-2">
+        <button id="ph-confirm-cancel" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button id="ph-confirm-ok" class="flex-1 bg-red-600 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-red-700 transition">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOASTS ================= -->
+  <div id="ph-toast-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center w-full px-4 pointer-events-none"></div>
 
 </div>
 </AppLayout>
