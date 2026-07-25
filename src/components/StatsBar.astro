@@ -16,27 +16,47 @@ const secondary = [
 ];
 ---
 
-<section class="bg-brand-900 text-white py-12 px-6">
+<section class="bg-brand-900 text-white py-14 md:py-16 px-6 border-y border-brand-800">
   <div class="max-w-7xl mx-auto">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-center text-center lg:text-left">
-      <!-- Primary: Google -->
-      <a href={primary.href} target="_blank" rel="noopener noreferrer" class="lg:col-span-1 group">
-        <p class="text-4xl md:text-5xl font-extrabold tracking-tight group-hover:text-brand-200 transition-colors">
-          {primary.value}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+      
+      <!-- Primary: Google rating -->
+      <a
+        href={primary.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="lg:col-span-4 group text-center lg:text-left lg:border-r lg:border-white/10 lg:pr-8"
+      >
+        <div class="flex items-baseline justify-center lg:justify-start gap-2">
+          <p class="text-5xl md:text-6xl font-extrabold tracking-tight group-hover:text-brand-200 transition-colors">
+            {primary.value}
+          </p>
+          <span class="text-2xl text-gold-400" aria-hidden="true">★</span>
+        </div>
+        <p class="mt-2 text-base font-semibold text-brand-100">{primary.label}</p>
+        <p class="mt-1 text-sm text-brand-300 group-hover:text-brand-200 transition-colors">
+          {primary.sub} <span class="inline-block transition-transform group-hover:translate-x-0.5">→</span>
         </p>
-        <p class="mt-1 text-brand-100 font-semibold">{primary.label}</p>
-        <p class="mt-1 text-sm text-brand-300">{primary.sub}</p>
       </a>
 
-      <!-- Secondary -->
-      <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-        {secondary.map((stat) => (
-          <div>
-            <p class="text-3xl md:text-4xl font-extrabold tracking-tight">{stat.value}</p>
-            <p class="mt-2 text-sm text-brand-200 font-medium leading-snug">{stat.label}</p>
+      <!-- Secondary stats -->
+      <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 text-center">
+        {secondary.map((stat, i) => (
+          <div class={`px-2 ${i > 0 ? 'sm:border-l sm:border-white/10' : ''}`}>
+            <p class="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
+              {stat.value}
+            </p>
+            <p class="mt-2 text-sm text-brand-200 font-medium leading-snug max-w-[12rem] mx-auto">
+              {stat.label}
+            </p>
           </div>
         ))}
       </div>
     </div>
+
+    <!-- Tagline -->
+    <p class="mt-10 pt-8 border-t border-white/10 text-center text-sm md:text-base text-brand-200 font-medium tracking-wide">
+      Evaluation first. Procedures only when they fit.
+    </p>
   </div>
 </section>
