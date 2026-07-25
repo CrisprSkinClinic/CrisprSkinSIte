@@ -132,6 +132,69 @@ exports.handler = async (event) => {
         return result;
       }
 
+      // ---- Phase 2: WAC inventory, full CRUD, physical audit,
+      // pending approvals, rep CRM, vendor merge, invoice commit ----
+      case "get_medicines_with_wac":
+        return await pharmacy.getMedicinesWithWac(supabase);
+      case "upsert_medicine_full": {
+        const result = await pharmacy.upsertMedicineFull(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_MEDICINE_SAVE_FULL", `Saved medicine (full) ${data?.name || ""}`);
+        return result;
+      }
+      case "upsert_supplier_full": {
+        const result = await pharmacy.upsertSupplierFull(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_SUPPLIER_SAVE_FULL", `Saved supplier (full) ${data?.name || ""}`);
+        return result;
+      }
+      case "manual_stock_adjustment": {
+        const result = await pharmacy.manualStockAdjustment(supabase, data, profile);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_MANUAL_STOCK_ADJUSTMENT", `Manual stock adjustment for medicine ${data?.medicineId || ""}: ${data?.type || ""} ${data?.quantity || ""}`);
+        return result;
+      }
+      case "run_physical_audit": {
+        const result = await pharmacy.runPhysicalAudit(supabase, data, profile);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_PHYSICAL_AUDIT", `Ran physical audit on ${data?.audits?.length || 0} medicine(s)`);
+        return result;
+      }
+      case "list_pending_approvals":
+        return await pharmacy.listPendingApprovals(supabase);
+      case "reject_pending_approval": {
+        const result = await pharmacy.rejectPendingApproval(supabase, data, profile);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_REJECT_DRAFT", `Rejected pending approval ${data?.id || ""}`);
+        return result;
+      }
+      case "list_medical_reps":
+        return await pharmacy.listMedicalReps(supabase);
+      case "upsert_medical_rep": {
+        const result = await pharmacy.upsertMedicalRep(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_REP_SAVE", `Saved medical rep ${data?.repName || ""}`);
+        return result;
+      }
+      case "deactivate_medical_rep": {
+        const result = await pharmacy.deactivateMedicalRep(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_REP_DEACTIVATE", `Deactivated medical rep ${data?.id || ""}`);
+        return result;
+      }
+      case "merge_duplicate_suppliers": {
+        const result = await pharmacy.mergeDuplicateSuppliers(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_SUPPLIER_MERGE", `Merged supplier ${data?.duplicateId || ""} into ${data?.masterId || ""}`);
+        return result;
+      }
+      case "commit_reviewed_invoice": {
+        const result = await pharmacy.commitReviewedInvoice(supabase, data);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_INVOICE_COMMIT", `Committed invoice ${data?.invoice?.invoice_number || ""}`);
+        return result;
+      }
+
       default:
         return { statusCode: 400, body: JSON.stringify({ error: `Unknown action: ${action}` }) };
     }
