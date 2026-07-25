@@ -600,9 +600,89 @@ function renderPhRecentSales() {
         <p class="text-sm font-semibold text-brand-900">${escapePhHtml(sale.patientName)}</p>
         <p class="text-xs text-charcoal/50">${sale.items.length} item(s) &middot; ${formatRupees(sale.total)}</p>
       </div>
-      <button onclick="window.phVoidSale('${sale.dispenseId}')" class="text-xs font-semibold text-red-600 hover:text-red-800 transition">Void</button>
+      <div class="flex items-center gap-3">
+        <button onclick="window.phOpenPartialReturn('${sale.dispenseId}')" class="text-xs font-semibold text-brand-700 hover:text-brand-900 transition">Return</button>
+        <button onclick="window.phVoidSale('${sale.dispenseId}')" class="text-xs font-semibold text-red-600 hover:text-red-800 transition">Void</button>
+      </div>
     </div>`).join('');
 }
+
+// ---- Partial return ----
+window.phOpenPartialReturn = async function (dispenseId) {
+  let items = [];
+  try {
+    const result = await window.phCallFunction('get_dispense_items', { dispenseId });
+    items = result.items || [];
+  } catch (err) {
+    showPhToast('Error loading sale items: ' + err.message, 'error');
+    return;
+  }
+  if (items.length === 0) {
+    showPhToast('Nothing left to return on this sale.', 'info');
+    return;
+  }
+
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-1">Partial Return</h3>
+      <p class="text-xs text-charcoal/40 mb-4">Enter how many units of each item are being returned. Leave a field blank to skip it.</p>
+      <div class="space-y-3 mb-2">
+        ${items.map((item) => `
+          <div class="flex items-center justify-between gap-3 border border-champagne-200 rounded-xl p-3">
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-brand-900 truncate">${escapePhHtml(item.medicine_name)}</p>
+              <p class="text-xs text-charcoal/40">${item.quantity_returnable} of ${item.quantity_dispensed} still returnable &middot; ${formatRupees(item.unit_price)}/unit</p>
+            </div>
+            <input type="number" min="0" max="${item.quantity_returnable}" placeholder="Qty"
+                   data-return-item-id="${item.item_id}" data-return-max="${item.quantity_returnable}"
+                   class="w-20 shrink-0 border border-champagne-300 rounded-lg px-2 py-1.5 text-sm tabular-nums" />
+          </div>`).join('')}
+      </div>
+      <input type="text" id="ph-return-reason" placeholder="Reason (optional)" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-2" />
+      <p id="ph-return-error" class="text-red-600 text-sm min-h-[1.25rem]"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phConfirmPartialReturn('${dispenseId}')" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Process Return</button>
+      </div>
+    </div>`);
+};
+
+window.phConfirmPartialReturn = async function (dispenseId) {
+  const errorEl = document.getElementById('ph-return-error');
+  const inputs = Array.from(document.querySelectorAll('[data-return-item-id]'));
+  const returnItems = [];
+
+  for (const input of inputs) {
+    const val = input.value.trim();
+    if (val === '') continue;
+    const qty = parseInt(val, 10);
+    const max = parseInt(input.dataset.returnMax, 10);
+    if (isNaN(qty) || qty <= 0) continue;
+    if (qty > max) {
+      errorEl.textContent = `Cannot return more than ${max} units of one of the items.`;
+      return;
+    }
+    returnItems.push({ dispense_item_id: input.dataset.returnItemId, quantity_returned: qty });
+  }
+
+  if (returnItems.length === 0) {
+    errorEl.textContent = 'Enter at least one quantity to return.';
+    return;
+  }
+
+  try {
+    await window.phCallFunction('return_pharmacy_sale_items', {
+      originalDispenseId: dispenseId,
+      returnItems,
+      reason: document.getElementById('ph-return-reason').value.trim() || null,
+    });
+    closePhModal();
+    loadPhCheckoutStats();
+    showPhToast('Return processed and stock restored.', 'success');
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+};
 
 window.phVoidSale = async function (dispenseId) {
   const confirmed = await showPhConfirm('Void this sale?', 'This will restore stock and cannot be undone.');
@@ -1299,19 +1379,122 @@ window.phCommitDraft = async function (draftId) {
     const { pendingApprovals } = await window.phCallFunction('list_pending_approvals');
     const draft = (pendingApprovals || []).find((d) => d.id === draftId);
     if (!draft) return showPhToast('Draft not found.', 'error');
+    openPhInvoiceReviewModal(draft);
+  } catch (err) {
+    showPhToast(err.message, 'error');
+  }
+};
 
-    const aiData = draft.ai_data || {};
+// Editable review step before an AI-extracted invoice is written to
+// real stock -- addresses the audit finding that commit previously
+// trusted the raw AI payload with no chance to fix a wrong qty/
+// batch/price/name before it became a permanent stock movement.
+function openPhInvoiceReviewModal(draft) {
+  const aiData = draft.ai_data || {};
+  const supplier = aiData.supplier || {};
+  const invoice = aiData.invoice || {};
+  const items = aiData.items || [];
+
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-1">Review Invoice</h3>
+      <p class="text-xs text-charcoal/40 mb-4">Check what the AI read before it's written to real stock — fix anything that looks wrong.</p>
+
+      <p class="text-[11px] font-bold text-charcoal/40 uppercase tracking-wide mb-2">Supplier</p>
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <input type="text" id="ph-review-supplier-name" placeholder="Supplier name" value="${escapePhAttr(supplier.supplier_name || '')}" class="col-span-2 border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="text" id="ph-review-supplier-gstin" placeholder="GSTIN" value="${escapePhAttr(supplier.gstin || '')}" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="text" id="ph-review-supplier-phone" placeholder="Phone" value="${escapePhAttr(supplier.contact_phone || '')}" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+      </div>
+
+      <p class="text-[11px] font-bold text-charcoal/40 uppercase tracking-wide mb-2">Invoice</p>
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <input type="text" id="ph-review-invoice-number" placeholder="Invoice number" value="${escapePhAttr(invoice.invoice_number || '')}" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="date" id="ph-review-invoice-date" value="${escapePhAttr(invoice.invoice_date || '')}" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="number" id="ph-review-invoice-total" placeholder="Grand total ₹" value="${invoice.grand_total ?? ''}" class="col-span-2 border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+      </div>
+
+      <p class="text-[11px] font-bold text-charcoal/40 uppercase tracking-wide mb-2">Items</p>
+      <div id="ph-review-items" class="space-y-2 max-h-[35vh] overflow-y-auto pr-1 mb-2">
+        ${items.map((item, itemIdx) => (item.batches || [{}]).map((batch, batchIdx) => `
+          <div class="border border-champagne-200 rounded-xl p-3" data-review-item-idx="${itemIdx}" data-review-batch-idx="${batchIdx}">
+            <input type="text" data-review-field="product_name" placeholder="Medicine name" value="${escapePhAttr(item.product_name || '')}" class="w-full border border-champagne-300 rounded-lg px-2 py-1.5 text-sm mb-1.5" />
+            <div class="grid grid-cols-2 gap-1.5 mb-1.5">
+              <input type="text" data-review-field="batch_number" placeholder="Batch #" value="${escapePhAttr(batch.batch_number || '')}" class="border border-champagne-300 rounded-lg px-2 py-1.5 text-sm" />
+              <input type="date" data-review-field="expiry_date" value="${escapePhAttr(batch.expiry_date || '')}" class="border border-champagne-300 rounded-lg px-2 py-1.5 text-sm" />
+            </div>
+            <div class="grid grid-cols-4 gap-1.5">
+              <input type="number" data-review-field="qty_purchased" placeholder="Qty" value="${batch.qty_purchased ?? ''}" class="border border-champagne-300 rounded-lg px-2 py-1.5 text-sm" />
+              <input type="number" data-review-field="free_qty" placeholder="Free" value="${batch.free_qty ?? 0}" class="border border-champagne-300 rounded-lg px-2 py-1.5 text-sm" />
+              <input type="number" data-review-field="ptr" placeholder="Cost ₹" value="${batch.ptr ?? ''}" class="border border-champagne-300 rounded-lg px-2 py-1.5 text-sm" />
+              <input type="number" data-review-field="mrp" placeholder="MRP ₹" value="${batch.mrp ?? ''}" class="border border-champagne-300 rounded-lg px-2 py-1.5 text-sm" />
+            </div>
+          </div>`).join('')).join('')}
+      </div>
+
+      <p id="ph-review-error" class="text-red-600 text-sm min-h-[1.25rem]"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phConfirmCommitDraft('${draft.id}')" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Commit to Stock</button>
+      </div>
+    </div>`);
+}
+
+window.phConfirmCommitDraft = async function (draftId) {
+  const errorEl = document.getElementById('ph-review-error');
+
+  const supplier = {
+    id: 'NEW',
+    supplier_name: document.getElementById('ph-review-supplier-name').value.trim() || null,
+    gstin: document.getElementById('ph-review-supplier-gstin').value.trim() || null,
+    contact_phone: document.getElementById('ph-review-supplier-phone').value.trim() || null,
+  };
+  const invoice = {
+    invoice_number: document.getElementById('ph-review-invoice-number').value.trim() || null,
+    invoice_date: document.getElementById('ph-review-invoice-date').value || null,
+    grand_total: parseFloat(document.getElementById('ph-review-invoice-total').value) || 0,
+  };
+
+  const itemRows = Array.from(document.querySelectorAll('#ph-review-items > div'));
+  const items = itemRows.map((row) => {
+    const field = (name) => row.querySelector(`[data-review-field="${name}"]`).value.trim();
+    return {
+      id: 'NEW',
+      product_name: field('product_name'),
+      batches: [{
+        batch_number: field('batch_number'),
+        expiry_date: field('expiry_date') || null,
+        qty_purchased: parseInt(field('qty_purchased'), 10) || 0,
+        free_qty: parseInt(field('free_qty'), 10) || 0,
+        ptr: parseFloat(field('ptr')) || 0,
+        mrp: parseFloat(field('mrp')) || 0,
+        net_purchase_value: (parseInt(field('qty_purchased'), 10) || 0) * (parseFloat(field('ptr')) || 0),
+      }],
+    };
+  }).filter((item) => item.product_name);
+
+  if (items.length === 0) {
+    errorEl.textContent = 'At least one item needs a medicine name.';
+    return;
+  }
+  if (!supplier.supplier_name) {
+    errorEl.textContent = 'Supplier name is required.';
+    return;
+  }
+
+  try {
     await window.phCallFunction('commit_reviewed_invoice', {
       draft_id: draftId,
-      supplier: { id: 'NEW', ...(aiData.supplier || {}) },
-      invoice: aiData.invoice || {},
-      items: aiData.items || [],
+      supplier,
+      invoice,
+      items,
     });
+    closePhModal();
     loadPhPendingApprovals();
     refreshPhBadges();
     showPhToast('Invoice committed — stock updated.', 'success');
   } catch (err) {
-    showPhToast('Error committing invoice: ' + err.message, 'error');
+    errorEl.textContent = err.message;
   }
 };
 
