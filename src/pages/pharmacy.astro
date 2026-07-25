@@ -198,10 +198,11 @@ import AppLayout from '../layouts/AppLayout.astro';
               <button data-ph-inv-view="all" class="ph-inv-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-brand-700 text-white transition">All Stock</button>
               <button data-ph-inv-view="low" class="ph-inv-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Low Stock</button>
               <button data-ph-inv-view="expiring" class="ph-inv-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Expiring Soon</button>
+              <button data-ph-inv-view="suppliers" class="ph-inv-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Suppliers</button>
             </div>
             <button id="ph-new-medicine-btn" class="text-xs font-bold px-4 py-2.5 rounded-lg bg-brand-900 text-white hover:bg-brand-700 transition flex items-center gap-1.5">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-              New Medicine
+              <span id="ph-new-medicine-btn-label">New Medicine</span>
             </button>
           </div>
           <div id="ph-inventory-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
