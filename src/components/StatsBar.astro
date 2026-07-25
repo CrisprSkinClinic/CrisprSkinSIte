@@ -4,6 +4,14 @@ const googleReviewsUrl = 'https://www.google.com/search?q=CRISPR+Skin+and+Hair+C
 
 const stats = [
   {
+    id: 'doctors',
+    end: 3,
+    decimals: 0,
+    suffix: '',
+    label: 'AIIMS-trained consultant dermatologists',
+    badge: 'Core team',
+  },
+  {
     id: 'rating',
     end: 4.9,
     decimals: 1,
@@ -11,13 +19,6 @@ const stats = [
     label: 'Google rating',
     sub: '370+ patient reviews',
     href: googleReviewsUrl,
-  },
-  {
-    id: 'doctors',
-    end: 3,
-    decimals: 0,
-    suffix: '',
-    label: 'AIIMS-trained consultant dermatologists',
   },
   {
     id: 'patients',
@@ -45,6 +46,12 @@ const stats = [
 
         const inner = (
           <>
+            {stat.badge && (
+              <span class="mb-3 inline-block text-[10px] font-bold uppercase tracking-wider text-brand-700 bg-brand-50 border border-brand-100 px-2.5 py-0.5 rounded-full">
+                {stat.badge}
+              </span>
+            )}
+
             <p
               class="text-4xl md:text-5xl font-extrabold tracking-tight text-brand-900 tabular-nums"
               data-stat-value
@@ -54,9 +61,15 @@ const stats = [
             >
               0{stat.suffix}
             </p>
-            <p class="mt-3 text-sm font-semibold text-slate-800 leading-snug">
+
+            <p
+              class={`mt-3 text-sm leading-snug ${
+                stat.badge ? 'font-bold text-brand-900' : 'font-semibold text-slate-800'
+              }`}
+            >
               {stat.label}
             </p>
+
             {stat.sub && (
               <p class="mt-1 text-xs text-slate-500">{stat.sub}</p>
             )}
@@ -90,7 +103,6 @@ const stats = [
 
     function frame(now) {
       const progress = Math.min((now - startTime) / duration, 1);
-      // easeOutCubic
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = start + (end - start) * eased;
       el.textContent =
@@ -118,7 +130,6 @@ const stats = [
     const grid = document.getElementById('statsBarGrid');
     if (!grid) return;
 
-    // Reset so animation can re-run on client navigations
     grid.querySelectorAll('[data-stat-value]').forEach((el) => {
       el.dataset.animated = 'false';
       const suffix = el.dataset.suffix || '';
