@@ -20,6 +20,14 @@
 
 const { ok } = require("./supabase-client");
 
+// ---- Whoami (frontend needs full_name + role to show who's signed
+// in and whether to expose pharmacist-vs-doctor-only affordances --
+// no doctors.id lookup needed here, unlike prescription-manager.js's
+// whoami, since a pharmacist has no row in the doctors table at all) ----
+async function whoami(profile) {
+  return ok({ profile: { id: profile.id, full_name: profile.full_name, role: profile.role } });
+}
+
 // ---- Suppliers ----
 async function listSuppliers(supabase) {
   const { data, error } = await supabase.rpc("list_suppliers");
@@ -209,6 +217,7 @@ async function returnPharmacySaleItems(supabase, data, profile) {
 }
 
 module.exports = {
+  whoami,
   listSuppliers,
   upsertSupplier,
   deactivateSupplier,
