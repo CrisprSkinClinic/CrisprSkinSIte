@@ -126,6 +126,7 @@ function switchPhTab(tab) {
   });
   if (tab === 'inventory') loadPhInventory('all');
   if (tab === 'purchasing') loadPhPurchaseOrders();
+  if (tab === 'reconcile') switchPhRecView('invoices');
 }
 document.querySelectorAll('.ph-tab-btn').forEach((btn) => {
   btn.addEventListener('click', () => switchPhTab(btn.dataset.phTab));
@@ -644,6 +645,267 @@ window.phSaveNewPO = async function () {
     });
     closePhModal();
     loadPhPurchaseOrders();
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+};
+
+// ==========================================================
+// RECONCILE TAB (Phase 2: invoice review, physical audit,
+// reorder suggestions, rep CRM)
+// ==========================================================
+function switchPhRecView(view) {
+  document.querySelectorAll('.ph-rec-subview').forEach((el) => el.classList.add('hidden'));
+  document.getElementById(`ph-rec-${view}`).classList.remove('hidden');
+  document.querySelectorAll('.ph-rec-view-btn').forEach((btn) => {
+    const active = btn.dataset.phRecView === view;
+    btn.classList.toggle('bg-brand-700', active);
+    btn.classList.toggle('text-white', active);
+    btn.classList.toggle('bg-champagne-100', !active);
+    btn.classList.toggle('text-brand-700', !active);
+  });
+  if (view === 'invoices') loadPhPendingApprovals();
+  if (view === 'audit') loadPhAuditList();
+  if (view === 'reorder') loadPhReorderSuggestions();
+  if (view === 'reps') loadPhReps();
+}
+document.querySelectorAll('.ph-rec-view-btn').forEach((btn) => {
+  btn.addEventListener('click', () => switchPhRecView(btn.dataset.phRecView));
+});
+
+// ---- Invoice Review ----
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById('ph-invoice-upload-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('ph-invoice-upload-status');
+  statusEl.textContent = 'Extracting invoice with AI, this can take a few seconds...';
+  try {
+    const base64 = await fileToBase64(file);
+    const { aiResult } = await window.phCallFunction('extract_invoice_from_image', {
+      fileData: base64,
+      mimeType: file.type,
+      fileName: file.name,
+    });
+    // Save straight into pending_approvals for review, same as the
+    // scheduled batch-scan path would, so both routes converge on
+    // one review queue.
+    await window.phCallFunction('create_pending_approval', {
+      fileName: file.name,
+      driveUrl: aiResult.invoice?.bill_url || null,
+      aiData: aiResult,
+    });
+    statusEl.textContent = 'Extracted — review it below.';
+    loadPhPendingApprovals();
+  } catch (err) {
+    statusEl.textContent = 'Error: ' + err.message;
+  } finally {
+    e.target.value = '';
+  }
+});
+
+async function loadPhPendingApprovals() {
+  const listEl = document.getElementById('ph-pending-approvals-list');
+  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  try {
+    const { pendingApprovals } = await window.phCallFunction('list_pending_approvals');
+    if (!pendingApprovals || pendingApprovals.length === 0) {
+      listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No invoices waiting for review.</p>';
+      return;
+    }
+    listEl.innerHTML = pendingApprovals.map((draft) => {
+      const inv = draft.ai_data?.invoice || {};
+      const sup = draft.ai_data?.supplier || {};
+      const itemCount = (draft.ai_data?.items || []).length;
+      return `
+        <div class="px-5 py-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(sup.supplier_name || 'Unknown supplier')} — ${escapePhHtml(inv.invoice_number || draft.file_name)}</p>
+              <p class="text-xs text-charcoal/50">${itemCount} item(s) &middot; ${formatRupees(inv.grand_total)} &middot; ${inv.invoice_date || ''}</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="window.phCommitDraft('${draft.id}')" class="text-xs font-bold text-brand-700 hover:text-brand-900 transition">Commit</button>
+              <button onclick="window.phRejectDraft('${draft.id}')" class="text-xs font-semibold text-red-600 hover:text-red-800 transition">Reject</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch (err) {
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+  }
+}
+
+window.phCommitDraft = async function (draftId) {
+  try {
+    const { pendingApprovals } = await window.phCallFunction('list_pending_approvals');
+    const draft = (pendingApprovals || []).find((d) => d.id === draftId);
+    if (!draft) return alert('Draft not found.');
+
+    const aiData = draft.ai_data || {};
+    const supplier = aiData.supplier || {};
+    const invoice = aiData.invoice || {};
+
+    // The AI extraction has no real supplier/medicine IDs -- always
+    // "NEW" here. A future pass could add a match-to-existing-supplier
+    // step; for now every commit creates fresh records, same starting
+    // point commitReviewedInvoice's GAS original had.
+    await window.phCallFunction('commit_reviewed_invoice', {
+      draft_id: draftId,
+      supplier: { id: 'NEW', ...supplier },
+      invoice,
+      items: aiData.items || [],
+    });
+    loadPhPendingApprovals();
+  } catch (err) {
+    alert('Error committing invoice: ' + err.message);
+  }
+};
+
+window.phRejectDraft = async function (draftId) {
+  if (!confirm('Reject this draft? It will be removed from the review queue.')) return;
+  try {
+    await window.phCallFunction('reject_pending_approval', { id: draftId });
+    loadPhPendingApprovals();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+};
+
+// ---- Physical Audit ----
+async function loadPhAuditList() {
+  const listEl = document.getElementById('ph-audit-list');
+  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  try {
+    const { medicines } = await window.phCallFunction('get_medicines_with_wac');
+    if (!medicines || medicines.length === 0) {
+      listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No medicines yet.</p>';
+      return;
+    }
+    listEl.innerHTML = medicines.map((m) => `
+      <div class="px-5 py-3 flex items-center justify-between">
+        <div>
+          <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(m.name)}</p>
+          <p class="text-xs text-charcoal/50">System stock: ${m.total_stock}</p>
+        </div>
+        <input type="number" data-audit-medicine-id="${m.medicine_id}" placeholder="Counted qty"
+               class="w-32 border border-champagne-300 rounded-lg px-3 py-1.5 text-sm" />
+      </div>`).join('');
+  } catch (err) {
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+  }
+}
+
+document.getElementById('ph-submit-audit-btn').addEventListener('click', async () => {
+  const resultEl = document.getElementById('ph-audit-result');
+  const inputs = document.querySelectorAll('[data-audit-medicine-id]');
+  const audits = [];
+  inputs.forEach((input) => {
+    if (input.value !== '') {
+      audits.push({ medicine_id: input.dataset.auditMedicineId, counted_quantity: parseInt(input.value, 10) });
+    }
+  });
+  if (audits.length === 0) {
+    resultEl.textContent = 'Enter at least one counted quantity.';
+    return;
+  }
+  try {
+    const { results } = await window.phCallFunction('run_physical_audit', { audits, reason: 'Physical audit via /pharmacy' });
+    const adjusted = results.filter((r) => r.adjusted);
+    resultEl.textContent = adjusted.length === 0
+      ? 'No discrepancies found — nothing adjusted.'
+      : `Adjusted ${adjusted.length} medicine(s): ` + adjusted.map((r) => `${r.delta > 0 ? '+' : ''}${r.delta}`).join(', ');
+    loadPhAuditList();
+  } catch (err) {
+    resultEl.textContent = 'Error: ' + err.message;
+  }
+});
+
+// ---- Reorder Suggestions ----
+async function loadPhReorderSuggestions() {
+  const listEl = document.getElementById('ph-reorder-list');
+  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  try {
+    const { recommendations } = await window.phCallFunction('get_predictive_reorder');
+    if (!recommendations || recommendations.length === 0) {
+      listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Nothing needs reordering right now.</p>';
+      return;
+    }
+    listEl.innerHTML = recommendations.map((r) => `
+      <div class="px-5 py-4">
+        <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(r.medName)}</p>
+        <p class="text-xs text-charcoal/50">${escapePhHtml(r.reason)}</p>
+        <p class="text-xs font-semibold text-brand-700 mt-1">Suggested reorder: ${r.suggestedQty} units</p>
+      </div>`).join('');
+  } catch (err) {
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+  }
+}
+
+// ---- Rep CRM ----
+async function loadPhReps() {
+  const listEl = document.getElementById('ph-reps-list');
+  listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">Loading...</p>';
+  try {
+    const { reps } = await window.phCallFunction('list_medical_reps');
+    if (!reps || reps.length === 0) {
+      listEl.innerHTML = '<p class="text-charcoal/30 text-sm text-center py-8">No reps added yet.</p>';
+      return;
+    }
+    listEl.innerHTML = reps.map((r) => `
+      <div class="px-5 py-4 flex items-center justify-between">
+        <div>
+          <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(r.rep_name)}</p>
+          <p class="text-xs text-charcoal/50">${escapePhHtml(r.company || '')} ${r.division ? '&middot; ' + escapePhHtml(r.division) : ''} ${r.phone ? '&middot; ' + escapePhHtml(r.phone) : ''}</p>
+        </div>
+      </div>`).join('');
+  } catch (err) {
+    listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${err.message}</p>`;
+  }
+}
+
+document.getElementById('ph-new-rep-btn').addEventListener('click', () => {
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-4">New Medical Rep</h3>
+      <div class="space-y-3">
+        <input type="text" id="ph-new-rep-name" placeholder="Rep name" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="text" id="ph-new-rep-company" placeholder="Company" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="text" id="ph-new-rep-division" placeholder="Division" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+        <input type="text" id="ph-new-rep-phone" placeholder="Phone" class="w-full border border-champagne-300 rounded-lg px-3 py-2 text-sm" />
+      </div>
+      <p id="ph-new-rep-error" class="text-red-500 text-sm mt-2 min-h-[1.25rem]"></p>
+      <div class="flex gap-2 mt-4">
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2 text-sm font-semibold">Cancel</button>
+        <button onclick="window.phSaveNewRep()" class="flex-1 bg-brand-900 text-white rounded-lg py-2 text-sm font-bold">Save</button>
+      </div>
+    </div>`);
+});
+
+window.phSaveNewRep = async function () {
+  const errorEl = document.getElementById('ph-new-rep-error');
+  const repName = document.getElementById('ph-new-rep-name').value.trim();
+  if (!repName) {
+    errorEl.textContent = 'Rep name is required.';
+    return;
+  }
+  try {
+    await window.phCallFunction('upsert_medical_rep', {
+      repName,
+      company: document.getElementById('ph-new-rep-company').value.trim() || null,
+      division: document.getElementById('ph-new-rep-division').value.trim() || null,
+      phone: document.getElementById('ph-new-rep-phone').value.trim() || null,
+    });
+    closePhModal();
+    loadPhReps();
   } catch (err) {
     errorEl.textContent = err.message;
   }
