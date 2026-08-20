@@ -17,7 +17,7 @@
 //     new-patient insertion uses insert_patient_encrypted instead of a
 //     direct .insert().
 
-const { ok } = require("./supabase-client");
+const { ok, sendAppointmentConfirmation } = require("./supabase-client");
 const { resolvePatientNamesMap, resolveSinglePatientName } = require("./patient-names");
 
 const CLINIC_DOCTOR_IDS = [
@@ -188,6 +188,9 @@ async function createAppointment(supabase, data, staffName, staffProfileId, logA
   // correctness boundary.
   const allowOverbook = data.allowOverbook === true && doctorId !== "any";
 
+  let firstSlotDoctorId = null;
+  let firstSlotAppointmentId = null;
+
   for (const slotTime of slots) {
     // For "any available", pick whichever doctor is actually free at
     // this specific slot -- re-verified here at booking time, same
@@ -240,9 +243,34 @@ async function createAppointment(supabase, data, staffName, staffProfileId, logA
       .single();
     if (error) throw error;
     insertedRows.push(newAppt.id);
+
+    if (firstSlotDoctorId === null) {
+      firstSlotDoctorId = assignedDoctor;
+      firstSlotAppointmentId = newAppt.id;
+    }
   }
 
   await logAudit("CREATE", `Booked ${patientName} for ${appointmentType || "appointment"} on ${date}`);
+
+  // WhatsApp confirmation, staff-booking equivalent of the one already
+  // sent by public-book-appointment.js for website self-bookings.
+  // Multi-slot bookings (linked_group_id) intentionally send only ONE
+  // confirmation, for the first slot -- per explicit product decision,
+  // to avoid spamming the patient with one message per linked slot.
+  const { data: doctorRow } = await supabase
+    .from("doctors")
+    .select("name")
+    .eq("id", firstSlotDoctorId)
+    .single();
+  await sendAppointmentConfirmation({
+    phone: patientPhone,
+    patientName,
+    doctorName: doctorRow?.name,
+    date,
+    time: slots[0],
+    appointmentId: firstSlotAppointmentId,
+  });
+
   return ok({ success: true, appointmentIds: insertedRows });
 }
 

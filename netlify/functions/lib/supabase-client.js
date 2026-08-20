@@ -44,4 +44,56 @@ function ok(body, statusCode = 200) {
   return { statusCode, body: JSON.stringify(body) };
 }
 
-module.exports = { createServiceRoleClient, ok };
+// Sends the WhatsApp appointment_confirmation template via the
+// send-wa-appointment-confirmation Supabase Edge Function, using the
+// same service-role credential this module already holds for its own
+// Supabase calls (no new secret needed -- see that function's own
+// comments for why it verifies the token by using it, rather than
+// comparing it directly against Deno's auto-injected
+// SUPABASE_SERVICE_ROLE_KEY, which turned out to be a different,
+// shorter-format key than this one on this project).
+//
+// Deliberately fire-and-forget from the caller's perspective: never
+// throws, only logs -- a booking must succeed regardless of whether
+// the confirmation message goes out.
+async function sendAppointmentConfirmation({ phone, patientName, doctorName, date, time, appointmentId }) {
+  if (!phone) {
+    console.error("Skipping WhatsApp confirmation: no phone on file for this booking.");
+    return;
+  }
+  try {
+    const bare = String(phone).replace(/^\+/, "");
+    const sendPhone = bare.length === 10 ? `91${bare}` : bare;
+
+    const displayDate = new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", {
+      day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+    });
+    const [hh, mm] = String(time).split(":");
+    const hourNum = parseInt(hh, 10);
+    const displayTime = `${((hourNum + 11) % 12) + 1}:${mm} ${hourNum >= 12 ? "PM" : "AM"}`;
+
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/send-wa-appointment-confirmation`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SERVICE_ROLE_KEY}`,
+      },
+      body: JSON.stringify({
+        phone: sendPhone,
+        patient_name: patientName,
+        doctor_name: doctorName ? `Dr. ${doctorName}` : "your doctor",
+        date: displayDate,
+        time: displayTime,
+        appointment_id: appointmentId,
+      }),
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      console.error("WhatsApp confirmation send failed:", errBody.error || res.status);
+    }
+  } catch (whatsappError) {
+    console.error("WhatsApp confirmation send threw:", whatsappError.message);
+  }
+}
+
+module.exports = { createServiceRoleClient, ok, sendAppointmentConfirmation };
