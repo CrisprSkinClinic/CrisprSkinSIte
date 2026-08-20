@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Backup Encryption Keys</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f8fafc; }
+    .card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; max-width: 440px; }
+    input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 15px; margin-top: 8px; }
+    button { background: #dc2626; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 16px; width: 100%; }
+    button:hover { background: #b91c1c; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+    p { color: #64748b; font-size: 14px; line-height: 1.5; text-align: left; }
+    .warning { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; color: #991b1b; font-size: 13px; text-align: left; }
+    #status { margin-top: 16px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Backup Encryption Keys</h2>
+    <p>
+      This exports the master keys that decrypt every patient's personal
+      information (name, phone, DOB, address, etc.) to Google Drive, protected
+      with a password you choose here.
+    </p>
+    <div class="warning">
+      <strong>Important:</strong> if you forget this password, the backup file
+      cannot be recovered by anyone -- not even Anthropic, Claude, or Supabase
+      support. Store it somewhere safe (a password manager), separate from this
+      backup file itself.
+    </div>
+    <p style="margin-top:16px;">
+      You must be signed in as a doctor on this device (via /prescription) for
+      this to work.
+    </p>
+    <input type="password" id="backup-password" placeholder="Choose a strong password (min 12 characters)" autocomplete="new-password">
+    <input type="password" id="backup-password-confirm" placeholder="Confirm password" autocomplete="new-password" style="margin-top:8px;">
+    <button id="run-backup-btn">Export Encryption Keys</button>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    document.getElementById('run-backup-btn').addEventListener('click', async () => {
+      const password = document.getElementById('backup-password').value;
+      const confirm = document.getElementById('backup-password-confirm').value;
+      const statusEl = document.getElementById('status');
+      const btn = document.getElementById('run-backup-btn');
+
+      if (password.length < 12) {
+        statusEl.textContent = 'Password must be at least 12 characters.';
+        statusEl.style.color = '#dc2626';
+        return;
+      }
+      if (password !== confirm) {
+        statusEl.textContent = 'Passwords do not match.';
+        statusEl.style.color = '#dc2626';
+        return;
+      }
+
+      // Reads the current Supabase session the SAME way
+      // prescription-shell.js does, from localStorage, since this
+      // static page doesn't share JS state with that page directly --
+      // it relies on the same Supabase client having already stored a
+      // session there from a prior sign-in on /prescription.
+      let accessToken = null;
+      try {
+        const keys = Object.keys(localStorage).filter((k) => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        if (keys.length > 0) {
+          const sessionData = JSON.parse(localStorage.getItem(keys[0]));
+          accessToken = sessionData?.access_token || sessionData?.currentSession?.access_token;
+        }
+      } catch (e) { /* fall through to the no-token error below */ }
+
+      if (!accessToken) {
+        statusEl.textContent = 'No active session found -- please sign in at /prescription first, then return to this page.';
+        statusEl.style.color = '#dc2626';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Exporting...';
+      statusEl.textContent = '';
+      try {
+        const response = await fetch('/.netlify/functions/backup-vault-keys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken, password }),
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || 'Export failed.');
+        statusEl.textContent = `Done -- saved as ${result.fileName} in your backup Drive folder.`;
+        statusEl.style.color = '#059669';
+        document.getElementById('backup-password').value = '';
+        document.getElementById('backup-password-confirm').value = '';
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
+        statusEl.style.color = '#dc2626';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Export Encryption Keys';
+      }
+    });
+  </script>
+</body>
+</html>

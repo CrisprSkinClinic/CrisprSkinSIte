@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Restore Database Backup</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f8fafc; padding: 20px; }
+    .card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; max-width: 560px; width: 100%; }
+    input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 15px; margin-top: 8px; }
+    button { padding: 12px 24px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 12px; width: 100%; border: none; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+    #preview-btn { background: #4f46e5; color: white; }
+    #preview-btn:hover:not(:disabled) { background: #4338ca; }
+    #restore-btn { background: #dc2626; color: white; display: none; }
+    #restore-btn:hover:not(:disabled) { background: #b91c1c; }
+    p { color: #64748b; font-size: 14px; line-height: 1.5; text-align: left; }
+    .warning { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; color: #991b1b; font-size: 13px; text-align: left; }
+    .note { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; color: #1e40af; font-size: 13px; text-align: left; }
+    #results { margin-top: 16px; text-align: left; font-size: 13px; max-height: 300px; overflow-y: auto; }
+    #results table { width: 100%; border-collapse: collapse; }
+    #results td, #results th { padding: 4px 8px; border-bottom: 1px solid #f1f5f9; text-align: left; }
+    #status { margin-top: 12px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Restore Database Backup</h2>
+    <div class="note">
+      This is INSERT-ONLY: it only adds rows that don't already exist. It will
+      never modify or delete anything currently in the database. Safe to run
+      even against a live, working database.
+    </div>
+    <p style="margin-top:16px;">
+      You must be signed in as a doctor on this device (via /prescription) for
+      this to work. Enter the exact filename of the backup you want to restore
+      from (visible in your Drive backup folder), e.g. <code>db-backup-2026-07-24.json</code>.
+    </p>
+    <input type="text" id="backup-filename" placeholder="db-backup-2026-07-24.json">
+    <button id="preview-btn">Preview This Backup</button>
+    <button id="restore-btn">Confirm: Run Real Restore</button>
+    <div id="status"></div>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    function getAccessToken() {
+      try {
+        const keys = Object.keys(localStorage).filter((k) => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        if (keys.length > 0) {
+          const sessionData = JSON.parse(localStorage.getItem(keys[0]));
+          return sessionData?.access_token || sessionData?.currentSession?.access_token;
+        }
+      } catch (e) { /* fall through */ }
+      return null;
+    }
+
+    function renderResults(data) {
+      const el = document.getElementById('results');
+      let html = `<p><strong>Backup from:</strong> ${new Date(data.backupExportedAt).toLocaleString()}</p>`;
+      html += `<table><tr><th>Table</th><th>Rows in Backup</th><th>${data.dryRun ? '' : 'Inserted'}</th><th>Status</th></tr>`;
+      data.results.forEach((r) => {
+        const status = r.error ? `<span style="color:#dc2626;">${r.error}</span>` : (r.dryRun ? 'Ready' : 'OK');
+        html += `<tr><td>${r.table}</td><td>${r.rowsInBackup}</td><td>${r.dryRun ? '' : (r.rowsInserted ?? '-')}</td><td>${status}</td></tr>`;
+      });
+      html += '</table>';
+      el.innerHTML = html;
+    }
+
+    async function runRestore(dryRun) {
+      const fileName = document.getElementById('backup-filename').value.trim();
+      const statusEl = document.getElementById('status');
+      const previewBtn = document.getElementById('preview-btn');
+      const restoreBtn = document.getElementById('restore-btn');
+
+      if (!fileName) {
+        statusEl.textContent = 'Please enter the backup filename.';
+        statusEl.style.color = '#dc2626';
+        return;
+      }
+      const accessToken = getAccessToken();
+      if (!accessToken) {
+        statusEl.textContent = 'No active session found -- please sign in at /prescription first.';
+        statusEl.style.color = '#dc2626';
+        return;
+      }
+
+      const activeBtn = dryRun ? previewBtn : restoreBtn;
+      activeBtn.disabled = true;
+      const originalText = activeBtn.textContent;
+      activeBtn.textContent = dryRun ? 'Loading preview...' : 'Restoring...';
+      statusEl.textContent = '';
+
+      try {
+        const response = await fetch('/.netlify/functions/restore-database', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken, fileName, dryRun }),
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.error || 'Failed.');
+
+        renderResults(result);
+        if (dryRun) {
+          statusEl.textContent = 'Preview loaded. Review the table above, then click "Confirm: Run Real Restore" if it looks right.';
+          statusEl.style.color = '#1e40af';
+          document.getElementById('restore-btn').style.display = 'block';
+        } else {
+          statusEl.textContent = 'Restore complete.';
+          statusEl.style.color = '#059669';
+        }
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
+        statusEl.style.color = '#dc2626';
+      } finally {
+        activeBtn.disabled = false;
+        activeBtn.textContent = originalText;
+      }
+    }
+
+    document.getElementById('preview-btn').addEventListener('click', () => runRestore(true));
+    document.getElementById('restore-btn').addEventListener('click', () => {
+      if (confirm('This will insert any missing rows from this backup into the live database. Continue?')) {
+        runRestore(false);
+      }
+    });
+  </script>
+</body>
+</html>

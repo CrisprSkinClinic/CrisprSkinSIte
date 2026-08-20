@@ -119,6 +119,15 @@ import MainLayout from '../layouts/MainLayout.astro';
       <div id="bookingsSection" class="hidden space-y-12">
 
         <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Viewing schedule/appointments for</label>
+          <select id="bookingsDoctorSelect" class="px-4 py-2 border border-slate-300 rounded-md mb-6">
+            <option value="514ff136-ee45-4d49-89b5-d128d96aef62">Dr. Karthik L</option>
+            <option value="d5372165-fc7e-47e8-aee6-ce02e7fefc71">Dr. Narayanan A</option>
+            <option value="519dbd89-d3d9-4ee9-8923-5fabbe51cf2e">Dr. Narayanan B</option>
+          </select>
+        </div>
+
+        <div>
           <h2 class="text-xl font-bold text-slate-900 mb-4">Upcoming Appointments</h2>
           <div id="appointmentsList" class="space-y-2">
             <p class="text-slate-400 text-sm">Loading...</p>
@@ -134,13 +143,13 @@ import MainLayout from '../layouts/MainLayout.astro';
             <div>
               <label class="block text-xs font-semibold text-slate-500 mb-1">Day</label>
               <select id="newSessionDay" class="px-4 py-2 border border-slate-300 rounded-md">
-                <option value="1">Monday</option>
-                <option value="2">Tuesday</option>
-                <option value="3">Wednesday</option>
-                <option value="4">Thursday</option>
-                <option value="5">Friday</option>
-                <option value="6">Saturday</option>
-                <option value="0">Sunday</option>
+                <option value="monday">Monday</option>
+                <option value="tuesday">Tuesday</option>
+                <option value="wednesday">Wednesday</option>
+                <option value="thursday">Thursday</option>
+                <option value="friday">Friday</option>
+                <option value="saturday">Saturday</option>
+                <option value="sunday">Sunday</option>
               </select>
             </div>
             <div>
@@ -151,18 +160,10 @@ import MainLayout from '../layouts/MainLayout.astro';
               <label class="block text-xs font-semibold text-slate-500 mb-1">Closing Time</label>
               <input type="time" id="newSessionEnd" class="px-4 py-2 border border-slate-300 rounded-md" />
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 mb-1">Slot Duration</label>
-              <select id="newSessionDuration" class="px-4 py-2 border border-slate-300 rounded-md">
-                <option value="15">15 min</option>
-                <option value="20">20 min</option>
-                <option value="30" selected>30 min</option>
-                <option value="45">45 min</option>
-                <option value="60">60 min</option>
-              </select>
-            </div>
             <button id="addSessionBtn" class="bg-brand-900 text-white font-semibold px-4 py-2 rounded-md hover:bg-brand-800 transition">Add Session</button>
           </div>
+
+          <p class="text-xs text-slate-400 mb-4">Slot duration is set per doctor (currently 30 min for all three) -- edit it in Supabase's <code>doctors.slot_duration_mins</code> if that ever needs to change.</p>
 
           <div id="sessionsByDay" class="space-y-3">
             <p class="text-slate-400 text-sm">Loading...</p>
@@ -209,34 +210,20 @@ import MainLayout from '../layouts/MainLayout.astro';
           <div>
             <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-3">Service-Intent Pages</h3>
             <div class="space-y-2">
-              <a href="/lp/lasik-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">LASIK Surgery (Chennai)</a>
-              <a href="/lp/cataract-surgery-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Cataract Surgery (Chennai)</a>
-              <a href="/lp/retina-diabetic-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Retina / Diabetic Eye Care</a>
-              <a href="/lp/glaucoma-screening-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Glaucoma Screening</a>
-              <a href="/lp/squint-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Squint Treatment</a>
-              <a href="/lp/neuro-ophthalmology-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Neuro-Ophthalmology</a>
-              <a href="/lp/comprehensive-eye-checkup-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Comprehensive Eye Checkup (Chennai)</a>
-              <a href="/lp/cataract-surgeon-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Cataract Surgeon (Chennai)</a>
-              <a href="/lp/pediatric-eye-doctor-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Pediatric Eye Doctor (Chennai)</a>
+              <a href="/lp/hair-transplant-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Hair Transplant (Chennai)</a>
+              <a href="/lp/acne-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Acne Treatment (Chennai)</a>
+              <a href="/lp/vitiligo-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Vitiligo Treatment (Chennai)</a>
+              <a href="/lp/psoriasis-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Psoriasis Treatment (Chennai)</a>
+              <a href="/lp/botox-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Botox (Chennai)</a>
+              <a href="/lp/pediatric-dermatology-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Pediatric Dermatology (Chennai)</a>
             </div>
           </div>
 
           <div>
             <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-3">Local-Intent Pages (KK Nagar)</h3>
             <div class="space-y-2">
-              <a href="/lp/eye-clinic-kk-nagar" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Eye Clinic KK Nagar</a>
-              <a href="/lp/eye-doctor-kk-nagar" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Eye Doctor KK Nagar</a>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-3">Symptom-Intent Pages</h3>
-            <div class="space-y-2">
-              <a href="/lp/blurred-vision-doctor-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Blurred Vision</a>
-              <a href="/lp/eye-pain-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Eye Pain</a>
-              <a href="/lp/sudden-vision-loss-chennai" target="_blank" class="block bg-red-50 border border-red-200 rounded-lg px-4 py-3 hover:border-red-300 hover:bg-red-100 transition-colors text-sm font-medium text-red-800">Sudden Vision Loss (Urgent styling)</a>
-              <a href="/lp/double-vision-treatment-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Double Vision</a>
-              <a href="/lp/diabetic-eye-checkup-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Diabetic Eye Checkup</a>
+              <a href="/lp/dermatologist-kk-nagar" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Dermatologist KK Nagar</a>
+              <a href="/lp/skin-hair-clinic-chennai" target="_blank" class="block bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-brand-300 hover:bg-brand-50 transition-colors text-sm font-medium text-slate-700">Skin & Hair Clinic Chennai</a>
             </div>
           </div>
         </div>
@@ -297,7 +284,6 @@ const tabBlog = document.getElementById('tabBlog');
     const newSessionDay = document.getElementById('newSessionDay') as HTMLSelectElement;
     const newSessionStart = document.getElementById('newSessionStart') as HTMLInputElement;
     const newSessionEnd = document.getElementById('newSessionEnd') as HTMLInputElement;
-    const newSessionDuration = document.getElementById('newSessionDuration') as HTMLSelectElement;
     const addSessionBtn = document.getElementById('addSessionBtn');
 
     const blockedDatesList = document.getElementById('blockedDatesList');
@@ -310,7 +296,12 @@ const tabBlog = document.getElementById('tabBlog');
     const newBlockedSlotReason = document.getElementById('newBlockedSlotReason') as HTMLInputElement;
     const addBlockedSlotBtn = document.getElementById('addBlockedSlotBtn');
 
-    const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const DAY_ORDER = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const DAY_LABELS: Record<string, string> = {
+      sunday: 'Sunday', monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday',
+      thursday: 'Thursday', friday: 'Friday', saturday: 'Saturday',
+    };
+    const bookingsDoctorSelect = document.getElementById('bookingsDoctorSelect') as HTMLSelectElement;
 
     function showResult(message: string, isError = false) {
       resultBox?.classList.remove('hidden', 'bg-red-50', 'bg-green-50', 'bg-slate-100');
@@ -405,6 +396,13 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     tabLandingPages?.addEventListener('click', () => activateTab('landingPages'));
     tabBookings?.addEventListener('click', async () => {
       activateTab('bookings');
+      await loadAppointments();
+      await loadSessions();
+      await loadBlockedDates();
+      await loadBlockedSlots();
+    });
+
+    bookingsDoctorSelect?.addEventListener('change', async () => {
       await loadAppointments();
       await loadSessions();
       await loadBlockedDates();
@@ -615,7 +613,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     async function loadAppointments() {
       appointmentsList.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
       try {
-        const { appointments } = await callBookingFunction('list_appointments');
+        const { appointments } = await callBookingFunction('list_appointments', { doctor_id: bookingsDoctorSelect.value });
         const upcoming = appointments.filter((a: any) => a.status !== 'cancelled');
         if (upcoming.length === 0) {
           appointmentsList.innerHTML = '<p class="text-slate-400 text-sm">No appointments yet.</p>';
@@ -625,15 +623,23 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
         upcoming.forEach((appt: any) => {
           const row = document.createElement('div');
           row.className = 'flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-3';
+          // notes holds "<service> | Email: ... | Booked via website
+          // self-service" (see public-book-appointment.js) -- split off
+          // just the service name for display rather than showing the
+          // raw notes string in full.
+          const serviceLabel = (appt.notes || '').split('|')[0].trim() || 'General Consultation';
+          const patientName = appt.patients?.name || 'Unknown patient';
+          const patientPhone = appt.patients?.phone || '';
+          const doctorName = appt.doctors?.name || 'Unassigned';
           row.innerHTML = `
             <div>
-              <p class="font-semibold text-slate-800">${appt.prefix || ''} ${appt.first_name} ${appt.last_name || ''} -- ${appt.service_type}</p>
-              <p class="text-sm text-slate-500">${appt.appointment_date} at ${appt.appointment_time} &middot; ${appt.phone} &middot; <span class="${appt.status === 'cancelled' ? 'text-red-500' : 'text-green-600'}">${appt.status}</span></p>
+              <p class="font-semibold text-slate-800">${patientName} -- ${serviceLabel}</p>
+              <p class="text-sm text-slate-500">${appt.slot_date} at ${appt.slot_time} &middot; Dr. ${doctorName} &middot; ${patientPhone} &middot; <span class="${appt.status === 'cancelled' ? 'text-red-500' : 'text-green-600'}">${appt.status}</span></p>
             </div>
             <button class="text-red-600 text-sm font-semibold hover:underline">Cancel</button>
           `;
           row.querySelector('button')?.addEventListener('click', async () => {
-            if (!confirm(`Cancel the appointment for ${appt.first_name}?`)) return;
+            if (!confirm(`Cancel the appointment for ${patientName}?`)) return;
             try {
               await callBookingFunction('cancel_appointment', { id: appt.id });
               await loadAppointments();
@@ -652,19 +658,19 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     async function loadSessions() {
       sessionsByDay.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
       try {
-        const { sessions } = await callBookingFunction('list_schedule_sessions');
-        const byDay: Record<number, any[]> = {};
+        const { sessions } = await callBookingFunction('list_schedule_sessions', { doctor_id: bookingsDoctorSelect.value });
+        const byDay: Record<string, any[]> = {};
         sessions.forEach((s: any) => {
           if (!byDay[s.day_of_week]) byDay[s.day_of_week] = [];
           byDay[s.day_of_week].push(s);
         });
 
         sessionsByDay.innerHTML = '';
-        for (let day = 0; day <= 6; day++) {
+        for (const day of DAY_ORDER) {
           const dayBox = document.createElement('div');
           dayBox.className = 'bg-white border border-slate-200 rounded-lg p-4';
           const daySessions = byDay[day] || [];
-          dayBox.innerHTML = `<p class="font-semibold text-slate-800 mb-2">${DAY_NAMES[day]}</p><div class="space-y-2" data-day="${day}"></div>`;
+          dayBox.innerHTML = `<p class="font-semibold text-slate-800 mb-2">${DAY_LABELS[day]}</p><div class="space-y-2" data-day="${day}"></div>`;
           const container = dayBox.querySelector(`[data-day="${day}"]`);
 
           if (daySessions.length === 0) {
@@ -675,7 +681,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
               row.className = `flex justify-between items-center px-3 py-2 rounded-lg ${session.is_active ? 'bg-green-50' : 'bg-champagne-50'}`;
               row.innerHTML = `
                 <span class="text-sm font-medium ${session.is_active ? 'text-green-800' : 'text-slate-400 line-through'}">
-                  ${formatTime12h(session.start_time)} -- ${formatTime12h(session.end_time)} (${session.slot_duration_minutes} min slots)
+                  ${formatTime12h(session.session_start)} -- ${formatTime12h(session.session_end)} (max ${session.max_per_slot} per slot)
                 </span>
                 <div class="flex gap-3">
                   <button class="text-xs font-semibold text-brand-600 hover:underline" data-action="toggle">${session.is_active ? 'Disable' : 'Enable'}</button>
@@ -712,10 +718,10 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
       }
       try {
         await callBookingFunction('add_schedule_session', {
-          day_of_week: Number(newSessionDay.value),
+          doctor_id: bookingsDoctorSelect.value,
+          day_of_week: newSessionDay.value,
           start_time: newSessionStart.value,
           end_time: newSessionEnd.value,
-          slot_duration_minutes: Number(newSessionDuration.value),
         });
         newSessionStart.value = '';
         newSessionEnd.value = '';
@@ -729,7 +735,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     async function loadBlockedDates() {
       blockedDatesList.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
       try {
-        const { blockedDates } = await callBookingFunction('list_blocked_dates');
+        const { blockedDates } = await callBookingFunction('list_blocked_dates', { doctor_id: bookingsDoctorSelect.value });
         if (blockedDates.length === 0) {
           blockedDatesList.innerHTML = '<p class="text-slate-400 text-sm">No blocked dates.</p>';
           return;
@@ -738,7 +744,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
         blockedDates.forEach((bd: any) => {
           const row = document.createElement('div');
           row.className = 'flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-3';
-          row.innerHTML = `<span class="text-sm font-medium text-slate-800">${bd.blocked_date}${bd.reason ? ` -- ${bd.reason}` : ''}</span><button class="text-red-600 text-sm font-semibold hover:underline">Remove</button>`;
+          row.innerHTML = `<span class="text-sm font-medium text-slate-800">${bd.override_date}${bd.reason ? ` -- ${bd.reason}` : ''}</span><button class="text-red-600 text-sm font-semibold hover:underline">Remove</button>`;
           row.querySelector('button')?.addEventListener('click', async () => {
             await callBookingFunction('remove_blocked_date', { id: bd.id });
             await loadBlockedDates();
@@ -753,7 +759,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     addBlockedDateBtn?.addEventListener('click', async () => {
       if (!newBlockedDateInput.value) return;
       try {
-        await callBookingFunction('add_blocked_date', { blocked_date: newBlockedDateInput.value, reason: newBlockedDateReason.value });
+        await callBookingFunction('add_blocked_date', { doctor_id: bookingsDoctorSelect.value, blocked_date: newBlockedDateInput.value, reason: newBlockedDateReason.value });
         newBlockedDateInput.value = '';
         newBlockedDateReason.value = '';
         await loadBlockedDates();
@@ -766,7 +772,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     async function loadBlockedSlots() {
       blockedSlotsList.innerHTML = '<p class="text-slate-400 text-sm">Loading...</p>';
       try {
-        const { blockedSlots } = await callBookingFunction('list_blocked_slots');
+        const { blockedSlots } = await callBookingFunction('list_blocked_slots', { doctor_id: bookingsDoctorSelect.value });
         if (blockedSlots.length === 0) {
           blockedSlotsList.innerHTML = '<p class="text-slate-400 text-sm">No blocked slots.</p>';
           return;
@@ -775,7 +781,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
         blockedSlots.forEach((bs: any) => {
           const row = document.createElement('div');
           row.className = 'flex justify-between items-center bg-white border border-slate-200 rounded-lg px-4 py-3';
-          row.innerHTML = `<span class="text-sm font-medium text-slate-800">${bs.blocked_date} at ${bs.time_slot}${bs.reason ? ` -- ${bs.reason}` : ''}</span><button class="text-red-600 text-sm font-semibold hover:underline">Remove</button>`;
+          row.innerHTML = `<span class="text-sm font-medium text-slate-800">${bs.override_date} at ${bs.blocked_slot}${bs.reason ? ` -- ${bs.reason}` : ''}</span><button class="text-red-600 text-sm font-semibold hover:underline">Remove</button>`;
           row.querySelector('button')?.addEventListener('click', async () => {
             await callBookingFunction('remove_blocked_slot', { id: bs.id });
             await loadBlockedSlots();
@@ -790,7 +796,7 @@ tabBlog?.addEventListener('click', () => activateTab('blog'));
     addBlockedSlotBtn?.addEventListener('click', async () => {
       if (!newBlockedSlotDate.value || !newBlockedSlotTime.value) return;
       try {
-        await callBookingFunction('add_blocked_slot', { blocked_date: newBlockedSlotDate.value, time_slot: newBlockedSlotTime.value, reason: newBlockedSlotReason.value });
+        await callBookingFunction('add_blocked_slot', { doctor_id: bookingsDoctorSelect.value, blocked_date: newBlockedSlotDate.value, time_slot: newBlockedSlotTime.value, reason: newBlockedSlotReason.value });
         newBlockedSlotDate.value = '';
         newBlockedSlotTime.value = '';
         newBlockedSlotReason.value = '';

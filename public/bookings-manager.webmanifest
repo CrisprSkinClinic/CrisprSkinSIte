@@ -1,0 +1,25 @@
+{
+  "name": "CRISPR Bookings Manager",
+  "short_name": "Bookings",
+  "description": "Staff appointment and schedule management for CRISPR Skin and Hair Clinic.",
+  "start_url": "/bookings-manager",
+  "scope": "/bookings-manager",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#223154",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/bookings-manager-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/bookings-manager-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

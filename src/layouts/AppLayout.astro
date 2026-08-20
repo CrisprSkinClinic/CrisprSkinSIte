@@ -1,0 +1,43 @@
+---
+// src/layouts/AppLayout.astro
+//
+// Minimal layout for internal staff tools (currently just
+// /bookings-manager) that should NOT include the public site's chrome
+// -- no Navbar, Footer, FloatingContact widget, top contact bar,
+// clinic-wide structured data, or homepage scroll-reveal animation.
+// Keeps only what every page genuinely needs regardless of audience:
+// charset/viewport, favicon, title/description, and noindex support
+// (defaulted to true here, unlike MainLayout, since every page using
+// this layout is an internal tool by definition).
+import { siteConfig } from '../config/site.js';
+import '../styles/global.css';
+
+const {
+  title,
+  description = 'Internal staff tool',
+  noindex = true,
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>{title} | {siteConfig.name}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <slot name="head" />
+  </head>
+  <body class="antialiased" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+    <slot />
+  </body>
+</html>

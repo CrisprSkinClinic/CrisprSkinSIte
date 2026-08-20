@@ -1,6 +1,6 @@
 ---
-title: "Acne Treatment"
-metaDescription: "Evidence-based acne treatment in KK Nagar, Chennai. Dermatologist-guided regimens for teenage and adult acne from AIIMS-trained doctors."
+title: "Acne Treatment in Chennai | KK Nagar Dermatologist"
+metaDescription: "Evidence-based acne treatment in KK Nagar, Chennai. Teenage & adult acne, scarring prevention. AIIMS-trained dermatologists. Book evaluation."
 heroEyebrow: "Clinical Dermatology"
 heroHeadline: "Acne Treatment"
 heroSubheadline: "A treatment plan matched to your acne type and severity -- not a one-size-fits-all skincare routine."

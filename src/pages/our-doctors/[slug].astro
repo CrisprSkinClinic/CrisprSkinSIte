@@ -15,9 +15,34 @@ const { doctor } = Astro.props;
 
 const pageTitle = `${doctor.name} - ${doctor.designation}`;
 const pageDescription = `${doctor.name}, ${doctor.qualificationsShort}, is a ${doctor.designation} at ${siteConfig.name}, KK Nagar, Chennai. Call ${siteConfig.contact.phone} to book.`;
+
+// Map expertise labels → service/condition URLs
+const expertiseLinks = {
+  "Hair transplantation (FUE)": "/services/hair-transplant-fue",
+  "Hair loss disorders": "/services/hair-loss",
+  "Acne & acne scars": "/services/acne",
+  "Pigmentary disorders (Melasma)": "/services/melasma",
+  "Psoriasis": "/services/psoriasis",
+  "Vitiligo": "/services/vitiligo",
+  "Urticaria": "/services/urticaria",
+  "Paediatric dermatology": "/services/pediatric-dermatology",
+  "Eczema": "/services/eczema",
+  "Atopic dermatitis": "/services/atopic-dermatitis",
+  "Birthmarks": "/services/birthmarks",
+  "Dermatosurgery": "/services/warts-moles-skin-tags",
+  "Skin surgery": "/services/warts-moles-skin-tags",
+  "Cosmetic dermatology": "/cosmetic",
+  "Aesthetic dermatology": "/cosmetic",
+  "Clinical dermatology": "/skin",
+  "General dermatology": "/skin",
+  "Chronic inflammatory skin diseases": "/services/psoriasis",
+  "Skin allergies": "/services/skin-allergy",
+  "Hair disorders": "/services/hair-loss",
+  "Acne": "/services/acne",
+};
 ---
 
-<MainLayout title={pageTitle} description={pageDescription} image="/images/hero-doctor.jpg">
+<MainLayout title={pageTitle} description={pageDescription} image={`/images/doctors/${doctor.slug}.jpg`}>
   <Breadcrumbs items={[
     { name: "Our Doctors", url: "/our-doctors" },
     { name: doctor.name, url: `/our-doctors/${doctor.slug}` }
@@ -30,6 +55,8 @@ const pageDescription = `${doctor.name}, ${doctor.qualificationsShort}, is a ${d
           <img
             src={`/images/doctors/${doctor.slug}.jpg`}
             alt={doctor.name}
+            width="400"
+            height="533"
             class="w-full h-full object-cover"
             onerror={`this.src='https://placehold.co/400x533/223154/FAF8F5?text=${encodeURIComponent(doctor.name)}'`}
           />
@@ -63,12 +90,23 @@ const pageDescription = `${doctor.name}, ${doctor.qualificationsShort}, is a ${d
     <section>
       <h2 class="text-3xl font-bold text-brand-900 mb-8 border-b border-champagne-200 pb-4">Areas of Expertise</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {doctor.expertise.map((item) => (
-          <div class="bg-champagne-50 px-5 py-4 rounded-xl border border-champagne-200 flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-brand-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="text-slate-800 font-medium">{item}</span>
-          </div>
-        ))}
+        {doctor.expertise.map((item) => {
+          const href = expertiseLinks[item];
+          return href ? (
+            <a
+              href={href}
+              class="bg-champagne-50 px-5 py-4 rounded-xl border border-champagne-200 flex items-center gap-3 hover:border-brand-300 hover:bg-white transition-all group"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-brand-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span class="text-slate-800 font-medium group-hover:text-brand-700 transition-colors">{item}</span>
+            </a>
+          ) : (
+            <div class="bg-champagne-50 px-5 py-4 rounded-xl border border-champagne-200 flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-brand-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span class="text-slate-800 font-medium">{item}</span>
+            </div>
+          );
+        })}
       </div>
     </section>
   </div>

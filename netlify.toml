@@ -5,6 +5,21 @@
 [functions]
   directory = "netlify/functions"
 
+[functions."backup-database"]
+  # Runs daily at 20:30 UTC = 2:00 AM IST -- overnight, when the clinic
+  # is closed (per the site's own listed hours, latest close is 9 PM
+  # IST) and unlikely to collide with real usage.
+  schedule = "30 20 * * *"
+
+[functions."pharmacy-ai-batch-scan"]
+  # Runs every 15 minutes, matching GAS's original
+  # setupAutoPilotCron() interval for scanning the pharmacy invoice
+  # inbox folder. This is an OPTIONAL workflow -- most invoices are
+  # expected to go through the synchronous extract_invoice_from_image
+  # action in the /pharmacy UI instead; this just covers anyone who
+  # drops files straight into the Drive inbox folder.
+  schedule = "*/15 * * * *"
+
 [build.environment]
   NODE_VERSION = "20"
   NODE_OPTIONS = "--max-old-space-size=4096"

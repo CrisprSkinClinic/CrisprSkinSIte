@@ -1,0 +1,628 @@
+---
+// src/pages/bookings-manager.astro
+//
+// Standalone staff booking-management tool, separate from /staff-admin.
+// Uses real per-staff Supabase Auth logins (created directly in
+// Supabase by clinic admin) rather than a single shared password --
+// every appointment/schedule change is attributed to the actual signed-in
+// staff member. Replaces the clinic's previous Firebase-based scheduler
+// with an equivalent tool built on the same Supabase/AppointmentManager
+// backend the rest of the site's booking system already uses.
+import AppLayout from '../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Bookings Manager" description="Staff appointment and schedule management">
+  <link slot="head" rel="manifest" href="/bookings-manager.webmanifest" />
+  <meta slot="head" name="theme-color" content="#223154" />
+  <link slot="head" rel="apple-touch-icon" href="/icons/bookings-manager-192.png" />
+  <meta slot="head" name="apple-mobile-web-app-capable" content="yes" />
+  <meta slot="head" name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<div id="bm-root" class="min-h-screen bg-slate-100">
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="bm-login-screen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm text-center">
+      <h2 class="text-2xl font-bold text-slate-800 mb-1">Bookings Manager</h2>
+      <p class="text-slate-500 text-sm mb-6">Sign in with your staff account.</p>
+      <form id="bm-login-form" class="space-y-4 text-left">
+        <div>
+          <label for="bm-email" class="text-xs font-semibold text-slate-500 mb-1 block">Email</label>
+          <input type="email" id="bm-email" required placeholder="you@crisprdermatology.com"
+                 class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+        </div>
+        <div>
+          <label for="bm-password" class="text-xs font-semibold text-slate-500 mb-1 block">Password</label>
+          <input type="password" id="bm-password" required placeholder="••••••••"
+                 class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+        </div>
+        <button type="submit" id="bm-login-btn"
+                class="w-full bg-brand-900 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-[0.98]">
+          Sign In
+        </button>
+        <p id="bm-login-error" class="text-red-500 text-sm text-center min-h-[1.25rem]"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP (hidden until signed in) ================= -->
+  <div id="bm-app" class="hidden min-h-screen flex flex-col">
+
+    <!-- Top bar -->
+    <div class="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div>
+        <h1 class="text-lg font-bold text-brand-900">Bookings Manager</h1>
+        <p id="bm-staff-name" class="text-xs text-slate-500"></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="bm-open-registrations" title="Pending Registrations" class="relative w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center hover:bg-purple-100 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+          <span id="bm-registrations-badge" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center"></span>
+        </button>
+        <button id="bm-open-dayclose" title="Day Close" class="w-9 h-9 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center hover:bg-teal-100 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3v4M8 3v4M2 11h20"/></svg>
+        </button>
+        <button id="bm-open-audit" title="Audit Log" class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6M9 8h6M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"/></svg>
+        </button>
+        <button id="bm-open-schedule" title="Manage Schedule" class="w-9 h-9 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-slate-200 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </button>
+        <button id="bm-signout" title="Sign Out" class="w-9 h-9 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Date pills for browsing appointments -->
+    <div class="bg-white border-b border-slate-200 px-4 py-3">
+      <div id="bm-date-pills" class="flex gap-2 overflow-x-auto pb-1"></div>
+    </div>
+
+    <!-- Filters: doctor / type / status, as compact dropdowns rather -->
+    <!-- than button rows that permanently occupy vertical screen space -->
+    <div class="bg-white border-b border-slate-200 px-4 py-2 flex gap-2">
+      <select id="bm-doctor-filter" class="flex-1 min-w-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700">
+        <option value="all">All Doctors</option>
+        <option value="514ff136-ee45-4d49-89b5-d128d96aef62">Dr. Karthik L</option>
+        <option value="d5372165-fc7e-47e8-aee6-ce02e7fefc71">Dr. Narayanan A</option>
+        <option value="519dbd89-d3d9-4ee9-8923-5fabbe51cf2e">Dr. Narayanan B</option>
+      </select>
+      <select id="bm-type-filter" class="flex-1 min-w-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700">
+        <option value="all">All Types</option>
+        <option value="New">New</option>
+        <option value="Review">Review</option>
+        <option value="Procedure">Procedure</option>
+      </select>
+      <select id="bm-status-filter" class="flex-1 min-w-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700">
+        <option value="all">All Statuses</option>
+        <option value="booked">Booked</option>
+        <option value="arrived">Arrived</option>
+        <option value="complete">Complete</option>
+        <option value="no_show">No Show</option>
+      </select>
+    </div>
+
+    <!-- Appointment feed -->
+    <div id="bm-appointment-feed" class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+      <p class="text-slate-400 text-sm text-center py-10">Loading...</p>
+    </div>
+
+    <!-- Floating action buttons -->
+    <button id="bm-fab-payment-only" class="fixed bottom-40 right-6 w-12 h-12 bg-teal-600 text-white rounded-2xl shadow-xl flex items-center justify-center z-30 hover:bg-teal-700 transition" title="Payment Only (No Appointment)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+    </button>
+    <button id="bm-fab-walkin" class="fixed bottom-24 right-6 w-12 h-12 bg-emerald-600 text-white rounded-2xl shadow-xl flex items-center justify-center z-30 hover:bg-emerald-700 transition" title="Walk-In">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    </button>
+    <button id="bm-fab-new" class="fixed bottom-6 right-6 w-14 h-14 bg-brand-900 text-white rounded-2xl shadow-xl flex items-center justify-center z-30 hover:bg-brand-800 transition" title="New Appointment">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+
+  <!-- ================= NEW/EDIT APPOINTMENT OVERLAY ================= -->
+  <div id="bm-booking-overlay" class="hidden fixed inset-0 bg-white z-40 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-100 justify-between items-center bg-white sticky top-0 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900">New Appointment</h2>
+      <button id="bm-close-booking" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="bm-edit-banner" class="hidden bg-amber-50 px-5 py-2.5 text-amber-800 text-sm font-bold flex justify-between items-center border-b border-amber-100">
+      <span>Editing Appointment</span>
+      <button id="bm-cancel-edit" class="underline text-xs">Cancel Edit</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-5 space-y-6 pb-32">
+      <!-- Date -->
+      <section id="bm-form-date-section">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">1. Date</label>
+        <input type="date" id="bm-form-date" class="w-full px-4 py-3 border border-slate-300 rounded-xl" />
+      </section>
+
+      <!-- Doctor -->
+      <section>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">2. Doctor</label>
+        <div class="grid grid-cols-4 gap-2" id="bm-form-doctor-group">
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-doctor" value="514ff136-ee45-4d49-89b5-d128d96aef62" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Karthik L</div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-doctor" value="d5372165-fc7e-47e8-aee6-ce02e7fefc71" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Narayanan A</div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-doctor" value="519dbd89-d3d9-4ee9-8923-5fabbe51cf2e" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Narayanan B</div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-doctor" value="any" class="peer sr-only" />
+            <div class="peer-checked:bg-slate-600 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Any</div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Appointment type -->
+      <section>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">3. Type & Duration</label>
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-type" value="New" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-white text-xs font-bold transition">New<span class="block text-[10px] opacity-70 font-normal mt-0.5">30 min</span></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-type" value="Review" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-white text-xs font-bold transition">Review<span class="block text-[10px] opacity-70 font-normal mt-0.5">15 min</span></div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="bm-type" value="Procedure" class="peer sr-only" />
+            <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-3 rounded-xl border border-slate-200 bg-white text-xs font-bold transition">Procedure<span class="block text-[10px] opacity-70 font-normal mt-0.5">Custom</span></div>
+          </label>
+        </div>
+        <div id="bm-procedure-config" class="hidden space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <input type="text" id="bm-procedure-name" placeholder="Procedure name (e.g. Chemical Peel)" class="w-full p-2.5 text-sm border border-slate-300 rounded-lg" />
+          <label class="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <input type="checkbox" id="bm-multi-slot-toggle" class="w-4 h-4" />
+            Multi-slot (select several times below)
+          </label>
+        </div>
+      </section>
+
+      <!-- Time slots -->
+      <section id="bm-time-slots-section">
+        <div class="flex justify-between items-end mb-2">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">4. Available Times</label>
+          <span id="bm-duration-label" class="text-xs font-bold bg-brand-100 text-brand-800 px-2 py-0.5 rounded-full"></span>
+        </div>
+        <div id="bm-time-slots-grid" class="grid grid-cols-3 gap-2">
+          <p class="col-span-3 text-slate-400 text-sm text-center py-6">Select doctor and type first.</p>
+        </div>
+      </section>
+
+      <!-- Walk-in status: replaces the date/time sections above -- a -->
+      <!-- walk-in is seen now, so there's nothing for staff to pick; -->
+      <!-- the system still assigns a real slot behind the scenes for -->
+      <!-- schedule/capacity purposes, it's just never shown here. -->
+      <section id="bm-walkin-status-section" class="hidden">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+          <p class="text-emerald-800 font-bold text-sm">Walk-In — Today, Now</p>
+          <p id="bm-walkin-status-detail" class="text-emerald-700 text-xs mt-1">Checking availability...</p>
+        </div>
+      </section>
+
+      <!-- Patient -->
+      <section>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">5. Patient Details</label>
+        <input type="tel" id="bm-patient-phone" placeholder="Phone number" class="w-full text-base border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 outline-none mb-1" />
+        <p id="bm-phone-lookup-status" class="text-xs min-h-[1rem] mb-2 px-1"></p>
+        <input type="text" id="bm-patient-name" placeholder="Full name" required class="w-full text-base font-semibold border border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:border-brand-500 outline-none" />
+      </section>
+    </div>
+
+    <div class="p-4 bg-white border-t border-slate-200">
+      <button id="bm-submit-booking" class="w-full bg-brand-900 text-white font-bold py-4 rounded-2xl shadow-lg transition active:scale-[0.98]">
+        Confirm & Book
+      </button>
+      <p id="bm-booking-error" class="text-red-500 text-sm text-center mt-2 min-h-[1.25rem]"></p>
+    </div>
+  </div>
+
+  <!-- ================= APPOINTMENT DETAIL MODAL ================= -->
+  <div id="bm-detail-modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" id="bm-detail-backdrop"></div>
+    <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:left-1/2 md:right-auto md:w-[420px] md:-translate-x-1/2 md:-translate-y-1/2 bg-white rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+      <div id="bm-detail-body" class="p-6 overflow-y-auto flex-1"></div>
+      <div class="grid grid-cols-2 gap-2 p-4 bg-slate-50 border-t border-slate-100">
+        <button data-status="arrived" class="bm-status-btn bg-green-100 hover:bg-green-200 text-green-800 font-bold py-2.5 rounded-xl text-sm transition">Check In</button>
+        <button data-status="complete" class="bm-status-btn bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl text-sm transition">Complete</button>
+        <button data-status="no_show" class="bm-status-btn bg-red-100 hover:bg-red-200 text-red-800 font-bold py-2.5 rounded-xl text-sm transition">No Show</button>
+        <button id="bm-delete-appt" class="bg-red-50 hover:bg-red-100 text-red-700 font-bold py-2.5 rounded-xl text-sm border border-red-200 transition">Delete</button>
+        <button id="bm-edit-appt" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold py-2.5 rounded-xl text-sm transition">Edit</button>
+        <button id="bm-reschedule-appt" class="bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-2.5 rounded-xl text-sm transition">Reschedule</button>
+        <button id="bm-record-payment-btn" class="col-span-2 bg-teal-100 hover:bg-teal-200 text-teal-800 font-bold py-2.5 rounded-xl text-sm transition">Record Payment</button>
+        <a id="bm-whatsapp-appt" href="#" target="_blank" rel="noopener noreferrer" class="col-span-2 hidden bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold py-2.5 rounded-xl text-sm transition text-center">Send Appointment via WhatsApp</a>
+      </div>
+      <button id="bm-close-detail" class="w-full bg-slate-800 text-white font-semibold py-3 text-sm">Close</button>
+    </div>
+  </div>
+
+  <!-- ================= SCHEDULE MANAGER OVERLAY ================= -->
+  <div id="bm-schedule-overlay" class="hidden fixed inset-0 bg-slate-100 z-50 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-200 justify-between items-center bg-white shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900">Schedule Manager</h2>
+      <button id="bm-close-schedule" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="flex bg-white border-b border-slate-200">
+      <button data-schedule-doctor="514ff136-ee45-4d49-89b5-d128d96aef62" class="bm-schedule-tab flex-1 py-3 text-sm font-semibold text-brand-600 border-b-2 border-brand-600">Karthik L</button>
+      <button data-schedule-doctor="d5372165-fc7e-47e8-aee6-ce02e7fefc71" class="bm-schedule-tab flex-1 py-3 text-sm font-semibold text-slate-500">Narayanan A</button>
+      <button data-schedule-doctor="519dbd89-d3d9-4ee9-8923-5fabbe51cf2e" class="bm-schedule-tab flex-1 py-3 text-sm font-semibold text-slate-500">Narayanan B</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5 space-y-8 pb-24">
+      <section class="bg-white p-5 rounded-2xl shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-4">Weekly Schedule</h3>
+        <div id="bm-weekly-schedule-rows" class="space-y-3"></div>
+        <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">
+          <select id="bm-new-block-day" class="px-3 py-2 border border-slate-300 rounded-lg text-sm">
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday">Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="saturday">Saturday</option>
+            <option value="sunday">Sunday</option>
+          </select>
+          <input type="time" id="bm-new-block-start" class="px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <input type="time" id="bm-new-block-end" class="px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <button id="bm-add-block" class="bg-brand-900 text-white text-sm font-semibold px-4 py-2 rounded-lg">Add</button>
+        </div>
+      </section>
+
+      <section class="bg-white p-5 rounded-2xl shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-4">Exceptions & Leave</h3>
+        <div id="bm-exceptions-list" class="space-y-2 mb-4"></div>
+        <div class="space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <input type="date" id="bm-exception-date" class="w-full p-2.5 border border-slate-300 rounded-lg text-sm" />
+          <div class="flex items-center gap-2">
+            <input type="time" id="bm-exception-start" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+            <span class="text-slate-400 text-sm">to</span>
+            <input type="time" id="bm-exception-end" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          </div>
+          <div class="flex items-center justify-between">
+            <label class="flex items-center gap-2 text-sm font-medium text-red-600">
+              <input type="checkbox" id="bm-exception-leave" class="w-4 h-4" />
+              Mark as full-day leave
+            </label>
+            <button id="bm-add-exception" class="px-4 py-2 bg-brand-900 text-white text-sm font-semibold rounded-lg">Add</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ================= AUDIT LOG OVERLAY ================= -->
+  <div id="bm-audit-overlay" class="hidden fixed inset-0 bg-slate-100 z-50 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-200 justify-between items-center bg-white shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900">Audit Log</h2>
+      <button id="bm-close-audit" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="bm-audit-list" class="flex-1 overflow-y-auto p-4 space-y-2">
+      <p class="text-slate-400 text-sm text-center py-10">Loading...</p>
+    </div>
+  </div>
+
+  <!-- ================= RECORD PAYMENT MODAL ================= -->
+  <div id="bm-payment-modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/50" id="bm-payment-backdrop"></div>
+    <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:left-1/2 md:right-auto md:w-[420px] md:-translate-x-1/2 md:-translate-y-1/2 bg-white rounded-t-3xl md:rounded-3xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+      <h3 class="text-lg font-bold text-slate-900 mb-1">Record Payment</h3>
+      <p id="bm-payment-patient-name" class="text-sm text-slate-500 mb-4"></p>
+
+      <!-- Only shown for standalone entries (pharmacy/lab walk-ins with -->
+      <!-- no appointment) -- reuses the same phone-lookup pattern as -->
+      <!-- the booking form. Hidden when opened from an appointment, -->
+      <!-- since the patient is already known there. -->
+      <div id="bm-payment-patient-picker" class="hidden mb-4 pb-4 border-b border-slate-100">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Patient Phone</label>
+        <input type="tel" id="bm-payment-patient-phone" placeholder="Phone number" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl mb-1" />
+        <p id="bm-payment-phone-lookup-status" class="text-xs min-h-[1rem] mb-2 px-1"></p>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Patient Name</label>
+        <input type="text" id="bm-payment-patient-name-input" placeholder="Full name" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+      </div>
+
+      <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Categories (select one or more)</label>
+      <div class="grid grid-cols-3 gap-2 mb-3">
+        <label class="cursor-pointer">
+          <input type="checkbox" data-category-checkbox="consultation" class="peer sr-only" checked />
+          <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Consultation</div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="checkbox" data-category-checkbox="pharmacy" class="peer sr-only" />
+          <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Pharmacy</div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="checkbox" data-category-checkbox="lab" class="peer sr-only" />
+          <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Lab</div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="checkbox" data-category-checkbox="vaccination" class="peer sr-only" />
+          <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Vaccination</div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="checkbox" data-category-checkbox="procedure" class="peer sr-only" />
+          <div class="peer-checked:bg-brand-900 peer-checked:text-white text-center py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold transition">Procedure</div>
+        </label>
+      </div>
+
+      <!-- One block per checked category, each with its own amount -->
+      <!-- (and, for consultation, the New/Review/Free tiles). All -->
+      <!-- three consultation tiles share identical markup/height so -->
+      <!-- they render consistently. -->
+      <div id="bm-payment-category-lines" class="space-y-4 mb-3"></div>
+
+      <div class="flex justify-between items-center py-2 mb-3 border-y border-slate-100">
+        <span class="text-sm font-bold text-slate-700">Total</span>
+        <span id="bm-payment-grand-total" class="text-lg font-extrabold text-slate-900">₹0</span>
+      </div>
+
+      <!-- Split payment rows -->
+      <div id="bm-payment-splits-section">
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Payment Mode</label>
+          <button id="bm-add-split-row" type="button" class="text-xs font-bold text-brand-600">+ Split Payment</button>
+        </div>
+        <div id="bm-payment-splits-rows" class="space-y-2 mb-2"></div>
+        <p id="bm-payment-splits-remainder" class="text-xs text-slate-400 mb-3"></p>
+      </div>
+
+      <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Notes (optional)</label>
+      <input type="text" id="bm-payment-notes" placeholder="e.g. Paracetamol + antiseptic cream" class="w-full px-4 py-3 border border-slate-300 rounded-xl mb-4" />
+      <div class="flex gap-2">
+        <button id="bm-payment-cancel" class="flex-1 bg-slate-100 text-slate-700 font-semibold py-3 rounded-xl">Cancel</button>
+        <button id="bm-payment-save" class="flex-1 bg-brand-900 text-white font-bold py-3 rounded-xl">Save</button>
+      </div>
+      <p id="bm-payment-error" class="text-red-500 text-xs text-center mt-2 min-h-[1rem]"></p>
+    </div>
+  </div>
+
+  <!-- ================= DAY CLOSE / CASH RECONCILIATION OVERLAY ================= -->
+  <div id="bm-dayclose-overlay" class="hidden fixed inset-0 bg-slate-100 z-50 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-200 justify-between items-center bg-white shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900">Day Close</h2>
+      <button id="bm-close-dayclose" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="bg-white border-b border-slate-200 px-4 py-3">
+      <input type="date" id="bm-dayclose-date" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm" />
+    </div>
+    <div class="flex-1 overflow-y-auto p-5 space-y-6 pb-24">
+      <section class="bg-white p-5 rounded-2xl shadow-sm">
+        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Totals by Mode</h3>
+        <div id="bm-dayclose-totals" class="space-y-2">
+          <p class="text-slate-400 text-sm">Loading...</p>
+        </div>
+      </section>
+
+      <section class="bg-white p-5 rounded-2xl shadow-sm">
+        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Itemized Payments</h3>
+        <div id="bm-dayclose-list" class="space-y-2">
+          <p class="text-slate-400 text-sm">Loading...</p>
+        </div>
+      </section>
+
+      <section class="bg-white p-5 rounded-2xl shadow-sm">
+        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Expenses</h3>
+        <div id="bm-expenses-list" class="space-y-2 mb-4">
+          <p class="text-slate-400 text-sm">Loading...</p>
+        </div>
+        <div class="flex flex-wrap gap-2 p-3 bg-slate-50 rounded-xl items-end">
+          <select id="bm-expense-category" class="px-3 py-2 border border-slate-300 rounded-lg text-sm">
+            <option value="bank_deposit">Bank Deposit</option>
+            <option value="handed_to_doctor">Handed to Doctor</option>
+            <option value="petty_expense">Petty Expense</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="number" id="bm-expense-amount" min="1" step="1" placeholder="Amount (₹)" class="w-32 px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <input type="text" id="bm-expense-notes" placeholder="Notes (optional)" class="flex-1 min-w-[120px] px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <button id="bm-add-expense" class="bg-brand-900 text-white text-sm font-semibold px-4 py-2 rounded-lg">Add</button>
+        </div>
+        <p id="bm-expense-error" class="text-red-500 text-xs mt-2 min-h-[1rem]"></p>
+      </section>
+
+      <section class="bg-white p-5 rounded-2xl shadow-sm">
+        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Cash Reconciliation</h3>
+
+        <!-- Previous day's closing, for the mismatch check -->
+        <div id="bm-prev-closing-notice" class="hidden text-xs mb-3 p-2.5 rounded-lg"></div>
+
+        <!-- Opening count -->
+        <div class="mb-5 pb-5 border-b border-slate-100">
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="text-xs font-bold text-slate-700">Opening Count (mandatory)</h4>
+            <span id="bm-opening-status" class="text-xs font-bold px-2 py-0.5 rounded-full"></span>
+          </div>
+          <div class="grid grid-cols-4 gap-2 mb-2">
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹50</label><input type="number" min="0" id="bm-open-50" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹100</label><input type="number" min="0" id="bm-open-100" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹200</label><input type="number" min="0" id="bm-open-200" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹500</label><input type="number" min="0" id="bm-open-500" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+          </div>
+          <div class="flex justify-between items-center">
+            <span id="bm-opening-total" class="text-sm font-bold text-slate-800">Total: ₹0</span>
+            <button id="bm-save-opening" class="bg-brand-900 text-white text-xs font-bold px-4 py-2 rounded-lg">Save Opening Count</button>
+          </div>
+        </div>
+
+        <!-- Mid-day recounts (optional, unlimited) -->
+        <div class="mb-5 pb-5 border-b border-slate-100">
+          <h4 class="text-xs font-bold text-slate-700 mb-2">Mid-Day Recount (optional, as many as needed)</h4>
+          <div class="grid grid-cols-4 gap-2 mb-2">
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹50</label><input type="number" min="0" id="bm-recount-50" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹100</label><input type="number" min="0" id="bm-recount-100" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹200</label><input type="number" min="0" id="bm-recount-200" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹500</label><input type="number" min="0" id="bm-recount-500" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+          </div>
+          <div class="flex justify-between items-center mb-3">
+            <span id="bm-recount-total" class="text-sm font-bold text-slate-800">Total: ₹0</span>
+            <button id="bm-save-recount" class="bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg">Log Recount</button>
+          </div>
+          <div id="bm-recounts-list" class="space-y-1"></div>
+        </div>
+
+        <!-- Closing count -->
+        <div>
+          <h4 class="text-xs font-bold text-slate-700 mb-2">Closing Count (mandatory)</h4>
+          <div class="grid grid-cols-4 gap-2 mb-2">
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹50</label><input type="number" min="0" id="bm-close-50" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹100</label><input type="number" min="0" id="bm-close-100" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹200</label><input type="number" min="0" id="bm-close-200" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+            <div><label class="text-[10px] font-bold text-slate-400 block mb-1">₹500</label><input type="number" min="0" id="bm-close-500" class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm" /></div>
+          </div>
+          <div class="flex justify-between items-center mb-3">
+            <span id="bm-closing-total" class="text-sm font-bold text-slate-800">Total: ₹0</span>
+            <button id="bm-save-closing" class="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-lg">Save Closing Count</button>
+          </div>
+          <div id="bm-reconciliation-result" class="hidden p-4 rounded-xl text-center font-bold"></div>
+        </div>
+        <p id="bm-cash-error" class="text-red-500 text-xs text-center mt-2 min-h-[1rem]"></p>
+      </section>
+    </div>
+  </div>
+
+  <!-- ================= PENDING REGISTRATIONS OVERLAY ================= -->
+  <div id="bm-registrations-overlay" class="hidden fixed inset-0 bg-slate-100 z-50 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-200 justify-between items-center bg-white shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900">Pending Registrations</h2>
+      <button id="bm-close-registrations" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="text-xs text-slate-400 px-5 py-3 bg-white border-b border-slate-100">Self-registrations from the public /register page. Approving creates a real patient record; if an existing patient already shares this phone number, approving updates that record instead of creating a duplicate.</p>
+    <div id="bm-registrations-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <p class="text-slate-400 text-sm text-center py-10">Loading...</p>
+    </div>
+  </div>
+
+  <!-- ================= PATIENT DETAIL OVERLAY (Profile + History) ================= -->
+  <div id="bm-patient-overlay" class="hidden fixed inset-0 bg-slate-100 z-50 flex-col">
+    <div class="flex px-5 py-4 border-b border-slate-200 justify-between items-center bg-white shadow-sm">
+      <h2 id="bm-patient-overlay-name" class="text-lg font-bold text-slate-900">Patient</h2>
+      <button id="bm-close-patient" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="flex bg-white border-b border-slate-200">
+      <button data-patient-tab="profile" class="bm-patient-tab flex-1 py-3 text-sm font-semibold text-brand-600 border-b-2 border-brand-600">Profile</button>
+      <button data-patient-tab="history" class="bm-patient-tab flex-1 py-3 text-sm font-semibold text-slate-500">Visit History</button>
+    </div>
+
+    <!-- Profile tab -->
+    <div id="bm-patient-tab-profile" class="flex-1 overflow-y-auto p-5 space-y-4">
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Full Name</label>
+        <input type="text" id="bm-profile-name" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Phone</label>
+        <input type="tel" id="bm-profile-phone" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Date of Birth</label>
+        <input type="date" id="bm-profile-dob" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+        <p id="bm-profile-age" class="text-xs text-slate-400 mt-1"></p>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Gender</label>
+        <select id="bm-profile-gender" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl">
+          <option value="">Not specified</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Email</label>
+        <input type="email" id="bm-profile-email" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Address</label>
+        <textarea id="bm-profile-address" rows="3" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl"></textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Area</label>
+          <input type="text" id="bm-profile-area" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Pincode</label>
+          <input type="text" id="bm-profile-pincode" inputmode="numeric" maxlength="6" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">City</label>
+          <input type="text" id="bm-profile-city" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">State</label>
+          <input type="text" id="bm-profile-state" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">Occupation</label>
+        <input type="text" id="bm-profile-occupation" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl" />
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">How they heard about us</label>
+        <select id="bm-profile-referral-source" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl">
+          <option value="">Not specified</option>
+          <option value="Friend/Family Referral">Friend/Family Referral</option>
+          <option value="Doctor Referral">Doctor Referral</option>
+          <option value="Google Search">Google Search</option>
+          <option value="Social Media">Social Media</option>
+          <option value="Practo">Practo</option>
+          <option value="Walk-in">Walk-in</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="text" id="bm-profile-referral-other" placeholder="Please specify" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl mt-2 hidden" />
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 block">UHID</label>
+        <input type="text" id="bm-profile-uhid" disabled class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-400" />
+        <p class="text-xs text-slate-400 mt-1">Assigned during patient registration -- not editable here.</p>
+      </div>
+      <button id="bm-save-profile" class="w-full bg-brand-900 text-white font-bold py-3 rounded-xl shadow-lg transition active:scale-[0.98]">
+        Save Profile
+      </button>
+      <p id="bm-profile-save-msg" class="text-sm text-center min-h-[1.25rem]"></p>
+    </div>
+
+    <!-- History tab -->
+    <div id="bm-patient-tab-history" class="hidden flex-1 overflow-y-auto p-5 space-y-2">
+      <p class="text-slate-400 text-sm text-center py-10">Loading...</p>
+    </div>
+  </div>
+
+</div>
+</AppLayout>
+
+<script define:vars={{ supabaseUrl: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_URL, supabaseAnonKey: import.meta.env.PUBLIC_APPOINTMENT_MANAGER_SUPABASE_ANON_KEY }}>
+  window.__BM_SUPABASE_URL__ = supabaseUrl;
+  window.__BM_SUPABASE_ANON_KEY__ = supabaseAnonKey;
+</script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script is:inline src="/scripts/bookings-manager.js"></script>
+<script is:inline>
+  // Register the service worker so Chrome/Edge offer the install
+  // prompt. Scoped to /bookings-manager only -- this does not affect
+  // any other page on the site.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/bookings-manager-sw.js', { scope: '/bookings-manager' })
+        .catch((err) => console.error('Service worker registration failed:', err));
+    });
+  }
+</script>

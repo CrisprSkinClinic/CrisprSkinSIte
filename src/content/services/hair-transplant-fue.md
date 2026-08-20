@@ -1,6 +1,6 @@
 ---
-title: "Hair Transplant (FUE)"
-metaDescription: "Advanced FUE hair transplant by an AIIMS-trained hair transplant surgeon in KK Nagar, Chennai. Natural results, no linear scar, evidence-based candidacy evaluation."
+title: "Hair Transplant in Chennai (FUE) | KK Nagar"
+metaDescription: "FUE hair transplant in KK Nagar, Chennai by an AIIMS-trained surgeon. Natural results, no linear scar. Honest candidacy evaluation. Book consultation."
 heroEyebrow: "Surgical Hair Restoration"
 heroHeadline: "Advanced FUE Hair Transplant"
 heroSubheadline: "Natural, permanent hair restoration through Follicular Unit Extraction, performed by a dedicated hair transplant surgeon."

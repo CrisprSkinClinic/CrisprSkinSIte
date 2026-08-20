@@ -69,11 +69,22 @@ exports.handler = async (event) => {
   try {
     switch (action) {
       case "list_appointments": {
-        const { data: rows, error } = await supabase
+        // appointments has no first_name/last_name/service_type columns of
+        // its own -- patient name/phone live on the patients table
+        // (joined via patient_id), and the service booked is stored as
+        // part of the free-text `notes` field (see public-book-appointment.js,
+        // which writes "<service> | Email: ... | Booked via website
+        // self-service" into notes at booking time) rather than a
+        // dedicated column.
+        let query = supabase
           .from("appointments")
-          .select("*")
-          .order("appointment_date", { ascending: true })
-          .order("appointment_time", { ascending: true });
+          .select("*, patients(name, phone), doctors(name)")
+          .order("slot_date", { ascending: true })
+          .order("slot_time", { ascending: true });
+        if (data && data.doctor_id) {
+          query = query.eq("doctor_id", data.doctor_id);
+        }
+        const { data: rows, error } = await query;
         if (error) throw error;
         return ok({ appointments: rows });
       }
@@ -87,24 +98,39 @@ exports.handler = async (event) => {
         return ok({ success: true });
       }
 
-      // ---- Schedule sessions (replaces old per-slot weekly_schedule) ----
+      // ---- Weekly schedule (slot_templates) ----
+      // Renamed from the previous schedule_sessions/start_time/end_time
+      // naming, which never matched the actual AppointmentManager schema
+      // (verified directly via SQL against the live database -- the real
+      // table is slot_templates, with session_start/session_end columns,
+      // scoped per doctor_id since this clinic has three doctors rather
+      // than the single-doctor eye clinic this admin panel was originally
+      // built for).
 
       case "list_schedule_sessions": {
-        const { data: rows, error } = await supabase
-          .from("schedule_sessions")
+        let query = supabase
+          .from("slot_templates")
           .select("*")
           .order("day_of_week", { ascending: true })
-          .order("start_time", { ascending: true });
+          .order("session_start", { ascending: true });
+        if (data && data.doctor_id) {
+          query = query.eq("doctor_id", data.doctor_id);
+        }
+        const { data: rows, error } = await query;
         if (error) throw error;
         return ok({ sessions: rows });
       }
 
       case "add_schedule_session": {
-        const { error } = await supabase.from("schedule_sessions").insert({
+        if (!data.doctor_id) {
+          return { statusCode: 400, body: JSON.stringify({ error: "doctor_id is required to add a schedule session." }) };
+        }
+        const { error } = await supabase.from("slot_templates").insert({
+          doctor_id: data.doctor_id,
           day_of_week: data.day_of_week,
-          start_time: data.start_time,
-          end_time: data.end_time,
-          slot_duration_minutes: data.slot_duration_minutes,
+          session_start: data.start_time,
+          session_end: data.end_time,
+          max_per_slot: data.max_per_slot || 1,
           is_active: true,
         });
         if (error) throw error;
@@ -113,7 +139,7 @@ exports.handler = async (event) => {
 
       case "toggle_schedule_session": {
         const { error } = await supabase
-          .from("schedule_sessions")
+          .from("slot_templates")
           .update({ is_active: data.is_active })
           .eq("id", data.id);
         if (error) throw error;
@@ -121,57 +147,88 @@ exports.handler = async (event) => {
       }
 
       case "delete_schedule_session": {
-        const { error } = await supabase.from("schedule_sessions").delete().eq("id", data.id);
+        const { error } = await supabase.from("slot_templates").delete().eq("id", data.id);
         if (error) throw error;
         return ok({ success: true });
       }
 
-      // ---- Blocked dates ----
+      // ---- Schedule overrides (leave days, blocked slots, modified hours) ----
+      // The real AppointmentManager schema uses one schedule_overrides
+      // table with an override_type column ('leave' | 'blocked_slot' |
+      // 'modified'), not the separate blocked_dates/blocked_slots tables
+      // this function previously assumed -- those tables never actually
+      // existed in the live database. Verified directly via SQL against
+      // the live schema before writing this.
 
       case "list_blocked_dates": {
-        const { data: rows, error } = await supabase
-          .from("blocked_dates")
+        let query = supabase
+          .from("schedule_overrides")
           .select("*")
-          .order("blocked_date", { ascending: true });
+          .eq("override_type", "leave")
+          .order("override_date", { ascending: true });
+        if (data && data.doctor_id) {
+          query = query.eq("doctor_id", data.doctor_id);
+        }
+        const { data: rows, error } = await query;
         if (error) throw error;
         return ok({ blockedDates: rows });
       }
 
       case "add_blocked_date": {
+        if (!data.doctor_id) {
+          return { statusCode: 400, body: JSON.stringify({ error: "doctor_id is required to block a date." }) };
+        }
         const { error } = await supabase
-          .from("blocked_dates")
-          .insert({ blocked_date: data.blocked_date, reason: data.reason || null });
+          .from("schedule_overrides")
+          .insert({
+            doctor_id: data.doctor_id,
+            override_date: data.blocked_date,
+            override_type: "leave",
+            reason: data.reason || null,
+          });
         if (error) throw error;
         return ok({ success: true });
       }
 
       case "remove_blocked_date": {
-        const { error } = await supabase.from("blocked_dates").delete().eq("id", data.id);
+        const { error } = await supabase.from("schedule_overrides").delete().eq("id", data.id);
         if (error) throw error;
         return ok({ success: true });
       }
 
-      // ---- Blocked slots ----
-
       case "list_blocked_slots": {
-        const { data: rows, error } = await supabase
-          .from("blocked_slots")
+        let query = supabase
+          .from("schedule_overrides")
           .select("*")
-          .order("blocked_date", { ascending: true });
+          .eq("override_type", "blocked_slot")
+          .order("override_date", { ascending: true });
+        if (data && data.doctor_id) {
+          query = query.eq("doctor_id", data.doctor_id);
+        }
+        const { data: rows, error } = await query;
         if (error) throw error;
         return ok({ blockedSlots: rows });
       }
 
       case "add_blocked_slot": {
+        if (!data.doctor_id) {
+          return { statusCode: 400, body: JSON.stringify({ error: "doctor_id is required to block a slot." }) };
+        }
         const { error } = await supabase
-          .from("blocked_slots")
-          .insert({ blocked_date: data.blocked_date, time_slot: data.time_slot, reason: data.reason || null });
+          .from("schedule_overrides")
+          .insert({
+            doctor_id: data.doctor_id,
+            override_date: data.blocked_date,
+            override_type: "blocked_slot",
+            blocked_slot: data.time_slot,
+            reason: data.reason || null,
+          });
         if (error) throw error;
         return ok({ success: true });
       }
 
       case "remove_blocked_slot": {
-        const { error } = await supabase.from("blocked_slots").delete().eq("id", data.id);
+        const { error } = await supabase.from("schedule_overrides").delete().eq("id", data.id);
         if (error) throw error;
         return ok({ success: true });
       }

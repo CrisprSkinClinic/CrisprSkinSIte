@@ -1,6 +1,6 @@
 ---
-title: "Pigmentation Treatment"
-metaDescription: "Pigmentation treatment in KK Nagar, Chennai. Dermatologist-guided care for dark spots, uneven tone, and post-inflammatory pigmentation."
+title: "Pigmentation Treatment in Chennai | KK Nagar"
+metaDescription: "Pigmentation & dark spot treatment in KK Nagar, Chennai. Melasma, PIH, uneven tone. Dermatologist-guided care. Book evaluation."
 heroEyebrow: "Clinical Dermatology"
 heroHeadline: "Pigmentation Treatment"
 heroSubheadline: "Identifying the specific type and cause of your pigmentation is the first step to treating it effectively."
