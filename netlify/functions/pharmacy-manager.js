@@ -55,6 +55,22 @@ exports.handler = async (event) => {
       case "whoami":
         return await pharmacy.whoami(profile);
 
+      // ---- Patient search (new — closes the gap where checkout had
+      // no way to find an existing patient and silently created a
+      // duplicate `patients` row on every sale). Forwards the
+      // caller's OWN accessToken (not the service-role key) to the
+      // `patients` edge function, which requires a real staff JWT. ----
+      case "search_patients":
+        return await pharmacy.searchPatients(accessToken, data);
+      case "get_patient_by_id":
+        return await pharmacy.getPatientById(accessToken, data);
+
+      // ---- Prescription-linked dispense queue (new "Rx Queue" tab) ----
+      case "get_dispense_queue":
+        return await pharmacy.getDispenseQueue(supabase);
+      case "get_prescription_for_dispense":
+        return await pharmacy.getPrescriptionForDispense(supabase, data);
+
       // ---- Suppliers ----
       case "list_suppliers":
         return await pharmacy.listSuppliers(supabase);
@@ -90,6 +106,12 @@ exports.handler = async (event) => {
       // ---- Inventory views ----
       case "get_inventory":
         return await pharmacy.getInventory(supabase);
+      case "quick_add_stock": {
+        const result = await pharmacy.quickAddStock(supabase, data, profile);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_QUICK_STOCK_ADD", `Quick-added stock for medicine ${data?.medicineId || ""}: qty ${data?.quantityReceived || ""}`);
+        return result;
+      }
       case "get_low_stock":
         return await pharmacy.getLowStock(supabase);
       case "get_expiring_batches":
@@ -112,6 +134,20 @@ exports.handler = async (event) => {
       }
       case "list_purchase_orders":
         return await pharmacy.listPurchaseOrders(supabase, data);
+      case "record_po_payment": {
+        const result = await pharmacy.recordPoPayment(supabase, data, profile);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_PO_PAYMENT", `Recorded payment of ${data?.amount || ""} against PO ${data?.poId || ""}`);
+        return result;
+      }
+      case "get_supplier_outstanding_pos":
+        return await pharmacy.getSupplierOutstandingPOs(supabase, data);
+      case "bulk_mark_pos_paid": {
+        const result = await pharmacy.bulkMarkPosPaid(supabase, data, profile);
+        if (result.statusCode && result.statusCode !== 200) return result;
+        await logAudit("PHARMACY_PO_BULK_PAYMENT", `Bulk payment run against ${data?.purchaseOrders?.length || 0} PO(s)`);
+        return result;
+      }
 
       // ---- Sale / void / partial return ----
       case "execute_pharmacy_sale": {
