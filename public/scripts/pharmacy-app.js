@@ -18,7 +18,9 @@ const phState = {
   session: null,
   profile: null,
   cart: [],
-  selectedMedicine: null,
+  // null = walk-in guest; { id, name, phone, uhid } once a registered
+  // patient is searched/selected in Checkout (see phSelectPatientByIndex).
+  selectedPatient: null,
   recentSales: [],
 };
 
@@ -292,9 +294,11 @@ function switchPhTab(tab) {
     el.classList.toggle('hover:bg-champagne-50', !active);
   });
   if (tab === 'checkout') loadPhCheckoutStats();
+  if (tab === 'rxqueue') loadPhDispenseQueue();
   if (tab === 'inventory') { loadPhInventoryStats(); loadPhInventory('all'); }
   if (tab === 'purchasing') { loadPhPoStats(); loadPhPurchaseOrders(); }
   if (tab === 'reconcile') switchPhRecView('invoices');
+  if (tab === 'reports') loadPhReports();
   closeMobileSidebar();
 }
 document.querySelectorAll('.ph-tab-btn').forEach((btn) => {
@@ -346,6 +350,18 @@ async function refreshPhBadges() {
       badge.classList.add('hidden');
     }
   } catch { /* non-critical */ }
+
+  try {
+    const { queue } = await window.phCallFunction('get_dispense_queue');
+    const pending = (queue || []).filter((q) => !q.dispense_status || q.dispense_status !== 'dispensed');
+    const badge = document.getElementById('ph-badge-rxqueue');
+    if (pending.length > 0) {
+      badge.textContent = pending.length;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  } catch { /* non-critical */ }
 }
 
 // ---- Helpers ----
@@ -381,7 +397,70 @@ async function loadPhCheckoutStats() {
   } catch { /* stats are supplementary */ }
 }
 
+// ==========================================================
+// PATIENT SEARCH + FIFO CART (rebuilt to match ClinicOS's PosPage.jsx
+// / fifoAllocation.js / MedicineSearch.jsx behavior — see build notes
+// at the bottom of this file for what changed and why)
+// ==========================================================
+
+// Ported verbatim from ClinicOS's src/lib/fifoAllocation.js: walks
+// FIFO-ordered batches, consuming from each until requestedQty is
+// covered or stock runs out. One allocation entry PER BATCH USED.
+function phAllocateFifo(requestedQty, batches) {
+  let remaining = requestedQty;
+  const allocations = [];
+  for (const batch of batches) {
+    if (remaining <= 0) break;
+    const take = Math.min(remaining, batch.available);
+    if (take <= 0) continue;
+    allocations.push({
+      batch_id: batch.batch_id,
+      batch_number: batch.batch_number,
+      expiry_date: batch.expiry_date,
+      quantity: take,
+      unit_price: batch.unit_price,
+      line_total: take * batch.unit_price,
+    });
+    remaining -= take;
+  }
+  return allocations;
+}
+
+// Ported from the same file: allocates entirely from ONE specific
+// batch (pharmacist override), capped at what's actually available.
+function phAllocateFromSingleBatch(requestedQty, batch) {
+  const take = Math.min(requestedQty, batch.available);
+  if (take <= 0) return [];
+  return [{
+    batch_id: batch.batch_id,
+    batch_number: batch.batch_number,
+    expiry_date: batch.expiry_date,
+    quantity: take,
+    unit_price: batch.unit_price,
+    line_total: take * batch.unit_price,
+  }];
+}
+
+function phTotalAvailable(batches) {
+  return batches.reduce((sum, b) => sum + (b.available || 0), 0);
+}
+
+function phIsScheduleH(drugSchedule) {
+  const s = (drugSchedule || '').trim().toUpperCase();
+  return s === 'H' || s === 'H1';
+}
+
+// phState.cart items now carry: { key, medicineId, medicineName,
+// gstPercent, drugSchedule, quantity, batches, overrideBatchId,
+// allocation, prescriptionItemId }
+
+// ---- Medicine search (uses get_medicines_with_wac, which already
+// includes drug_schedule/total_stock/reorder_level — this is the
+// closest existing backend action to ClinicOS's `medicine_stock` view
+// used by MedicineSearch.jsx, so no new RPC was needed here) ----
 let phMedSearchTimeout = null;
+let phMedCache = null;
+
 document.getElementById('ph-med-search').addEventListener('input', (e) => {
   clearTimeout(phMedSearchTimeout);
   const query = e.target.value.trim().toLowerCase();
@@ -393,18 +472,32 @@ document.getElementById('ph-med-search').addEventListener('input', (e) => {
   }
   phMedSearchTimeout = setTimeout(async () => {
     try {
-      const { medicines } = await window.phCallFunction('list_medicines');
-      const matches = medicines.filter((m) => m.name.toLowerCase().includes(query)).slice(0, 8);
+      if (!phMedCache) {
+        const { medicines } = await window.phCallFunction('get_medicines_with_wac');
+        phMedCache = medicines || [];
+      }
+      const matches = phMedCache
+        .filter((m) => m.name.toLowerCase().includes(query))
+        .slice(0, 8);
       if (matches.length === 0) {
         resultsEl.innerHTML = `<div class="p-4 text-sm text-charcoal/40 text-center">No matching medicines.</div>`;
         resultsEl.classList.remove('hidden');
         return;
       }
-      resultsEl.innerHTML = matches.map((m) => `
-        <button class="w-full text-left px-4 py-3 hover:bg-champagne-50 transition" onclick="window.phSelectMedicine('${m.id}', '${escapePhAttr(m.name)}', ${m.gst_percent || 0})">
-          <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(m.name)}</p>
+      resultsEl.innerHTML = matches.map((m) => {
+        const stockLabel = m.total_stock > 0
+          ? `${m.total_stock} ${m.unit || ''} in stock`
+          : `<span class="text-red-600 font-semibold">Out of stock</span>`;
+        return `
+        <button class="w-full text-left px-4 py-3 hover:bg-champagne-50 transition" onclick="window.phAddMedicineToCart('${m.medicine_id}')">
+          <div class="flex items-center gap-2 flex-wrap">
+            <p class="font-semibold text-brand-900 text-sm">${escapePhHtml(m.name)}</p>
+            ${phIsScheduleH(m.drug_schedule) ? `<span class="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-50 text-red-700">Sch. ${escapePhHtml(m.drug_schedule)}</span>` : ''}
+          </div>
           <p class="text-xs text-charcoal/50">${escapePhHtml(m.category || '')}</p>
-        </button>`).join('');
+          <p class="text-xs text-charcoal/40 mt-0.5">${stockLabel}${m.front_expiry_date ? ` &middot; Exp ${m.front_expiry_date}` : ''}</p>
+        </button>`;
+      }).join('');
       resultsEl.classList.remove('hidden');
     } catch (err) {
       resultsEl.innerHTML = `<div class="p-4 text-sm text-red-600">${escapePhHtml(err.message)}</div>`;
@@ -413,65 +506,163 @@ document.getElementById('ph-med-search').addEventListener('input', (e) => {
   }, 300);
 });
 
-window.phSelectMedicine = async function (medicineId, medicineName, gstPercent = 0) {
+// Adds a medicine straight to cart at qty 1 with FIFO auto-allocation
+// (matching ClinicOS's PosPage.addToCart) — quantity/batch override
+// happen afterward in the cart itself, not in a pre-add form.
+window.phAddMedicineToCart = async function (medicineId) {
   document.getElementById('ph-med-results').classList.add('hidden');
-  document.getElementById('ph-med-search').value = medicineName;
-  const selectedEl = document.getElementById('ph-med-selected');
-  const batchesEl = document.getElementById('ph-med-batches');
-  selectedEl.classList.remove('hidden');
-  document.getElementById('ph-med-selected-name').textContent = medicineName;
-  batchesEl.innerHTML = `<p class="text-xs text-charcoal/40">Loading batches...</p>`;
+  document.getElementById('ph-med-search').value = '';
+
+  const med = (phMedCache || []).find((m) => m.medicine_id === medicineId);
+  if (!med) return;
 
   try {
-    const qty = parseInt(document.getElementById('ph-med-qty').value, 10) || 1;
-    const { batches } = await window.phCallFunction('get_fifo_batches', { medicineId, quantity: qty });
-    if (!batches || batches.length === 0) {
-      batchesEl.innerHTML = `<p class="text-xs text-red-600 font-medium">No stock available for this medicine.</p>`;
-      phState.selectedMedicine = { id: medicineId, name: medicineName, gstPercent, batches: [] };
-      return;
-    }
-    phState.selectedMedicine = { id: medicineId, name: medicineName, gstPercent, batches };
-    batchesEl.innerHTML = batches.map((b) => {
-      const gstAmount = b.unit_price * b.to_dispense * (gstPercent / 100);
-      return `
-      <p class="text-xs text-charcoal/60">Batch <span class="font-semibold text-charcoal/80">${escapePhHtml(b.batch_number)}</span> — ${b.to_dispense} unit(s) @ ${formatRupees(b.unit_price)}${gstPercent > 0 ? ` <span class="text-charcoal/40">+ ${gstPercent}% GST (${formatRupees(gstAmount)})</span>` : ''} <span class="text-charcoal/40">(exp ${b.expiry_date})</span></p>
-    `;
-    }).join('');
+    const { batches } = await window.phCallFunction('get_fifo_batches', { medicineId, quantity: 1 });
+    const key = `${medicineId}-${Date.now()}`;
+    const allocation = phAllocateFifo(1, batches || []);
+    phState.cart.push({
+      key,
+      medicineId,
+      medicineName: med.name,
+      gstPercent: med.gst_percent || 0,
+      drugSchedule: med.drug_schedule || '',
+      quantity: 1,
+      batches: batches || [],
+      overrideBatchId: null,
+      allocation,
+      prescriptionItemId: null,
+    });
+    renderPhCart();
+    loadPhCheckoutStats();
   } catch (err) {
-    batchesEl.innerHTML = `<p class="text-xs text-red-600">${escapePhHtml(err.message)}</p>`;
+    showPhToast(err.message, 'error');
   }
 };
 
-document.getElementById('ph-med-qty').addEventListener('change', () => {
-  if (phState.selectedMedicine) {
-    window.phSelectMedicine(phState.selectedMedicine.id, phState.selectedMedicine.name, phState.selectedMedicine.gstPercent);
-  }
-});
-
-document.getElementById('ph-add-to-cart-btn').addEventListener('click', () => {
-  const med = phState.selectedMedicine;
-  if (!med || !med.batches || med.batches.length === 0) return;
-  const qty = parseInt(document.getElementById('ph-med-qty').value, 10) || 1;
-
-  med.batches.forEach((b) => {
-    phState.cart.push({
-      medicineId: med.id,
-      medicineName: med.name,
-      batchId: b.batch_id,
-      batchNumber: b.batch_number,
-      quantity: b.to_dispense,
-      unitPrice: b.unit_price,
-      gstPercent: med.gstPercent || 0,
-    });
-  });
-
-  document.getElementById('ph-med-selected').classList.add('hidden');
-  document.getElementById('ph-med-search').value = '';
-  document.getElementById('ph-med-qty').value = 1;
-  phState.selectedMedicine = null;
+window.phUpdateCartQty = function (key, newQty) {
+  const qty = Math.max(1, parseInt(newQty, 10) || 1);
+  const item = phState.cart.find((i) => i.key === key);
+  if (!item) return;
+  item.quantity = qty;
+  item.allocation = item.overrideBatchId
+    ? phAllocateFromSingleBatch(qty, item.batches.find((b) => b.batch_id === item.overrideBatchId) || {})
+    : phAllocateFifo(qty, item.batches);
   renderPhCart();
   loadPhCheckoutStats();
+};
+
+window.phUpdateCartBatchOverride = function (key, batchId) {
+  const item = phState.cart.find((i) => i.key === key);
+  if (!item) return;
+  if (!batchId) {
+    item.overrideBatchId = null;
+    item.allocation = phAllocateFifo(item.quantity, item.batches);
+  } else {
+    const batch = item.batches.find((b) => b.batch_id === batchId);
+    item.overrideBatchId = batchId;
+    item.allocation = batch ? phAllocateFromSingleBatch(item.quantity, batch) : [];
+  }
+  renderPhCart();
+};
+
+window.phRemoveFromCart = function (key) {
+  phState.cart = phState.cart.filter((i) => i.key !== key);
+  renderPhCart();
+  loadPhCheckoutStats();
+};
+
+function phClearCart() {
+  phState.cart = [];
+  phState.selectedPatient = null;
+  document.getElementById('ph-cart-patient-name').value = '';
+  document.getElementById('ph-cart-patient-phone').value = '';
+  renderPhPatientPanel();
+  renderPhCart();
+  loadPhCheckoutStats();
+}
+
+// ---- Patient search (NEW — closes the gap where checkout had no way
+// to find an existing patient and every sale silently created a
+// duplicate `patients` row). Calls the new search_patients action,
+// which forwards the pharmacist's own access token to the `patients`
+// Supabase Edge Function. ----
+let phPatientSearchTimeout = null;
+document.getElementById('ph-cart-patient-name').addEventListener('input', (e) => {
+  if (phState.selectedPatient) return; // typing while a patient is already selected does nothing — clear first
+  clearTimeout(phPatientSearchTimeout);
+  const query = e.target.value.trim();
+  const resultsEl = document.getElementById('ph-patient-results');
+  if (!resultsEl) return;
+  if (query.length < 2) {
+    resultsEl.classList.add('hidden');
+    resultsEl.innerHTML = '';
+    return;
+  }
+  phPatientSearchTimeout = setTimeout(async () => {
+    try {
+      const { patients } = await window.phCallFunction('search_patients', { query });
+      if (!patients || patients.length === 0) {
+        phPatientSearchResults = [];
+        resultsEl.innerHTML = `<div class="p-3 text-xs text-charcoal/40 text-center">No matching registered patients — this will be saved as a new walk-in.</div>`;
+        resultsEl.classList.remove('hidden');
+        return;
+      }
+      // Stash full results in a JS array and look up by index in the
+      // click handler, rather than serializing the object into the
+      // onclick attribute — matches this file's existing convention
+      // of passing primitive args to window.* handlers, and avoids
+      // any HTML-attribute-escaping edge case with a name/phone value.
+      phPatientSearchResults = patients;
+      resultsEl.innerHTML = patients.map((p, idx) => `
+        <button class="w-full text-left px-3 py-2 hover:bg-champagne-50 transition text-sm" onclick="window.phSelectPatientByIndex(${idx})">
+          <span class="font-semibold text-brand-900">${escapePhHtml(p.name)}</span>
+          <span class="text-charcoal/40"> &middot; ${escapePhHtml(p.phone || '—')}${p.uhid ? ' &middot; ' + escapePhHtml(p.uhid) : ''}</span>
+        </button>`).join('');
+      resultsEl.classList.remove('hidden');
+    } catch (err) {
+      resultsEl.innerHTML = `<div class="p-3 text-xs text-red-600">${escapePhHtml(err.message)}</div>`;
+      resultsEl.classList.remove('hidden');
+    }
+  }, 300);
 });
+
+let phPatientSearchResults = [];
+window.phSelectPatientByIndex = function (idx) {
+  const patient = phPatientSearchResults[idx];
+  if (!patient) return;
+  phState.selectedPatient = patient;
+  document.getElementById('ph-patient-results').classList.add('hidden');
+  document.getElementById('ph-patient-results').innerHTML = '';
+  renderPhPatientPanel();
+};
+
+window.phClearSelectedPatient = function () {
+  phState.selectedPatient = null;
+  document.getElementById('ph-cart-patient-name').value = '';
+  renderPhPatientPanel();
+};
+
+function renderPhPatientPanel() {
+  const chipEl = document.getElementById('ph-patient-selected-chip');
+  const nameInput = document.getElementById('ph-cart-patient-name');
+  const phoneInput = document.getElementById('ph-cart-patient-phone');
+  if (!chipEl) return;
+  if (phState.selectedPatient) {
+    chipEl.classList.remove('hidden');
+    chipEl.innerHTML = `
+      <span class="text-sm text-brand-700 font-semibold">${escapePhHtml(phState.selectedPatient.name)}${phState.selectedPatient.uhid ? ' &middot; ' + escapePhHtml(phState.selectedPatient.uhid) : ''}</span>
+      <button onclick="window.phClearSelectedPatient()" class="text-brand-400 hover:text-brand-700" aria-label="Clear patient">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>`;
+    nameInput.classList.add('hidden');
+    phoneInput.classList.add('hidden');
+  } else {
+    chipEl.classList.add('hidden');
+    chipEl.innerHTML = '';
+    nameInput.classList.remove('hidden');
+    phoneInput.classList.remove('hidden');
+  }
+}
 
 function renderPhCart() {
   const listEl = document.getElementById('ph-cart-list');
@@ -479,110 +670,171 @@ function renderPhCart() {
   const checkoutBtn = document.getElementById('ph-checkout-btn');
   const subtotalRow = document.getElementById('ph-cart-subtotal-row');
   const gstRow = document.getElementById('ph-cart-gst-row');
+  const scheduleWarnEl = document.getElementById('ph-cart-schedule-h-warning');
 
   if (phState.cart.length === 0) {
     listEl.innerHTML = `<p id="ph-cart-empty" class="text-charcoal/30 text-sm text-center py-8">No items added yet.</p>`;
     totalEl.textContent = formatRupees(0);
     subtotalRow.classList.add('hidden');
-    subtotalRow.classList.remove('flex');
     gstRow.classList.add('hidden');
-    gstRow.classList.remove('flex');
+    if (scheduleWarnEl) scheduleWarnEl.classList.add('hidden');
     checkoutBtn.disabled = true;
     return;
   }
 
-  const subtotal = phState.cart.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-  const gstTotal = phState.cart.reduce((sum, item) => sum + item.quantity * item.unitPrice * ((item.gstPercent || 0) / 100), 0);
+  // Schedule H/H1 gate — ported from ClinicOS PosPage.jsx's
+  // scheduleHBlocked: any cart item on Schedule H/H1 requires an
+  // identified (searched/selected) patient, not a walk-in guest.
+  const scheduleHBlocked = phState.cart.some((item) => phIsScheduleH(item.drugSchedule) && !phState.selectedPatient);
+  if (scheduleWarnEl) {
+    scheduleWarnEl.classList.toggle('hidden', !scheduleHBlocked);
+  }
+
+  const lineTotal = (item) => (item.allocation || []).reduce((s, a) => s + a.line_total, 0);
+  const subtotal = phState.cart.reduce((sum, item) => sum + lineTotal(item), 0);
+  const gstTotal = phState.cart.reduce((sum, item) => sum + lineTotal(item) * ((item.gstPercent || 0) / 100), 0);
   const grandTotal = subtotal + gstTotal;
 
-  listEl.innerHTML = phState.cart.map((item, idx) => {
-    const lineBase = item.quantity * item.unitPrice;
-    const lineGst = lineBase * ((item.gstPercent || 0) / 100);
+  listEl.innerHTML = phState.cart.map((item) => {
+    const available = phTotalAvailable(item.batches);
+    const allocatedQty = (item.allocation || []).reduce((s, a) => s + a.quantity, 0);
+    const isShort = allocatedQty < item.quantity;
+    const isScheduleH = phIsScheduleH(item.drugSchedule);
+    const spansMultiple = (item.allocation || []).length > 1;
+    const lt = lineTotal(item);
+    const gstAmt = lt * ((item.gstPercent || 0) / 100);
+
+    const batchOptions = item.batches.length > 1 ? `
+      <select class="text-xs border border-champagne-300 rounded-lg px-2 py-1.5 flex-1" onchange="window.phUpdateCartBatchOverride('${item.key}', this.value || null)">
+        <option value="">Auto (FIFO — oldest first)</option>
+        ${item.batches.map((b) => `<option value="${b.batch_id}" ${item.overrideBatchId === b.batch_id ? 'selected' : ''}>${escapePhHtml(b.batch_number)} &middot; Exp ${b.expiry_date} &middot; ${b.available} avail</option>`).join('')}
+      </select>` : '';
+
     return `
-    <div class="flex items-center justify-between bg-champagne-50 rounded-lg px-3 py-2.5">
-      <div>
-        <p class="text-sm font-semibold text-brand-900">${escapePhHtml(item.medicineName)}</p>
-        <p class="text-xs text-charcoal/50">Batch ${escapePhHtml(item.batchNumber)} &middot; ${item.quantity} &times; ${formatRupees(item.unitPrice)}${item.gstPercent > 0 ? ` &middot; GST ${item.gstPercent}%` : ''}</p>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="text-sm font-bold text-brand-900 tabular-nums">${formatRupees(lineBase + lineGst)}</span>
-        <button onclick="window.phRemoveFromCart(${idx})" class="text-charcoal/30 hover:text-red-600 transition" aria-label="Remove">
+    <div class="bg-champagne-50 rounded-lg px-3 py-2.5">
+      <div class="flex items-start justify-between gap-2 mb-1.5">
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <p class="text-sm font-semibold text-brand-900">${escapePhHtml(item.medicineName)}</p>
+            ${isScheduleH ? `<span class="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-50 text-red-700">Schedule ${escapePhHtml(item.drugSchedule)} — needs patient</span>` : ''}
+          </div>
+        </div>
+        <button onclick="window.phRemoveFromCart('${item.key}')" class="text-charcoal/30 hover:text-red-600 transition shrink-0" aria-label="Remove">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
+      </div>
+      <div class="flex items-center gap-2 mb-1.5">
+        <input type="number" min="1" max="${available}" value="${item.quantity}"
+               class="w-16 border border-champagne-300 rounded-lg px-2 py-1.5 text-xs tabular-nums"
+               onchange="window.phUpdateCartQty('${item.key}', this.value)" />
+        ${batchOptions}
+      </div>
+      ${spansMultiple ? `<p class="text-xs text-brand-600 mb-1">Spanning ${item.allocation.length} batches to fulfil quantity</p>` : ''}
+      ${isShort ? `<p class="text-xs text-red-600 mb-1">Only ${available} available — short by ${item.quantity - allocatedQty}</p>` : ''}
+      <div class="flex items-center justify-between text-xs text-charcoal/50">
+        <span>${item.quantity} &times; ${formatRupees(item.allocation?.[0]?.unit_price ?? 0)}${item.gstPercent > 0 ? ` &middot; GST ${item.gstPercent}%` : ''}</span>
+        <span class="text-sm font-bold text-brand-900 tabular-nums">${formatRupees(lt + gstAmt)}</span>
       </div>
     </div>`;
   }).join('');
 
-  if (gstTotal > 0) {
+  if (gstTotal > 0.005) {
     subtotalRow.classList.remove('hidden');
-    subtotalRow.classList.add('flex');
     gstRow.classList.remove('hidden');
-    gstRow.classList.add('flex');
     document.getElementById('ph-cart-subtotal').textContent = formatRupees(subtotal);
     document.getElementById('ph-cart-gst').textContent = formatRupees(gstTotal);
   } else {
     subtotalRow.classList.add('hidden');
-    subtotalRow.classList.remove('flex');
     gstRow.classList.add('hidden');
-    gstRow.classList.remove('flex');
   }
   totalEl.textContent = formatRupees(grandTotal);
-  checkoutBtn.disabled = false;
+  checkoutBtn.disabled = scheduleHBlocked;
 }
-
-window.phRemoveFromCart = function (idx) {
-  phState.cart.splice(idx, 1);
-  renderPhCart();
-  loadPhCheckoutStats();
-};
 
 document.getElementById('ph-checkout-btn').addEventListener('click', async () => {
   const errorEl = document.getElementById('ph-checkout-error');
   const btn = document.getElementById('ph-checkout-btn');
   errorEl.textContent = '';
 
+  if (phState.cart.length === 0) return;
+
   const patientName = document.getElementById('ph-cart-patient-name').value.trim();
   const patientPhone = document.getElementById('ph-cart-patient-phone').value.trim();
   const paymentMode = document.getElementById('ph-cart-payment-mode').value;
 
-  if (!patientName) {
-    errorEl.textContent = 'Patient name is required (use "Walk-in" if unknown).';
+  if (!phState.selectedPatient && !patientName) {
+    errorEl.textContent = 'Select a patient, or enter a walk-in name.';
+    return;
+  }
+
+  const scheduleHBlocked = phState.cart.some((item) => phIsScheduleH(item.drugSchedule) && !phState.selectedPatient);
+  if (scheduleHBlocked) {
+    errorEl.textContent = 'One or more items require a Schedule H/H1 patient reference — search and select a registered patient, not a walk-in guest.';
+    return;
+  }
+
+  const shortfalls = phState.cart.filter((item) => {
+    const allocated = (item.allocation || []).reduce((s, a) => s + a.quantity, 0);
+    return allocated < item.quantity;
+  });
+  if (shortfalls.length > 0) {
+    errorEl.textContent = `Insufficient stock for: ${shortfalls.map((i) => i.medicineName).join(', ')}`;
     return;
   }
 
   btn.disabled = true;
   btn.textContent = 'Processing...';
   try {
-    const items = phState.cart.map((item) => ({
-      medicine_id: item.medicineId,
-      batch_id: item.batchId,
-      quantity: item.quantity,
-      unit_price: item.unitPrice,
-      gst_percent: item.gstPercent,
-    }));
-    const result = await window.phCallFunction('execute_pharmacy_sale', {
+    // Flatten cart -> one line per batch allocation (FIFO can span
+    // multiple batches per medicine), carrying prescription_item_id
+    // through in parallel so execute_pharmacy_sale can actually link
+    // dispense_items back to the prescription that generated them —
+    // this was previously silently dropped, see build notes.
+    const items = phState.cart.flatMap((item) =>
+      (item.allocation || []).map((a) => ({
+        medicine_id: item.medicineId,
+        medicine_name: item.medicineName,
+        batch_id: a.batch_id,
+        quantity: a.quantity,
+        unit_price: a.unit_price,
+        gst_percent: item.gstPercent || 0,
+        is_external: false,
+      }))
+    );
+    const prescriptionItemIds = phState.cart.flatMap((item) =>
+      (item.allocation || []).map(() => item.prescriptionItemId || null)
+    );
+
+    const payload = {
       items,
-      newPatientName: patientName,
-      newPatientPhone: patientPhone || null,
       paymentMode,
-    });
+      prescriptionItemIds: prescriptionItemIds.some((x) => x) ? prescriptionItemIds : null,
+      ...(phState.selectedPatient
+        ? { patientId: phState.selectedPatient.id }
+        : { newPatientName: patientName, newPatientPhone: patientPhone || null }),
+    };
+
+    const result = await window.phCallFunction('execute_pharmacy_sale', payload);
     phState.recentSales.unshift({
       dispenseId: result.dispense_id,
       billId: result.bill_id,
       billNumber: result.bill_number,
       total: result.total_amount,
-      patientName,
-      patientPhone: patientPhone || null,
+      patientName: phState.selectedPatient ? phState.selectedPatient.name : patientName,
+      patientPhone: phState.selectedPatient ? phState.selectedPatient.phone : (patientPhone || null),
       paymentMode,
-      items: [...phState.cart],
+      items: phState.cart.flatMap((item) => (item.allocation || []).map((a) => ({
+        medicineName: item.medicineName,
+        batchNumber: a.batch_number,
+        quantity: a.quantity,
+        unitPrice: a.unit_price,
+        gstPercent: item.gstPercent || 0,
+      }))),
     });
-    phState.cart = [];
-    renderPhCart();
+    phClearCart();
     renderPhRecentSales();
     loadPhCheckoutStats();
     refreshPhBadges();
-    document.getElementById('ph-cart-patient-name').value = '';
-    document.getElementById('ph-cart-patient-phone').value = '';
     showPhToast(`Sale complete — ${formatRupees(result.total_amount)}`, 'success');
     window.phShowReceipt(result.dispense_id);
   } catch (err) {
@@ -593,6 +845,117 @@ document.getElementById('ph-checkout-btn').addEventListener('click', async () =>
     btn.textContent = 'Complete Sale';
   }
 });
+
+// ==========================================================
+// RX QUEUE TAB (new — matches ClinicOS's PharmacyQueuePage.jsx flow,
+// but feeds the SAME FIFO cart/checkout used above rather than a
+// separate insert path — see the tab panel's HTML comment for why)
+// ==========================================================
+async function loadPhDispenseQueue() {
+  const listEl = document.getElementById('ph-rxqueue-list');
+  listEl.innerHTML = skeletonRows(3);
+  try {
+    const { queue } = await window.phCallFunction('get_dispense_queue');
+    if (!queue || queue.length === 0) {
+      listEl.innerHTML = emptyState('No pending prescriptions — finalised prescriptions from today will appear here.', ICONS.clock);
+      return;
+    }
+    listEl.innerHTML = queue.map((item) => {
+      const dispenseStatus = !item.dispense_id ? 'pending' : (item.dispense_status === 'dispensed' ? 'dispensed' : item.dispense_status);
+      const badgeMap = {
+        pending: 'bg-blue-50 text-blue-700',
+        partial: 'bg-amber-50 text-amber-700',
+        dispensed: 'bg-emerald-50 text-emerald-700',
+      };
+      const timeLabel = item.slot_time ? String(item.slot_time).slice(0, 5) : '—';
+      return `
+      <button class="w-full flex items-center gap-3 px-5 py-4 hover:bg-champagne-50 transition text-left" onclick="window.phOpenDispense('${item.prescription_id}', '${item.patient_id}')">
+        <div class="h-9 w-9 rounded-full bg-champagne-100 flex items-center justify-center shrink-0 text-brand-700">${ICONS.receipt}</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm font-semibold text-brand-900 truncate">${escapePhHtml(item.patient_name)}</span>
+            ${item.patient_is_registered && item.patient_uhid ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700">${escapePhHtml(item.patient_uhid)}</span>` : `<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">Guest</span>`}
+          </div>
+          <p class="text-xs text-charcoal/40 mt-0.5">${timeLabel} &middot; Dr. ${escapePhHtml(item.doctor_name || '—')}</p>
+        </div>
+        <span class="text-[11px] font-bold px-2 py-0.5 rounded-full capitalize shrink-0 ${badgeMap[dispenseStatus] || 'bg-slate-100 text-slate-600'}">${escapePhHtml(dispenseStatus)}</span>
+      </button>`;
+    }).join('');
+  } catch (err) {
+    listEl.innerHTML = `<div class="p-6 text-sm text-red-600">${escapePhHtml(err.message)}</div>`;
+  }
+}
+
+document.getElementById('ph-rxqueue-refresh-btn')?.addEventListener('click', loadPhDispenseQueue);
+
+// Loads a prescription's items into the checkout cart (FIFO-allocated,
+// same as adding via medicine search), pre-selects the patient, and
+// switches to the Checkout tab so the pharmacist completes the sale
+// through the same execute_pharmacy_sale path as any walk-in. Each
+// cart line keeps its prescriptionItemId so the eventual sale links
+// dispense_items back to the prescription (see execute_pharmacy_sale
+// call in the checkout handler above).
+window.phOpenDispense = async function (prescriptionId, patientId) {
+  try {
+    const [{ items }, { patient }] = await Promise.all([
+      window.phCallFunction('get_prescription_for_dispense', { prescriptionId }),
+      window.phCallFunction('get_patient_by_id', { patientId }),
+    ]);
+
+    if (!items || items.length === 0) {
+      showPhToast('This prescription has no items to dispense.', 'info');
+      return;
+    }
+
+    phState.cart = [];
+    for (const rxItem of items) {
+      if (rxItem.is_external || !rxItem.medicine_id) {
+        // External items are recorded as a zero-stock, zero-price line
+        // for visibility, matching FIFODispenseForm.jsx's handling —
+        // not deducted from stock, dispensed_by note covers the rest.
+        phState.cart.push({
+          key: `${rxItem.id}-ext`,
+          medicineId: rxItem.medicine_id,
+          medicineName: rxItem.medicine_name,
+          gstPercent: 0,
+          drugSchedule: '',
+          quantity: rxItem.quantity,
+          batches: [],
+          overrideBatchId: null,
+          allocation: [{ batch_id: null, batch_number: 'External', expiry_date: null, quantity: rxItem.quantity, unit_price: 0, line_total: 0 }],
+          prescriptionItemId: rxItem.id,
+        });
+        continue;
+      }
+      const { batches } = await window.phCallFunction('get_fifo_batches', { medicineId: rxItem.medicine_id, quantity: rxItem.quantity });
+      phState.cart.push({
+        key: `${rxItem.id}`,
+        medicineId: rxItem.medicine_id,
+        medicineName: rxItem.medicine_name,
+        gstPercent: 0,
+        drugSchedule: '',
+        quantity: rxItem.quantity,
+        batches: batches || [],
+        overrideBatchId: null,
+        allocation: phAllocateFifo(rxItem.quantity, batches || []),
+        prescriptionItemId: rxItem.id,
+      });
+    }
+
+    // Pre-select the patient this prescription belongs to — every
+    // prescription has a real patient_id, so this should always
+    // resolve; leave unselected only if the lookup genuinely fails.
+    phState.selectedPatient = patient || null;
+
+    switchPhTab('checkout');
+    renderPhPatientPanel();
+    renderPhCart();
+    loadPhCheckoutStats();
+    showPhToast('Prescription loaded into cart — review and complete the sale below.', 'info');
+  } catch (err) {
+    showPhToast(err.message, 'error');
+  }
+};
 
 function renderPhRecentSales() {
   const listEl = document.getElementById('ph-recent-sales');
@@ -839,6 +1202,7 @@ async function loadPhInventory(view) {
           </button>
           ${phOverflowMenuHtml([
             { label: 'Edit', onclick: `window.phOpenSupplierEdit('${s.id}')` },
+            { label: 'Vendor Ledger (outstanding POs)', onclick: `window.phOpenVendorLedger('${s.id}', '${escapePhAttr(s.name)}')` },
             { label: 'Merge into another supplier...', onclick: `window.phOpenMergeSupplier('${s.id}', '${escapePhAttr(s.name)}')` },
             { label: 'Deactivate', onclick: `window.phDeactivateSupplier('${s.id}', '${escapePhAttr(s.name)}')`, danger: true },
           ])}
@@ -908,6 +1272,81 @@ window.phOpenSupplierEdit = async function (supplierId) {
   } catch (err) {
     showPhToast(err.message, 'error');
   }
+};
+
+// ---- Vendor Ledger (new — matches ClinicOS's VendorLedgerSheet.jsx:
+// per-supplier outstanding POs with a checkbox-select + bulk mark-paid,
+// backed by get_supplier_outstanding_pos / bulk_mark_pos_paid, both
+// of which ultimately go through record_po_payment so the balance
+// check and journal posting stay in one place. ----
+window.phOpenVendorLedger = async function (supplierId, supplierName) {
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-1">Vendor Ledger — ${escapePhHtml(supplierName)}</h3>
+      <p class="text-xs text-charcoal/40 mb-4">Outstanding purchase orders for this supplier.</p>
+      <div id="ph-vl-list" class="space-y-2 mb-4 max-h-80 overflow-y-auto">
+        <p class="text-charcoal/30 text-sm text-center py-6">Loading...</p>
+      </div>
+      <div id="ph-vl-pay-row" class="hidden items-center gap-2 border-t border-champagne-200 pt-4">
+        <select id="ph-vl-payment-mode" class="border border-champagne-300 rounded-lg px-3 py-2 text-sm">
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="card">Card</option>
+          <option value="other">Other</option>
+        </select>
+        <button id="ph-vl-pay-btn" class="ml-auto bg-brand-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-brand-700 transition">Mark Selected Paid</button>
+      </div>
+      <p id="ph-vl-error" class="text-red-600 text-sm mt-2 min-h-[1.25rem]"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Close</button>
+      </div>
+    </div>`);
+
+  let ledgerPOs = [];
+  const listEl = document.getElementById('ph-vl-list');
+  try {
+    const { purchaseOrders } = await window.phCallFunction('get_supplier_outstanding_pos', { supplierId });
+    ledgerPOs = purchaseOrders || [];
+    if (ledgerPOs.length === 0) {
+      listEl.innerHTML = `<p class="text-emerald-700 text-sm text-center py-6 font-medium">No outstanding balance — everything is paid up.</p>`;
+      return;
+    }
+    listEl.innerHTML = ledgerPOs.map((po) => `
+      <label class="flex items-center gap-3 border border-champagne-200 rounded-xl p-3 cursor-pointer hover:bg-champagne-50 transition">
+        <input type="checkbox" data-vl-po-id="${po.id}" class="ph-vl-checkbox" />
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-brand-900">${escapePhHtml(po.po_number)}${po.invoice_number ? ' &middot; ' + escapePhHtml(po.invoice_number) : ''}</p>
+          <p class="text-xs text-charcoal/40">${formatRupees(po.amount_paid || 0)} paid of ${formatRupees(po.total_amount)}${po.due_date ? ' &middot; due ' + escapePhHtml(po.due_date) : ''}</p>
+        </div>
+        <span class="text-sm font-bold text-brand-900 tabular-nums shrink-0">${formatRupees(po.balance_due)}</span>
+      </label>`).join('');
+    document.getElementById('ph-vl-pay-row').classList.remove('hidden');
+    document.getElementById('ph-vl-pay-row').classList.add('flex');
+  } catch (err) {
+    listEl.innerHTML = `<p class="text-red-600 text-sm text-center py-6">${escapePhHtml(err.message)}</p>`;
+    return;
+  }
+
+  document.getElementById('ph-vl-pay-btn').addEventListener('click', async () => {
+    const errorEl = document.getElementById('ph-vl-error');
+    errorEl.textContent = '';
+    const selectedIds = Array.from(document.querySelectorAll('.ph-vl-checkbox:checked')).map((c) => c.dataset.vlPoId);
+    if (selectedIds.length === 0) {
+      errorEl.textContent = 'Select at least one purchase order.';
+      return;
+    }
+    const selectedPOs = ledgerPOs.filter((po) => selectedIds.includes(po.id));
+    const paymentMode = document.getElementById('ph-vl-payment-mode').value;
+    try {
+      await window.phCallFunction('bulk_mark_pos_paid', { purchaseOrders: selectedPOs, paymentMode });
+      closePhModal();
+      loadPhPurchaseOrders();
+      loadPhPoStats();
+      showPhToast(`${selectedPOs.length} purchase order(s) marked paid.`, 'success');
+    } catch (err) {
+      errorEl.textContent = err.message;
+    }
+  });
 };
 
 function openPhSupplierModal(existingSupplier) {
@@ -983,6 +1422,262 @@ window.phSaveSupplier = async function (existingId) {
   }
 };
 
+// ---- Quick Stock (new — matches ClinicOS's StockEntryForm.jsx:
+// search/pick a medicine, then enter one batch's receiving details
+// directly, bypassing the full purchase-order flow. Writes straight
+// to medicine_batches via the new quick_add_stock action. ----
+document.getElementById('ph-quick-stock-btn')?.addEventListener('click', () => openPhQuickStockModal());
+
+let phQuickStockSelectedMedicine = null;
+
+function openPhQuickStockModal() {
+  phQuickStockSelectedMedicine = null;
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-4">Quick Stock</h3>
+      <div class="mb-3">
+        <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Medicine *</label>
+        <div id="ph-qs-med-picked" class="hidden flex items-center justify-between px-3 py-2.5 bg-champagne-50 rounded-lg border border-champagne-200 mb-1">
+          <span id="ph-qs-med-picked-name" class="text-sm font-semibold text-brand-800"></span>
+          <button type="button" id="ph-qs-med-change" class="text-xs text-brand-500 hover:text-brand-700">Change</button>
+        </div>
+        <div id="ph-qs-med-search-wrap" class="relative">
+          <input type="text" id="ph-qs-med-search" placeholder="Search medicine to stock..."
+                 class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5" />
+          <div id="ph-qs-med-results" class="hidden absolute mt-1 w-full bg-white rounded-xl border border-champagne-200 shadow-lg overflow-hidden divide-y divide-champagne-100 z-10 max-h-56 overflow-y-auto"></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Batch Number</label>
+          <input type="text" id="ph-qs-batch-number" placeholder="e.g. BT2024001" class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Expiry Date *</label>
+          <input type="date" id="ph-qs-expiry" class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5" />
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Purchase Price (₹)</label>
+          <input type="number" min="0" step="0.01" id="ph-qs-purchase-price" placeholder="0.00" class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Selling Price (₹) *</label>
+          <input type="number" min="0" step="0.01" id="ph-qs-selling-price" placeholder="0.00" class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5" />
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Quantity Received *</label>
+          <input type="number" min="1" id="ph-qs-quantity" placeholder="e.g. 100" class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Supplier</label>
+          <input type="text" id="ph-qs-supplier" placeholder="Supplier name" class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5" />
+        </div>
+      </div>
+      <p id="ph-qs-error" class="text-red-600 text-sm mb-2 min-h-[1.25rem]"></p>
+      <div class="flex gap-2">
+        <button type="button" onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button type="button" id="ph-qs-save-btn" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Add Stock</button>
+      </div>
+    </div>`);
+
+  let qsSearchTimeout = null;
+  document.getElementById('ph-qs-med-search').addEventListener('input', (e) => {
+    clearTimeout(qsSearchTimeout);
+    const query = e.target.value.trim().toLowerCase();
+    const resultsEl = document.getElementById('ph-qs-med-results');
+    if (query.length < 2) { resultsEl.classList.add('hidden'); resultsEl.innerHTML = ''; return; }
+    qsSearchTimeout = setTimeout(async () => {
+      try {
+        if (!phMedCache) {
+          const { medicines } = await window.phCallFunction('get_medicines_with_wac');
+          phMedCache = medicines || [];
+        }
+        const matches = phMedCache.filter((m) => m.name.toLowerCase().includes(query)).slice(0, 8);
+        resultsEl.innerHTML = matches.length === 0
+          ? `<div class="p-3 text-xs text-charcoal/40 text-center">No matching medicines.</div>`
+          : matches.map((m) => `<button type="button" class="w-full text-left px-3 py-2 hover:bg-champagne-50 transition text-sm" data-qs-med-id="${m.medicine_id}">${escapePhHtml(m.name)}</button>`).join('');
+        resultsEl.classList.remove('hidden');
+        resultsEl.querySelectorAll('[data-qs-med-id]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const med = phMedCache.find((m) => m.medicine_id === btn.dataset.qsMedId);
+            phQuickStockSelectedMedicine = med;
+            document.getElementById('ph-qs-med-picked-name').textContent = med.name;
+            document.getElementById('ph-qs-med-picked').classList.remove('hidden');
+            document.getElementById('ph-qs-med-search-wrap').classList.add('hidden');
+            resultsEl.classList.add('hidden');
+          });
+        });
+      } catch (err) {
+        resultsEl.innerHTML = `<div class="p-3 text-xs text-red-600">${escapePhHtml(err.message)}</div>`;
+        resultsEl.classList.remove('hidden');
+      }
+    }, 300);
+  });
+
+  document.getElementById('ph-qs-med-change').addEventListener('click', () => {
+    phQuickStockSelectedMedicine = null;
+    document.getElementById('ph-qs-med-picked').classList.add('hidden');
+    document.getElementById('ph-qs-med-search-wrap').classList.remove('hidden');
+    document.getElementById('ph-qs-med-search').value = '';
+  });
+
+  document.getElementById('ph-qs-save-btn').addEventListener('click', async () => {
+    const errorEl = document.getElementById('ph-qs-error');
+    errorEl.textContent = '';
+    if (!phQuickStockSelectedMedicine) { errorEl.textContent = 'Select a medicine.'; return; }
+    const expiryDate = document.getElementById('ph-qs-expiry').value;
+    const sellingPrice = document.getElementById('ph-qs-selling-price').value;
+    const quantityReceived = document.getElementById('ph-qs-quantity').value;
+    if (!expiryDate) { errorEl.textContent = 'Expiry date is required.'; return; }
+    if (!sellingPrice || Number(sellingPrice) < 0) { errorEl.textContent = 'Selling price is required.'; return; }
+    if (!quantityReceived || Number(quantityReceived) < 1) { errorEl.textContent = 'Quantity received must be at least 1.'; return; }
+
+    try {
+      await window.phCallFunction('quick_add_stock', {
+        medicineId: phQuickStockSelectedMedicine.medicine_id,
+        batchNumber: document.getElementById('ph-qs-batch-number').value.trim() || null,
+        expiryDate,
+        purchasePrice: document.getElementById('ph-qs-purchase-price').value || 0,
+        sellingPrice,
+        quantityReceived,
+        supplier: document.getElementById('ph-qs-supplier').value.trim() || null,
+      });
+      phMedCache = null; // force refresh so new stock shows up in search/inventory
+      closePhModal();
+      loadPhInventory(phCurrentInvView || 'all');
+      loadPhInventoryStats();
+      showPhToast('Stock added.', 'success');
+    } catch (err) {
+      errorEl.textContent = err.message;
+    }
+  });
+}
+
+// ---- Manual Stock Adjustment (new — wires up manual_stock_adjustment,
+// which was deployed and live but had zero call sites in this codebase
+// before this rewrite. Also see the fix applied to the RPC itself:
+// the removal path was previously a no-op bug, now correctly
+// decrements existing batches oldest-first. ----
+document.getElementById('ph-manual-adj-btn')?.addEventListener('click', () => openPhManualAdjustModal());
+
+let phManualAdjSelectedMedicine = null;
+
+function openPhManualAdjustModal() {
+  phManualAdjSelectedMedicine = null;
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-1">Adjust Stock</h3>
+      <p class="text-xs text-charcoal/40 mb-4">Record stock lost to damage, expiry write-off, theft, or other reasons — or a manual addition outside the normal purchase flow.</p>
+      <div class="mb-3">
+        <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Medicine *</label>
+        <div id="ph-adj-med-picked" class="hidden flex items-center justify-between px-3 py-2.5 bg-champagne-50 rounded-lg border border-champagne-200 mb-1">
+          <span id="ph-adj-med-picked-name" class="text-sm font-semibold text-brand-800"></span>
+          <button type="button" id="ph-adj-med-change" class="text-xs text-brand-500 hover:text-brand-700">Change</button>
+        </div>
+        <div id="ph-adj-med-search-wrap" class="relative">
+          <input type="text" id="ph-adj-med-search" placeholder="Search medicine..."
+                 class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5" />
+          <div id="ph-adj-med-results" class="hidden absolute mt-1 w-full bg-white rounded-xl border border-champagne-200 shadow-lg overflow-hidden divide-y divide-champagne-100 z-10 max-h-56 overflow-y-auto"></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Type *</label>
+          <select id="ph-adj-type" class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5">
+            <option value="DAMAGE">Damage</option>
+            <option value="EXPIRED">Expired write-off</option>
+            <option value="THEFT">Theft / loss</option>
+            <option value="OTHER">Other removal</option>
+            <option value="PURCHASE">Manual addition</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Quantity *</label>
+          <input type="number" id="ph-adj-quantity" min="1" placeholder="e.g. 5" class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5" />
+        </div>
+      </div>
+      <input type="text" id="ph-adj-reason" placeholder="Reason / note" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm mb-2" />
+      <p id="ph-adj-error" class="text-red-600 text-sm mb-2 min-h-[1.25rem]"></p>
+      <div class="flex gap-2">
+        <button type="button" onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button type="button" id="ph-adj-save-btn" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Apply Adjustment</button>
+      </div>
+    </div>`);
+
+  let adjSearchTimeout = null;
+  document.getElementById('ph-adj-med-search').addEventListener('input', (e) => {
+    clearTimeout(adjSearchTimeout);
+    const query = e.target.value.trim().toLowerCase();
+    const resultsEl = document.getElementById('ph-adj-med-results');
+    if (query.length < 2) { resultsEl.classList.add('hidden'); resultsEl.innerHTML = ''; return; }
+    adjSearchTimeout = setTimeout(async () => {
+      try {
+        if (!phMedCache) {
+          const { medicines } = await window.phCallFunction('get_medicines_with_wac');
+          phMedCache = medicines || [];
+        }
+        const matches = phMedCache.filter((m) => m.name.toLowerCase().includes(query)).slice(0, 8);
+        resultsEl.innerHTML = matches.length === 0
+          ? `<div class="p-3 text-xs text-charcoal/40 text-center">No matching medicines.</div>`
+          : matches.map((m) => `<button type="button" class="w-full text-left px-3 py-2 hover:bg-champagne-50 transition text-sm" data-adj-med-id="${m.medicine_id}">${escapePhHtml(m.name)} <span class="text-charcoal/40">&middot; ${m.total_stock} in stock</span></button>`).join('');
+        resultsEl.classList.remove('hidden');
+        resultsEl.querySelectorAll('[data-adj-med-id]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const med = phMedCache.find((m) => m.medicine_id === btn.dataset.adjMedId);
+            phManualAdjSelectedMedicine = med;
+            document.getElementById('ph-adj-med-picked-name').textContent = `${med.name} (${med.total_stock} in stock)`;
+            document.getElementById('ph-adj-med-picked').classList.remove('hidden');
+            document.getElementById('ph-adj-med-search-wrap').classList.add('hidden');
+            resultsEl.classList.add('hidden');
+          });
+        });
+      } catch (err) {
+        resultsEl.innerHTML = `<div class="p-3 text-xs text-red-600">${escapePhHtml(err.message)}</div>`;
+        resultsEl.classList.remove('hidden');
+      }
+    }, 300);
+  });
+
+  document.getElementById('ph-adj-med-change').addEventListener('click', () => {
+    phManualAdjSelectedMedicine = null;
+    document.getElementById('ph-adj-med-picked').classList.add('hidden');
+    document.getElementById('ph-adj-med-search-wrap').classList.remove('hidden');
+    document.getElementById('ph-adj-med-search').value = '';
+  });
+
+  document.getElementById('ph-adj-save-btn').addEventListener('click', async () => {
+    const errorEl = document.getElementById('ph-adj-error');
+    errorEl.textContent = '';
+    if (!phManualAdjSelectedMedicine) { errorEl.textContent = 'Select a medicine.'; return; }
+    const quantity = parseInt(document.getElementById('ph-adj-quantity').value, 10);
+    if (!quantity || quantity < 1) { errorEl.textContent = 'Enter a quantity of at least 1.'; return; }
+    const type = document.getElementById('ph-adj-type').value;
+    try {
+      const result = await window.phCallFunction('manual_stock_adjustment', {
+        medicineId: phManualAdjSelectedMedicine.medicine_id,
+        quantity,
+        type,
+        reason: document.getElementById('ph-adj-reason').value.trim() || null,
+      });
+      phMedCache = null;
+      closePhModal();
+      loadPhInventory(phCurrentInvView || 'all');
+      loadPhInventoryStats();
+      if (type !== 'PURCHASE' && result.quantityAdjusted < quantity) {
+        showPhToast(`Only ${result.quantityAdjusted} of ${quantity} could be removed — that's all the stock available.`, 'info');
+      } else {
+        showPhToast('Stock adjusted.', 'success');
+      }
+    } catch (err) {
+      errorEl.textContent = err.message;
+    }
+  });
+}
+
 // Opens the medicine modal either empty (new) or pre-filled (edit).
 // existingMedicine is a row shape from list_medicines/get_medicines_with_wac
 // (snake_case columns) or null for a brand-new medicine.
@@ -1008,7 +1703,12 @@ async function openPhMedicineModal(existingMedicine) {
       </div>
 
       <div data-med-modal-panel="basic" class="space-y-3">
-        <input type="text" id="ph-new-med-name" placeholder="Name" value="${escapePhAttr(m.name || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <div class="flex gap-2">
+          <input type="text" id="ph-new-med-name" placeholder="Name" value="${escapePhAttr(m.name || '')}" class="flex-1 border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+          ${!isEdit ? `<button type="button" id="ph-new-med-autofill-btn" class="shrink-0 text-xs font-bold px-3 py-2.5 rounded-lg border border-brand-300 text-brand-700 hover:bg-champagne-50 transition whitespace-nowrap">✨ Auto-fill</button>` : ''}
+          ${!isEdit ? `<label class="shrink-0 text-xs font-bold px-3 py-2.5 rounded-lg border border-brand-300 text-brand-700 hover:bg-champagne-50 transition whitespace-nowrap cursor-pointer">📷 Scan<input type="file" id="ph-new-med-pamphlet-input" accept="image/*" class="hidden" /></label>` : ''}
+        </div>
+        <p id="ph-new-med-autofill-status" class="hidden text-xs text-charcoal/40"></p>
         <input type="text" id="ph-new-med-generic" placeholder="Generic name" value="${escapePhAttr(m.generic_name || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
         <input type="text" id="ph-new-med-manufacturer" placeholder="Manufacturer" value="${escapePhAttr(m.manufacturer || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
         <input type="text" id="ph-new-med-category" placeholder="Category" value="${escapePhAttr(m.category || '')}" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
@@ -1075,6 +1775,70 @@ async function openPhMedicineModal(existingMedicine) {
         panel.classList.toggle('hidden', panel.dataset.medModalPanel !== btn.dataset.medModalTab);
       });
     });
+  });
+
+  // ---- Auto-fill from brand name (new — wires up
+  // auto_fill_medicine_details, Gemini-backed, previously deployed
+  // with zero call sites). Only shown for a brand-new medicine (not
+  // edit) since it's meant to save data entry when adding something
+  // not yet in the catalog. ----
+  document.getElementById('ph-new-med-autofill-btn')?.addEventListener('click', async () => {
+    const nameInput = document.getElementById('ph-new-med-name');
+    const statusEl = document.getElementById('ph-new-med-autofill-status');
+    const brandName = nameInput.value.trim();
+    if (!brandName) {
+      statusEl.textContent = 'Enter a brand name first.';
+      statusEl.classList.remove('hidden');
+      return;
+    }
+    statusEl.textContent = 'Looking up composition and tax details...';
+    statusEl.classList.remove('hidden');
+    try {
+      const { aiResult } = await window.phCallFunction('auto_fill_medicine_details', { brandName });
+      if (aiResult?.generic) document.getElementById('ph-new-med-generic').value = aiResult.generic;
+      if (aiResult?.category) document.getElementById('ph-new-med-category').value = aiResult.category;
+      if (aiResult?.company) document.getElementById('ph-new-med-manufacturer').value = aiResult.company;
+      if (aiResult?.hsn) document.getElementById('ph-new-med-hsn').value = aiResult.hsn;
+      if (aiResult?.gst != null) document.getElementById('ph-new-med-gst').value = aiResult.gst;
+      if (aiResult?.formulation) {
+        const formSelect = document.getElementById('ph-new-med-formulation');
+        if (Array.from(formSelect.options).some((o) => o.value === aiResult.formulation)) {
+          formSelect.value = aiResult.formulation;
+        }
+      }
+      if (aiResult?.schedule) {
+        const schedSelect = document.getElementById('ph-new-med-schedule');
+        if (Array.from(schedSelect.options).some((o) => o.value === aiResult.schedule)) {
+          schedSelect.value = aiResult.schedule;
+        }
+      }
+      statusEl.textContent = 'Filled in from AI lookup — please double-check before saving.';
+    } catch (err) {
+      statusEl.textContent = 'Auto-fill failed: ' + err.message;
+    }
+  });
+
+  // ---- Scan Pamphlet (new — wires up extract_pamphlet_data, also
+  // previously deployed with zero call sites). Reads brand/molecule/
+  // strength off a photographed product pamphlet or box, same
+  // double-check-before-saving posture as auto-fill above. ----
+  document.getElementById('ph-new-med-pamphlet-input')?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('ph-new-med-autofill-status');
+    statusEl.textContent = 'Reading pamphlet photo...';
+    statusEl.classList.remove('hidden');
+    try {
+      const base64 = await fileToBase64(file);
+      const { aiResult } = await window.phCallFunction('extract_pamphlet_data', { fileData: base64 });
+      if (aiResult?.brand_name) document.getElementById('ph-new-med-name').value = aiResult.brand_name;
+      if (aiResult?.molecule) document.getElementById('ph-new-med-generic').value = aiResult.molecule;
+      statusEl.textContent = 'Filled in from pamphlet scan — please double-check before saving.';
+    } catch (err) {
+      statusEl.textContent = 'Pamphlet scan failed: ' + err.message;
+    } finally {
+      e.target.value = '';
+    }
   });
 }
 
@@ -1151,6 +1915,7 @@ async function loadPhPurchaseOrders() {
         <div class="flex items-center gap-3">
           ${paymentStatusChip(po.payment_status)}
           ${po.delivery_date ? '' : `<button onclick="window.phReceivePO('${po.id}', ${po.total_amount})" class="text-xs font-bold text-brand-700 hover:text-brand-900 transition">Receive</button>`}
+          ${po.delivery_date && po.payment_status !== 'paid' ? `<button onclick="window.phOpenRecordPayment('${po.id}', ${po.total_amount}, ${po.amount_paid || 0})" class="text-xs font-bold text-brand-700 hover:text-brand-900 transition">Record Payment</button>` : ''}
         </div>
       </div>`).join('');
   } catch (err) {
@@ -1195,6 +1960,57 @@ window.phConfirmReceivePO = async function (poId) {
     loadPhPoStats();
     refreshPhBadges();
     showPhToast('Purchase order received — stock updated.', 'success');
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+};
+
+// ---- Record Payment (new — closes a real gap: record_po_payment was
+// deployed and callable but had NO frontend call site anywhere, so a
+// PO received on credit (partial/pending) had no way to ever be
+// marked as paid down further. Deliberately separate from Receive,
+// since receive_purchase_order can only run once per PO (it raises if
+// batches already exist) — this is for every payment AFTER that. ----
+window.phOpenRecordPayment = function (poId, totalAmount, amountPaid) {
+  const outstanding = Math.max(0, totalAmount - amountPaid);
+  showPhModal(`
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-brand-900 mb-1">Record Payment</h3>
+      <p class="text-xs text-charcoal/40 mb-4">${formatRupees(amountPaid)} paid of ${formatRupees(totalAmount)} &middot; ${formatRupees(outstanding)} outstanding.</p>
+      <div class="space-y-3">
+        <select id="ph-record-payment-mode" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm">
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="card">Card</option>
+          <option value="other">Other</option>
+        </select>
+        <div>
+          <label class="text-xs font-semibold text-charcoal/50 mb-1 block">Amount to record</label>
+          <input type="number" id="ph-record-payment-amount" value="${outstanding}" max="${outstanding}" min="0.01" step="0.01" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+      </div>
+      <p id="ph-record-payment-error" class="text-red-600 text-sm mt-3 min-h-[1.25rem]"></p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="closePhModal()" class="flex-1 border border-champagne-300 rounded-lg py-2.5 text-sm font-semibold hover:bg-champagne-50 transition">Cancel</button>
+        <button onclick="window.phConfirmRecordPayment('${poId}')" class="flex-1 bg-brand-900 text-white rounded-lg py-2.5 text-sm font-bold hover:bg-brand-700 transition">Record Payment</button>
+      </div>
+    </div>`);
+};
+
+window.phConfirmRecordPayment = async function (poId) {
+  const errorEl = document.getElementById('ph-record-payment-error');
+  const paymentMode = document.getElementById('ph-record-payment-mode').value;
+  const amount = parseFloat(document.getElementById('ph-record-payment-amount').value) || 0;
+  if (amount <= 0) {
+    errorEl.textContent = 'Enter an amount greater than zero.';
+    return;
+  }
+  try {
+    await window.phCallFunction('record_po_payment', { poId, amount, paymentMode });
+    closePhModal();
+    loadPhPurchaseOrders();
+    loadPhPoStats();
+    showPhToast('Payment recorded.', 'success');
   } catch (err) {
     errorEl.textContent = err.message;
   }
@@ -1689,30 +2505,60 @@ async function loadPhReps() {
       listEl.innerHTML = emptyState('No reps added yet.', ICONS.box);
       return;
     }
-    listEl.innerHTML = reps.map((r) => `
+    listEl.innerHTML = reps.map((r) => {
+      const fullName = [r.salutation, r.first_name, r.last_name].filter(Boolean).join(' ') || '(No name)';
+      const waHref = phWaLink(r.phone);
+      return `
       <div class="px-5 py-4 flex items-center justify-between">
         <div class="min-w-0">
-          <p class="font-semibold text-brand-900 text-sm truncate">${escapePhHtml(r.rep_name)}</p>
+          <p class="font-semibold text-brand-900 text-sm truncate">${escapePhHtml(fullName)}</p>
           <p class="text-xs text-charcoal/50 truncate">${[r.company, r.division, r.phone].filter(Boolean).map(escapePhHtml).join(' &middot; ')}</p>
         </div>
-        ${phOverflowMenuHtml([
-          { label: 'Deactivate', onclick: `window.phDeactivateRep('${r.id}', '${escapePhAttr(r.rep_name)}')`, danger: true },
-        ])}
-      </div>`).join('');
+        <div class="flex items-center gap-1 shrink-0">
+          ${r.phone ? `<a href="tel:${escapePhAttr(r.phone)}" class="p-2 rounded-lg text-charcoal/40 hover:bg-champagne-50 hover:text-brand-700 transition" aria-label="Call"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>` : ''}
+          ${waHref ? `<a href="${waHref}" target="_blank" rel="noreferrer" class="p-2 rounded-lg text-green-600 hover:bg-green-50 transition" aria-label="WhatsApp"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.9 11.9L4 20l4.2-1.1a7.9 7.9 0 0 0 3.85 1h.01a7.94 7.94 0 0 0 5.54-13.58zM12.05 18.4h-.01a6.5 6.5 0 0 1-3.32-.91l-.24-.14-2.47.65.66-2.41-.16-.25a6.55 6.55 0 0 1 10.2-8.11 6.5 6.5 0 0 1-4.66 11.17z"/></svg></a>` : ''}
+          ${phOverflowMenuHtml([
+            { label: 'Deactivate', onclick: `window.phDeactivateRep('${r.id}', '${escapePhAttr(fullName)}')`, danger: true },
+          ])}
+        </div>
+      </div>`;
+    }).join('');
   } catch (err) {
     listEl.innerHTML = `<p class="text-sm text-red-600 text-center py-8">${escapePhHtml(err.message)}</p>`;
   }
+}
+
+// Ported from ClinicOS's RepsPage.jsx waLink() — assumes bare 10-digit
+// Indian numbers need +91 prefixed (matches this project's documented
+// convention: phone numbers stored as bare 10-digit numbers).
+function phWaLink(phone) {
+  if (!phone) return null;
+  const digits = String(phone).replace(/\D/g, '');
+  if (!digits) return null;
+  const withCountryCode = digits.length === 10 ? `91${digits}` : digits;
+  return `https://wa.me/${withCountryCode}`;
 }
 
 document.getElementById('ph-new-rep-btn').addEventListener('click', () => {
   showPhModal(`
     <div class="p-6">
       <h3 class="text-lg font-bold text-brand-900 mb-4">New Medical Rep</h3>
+      <div class="grid grid-cols-3 gap-2 mb-3">
+        <select id="ph-new-rep-salutation" class="border border-champagne-300 rounded-lg px-2 py-2.5 text-sm">
+          <option value="">—</option>
+          <option value="Mr.">Mr.</option>
+          <option value="Ms.">Ms.</option>
+          <option value="Mrs.">Mrs.</option>
+          <option value="Dr.">Dr.</option>
+        </select>
+        <input type="text" id="ph-new-rep-first-name" placeholder="First name" class="col-span-1 border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-rep-last-name" placeholder="Last name" class="col-span-1 border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+      </div>
       <div class="space-y-3">
-        <input type="text" id="ph-new-rep-name" placeholder="Rep name" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
         <input type="text" id="ph-new-rep-company" placeholder="Company" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
         <input type="text" id="ph-new-rep-division" placeholder="Division" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
         <input type="text" id="ph-new-rep-phone" placeholder="Phone" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
+        <input type="text" id="ph-new-rep-designation" placeholder="Designation (optional)" class="w-full border border-champagne-300 rounded-lg px-3 py-2.5 text-sm" />
       </div>
       <p id="ph-new-rep-error" class="text-red-600 text-sm mt-2 min-h-[1.25rem]"></p>
       <div class="flex gap-2 mt-4">
@@ -1724,21 +2570,25 @@ document.getElementById('ph-new-rep-btn').addEventListener('click', () => {
 
 window.phSaveNewRep = async function () {
   const errorEl = document.getElementById('ph-new-rep-error');
-  const repName = document.getElementById('ph-new-rep-name').value.trim();
-  if (!repName) {
-    errorEl.textContent = 'Rep name is required.';
+  const firstName = document.getElementById('ph-new-rep-first-name').value.trim();
+  const lastName = document.getElementById('ph-new-rep-last-name').value.trim();
+  if (!firstName && !lastName) {
+    errorEl.textContent = 'Enter at least a first or last name.';
     return;
   }
   try {
     await window.phCallFunction('upsert_medical_rep', {
-      repName,
+      salutation: document.getElementById('ph-new-rep-salutation').value || null,
+      firstName: firstName || null,
+      lastName: lastName || null,
       company: document.getElementById('ph-new-rep-company').value.trim() || null,
       division: document.getElementById('ph-new-rep-division').value.trim() || null,
       phone: document.getElementById('ph-new-rep-phone').value.trim() || null,
+      designation: document.getElementById('ph-new-rep-designation').value.trim() || null,
     });
     closePhModal();
     loadPhReps();
-    showPhToast(`${repName} added.`, 'success');
+    showPhToast(`${[firstName, lastName].filter(Boolean).join(' ')} added.`, 'success');
   } catch (err) {
     errorEl.textContent = err.message;
   }
@@ -1869,6 +2719,117 @@ window.phConfirmMergeSupplier = async function (duplicateId, duplicateName) {
 // ==========================================================
 // MODAL HELPERS
 // ==========================================================
+// ==========================================================
+// REPORTS TAB (new — matches ClinicOS's ReportsPage.jsx: valuation
+// summary cards + CSV exports, computed client-side from data already
+// fetched via existing actions, ported formulas exactly from
+// src/lib/marginUtils.js's calcInventoryValuation)
+// ==========================================================
+let phReportsCache = { medicines: [], nearExpiry: [] };
+
+function phCalcInventoryValuation(medicines) {
+  let capitalLocked = 0;
+  let retailWorth = 0;
+  let activeSkus = 0;
+  for (const med of medicines) {
+    const stock = Number(med.total_stock) || 0;
+    if (stock <= 0) continue;
+    activeSkus += 1;
+    // get_medicines_with_wac names these blended_cost/front_mrp,
+    // not wac/representative_mrp like ClinicOS's medicine_stock view —
+    // confirmed via pg_get_function_result before writing this.
+    const cost = Number(med.blended_cost) || 0;
+    const mrp = Number(med.front_mrp) || 0;
+    capitalLocked += stock * cost;
+    retailWorth += stock * mrp;
+  }
+  return {
+    capitalLocked,
+    retailWorth,
+    projectedProfit: retailWorth - capitalLocked,
+    activeSkus,
+  };
+}
+
+function phToCsv(rows, columns) {
+  const escape = (val) => {
+    if (val == null) return '';
+    const s = String(val);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const header = columns.map((c) => escape(c.label)).join(',');
+  const lines = rows.map((row) => columns.map((c) => escape(c.value(row))).join(','));
+  return [header, ...lines].join('\n');
+}
+
+function phDownloadCsv(csvString, filename) {
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function loadPhReports() {
+  const valuationEl = document.getElementById('ph-reports-valuation');
+  valuationEl.innerHTML = statCard('Capital Locked', '…', ICONS.rupee) + statCard('Retail Worth', '…', ICONS.rupee) + statCard('Projected Profit', '…', ICONS.rupee) + statCard('Active SKUs', '…', ICONS.box);
+  try {
+    const [{ medicines }, { expiringBatches }] = await Promise.all([
+      window.phCallFunction('get_medicines_with_wac'),
+      window.phCallFunction('get_expiring_batches', { withinDays: 90 }),
+    ]);
+    phReportsCache = { medicines: medicines || [], nearExpiry: expiringBatches || [] };
+    const v = phCalcInventoryValuation(phReportsCache.medicines);
+    valuationEl.innerHTML =
+      statCard('Capital Locked', formatRupees(v.capitalLocked), ICONS.rupee) +
+      statCard('Retail Worth', formatRupees(v.retailWorth), ICONS.rupee) +
+      statCard('Projected Profit', formatRupees(v.projectedProfit), ICONS.rupee, v.projectedProfit >= 0 ? 'good' : 'danger') +
+      statCard('Active SKUs', v.activeSkus, ICONS.box);
+
+    const expiryBtn = document.getElementById('ph-export-near-expiry-btn');
+    const expiryLabel = document.getElementById('ph-export-near-expiry-label');
+    expiryBtn.disabled = phReportsCache.nearExpiry.length === 0;
+    expiryBtn.classList.toggle('opacity-50', phReportsCache.nearExpiry.length === 0);
+    expiryLabel.textContent = phReportsCache.nearExpiry.length > 0
+      ? `Near-Expiry CSV (${phReportsCache.nearExpiry.length} items, next 90 days)`
+      : 'Near-Expiry CSV';
+  } catch (err) {
+    valuationEl.innerHTML = `<p class="col-span-full text-sm text-red-600 text-center py-4">${escapePhHtml(err.message)}</p>`;
+  }
+}
+
+document.getElementById('ph-reports-refresh-btn')?.addEventListener('click', loadPhReports);
+
+document.getElementById('ph-export-stock-valuation-btn')?.addEventListener('click', () => {
+  const rows = phReportsCache.medicines.filter((m) => (m.total_stock || 0) > 0);
+  const csv = phToCsv(rows, [
+    { label: 'Item Name', value: (r) => r.name },
+    { label: 'Generic', value: (r) => r.generic_name || '' },
+    { label: 'Category', value: (r) => r.category || '' },
+    { label: 'Current Stock', value: (r) => r.total_stock ?? 0 },
+    { label: 'Unit Cost (WAC)', value: (r) => (r.blended_cost != null ? Number(r.blended_cost).toFixed(2) : '') },
+    { label: 'MRP', value: (r) => (r.front_mrp != null ? Number(r.front_mrp).toFixed(2) : '') },
+    { label: 'Line Value', value: (r) => ((r.total_stock || 0) * (Number(r.blended_cost) || 0)).toFixed(2) },
+  ]);
+  phDownloadCsv(csv, `stock_valuation_${new Date().toISOString().slice(0, 10)}.csv`);
+});
+
+document.getElementById('ph-export-near-expiry-btn')?.addEventListener('click', () => {
+  if (phReportsCache.nearExpiry.length === 0) return;
+  const csv = phToCsv(phReportsCache.nearExpiry, [
+    { label: 'Item Name', value: (r) => r.medicine_name || '' },
+    { label: 'Batch', value: (r) => r.batch_number },
+    { label: 'Expiry Date', value: (r) => r.expiry_date },
+    { label: 'Qty Remaining', value: (r) => r.quantity_remaining },
+    { label: 'Days Left', value: (r) => Math.round((new Date(r.expiry_date) - new Date()) / (1000 * 60 * 60 * 24)) },
+  ]);
+  phDownloadCsv(csv, `near_expiry_${new Date().toISOString().slice(0, 10)}.csv`);
+});
+
 function showPhModal(html) {
   document.getElementById('ph-modal-content').innerHTML = html;
   document.getElementById('ph-modal-backdrop').classList.remove('hidden');
