@@ -79,6 +79,11 @@ import AppLayout from '../layouts/AppLayout.astro';
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
           Checkout
         </button>
+        <button data-ph-tab="rxqueue" class="ph-tab-btn relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-left text-charcoal/60 hover:bg-champagne-50">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="m10.5 20.5 6-6"/><circle cx="8.5" cy="8.5" r="5.5"/><path d="m17 12 4.5 4.5a2.12 2.12 0 0 1-3 3L14 15"/></svg>
+          Rx Queue
+          <span id="ph-badge-rxqueue" class="hidden ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-brand-700 text-white text-[11px] font-bold flex items-center justify-center">0</span>
+        </button>
         <button data-ph-tab="inventory" class="ph-tab-btn relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-left text-charcoal/60 hover:bg-champagne-50">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
           Inventory
@@ -92,6 +97,10 @@ import AppLayout from '../layouts/AppLayout.astro';
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M3 16v5h5"/><path d="M21 16v5h-5"/><path d="m21 3-6.5 6.5"/><path d="m3 21 6.5-6.5"/></svg>
           Reconcile
           <span id="ph-badge-reconcile" class="hidden ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-brand-700 text-white text-[11px] font-bold flex items-center justify-center">0</span>
+        </button>
+        <button data-ph-tab="reports" class="ph-tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-left text-charcoal/60 hover:bg-champagne-50">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          Reports
         </button>
       </nav>
 
@@ -121,35 +130,50 @@ import AppLayout from '../layouts/AppLayout.astro';
           <div id="ph-checkout-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8"></div>
 
           <div class="grid lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-2xl border border-champagne-200 shadow-sm p-6">
-              <div class="flex items-center gap-2 mb-4">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-700"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <h3 class="text-sm font-bold text-brand-700 uppercase tracking-wide">Add Medicine</h3>
-              </div>
-              <div class="relative mb-3">
-                <input type="text" id="ph-med-search" placeholder="Search medicine by name..."
-                       class="w-full text-base border border-champagne-300 rounded-xl px-4 py-3 bg-champagne-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition-all" />
-                <div id="ph-med-results" class="hidden absolute mt-1 w-full bg-white rounded-xl border border-champagne-200 shadow-lg overflow-hidden divide-y divide-champagne-100 z-10 max-h-64 overflow-y-auto"></div>
-              </div>
-              <div id="ph-med-selected" class="hidden bg-champagne-50 rounded-xl p-4 mb-3 border border-champagne-200">
-                <p id="ph-med-selected-name" class="font-bold text-brand-900 text-sm"></p>
-                <div id="ph-med-batches" class="mt-2 space-y-1"></div>
-                <div class="flex items-center gap-2 mt-3">
-                  <label class="text-xs font-semibold text-charcoal/50">Quantity</label>
-                  <input type="number" id="ph-med-qty" min="1" value="1" class="w-20 border border-champagne-300 rounded-lg px-2 py-1.5 text-sm tabular-nums" />
-                  <button id="ph-add-to-cart-btn" class="ml-auto bg-brand-700 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-brand-900 transition">Add to Sale</button>
+            <div class="space-y-6">
+              <!-- Patient (moved above medicine search — matches ClinicOS's
+                   PosPage.jsx layout order: patient identification comes
+                   first, since Schedule H items need it known up front) -->
+              <div class="bg-white rounded-2xl border border-champagne-200 shadow-sm p-6">
+                <div class="flex items-center gap-2 mb-4">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-700"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                  <h3 class="text-sm font-bold text-brand-700 uppercase tracking-wide">Patient</h3>
                 </div>
+                <div id="ph-patient-selected-chip" class="hidden items-center justify-between bg-champagne-50 rounded-lg px-3 py-2.5 border border-champagne-200"></div>
+                <div class="relative">
+                  <input type="text" id="ph-cart-patient-name" placeholder="Search existing patient, or type a walk-in name..."
+                         class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2.5 bg-champagne-50 focus:bg-white focus:border-brand-500 outline-none" />
+                  <div id="ph-patient-results" class="hidden absolute mt-1 w-full bg-white rounded-xl border border-champagne-200 shadow-lg overflow-hidden divide-y divide-champagne-100 z-20 max-h-56 overflow-y-auto"></div>
+                </div>
+                <input type="text" id="ph-cart-patient-phone" placeholder="Phone (optional, for walk-in)"
+                       class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2 mt-2 bg-champagne-50 focus:bg-white focus:border-brand-500 outline-none" />
+                <p class="text-xs text-charcoal/40 mt-2">Search matches existing registered patients by name or phone — select one to link this sale to their record instead of creating a new walk-in.</p>
               </div>
-              <p class="text-xs text-charcoal/40 flex items-center gap-1.5">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                Batches are suggested oldest-first (FIFO) automatically.
-              </p>
+
+              <div class="bg-white rounded-2xl border border-champagne-200 shadow-sm p-6">
+                <div class="flex items-center gap-2 mb-4">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-700"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <h3 class="text-sm font-bold text-brand-700 uppercase tracking-wide">Add Medicine</h3>
+                </div>
+                <div class="relative mb-3">
+                  <input type="text" id="ph-med-search" placeholder="Search medicine by name..."
+                         class="w-full text-base border border-champagne-300 rounded-xl px-4 py-3 bg-champagne-50 focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition-all" />
+                  <div id="ph-med-results" class="hidden absolute mt-1 w-full bg-white rounded-xl border border-champagne-200 shadow-lg overflow-hidden divide-y divide-champagne-100 z-10 max-h-64 overflow-y-auto"></div>
+                </div>
+                <p class="text-xs text-charcoal/40 flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                  Selecting a medicine adds it to the sale immediately at qty 1 (FIFO batch, oldest stock first) — adjust quantity or override the batch in the cart.
+                </p>
+              </div>
             </div>
 
             <div class="bg-white rounded-2xl border border-champagne-200 shadow-sm p-6 flex flex-col">
               <div class="flex items-center gap-2 mb-4">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-700"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                 <h3 class="text-sm font-bold text-brand-700 uppercase tracking-wide">Current Sale</h3>
+              </div>
+              <div id="ph-cart-schedule-h-warning" class="hidden mb-3 px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 font-medium">
+                One or more items are Schedule H/H1 — search and select a registered patient above before this sale can be completed.
               </div>
               <div id="ph-cart-list" class="flex-1 space-y-2 mb-4 min-h-[80px]">
                 <p id="ph-cart-empty" class="text-charcoal/30 text-sm text-center py-8">No items added yet.</p>
@@ -167,10 +191,6 @@ import AppLayout from '../layouts/AppLayout.astro';
                   <span class="text-charcoal/60">Total</span>
                   <span id="ph-cart-total" class="text-2xl font-bold text-brand-900 tabular-nums">₹0</span>
                 </div>
-                <input type="text" id="ph-cart-patient-name" placeholder="Patient name (walk-in OK)"
-                       class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2 bg-champagne-50 focus:bg-white focus:border-brand-500 outline-none" />
-                <input type="text" id="ph-cart-patient-phone" placeholder="Phone (optional)"
-                       class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2 bg-champagne-50 focus:bg-white focus:border-brand-500 outline-none" />
                 <select id="ph-cart-payment-mode" class="w-full text-sm border border-champagne-300 rounded-lg px-3 py-2 bg-champagne-50">
                   <option value="cash">Cash</option>
                   <option value="upi">UPI</option>
@@ -193,6 +213,32 @@ import AppLayout from '../layouts/AppLayout.astro';
           </div>
         </div>
 
+        <!-- ============ RX QUEUE TAB ============ -->
+        <!-- New tab, matching ClinicOS's PharmacyQueuePage.jsx +
+             DispensePage.jsx: today's finalised prescriptions waiting
+             to be dispensed, separate from POS/walk-in checkout.
+             Unlike ClinicOS's DispensePage (which bypasses
+             execute_pharmacy_sale and inserts pharmacy_dispenses rows
+             directly, with no accounting journal entries), this loads
+             the prescription's items into the SAME FIFO cart as
+             Checkout and completes via execute_pharmacy_sale, so
+             every dispense — walk-in or prescription-linked — goes
+             through one consistent, transactionally-safe path. -->
+        <div id="ph-tab-rxqueue" class="ph-tab-panel hidden">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-brand-900 tracking-tight">Rx Queue</h2>
+            <p class="text-sm text-charcoal/50 mt-0.5">Today's finalised prescriptions waiting to be dispensed.</p>
+          </div>
+          <div class="flex items-center justify-end mb-4">
+            <button id="ph-rxqueue-refresh-btn" class="p-2 rounded-lg border border-champagne-300 text-charcoal/40 hover:bg-champagne-50 transition" aria-label="Refresh">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/></svg>
+            </button>
+          </div>
+          <div id="ph-rxqueue-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
+            <p class="text-charcoal/30 text-sm text-center py-8">Loading queue...</p>
+          </div>
+        </div>
+
         <!-- ============ INVENTORY TAB ============ -->
         <div id="ph-tab-inventory" class="ph-tab-panel hidden">
           <div class="mb-6">
@@ -209,10 +255,20 @@ import AppLayout from '../layouts/AppLayout.astro';
               <button data-ph-inv-view="expiring" class="ph-inv-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Expiring Soon</button>
               <button data-ph-inv-view="suppliers" class="ph-inv-view-btn text-xs font-bold px-3.5 py-2 rounded-full bg-champagne-100 text-brand-700 transition">Suppliers</button>
             </div>
-            <button id="ph-new-medicine-btn" class="text-xs font-bold px-4 py-2.5 rounded-lg bg-brand-900 text-white hover:bg-brand-700 transition flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-              <span id="ph-new-medicine-btn-label">New Medicine</span>
-            </button>
+            <div class="flex items-center gap-2">
+              <button id="ph-manual-adj-btn" class="text-xs font-bold px-4 py-2.5 rounded-lg border border-champagne-300 text-brand-700 hover:bg-champagne-50 transition flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                Adjust Stock
+              </button>
+              <button id="ph-quick-stock-btn" class="text-xs font-bold px-4 py-2.5 rounded-lg border border-champagne-300 text-brand-700 hover:bg-champagne-50 transition flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                Quick Stock
+              </button>
+              <button id="ph-new-medicine-btn" class="text-xs font-bold px-4 py-2.5 rounded-lg bg-brand-900 text-white hover:bg-brand-700 transition flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                <span id="ph-new-medicine-btn-label">New Medicine</span>
+              </button>
+            </div>
           </div>
           <div id="ph-inventory-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
             <p class="text-charcoal/30 text-sm text-center py-8">Loading inventory...</p>
@@ -293,6 +349,33 @@ import AppLayout from '../layouts/AppLayout.astro';
             </div>
             <div id="ph-reps-list" class="bg-white rounded-2xl border border-champagne-200 shadow-sm divide-y divide-champagne-100 overflow-hidden">
               <p class="text-charcoal/30 text-sm text-center py-8">Loading reps...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ REPORTS TAB ============ -->
+        <div id="ph-tab-reports" class="ph-tab-panel hidden">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-2xl font-bold text-brand-900 tracking-tight">Reports</h2>
+              <p class="text-sm text-charcoal/50 mt-0.5">Stock valuation and exports.</p>
+            </div>
+            <button id="ph-reports-refresh-btn" class="p-2 rounded-lg border border-champagne-300 text-charcoal/40 hover:bg-champagne-50 transition" aria-label="Refresh">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/></svg>
+            </button>
+          </div>
+          <div id="ph-reports-valuation" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6"></div>
+          <div class="bg-white rounded-2xl border border-champagne-200 shadow-sm p-6">
+            <h3 class="text-sm font-bold text-brand-700 uppercase tracking-wide mb-3">Exports</h3>
+            <div class="space-y-2">
+              <button id="ph-export-stock-valuation-btn" class="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-champagne-300 text-sm text-charcoal/70 hover:bg-champagne-50 transition">
+                <span>Stock Valuation CSV</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-charcoal/30"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              </button>
+              <button id="ph-export-near-expiry-btn" class="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-champagne-300 text-sm text-charcoal/70 hover:bg-champagne-50 transition">
+                <span id="ph-export-near-expiry-label">Near-Expiry CSV</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-charcoal/30"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              </button>
             </div>
           </div>
         </div>
