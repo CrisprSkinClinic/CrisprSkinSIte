@@ -7,17 +7,17 @@ export default {
         // CRISPR logo palette: clear violet, orchid, magenta and pink.
         // Deep values stay violet (not wine/plum) for accessible text.
         brand: {
-          50: '#FAF5FF',
-          100: '#F3E8FF',
-          200: '#E9D5FF',
-          300: '#D8B4FE',
-          400: '#C084FC',
-          500: '#A855F7',
-          600: '#9333EA',
-          700: '#7E22CE',
-          800: '#6B21A8',
-          900: '#4C1D95',
-          950: '#2E1065',
+          50: '#FBF8FC',
+          100: '#F3ECF5',
+          200: '#E4D5E8',
+          300: '#CEB5D5',
+          400: '#AE89B8',
+          500: '#93639F',
+          600: '#7E4D8B',
+          700: '#673C72',
+          800: '#503057',
+          900: '#38223D',
+          950: '#241628',
         },
         // Champagne Beige -- secondary surfaces, subtle backgrounds
         // (kept as a warm neutral pairing; not a color the user flagged)
@@ -38,13 +38,13 @@ export default {
         // a file we haven't touched yet still resolves to navy instead of
         // silently rendering unstyled.
         gold: {
-          50: '#FDF2F8',
-          100: '#FCE7F3',
-          300: '#F9A8D4',
-          400: '#F472B6',
-          500: '#EC4899',
-          600: '#DB2777',
-          700: '#BE185D',
+          50: '#FFF8FB',
+          100: '#FCECF3',
+          300: '#E9B7CF',
+          400: '#D990B3',
+          500: '#C36F9A',
+          600: '#A9557E',
+          700: '#8A4266',
         },
       },
     },
