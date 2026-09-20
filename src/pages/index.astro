@@ -104,18 +104,21 @@ const latestPosts = allPosts
     </div>
   </section>
 
-  <section class="bg-white py-16 px-6 border-y border-champagne-200">
-    <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl font-bold mb-8 text-brand-900">Dealing With a Skin or Hair Concern?</h2>
-      <div class="flex flex-wrap justify-center gap-4 mb-8">
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Hair Fall</span>
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Persistent Acne</span>
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Pigmentation</span>
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Itchy or Scaly Skin</span>
-        <span class="bg-brand-50 text-brand-800 px-4 py-2 rounded-full font-medium">Skin Allergies</span>
+  <section class="bg-slate-950 py-20 px-6 text-white">
+    <div class="max-w-7xl mx-auto grid gap-12 lg:grid-cols-[.85fr_1.15fr] lg:items-center">
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-brand-300 mb-4">When to consult</p>
+        <h2 class="text-4xl md:text-5xl leading-tight">Persistent concerns deserve a clear diagnosis.</h2>
+        <p class="text-base text-slate-400 mt-5 max-w-xl leading-relaxed">Early assessment often means simpler treatment, better control, and fewer unnecessary products or procedures.</p>
+        <a href="/book" data-track="booking-click" class="inline-flex mt-8 items-center gap-3 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-slate-950 hover:bg-brand-50 transition">Book a consultation <span aria-hidden="true">→</span></a>
       </div>
-      <p class="text-lg text-slate-600 mb-6">Early diagnosis leads to simpler, more effective treatment.</p>
-      <a href="/book" class="text-brand-600 font-bold hover:underline">Contact us now →</a>
+      <div class="grid grid-cols-1 sm:grid-cols-2 border-y border-white/15">
+        {['Hair fall or scalp changes', 'Persistent or recurring acne', 'Pigmentation that is changing', 'Itchy, scaly or inflamed skin', 'Recurrent skin allergies', 'A mole or growth that concerns you'].map((concern, index) => (
+          <div class={`flex items-center gap-4 py-5 text-sm text-slate-200 ${index % 2 === 1 ? 'sm:border-l sm:border-white/15 sm:pl-6' : ''} ${index > 1 ? 'border-t border-white/15' : index === 1 ? 'border-t border-white/15 sm:border-t-0' : ''}`}>
+            <span class="text-xs font-semibold text-brand-300">0{index + 1}</span><span>{concern}</span>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 
