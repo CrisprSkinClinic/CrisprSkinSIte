@@ -114,10 +114,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
 
   <body class="bg-warmwhite text-charcoal antialiased selection:bg-brand-200 selection:text-brand-900 flex flex-col min-h-screen">
     
-    <div class="bg-slate-900 text-white/90 text-[11px] sm:text-xs py-2.5 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-0 relative z-50 text-center sm:text-left tracking-wide">
-      <span class="uppercase">Chennai · Dermatologist-led care</span>
+    <div class="bg-slate-900 text-white/90 text-[10px] sm:text-xs py-2 px-4 sm:px-6 flex flex-row justify-between items-center gap-3 relative z-50 tracking-wide">
+      <span class="uppercase whitespace-nowrap">Chennai · Dermatologist-led</span>
       <div class="flex flex-col sm:flex-row sm:space-x-4 items-center">
-        <span>Call: {siteConfig.contact.phone}</span>
+        <span class="whitespace-nowrap">{siteConfig.contact.phone}</span>
         <a href={`mailto:${siteConfig.contact.email}`} class="hover:underline hidden sm:inline">{siteConfig.contact.email}</a>
       </div>
     </div>
