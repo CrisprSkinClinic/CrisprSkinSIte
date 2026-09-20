@@ -13,6 +13,22 @@ body {
     #fffcfd;
 }
 
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow: 0 20px 60px rgba(76, 29, 149, 0.12);
+  backdrop-filter: blur(22px) saturate(145%);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+}
+
+.glass-dark {
+  background: rgba(46, 16, 101, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 50px rgba(46, 16, 101, 0.24);
+  backdrop-filter: blur(20px) saturate(135%);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+}
+
 h1, h2, .font-display {
   font-family: 'DM Serif Display', Georgia, serif;
   font-weight: 400;
@@ -34,4 +50,14 @@ h1, h2, .font-display {
 @keyframes reveal-up {
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1023px) {
+  .mobile-glass-card {
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.88);
+    box-shadow: 0 16px 45px rgba(76, 29, 149, 0.12);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+  }
 }
