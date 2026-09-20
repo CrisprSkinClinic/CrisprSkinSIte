@@ -8,17 +8,15 @@ html {
 
 body {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  background:
-    radial-gradient(circle at 5% 12%, rgba(229, 77, 146, 0.05), transparent 25rem),
-    #fffcfd;
+  background: #fdfcfc;
 }
 
 .glass-panel {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  box-shadow: 0 20px 60px rgba(76, 29, 149, 0.12);
-  backdrop-filter: blur(22px) saturate(145%);
-  -webkit-backdrop-filter: blur(22px) saturate(145%);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(103, 60, 114, 0.12);
+  box-shadow: 0 14px 38px rgba(35, 27, 38, 0.08);
+  backdrop-filter: blur(16px) saturate(115%);
+  -webkit-backdrop-filter: blur(16px) saturate(115%);
 }
 
 .glass-dark {
@@ -54,10 +52,10 @@ h1, h2, .font-display {
 
 @media (max-width: 1023px) {
   .mobile-glass-card {
-    background: rgba(255, 255, 255, 0.74);
-    border: 1px solid rgba(255, 255, 255, 0.88);
-    box-shadow: 0 16px 45px rgba(76, 29, 149, 0.12);
-    backdrop-filter: blur(18px) saturate(145%);
-    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(103, 60, 114, 0.12);
+    box-shadow: 0 12px 32px rgba(35, 27, 38, 0.07);
+    backdrop-filter: blur(14px) saturate(110%);
+    -webkit-backdrop-filter: blur(14px) saturate(110%);
   }
 }
