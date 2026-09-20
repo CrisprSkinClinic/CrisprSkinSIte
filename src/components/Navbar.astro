@@ -1,15 +1,18 @@
 ---
 import { siteConfig } from '../config/site.js';
 ---
-<header class="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/85 border-b border-slate-200/50 shadow-sm transition-all duration-300">
-  <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+<header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-brand-100 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-6 h-24 flex justify-between items-center">
 
-    <a href="/" class="flex flex-col justify-center group">
-      <span class="text-2xl font-extrabold text-brand-900 tracking-tight leading-none group-hover:text-brand-700 transition-colors">{siteConfig.name}</span>
-      <span class="text-[0.65rem] font-bold text-slate-500 uppercase tracking-widest mt-1">Dermatology &middot; Hair &middot; Aesthetics</span>
+    <a href="/" class="flex items-center gap-3 group" aria-label={`${siteConfig.name} home`}>
+      <img src="/images/crispr-mark.svg" alt="" width="44" height="44" class="h-11 w-11" />
+      <span class="flex flex-col justify-center">
+        <span class="text-2xl font-semibold text-brand-700 tracking-[0.08em] leading-none group-hover:text-brand-600 transition-colors">CRISPR</span>
+        <span class="text-[0.58rem] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1.5">Skin &amp; Hair Clinic</span>
+      </span>
     </a>
 
-    <nav class="hidden lg:flex space-x-6 items-center">
+    <nav class="hidden lg:flex space-x-6 items-center rounded-full bg-brand-50/80 px-6 py-3 border border-brand-100">
       <a href="/" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Home</a>
 
       <!-- Services Mega Menu -->
@@ -136,8 +139,8 @@ import { siteConfig } from '../config/site.js';
       <a href="/contact" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Contact</a>
     </nav>
 
-    <a href="/book" data-track="booking-click" class="hidden lg:inline-block bg-gold-500 text-brand-900 text-sm font-bold px-6 py-2.5 rounded-full shadow-md hover:bg-gold-600 hover:shadow-lg transition-all transform hover:-translate-y-0.5">
-      Book Now
+    <a href="/book" data-track="booking-click" class="hidden lg:inline-flex items-center gap-2 bg-brand-800 text-white text-sm font-bold px-6 py-3 rounded-full shadow-lg shadow-brand-900/15 hover:bg-brand-700 hover:-translate-y-0.5 transition-all">
+      Book Appointment <span aria-hidden="true">→</span>
     </a>
 
     <button id="mobileMenuBtn" class="lg:hidden p-2 text-slate-600 hover:text-brand-600 transition-colors" aria-label="Toggle Menu" aria-expanded="false">
