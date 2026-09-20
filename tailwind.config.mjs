@@ -4,20 +4,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        // CRISPR's plum-and-orchid identity, tuned for accessible text,
-        // quiet editorial surfaces, and high-contrast clinical CTAs.
+        // CRISPR logo palette: clear violet, orchid, magenta and pink.
+        // Deep values stay violet (not wine/plum) for accessible text.
         brand: {
-          50: '#FCF5FA',
-          100: '#F8E7F4',
-          200: '#F0CFE8',
-          300: '#E4A8D7',
-          400: '#D578C0',
-          500: '#B94DA5',
-          600: '#963A88',
-          700: '#742A6B',
-          800: '#561D50',
-          900: '#351231',
-          950: '#210A1E',
+          50: '#FAF5FF',
+          100: '#F3E8FF',
+          200: '#E9D5FF',
+          300: '#D8B4FE',
+          400: '#C084FC',
+          500: '#A855F7',
+          600: '#9333EA',
+          700: '#7E22CE',
+          800: '#6B21A8',
+          900: '#4C1D95',
+          950: '#2E1065',
         },
         // Champagne Beige -- secondary surfaces, subtle backgrounds
         // (kept as a warm neutral pairing; not a color the user flagged)
@@ -38,13 +38,13 @@ export default {
         // a file we haven't touched yet still resolves to navy instead of
         // silently rendering unstyled.
         gold: {
-          50: '#FFF4F8',
-          100: '#FFE3EF',
-          300: '#F6A7C8',
-          400: '#EE7EAE',
-          500: '#E54D92',
-          600: '#CA3277',
-          700: '#A82461',
+          50: '#FDF2F8',
+          100: '#FCE7F3',
+          300: '#F9A8D4',
+          400: '#F472B6',
+          500: '#EC4899',
+          600: '#DB2777',
+          700: '#BE185D',
         },
       },
     },
