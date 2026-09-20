@@ -1,30 +1,37 @@
 ---
 import { siteConfig } from '../config/site.js';
-const { title: _title, subtitle, eyebrow, credentials, ctaText, whatsappText } = Astro.props;
+const { title, subtitle, eyebrow, credentials, ctaText, whatsappText } = Astro.props;
 ---
 
-<section class="relative overflow-hidden bg-[#fdfcfc] border-b border-slate-200/70">
+<section class="relative overflow-hidden border-b border-slate-200/70 bg-[radial-gradient(circle_at_50%_26%,#ffffff_0%,#f5f7fb_58%,#edf1f7_100%)]">
 
-  <div class="relative mx-auto grid max-w-7xl gap-9 px-5 pb-12 pt-9 md:px-6 md:py-20 lg:min-h-[650px] lg:grid-cols-[.88fr_1.12fr] lg:items-center">
-    <div class="order-1 max-w-3xl reveal-up">
-      <p class="mb-5 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.24em] text-brand-700"><span class="h-px w-9 bg-brand-400"></span>{credentials}</p>
-      <p class="mb-3 text-sm font-semibold text-brand-600">{eyebrow}</p>
-      <h1 class="max-w-2xl text-[2.45rem] leading-[1.04] text-slate-950 sm:text-6xl lg:text-[4.2rem]">Dermatology that begins with <span class="text-brand-700">understanding.</span></h1>
-      <p class="mt-6 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">{subtitle}</p>
+  <div class="relative mx-auto grid max-w-7xl gap-10 px-[22px] pb-16 pt-16 md:px-6 md:py-20 lg:min-h-[650px] lg:grid-cols-[.88fr_1.12fr] lg:items-center">
+    <div class="order-1 mx-auto max-w-3xl text-center reveal-up lg:mx-0 lg:text-left">
+      <p class="mx-auto mb-7 inline-flex items-center gap-2 rounded-full bg-[#e2e8f3] px-4 py-2 text-[12px] font-semibold text-[#293957] lg:mx-0">
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.5-2.9 8-7 10-4.1-2-7-5.5-7-10V6l7-3z"/><path d="m9.5 12 1.6 1.6 3.6-3.8"/></svg>
+        {credentials}
+      </p>
+      <p class="mb-4 text-[27px] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#2e4779] sm:text-4xl lg:text-2xl lg:text-brand-700">{eyebrow}</p>
+      <h1 class="mx-auto max-w-[330px] text-[34px] font-extrabold leading-[1.2] tracking-[-0.04em] text-[#0e172b] sm:max-w-2xl sm:text-5xl lg:mx-0 lg:text-[4.2rem] lg:leading-[1.04]">{title}</h1>
+      <p class="mx-auto mt-7 max-w-[350px] text-[16px] leading-[1.65] text-slate-600 sm:max-w-2xl md:text-lg lg:mx-0">{subtitle}</p>
 
-      <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 reveal-up reveal-up-delay">
-        <a href="/book" data-track="booking-click" class="inline-flex min-h-14 items-center justify-center gap-3 rounded-xl bg-brand-700 px-7 py-4 text-sm font-bold text-white shadow-lg shadow-brand-900/15 transition hover:-translate-y-0.5 hover:bg-brand-800">{ctaText}<span aria-hidden="true">→</span></a>
-        <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 border-b border-brand-300 py-2 text-sm font-bold text-brand-800 transition hover:border-brand-700">{whatsappText}<span aria-hidden="true">↗</span></a>
+      <div class="mt-8 flex w-full flex-col gap-3 reveal-up reveal-up-delay sm:mx-auto sm:max-w-lg lg:mx-0 lg:max-w-none lg:flex-row lg:flex-wrap lg:items-center">
+        <a href="/book" data-track="booking-click" class="inline-flex min-h-14 w-full items-center justify-center rounded-xl bg-[#2e4779] px-7 py-4 text-[15px] font-bold text-white shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-[#243a66] lg:w-auto">{ctaText}</a>
+        <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-white/80 px-7 py-4 text-[15px] font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 lg:w-auto">
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-2.1-1.05-3.47-3.18-3.57-3.33-.173-.297-.018-.458.13-.606.298-.296.595-.694.743-1.041.1-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.24-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487 2.98 1.288 2.98.859 3.518.805.536-.05 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347Z"/><path d="M12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.88 11.88 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893C23.946 5.343 18.607.003 12.05 0Zm0 21.785h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 5.45 0 9.884 4.437 9.881 9.892-.003 5.45-4.437 9.884-9.885 9.884Z"/></svg>
+          {whatsappText}
+        </a>
       </div>
-
-      <p class="mt-7 border-l-2 border-brand-300 pl-4 text-xs font-semibold leading-relaxed text-slate-500">Three consultant dermatologists · Evidence-based treatment · No unnecessary procedures</p>
     </div>
 
-    <div class="order-2 relative">
-      <div class="relative mx-auto max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10 sm:rounded-3xl">
-        <img src="/images/hero-doctor.jpg" alt="AIIMS-trained dermatology team at CRISPR Skin and Hair Clinic" width="900" height="720" loading="eager" fetchpriority="high" class="aspect-[4/3] w-full rounded-[0.85rem] object-cover sm:rounded-[1.25rem]" />
-        <div class="flex items-center justify-between gap-4 px-3 py-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:px-4 sm:text-xs">
-          <span>Consultant-led care</span><span class="text-brand-700">KK Nagar, Chennai</span>
+    <div class="order-2 relative mx-auto w-full max-w-lg lg:max-w-2xl">
+      <div class="relative rounded-[28px] bg-white p-2 shadow-[0_20px_48px_rgba(15,23,42,0.18)] ring-1 ring-white/90">
+        <img src="/images/hero-doctor.jpg" alt="AIIMS-trained dermatology team at CRISPR Skin and Hair Clinic" width="900" height="720" loading="eager" fetchpriority="high" class="aspect-[4/3] w-full rounded-[22px] object-cover" />
+        <div class="absolute -bottom-7 -left-2 flex items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left shadow-[0_14px_36px_rgba(15,23,42,0.16)] sm:left-5">
+          <span class="grid h-10 w-10 place-items-center rounded-full bg-emerald-100 text-emerald-600">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11a8 8 0 1 1-3-6.25"/><path d="m8.5 11.5 2.2 2.2L20 4.5"/></svg>
+          </span>
+          <span><strong class="block text-[14px] leading-tight text-slate-900">Evidence-Based</strong><small class="block text-[11px] text-slate-500">Ethical Treatment</small></span>
         </div>
       </div>
     </div>
