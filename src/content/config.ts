@@ -35,8 +35,7 @@ const blogCollection = defineCollection({
 
 // Curated patient testimonials, shown on Testimonials.astro. Content
 // lives here (not hardcoded in the component) specifically so staff can
-// add/edit/remove them via /staff-admin without a code change or
-// redeploy request -- see create-content.js's "testimonial" contentType.
+// Testimonials are maintained as reviewed content files in the repository.
 const testimonialCollection = defineCollection({
   type: 'content',
   schema: z.object({
