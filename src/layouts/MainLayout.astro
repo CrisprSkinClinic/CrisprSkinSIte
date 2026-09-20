@@ -109,13 +109,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   </head>
 
   <body class="bg-warmwhite text-charcoal antialiased selection:bg-brand-200 selection:text-brand-900 flex flex-col min-h-screen">
     
-    <div class="bg-brand-900 text-white text-xs sm:text-sm py-2 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-0 relative z-50 text-center sm:text-left">
-      <span>{siteConfig.contact.workingHoursDisplay}</span>
+    <div class="bg-brand-950 text-white/90 text-[11px] sm:text-xs py-2.5 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-0 relative z-50 text-center sm:text-left tracking-wide">
+      <span class="uppercase">Chennai · Dermatologist-led care</span>
       <div class="flex flex-col sm:flex-row sm:space-x-4 items-center">
         <span>Call: {siteConfig.contact.phone}</span>
         <a href={`mailto:${siteConfig.contact.email}`} class="hover:underline hidden sm:inline">{siteConfig.contact.email}</a>
