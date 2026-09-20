@@ -4,26 +4,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Navy palette for CRISPR Skin and Hair Clinic, replacing the
-        // original Warm Luxury forest-green + gold scheme with a single
-        // navy accent -- same "brand" shade numbers so every existing
-        // rounded/shadowed component keeps working unchanged, just
-        // recolored. Gold's old CTA/highlight role is now filled by the
-        // lighter/darker ends of this same navy scale rather than a
-        // second hue -- confirmed with the user: just navy, not navy +
-        // a second accent.
+        // CRISPR's plum-and-orchid identity, tuned for accessible text,
+        // quiet editorial surfaces, and high-contrast clinical CTAs.
         brand: {
-          50: '#EEF0F6',
-          100: '#DBE0ED',
-          200: '#B3BFDA',
-          300: '#8698C2',
-          400: '#5A70A5',
-          500: '#334B7D',
-          600: '#2A3D68',
-          700: '#223154', // primary -- Deep Navy
-          800: '#1A2540',
-          900: '#12131A',
-          950: '#0B0C10',
+          50: '#FCF5FA',
+          100: '#F8E7F4',
+          200: '#F0CFE8',
+          300: '#E4A8D7',
+          400: '#D578C0',
+          500: '#B94DA5',
+          600: '#963A88',
+          700: '#742A6B',
+          800: '#561D50',
+          900: '#351231',
+          950: '#210A1E',
         },
         // Champagne Beige -- secondary surfaces, subtle backgrounds
         // (kept as a warm neutral pairing; not a color the user flagged)
@@ -35,7 +29,7 @@ export default {
           400: '#CCB496',
         },
         // Warm White -- page background
-        warmwhite: '#FAF8F5',
+        warmwhite: '#FFFCFD',
         // Charcoal -- body text
         charcoal: '#2F2F2F',
         // Gold role retired -- CTAs/highlights now use `brand` shades
@@ -44,13 +38,13 @@ export default {
         // a file we haven't touched yet still resolves to navy instead of
         // silently rendering unstyled.
         gold: {
-          50: '#EEF0F6',
-          100: '#DBE0ED',
-          300: '#8698C2',
-          400: '#5A70A5',
-          500: '#334B7D',
-          600: '#2A3D68',
-          700: '#223154',
+          50: '#FFF4F8',
+          100: '#FFE3EF',
+          300: '#F6A7C8',
+          400: '#EE7EAE',
+          500: '#E54D92',
+          600: '#CA3277',
+          700: '#A82461',
         },
       },
     },
