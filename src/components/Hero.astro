@@ -5,22 +5,22 @@ const { title: _title, subtitle, eyebrow, credentials, ctaText, whatsappText } =
 
 <section class="relative overflow-hidden bg-[#fdfcfc] border-b border-slate-200/70">
 
-  <div class="relative mx-auto grid max-w-7xl gap-10 px-5 pb-14 pt-10 md:px-6 md:py-20 lg:min-h-[650px] lg:grid-cols-[.88fr_1.12fr] lg:items-center">
-    <div class="order-2 max-w-3xl reveal-up lg:order-1">
+  <div class="relative mx-auto grid max-w-7xl gap-9 px-5 pb-12 pt-9 md:px-6 md:py-20 lg:min-h-[650px] lg:grid-cols-[.88fr_1.12fr] lg:items-center">
+    <div class="order-1 max-w-3xl reveal-up">
       <p class="mb-5 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.24em] text-brand-700"><span class="h-px w-9 bg-brand-400"></span>{credentials}</p>
       <p class="mb-3 text-sm font-semibold text-brand-600">{eyebrow}</p>
-      <h1 class="max-w-2xl text-[2.65rem] leading-[1.05] text-slate-950 sm:text-6xl lg:text-[4.2rem]">Dermatology that begins with <span class="text-brand-700">understanding.</span></h1>
+      <h1 class="max-w-2xl text-[2.45rem] leading-[1.04] text-slate-950 sm:text-6xl lg:text-[4.2rem]">Dermatology that begins with <span class="text-brand-700">understanding.</span></h1>
       <p class="mt-6 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">{subtitle}</p>
 
-      <div class="mt-8 grid gap-3 sm:flex reveal-up reveal-up-delay">
+      <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 reveal-up reveal-up-delay">
         <a href="/book" data-track="booking-click" class="inline-flex min-h-14 items-center justify-center gap-3 rounded-xl bg-brand-700 px-7 py-4 text-sm font-bold text-white shadow-lg shadow-brand-900/15 transition hover:-translate-y-0.5 hover:bg-brand-800">{ctaText}<span aria-hidden="true">→</span></a>
-        <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="glass-panel inline-flex min-h-14 items-center justify-center gap-2 rounded-xl px-7 py-4 text-sm font-bold text-brand-900 transition hover:-translate-y-0.5">{whatsappText}</a>
+        <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 border-b border-brand-300 py-2 text-sm font-bold text-brand-800 transition hover:border-brand-700">{whatsappText}<span aria-hidden="true">↗</span></a>
       </div>
 
       <p class="mt-7 border-l-2 border-brand-300 pl-4 text-xs font-semibold leading-relaxed text-slate-500">Three consultant dermatologists · Evidence-based treatment · No unnecessary procedures</p>
     </div>
 
-    <div class="order-1 relative lg:order-2">
+    <div class="order-2 relative">
       <div class="relative mx-auto max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10 sm:rounded-3xl">
         <img src="/images/hero-doctor.jpg" alt="AIIMS-trained dermatology team at CRISPR Skin and Hair Clinic" width="900" height="720" loading="eager" fetchpriority="high" class="aspect-[4/3] w-full rounded-[0.85rem] object-cover sm:rounded-[1.25rem]" />
         <div class="flex items-center justify-between gap-4 px-3 py-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:px-4 sm:text-xs">
