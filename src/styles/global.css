@@ -6,3 +6,32 @@ html {
   scroll-behavior: smooth;
 }
 
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 5% 12%, rgba(229, 77, 146, 0.05), transparent 25rem),
+    #fffcfd;
+}
+
+h1, h2, .font-display {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+::selection {
+  background: #f0cfe8;
+  color: #351231;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-up {
+    animation: reveal-up .75s cubic-bezier(.22, 1, .36, 1) both;
+  }
+  .reveal-up-delay { animation-delay: .14s; }
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
