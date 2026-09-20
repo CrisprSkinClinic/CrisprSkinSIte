@@ -1,6 +1,6 @@
 ---
 import { siteConfig } from '../config/site.js';
-const { title: _title, subtitle, eyebrow, credentials, ctaText, whatsappText } = Astro.props;
+const { title, titleAccent, subtitle, eyebrow, credentials, ctaText, whatsappText } = Astro.props;
 ---
 
 <section class="relative overflow-hidden bg-[#fdfcfc] border-b border-slate-200/70">
@@ -9,7 +9,7 @@ const { title: _title, subtitle, eyebrow, credentials, ctaText, whatsappText } =
     <div class="order-1 max-w-3xl reveal-up">
       <p class="mb-5 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.24em] text-brand-700"><span class="h-px w-9 bg-brand-400"></span>{credentials}</p>
       <p class="mb-3 text-sm font-semibold text-brand-600">{eyebrow}</p>
-      <h1 class="max-w-2xl text-[2.45rem] leading-[1.04] text-slate-950 sm:text-6xl lg:text-[4.2rem]">Dermatology that begins with <span class="text-brand-700">understanding.</span></h1>
+      <h1 class="max-w-2xl text-[2.45rem] leading-[1.04] text-slate-950 sm:text-6xl lg:text-[4.2rem]">{title} <span class="text-brand-700">{titleAccent}</span></h1>
       <p class="mt-6 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">{subtitle}</p>
 
       <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 reveal-up reveal-up-delay">
@@ -17,14 +17,14 @@ const { title: _title, subtitle, eyebrow, credentials, ctaText, whatsappText } =
         <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 border-b border-brand-300 py-2 text-sm font-bold text-brand-800 transition hover:border-brand-700">{whatsappText}<span aria-hidden="true">↗</span></a>
       </div>
 
-      <p class="mt-7 border-l-2 border-brand-300 pl-4 text-xs font-semibold leading-relaxed text-slate-500">Three consultant dermatologists · Evidence-based treatment · No unnecessary procedures</p>
+      <p class="mt-7 border-l-2 border-brand-300 pl-4 text-xs font-semibold leading-relaxed text-slate-500">Three consultant dermatologists · Diagnosis-led care · Treatment only when indicated</p>
     </div>
 
     <div class="order-2 relative">
       <div class="relative mx-auto max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10 sm:rounded-3xl">
         <img src="/images/hero-doctor.jpg" alt="AIIMS-trained dermatology team at CRISPR Skin and Hair Clinic" width="900" height="720" loading="eager" fetchpriority="high" class="aspect-[4/3] w-full rounded-[0.85rem] object-cover sm:rounded-[1.25rem]" />
         <div class="flex items-center justify-between gap-4 px-3 py-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 sm:px-4 sm:text-xs">
-          <span>Consultant-led care</span><span class="text-brand-700">KK Nagar, Chennai</span>
+          <span>Specialist dermatology team</span><span class="text-brand-700">KK Nagar, Chennai</span>
         </div>
       </div>
     </div>
