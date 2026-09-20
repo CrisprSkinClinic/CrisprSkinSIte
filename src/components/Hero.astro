@@ -3,39 +3,37 @@ import { siteConfig } from '../config/site.js';
 const { title: _title, subtitle, eyebrow, credentials, ctaText, whatsappText } = Astro.props;
 ---
 
-<section class="relative overflow-hidden bg-gradient-to-br from-white via-brand-50 to-gold-50">
-  <div class="pointer-events-none absolute -left-28 top-28 h-72 w-72 rounded-full bg-gold-300/30 blur-3xl"></div>
-  <div class="pointer-events-none absolute -right-20 top-0 h-96 w-96 rounded-full bg-brand-300/35 blur-3xl"></div>
+<section class="relative overflow-hidden bg-[#fdfcfc] border-b border-slate-200/70">
 
   <div class="relative mx-auto grid max-w-7xl gap-10 px-5 pb-14 pt-10 md:px-6 md:py-20 lg:min-h-[700px] lg:grid-cols-[.9fr_1.1fr] lg:items-center">
     <div class="order-2 max-w-3xl reveal-up lg:order-1">
       <p class="mb-5 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.22em] text-brand-700"><span class="h-px w-9 bg-gold-500"></span>{credentials}</p>
       <p class="mb-3 text-sm font-semibold text-gold-600">{eyebrow}</p>
-      <h1 class="max-w-3xl text-[2.8rem] leading-[1.02] text-slate-950 sm:text-6xl lg:text-7xl">Dermatology that begins with <span class="bg-gradient-to-r from-brand-700 to-gold-600 bg-clip-text italic text-transparent">understanding.</span></h1>
+      <h1 class="max-w-3xl text-[2.65rem] leading-[1.04] text-slate-950 sm:text-6xl lg:text-7xl">Dermatology that begins with <span class="text-brand-700">understanding.</span></h1>
       <p class="mt-6 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">{subtitle}</p>
 
       <div class="mt-8 grid gap-3 sm:flex reveal-up reveal-up-delay">
-        <a href="/book" data-track="booking-click" class="inline-flex min-h-14 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-brand-700 to-brand-600 px-7 py-4 text-sm font-bold text-white shadow-xl shadow-brand-700/25 transition hover:-translate-y-0.5 hover:shadow-2xl">{ctaText}<span aria-hidden="true">→</span></a>
-        <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="glass-panel inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl px-7 py-4 text-sm font-bold text-brand-900 transition hover:-translate-y-0.5">{whatsappText}</a>
+        <a href="/book" data-track="booking-click" class="inline-flex min-h-14 items-center justify-center gap-3 rounded-xl bg-brand-700 px-7 py-4 text-sm font-bold text-white shadow-lg shadow-brand-900/15 transition hover:-translate-y-0.5 hover:bg-brand-800">{ctaText}<span aria-hidden="true">→</span></a>
+        <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="glass-panel inline-flex min-h-14 items-center justify-center gap-2 rounded-xl px-7 py-4 text-sm font-bold text-brand-900 transition hover:-translate-y-0.5">{whatsappText}</a>
       </div>
 
       <div class="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs font-semibold text-slate-500"><span>✓ AIIMS-trained team</span><span>✓ Evidence-based care</span><span>✓ Ethical treatment</span></div>
     </div>
 
     <div class="order-1 relative lg:order-2">
-      <div class="relative mx-auto max-w-2xl overflow-hidden rounded-[2rem] border border-white/90 bg-white/40 p-2 shadow-2xl shadow-brand-900/15 backdrop-blur-xl sm:rounded-[2.75rem]">
-        <img src="/images/hero-doctor.jpg" alt="AIIMS-trained dermatology team at CRISPR Skin and Hair Clinic" width="900" height="720" loading="eager" fetchpriority="high" class="aspect-[4/3] w-full rounded-[1.6rem] object-cover sm:rounded-[2.35rem]" />
-        <div class="absolute inset-x-5 bottom-5 rounded-2xl border border-white/25 bg-gradient-to-r from-brand-800/80 to-brand-600/65 p-4 text-white shadow-xl backdrop-blur-xl sm:inset-x-auto sm:bottom-7 sm:left-7 sm:max-w-xs sm:p-5">
+      <div class="relative mx-auto max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white/70 p-1.5 shadow-xl shadow-slate-900/10 backdrop-blur-xl sm:rounded-3xl">
+        <img src="/images/hero-doctor.jpg" alt="AIIMS-trained dermatology team at CRISPR Skin and Hair Clinic" width="900" height="720" loading="eager" fetchpriority="high" class="aspect-[4/3] w-full rounded-[0.85rem] object-cover sm:rounded-[1.25rem]" />
+        <div class="absolute inset-x-4 bottom-4 rounded-xl border border-white/60 bg-white/82 p-4 text-slate-900 shadow-lg backdrop-blur-xl sm:inset-x-auto sm:bottom-6 sm:left-6 sm:max-w-xs sm:p-5">
           <p class="font-display text-xl leading-tight">Clear advice. Thoughtful treatment. Natural results.</p>
-          <p class="mt-2 text-[11px] leading-relaxed text-white/75">Care without unnecessary procedures.</p>
+          <p class="mt-2 text-[11px] leading-relaxed text-slate-500">Care without unnecessary procedures.</p>
         </div>
       </div>
 
-      <div class="glass-panel absolute -right-2 top-5 hidden rounded-2xl px-4 py-3 text-xs font-bold text-brand-900 sm:block lg:-right-5">4.9 ★ Google rating</div>
+      <div class="glass-panel absolute -right-2 top-5 hidden rounded-xl px-4 py-3 text-xs font-bold text-brand-900 sm:block lg:-right-5">4.9 ★ Google rating</div>
     </div>
   </div>
 
-  <div class="relative mx-4 mb-6 rounded-[1.75rem] border border-white/80 bg-white/60 shadow-lg shadow-brand-900/5 backdrop-blur-xl md:mx-auto md:max-w-7xl">
+  <div class="relative mx-4 mb-6 rounded-2xl border border-slate-200/80 bg-white/82 shadow-sm backdrop-blur-xl md:mx-auto md:max-w-7xl">
     <div class="grid grid-cols-2 gap-px px-3 py-5 text-center text-[11px] font-bold text-brand-800 sm:grid-cols-4 md:text-sm"><span>Medical Dermatology</span><span>Hair Restoration</span><span>Aesthetic Care</span><span>Paediatric Skin</span></div>
   </div>
 </section>
