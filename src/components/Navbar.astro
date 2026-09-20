@@ -2,12 +2,12 @@
 import { siteConfig } from '../config/site.js';
 ---
 <header class="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_5px_22px_rgba(15,23,42,0.05)] transition-all duration-300">
-  <div class="max-w-7xl mx-auto px-6 h-24 flex justify-between items-center">
+  <div class="max-w-7xl mx-auto px-5 sm:px-6 h-20 lg:h-24 flex justify-between items-center">
 
     <a href="/" class="flex items-center gap-3 group" aria-label={`${siteConfig.name} home`}>
-      <img src="/images/crispr-mark.svg" alt="" width="44" height="44" class="h-11 w-11" />
+      <img src="/images/crispr-mark.svg" alt="" width="44" height="44" class="h-10 w-10 lg:h-11 lg:w-11" />
       <span class="flex flex-col justify-center">
-        <span class="text-2xl font-semibold text-brand-700 tracking-[0.08em] leading-none group-hover:text-brand-600 transition-colors">CRISPR</span>
+        <span class="text-xl lg:text-2xl font-semibold text-brand-700 tracking-[0.08em] leading-none group-hover:text-brand-600 transition-colors">CRISPR</span>
         <span class="text-[0.58rem] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1.5">Skin &amp; Hair Clinic</span>
       </span>
     </a>
