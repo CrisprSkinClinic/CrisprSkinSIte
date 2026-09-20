@@ -2,14 +2,19 @@
 import { siteConfig } from '../config/site.js';
 ---
 <header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/80 transition-all duration-300">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 lg:h-24 flex justify-between items-center">
+  <div class="max-w-7xl mx-auto px-[22px] sm:px-6 h-[72px] lg:h-24 flex justify-between items-center">
 
-    <a href="/" class="flex items-center gap-3 group" aria-label={`${siteConfig.name} home`}>
+    <a href="/" class="hidden lg:flex items-center gap-3 group" aria-label={`${siteConfig.name} home`}>
       <img src="/images/crispr-mark.svg" alt="" width="44" height="44" class="h-8 w-8 lg:h-11 lg:w-11" />
       <span class="flex flex-col justify-center">
         <span class="text-lg lg:text-2xl font-semibold text-brand-700 tracking-[0.08em] leading-none group-hover:text-brand-600 transition-colors">CRISPR</span>
         <span class="text-[0.48rem] lg:text-[0.58rem] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">Skin &amp; Hair Clinic</span>
       </span>
+    </a>
+
+    <a href="/" class="flex min-w-0 flex-col lg:hidden" aria-label={`${siteConfig.name} home`}>
+      <span class="whitespace-nowrap text-[19px] font-extrabold leading-none tracking-[-0.055em] text-slate-950">CRISPR Skin and Hair Clinic</span>
+      <span class="mt-1 text-[8px] font-bold uppercase tracking-[0.13em] text-slate-500">Dermatology · Hair · Aesthetics</span>
     </a>
 
     <nav class="hidden lg:flex space-x-7 items-center px-2 py-3">
@@ -143,8 +148,8 @@ import { siteConfig } from '../config/site.js';
       Book Appointment <span aria-hidden="true">→</span>
     </a>
 
-    <button id="mobileMenuBtn" class="lg:hidden grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-brand-800 shadow-sm hover:text-brand-600 transition-colors" aria-label="Toggle Menu" aria-expanded="false">
-      <svg id="menuIconOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <button id="mobileMenuBtn" class="lg:hidden grid h-9 w-9 shrink-0 place-items-center text-slate-600 hover:text-slate-950 transition-colors" aria-label="Toggle Menu" aria-expanded="false">
+      <svg id="menuIconOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
       <svg id="menuIconClose" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
