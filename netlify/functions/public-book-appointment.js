@@ -237,24 +237,29 @@ exports.handler = async (event) => {
 
     // ---- Find or create the patient ----
 
-    const { data: existingPatients, error: patientLookupError } = await supabase
-      .from("patients")
-      .select("id")
-      .eq("phone", phone)
-      .limit(1);
+    // patients.name/phone are encrypted columns (name_enc/phone_enc) --
+    // a direct .eq("phone", phone) filter can't match encrypted values,
+    // so lookup goes through the find_patient_by_phone RPC (hash-based
+    // exact match) instead, and insertion goes through
+    // insert_patient_encrypted so the new row's PII is encrypted from
+    // the start rather than ever touching the table in plaintext.
+    const { data: existingRows, error: patientLookupError } = await supabase.rpc("find_patient_by_phone", { p_phone: phone });
     if (patientLookupError) throw patientLookupError;
 
     let patientId;
-    if (existingPatients && existingPatients.length > 0) {
-      patientId = existingPatients[0].id;
+    if (existingRows && existingRows.length > 0) {
+      patientId = existingRows[0].id;
     } else {
-      const { data: newPatient, error: insertPatientError } = await supabase
-        .from("patients")
-        .insert({ name, phone, is_registered: false })
-        .select("id")
-        .single();
+      const { data: newPatientId, error: insertPatientError } = await supabase.rpc("insert_patient_encrypted", {
+        p_name: name,
+        p_phone: phone,
+        p_dob: null,
+        p_gender: null,
+        p_address: null,
+        p_is_registered: false,
+      });
       if (insertPatientError) throw insertPatientError;
-      patientId = newPatient.id;
+      patientId = newPatientId;
     }
 
     // patients has no email column, so it's folded into the appointment
@@ -281,6 +286,63 @@ exports.handler = async (event) => {
       .select("id")
       .single();
     if (insertAppointmentError) throw insertAppointmentError;
+
+    // ---- Send WhatsApp confirmation (best-effort, never blocks the booking) ----
+    //
+    // Calls a dedicated Supabase Edge Function (send-wa-appointment-confirmation)
+    // rather than send-whatsapp-meta directly, since this Netlify function has
+    // no staff login -- it authenticates with the service_role key it already
+    // holds for its other Supabase calls, so no new secret is needed here.
+    // Meta credentials stay living only in Supabase.
+    //
+    // Deliberately fire-and-forget with respect to the booking response: if
+    // the WhatsApp send fails (template not approved for this language, Meta
+    // outage, malformed phone, etc.), the booking itself must still succeed
+    // and return success to the patient -- a confirmation message is a nice-
+    // to-have, not a precondition for the appointment being real.
+    try {
+      const { data: doctorRow, error: doctorLookupError } = await supabase
+        .from("doctors")
+        .select("name")
+        .eq("id", doctorId)
+        .single();
+      if (doctorLookupError) throw doctorLookupError;
+
+      const confirmationPhone = phone.replace(/^\+/, "");
+      const sendPhone = confirmationPhone.length === 10 ? `91${confirmationPhone}` : confirmationPhone;
+
+      const displayDate = new Date(`${slotDate}T00:00:00Z`).toLocaleDateString("en-GB", {
+        day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+      });
+      const [hh, mm] = slotTime.split(":");
+      const hourNum = parseInt(hh, 10);
+      const displayTime = `${((hourNum + 11) % 12) + 1}:${mm} ${hourNum >= 12 ? "PM" : "AM"}`;
+
+      const confirmationRes = await fetch(
+        `${SUPABASE_URL}/functions/v1/send-wa-appointment-confirmation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${serviceRoleKey}`,
+          },
+          body: JSON.stringify({
+            phone: sendPhone,
+            patient_name: name,
+            doctor_name: doctorRow?.name ? `Dr. ${doctorRow.name}` : "your doctor",
+            date: displayDate,
+            time: displayTime,
+            appointment_id: appointment.id,
+          }),
+        }
+      );
+      if (!confirmationRes.ok) {
+        const errBody = await confirmationRes.json().catch(() => ({}));
+        console.error("WhatsApp confirmation send failed:", errBody.error || confirmationRes.status);
+      }
+    } catch (whatsappError) {
+      console.error("WhatsApp confirmation send threw:", whatsappError.message);
+    }
 
     return ok({ success: true, appointment_id: appointment.id });
   } catch (error) {

@@ -12,6 +12,7 @@ import { siteConfig } from '../config/site.js';
     <nav class="hidden lg:flex space-x-6 items-center">
       <a href="/" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Home</a>
 
+      <!-- Services Mega Menu -->
       <div class="relative group">
         <button class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors flex items-center gap-1">
           Services
@@ -70,7 +71,65 @@ import { siteConfig } from '../config/site.js';
         </div>
       </div>
 
-      <a href="/conditions" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Conditions</a>
+      <!-- Conditions Mega Menu (NEW) -->
+      <div class="relative group">
+        <button class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors flex items-center gap-1">
+          Conditions
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 hidden group-hover:block">
+          <div class="bg-white rounded-xl shadow-xl border border-champagne-200 py-6 px-6 w-[720px] grid grid-cols-4 gap-6">
+            <div>
+              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Hair</a>
+              <div class="flex flex-col gap-2">
+                <a href="/conditions/androgenetic-alopecia" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Androgenetic Alopecia</a>
+                <a href="/conditions/female-pattern-hair-loss" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Female Pattern Hair Loss</a>
+                <a href="/conditions/telogen-effluvium" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Telogen Effluvium</a>
+                <a href="/conditions/alopecia-areata" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Alopecia Areata</a>
+                <a href="/conditions/alopecia-totalis-universalis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Alopecia Totalis / Universalis</a>
+                <a href="/conditions/postpartum-hair-loss" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Postpartum Hair Loss</a>
+                <a href="/conditions/scalp-psoriasis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Scalp Psoriasis</a>
+                <a href="/conditions/seborrheic-dermatitis-scalp" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Seborrheic Dermatitis (Scalp)</a>
+              </div>
+            </div>
+            <div>
+              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Skin</a>
+              <div class="flex flex-col gap-2">
+                <a href="/conditions/hormonal-acne" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Hormonal Acne</a>
+                <a href="/conditions/acne-scar-types" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Acne Scar Types</a>
+                <a href="/conditions/melasma" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Melasma</a>
+                <a href="/conditions/post-inflammatory-hyperpigmentation" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Post-inflammatory Hyperpigmentation</a>
+                <a href="/conditions/plaque-psoriasis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Plaque Psoriasis</a>
+                <a href="/conditions/contact-dermatitis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Contact Dermatitis</a>
+                <a href="/conditions/urticaria-acute-chronic" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Urticaria</a>
+                <a href="/conditions/tinea-infections" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Tinea Infections</a>
+                <a href="/conditions/vitiligo" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Vitiligo</a>
+              </div>
+            </div>
+            <div>
+              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Nails & Growths</a>
+              <div class="flex flex-col gap-2">
+                <a href="/conditions/onychomycosis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Onychomycosis (Nail Fungus)</a>
+                <a href="/conditions/ingrown-toenail" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Ingrown Toenail</a>
+                <a href="/conditions/viral-warts" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Viral Warts</a>
+                <a href="/conditions/melanocytic-naevi-moles" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Moles (Melanocytic Naevi)</a>
+              </div>
+            </div>
+            <div>
+              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Pediatric</a>
+              <div class="flex flex-col gap-2">
+                <a href="/conditions/childhood-atopic-dermatitis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Childhood Atopic Dermatitis</a>
+                <a href="/conditions/diaper-dermatitis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Diaper Dermatitis</a>
+                <a href="/conditions/molluscum-contagiosum" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Molluscum Contagiosum</a>
+                <a href="/conditions/hand-foot-mouth-disease" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Hand Foot Mouth Disease</a>
+                <a href="/conditions/infantile-haemangioma" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Infantile Haemangioma</a>
+                <a href="/conditions/congenital-melanocytic-naevus" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Congenital Melanocytic Naevus</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <a href="/our-doctors" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Our Doctors</a>
       <a href="/faq" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">FAQ</a>
       <a href="/blog" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Blog</a>
@@ -96,11 +155,13 @@ import { siteConfig } from '../config/site.js';
     <nav class="px-6 py-4 flex flex-col gap-1">
       <a href="/" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Home</a>
 
+      <!-- Mobile Services -->
       <button id="mobileServicesToggle" class="w-full flex items-center justify-between py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors" aria-expanded="false">
         <span>Services</span>
         <svg id="mobileServicesChevron" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div id="mobileServicesSubmenu" class="hidden flex-col gap-4 pl-4 border-l border-champagne-200 ml-1">
+        <!-- (same Services content as before) -->
         <div>
           <a href="/hair" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Hair</a>
           <div class="flex flex-col gap-1">
@@ -150,7 +211,61 @@ import { siteConfig } from '../config/site.js';
         </div>
       </div>
 
-      <a href="/conditions" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Conditions</a>
+      <!-- Mobile Conditions (NEW) -->
+      <button id="mobileConditionsToggle" class="w-full flex items-center justify-between py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors" aria-expanded="false">
+        <span>Conditions</span>
+        <svg id="mobileConditionsChevron" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="mobileConditionsSubmenu" class="hidden flex-col gap-4 pl-4 border-l border-champagne-200 ml-1">
+        <div>
+          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Hair</a>
+          <div class="flex flex-col gap-1">
+            <a href="/conditions/androgenetic-alopecia" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Androgenetic Alopecia</a>
+            <a href="/conditions/female-pattern-hair-loss" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Female Pattern Hair Loss</a>
+            <a href="/conditions/telogen-effluvium" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Telogen Effluvium</a>
+            <a href="/conditions/alopecia-areata" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Alopecia Areata</a>
+            <a href="/conditions/alopecia-totalis-universalis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Alopecia Totalis / Universalis</a>
+            <a href="/conditions/postpartum-hair-loss" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Postpartum Hair Loss</a>
+            <a href="/conditions/scalp-psoriasis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Scalp Psoriasis</a>
+            <a href="/conditions/seborrheic-dermatitis-scalp" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Seborrheic Dermatitis (Scalp)</a>
+          </div>
+        </div>
+        <div>
+          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Skin</a>
+          <div class="flex flex-col gap-1">
+            <a href="/conditions/hormonal-acne" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Hormonal Acne</a>
+            <a href="/conditions/acne-scar-types" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Acne Scar Types</a>
+            <a href="/conditions/melasma" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Melasma</a>
+            <a href="/conditions/post-inflammatory-hyperpigmentation" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Post-inflammatory Hyperpigmentation</a>
+            <a href="/conditions/plaque-psoriasis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Plaque Psoriasis</a>
+            <a href="/conditions/contact-dermatitis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Contact Dermatitis</a>
+            <a href="/conditions/urticaria-acute-chronic" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Urticaria</a>
+            <a href="/conditions/tinea-infections" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Tinea Infections</a>
+            <a href="/conditions/vitiligo" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Vitiligo</a>
+          </div>
+        </div>
+        <div>
+          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Nails & Growths</a>
+          <div class="flex flex-col gap-1">
+            <a href="/conditions/onychomycosis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Onychomycosis (Nail Fungus)</a>
+            <a href="/conditions/ingrown-toenail" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Ingrown Toenail</a>
+            <a href="/conditions/viral-warts" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Viral Warts</a>
+            <a href="/conditions/melanocytic-naevi-moles" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Moles (Melanocytic Naevi)</a>
+          </div>
+        </div>
+        <div>
+          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Pediatric</a>
+          <div class="flex flex-col gap-1">
+            <a href="/conditions/childhood-atopic-dermatitis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Childhood Atopic Dermatitis</a>
+            <a href="/conditions/diaper-dermatitis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Diaper Dermatitis</a>
+            <a href="/conditions/molluscum-contagiosum" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Molluscum Contagiosum</a>
+            <a href="/conditions/hand-foot-mouth-disease" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Hand Foot Mouth Disease</a>
+            <a href="/conditions/infantile-haemangioma" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Infantile Haemangioma</a>
+            <a href="/conditions/congenital-melanocytic-naevus" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Congenital Melanocytic Naevus</a>
+          </div>
+        </div>
+      </div>
+
       <a href="/our-doctors" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Our Doctors</a>
       <a href="/faq" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">FAQ</a>
       <a href="/blog" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Blog</a>
@@ -177,12 +292,8 @@ import { siteConfig } from '../config/site.js';
       btn.setAttribute('aria-expanded', String(isHidden));
     });
 
-    // Close menu when a top-level link inside it is tapped
-    // (excludes the Services toggle button itself, and excludes links
-    // inside the services submenu, which are handled separately below
-    // so tapping a service link closes the WHOLE mobile menu, not just
-    // the submenu).
-    panel.querySelectorAll('nav > a, #mobileServicesSubmenu a').forEach((link) => {
+    // Close menu when any link is tapped
+    panel.querySelectorAll('nav > a, #mobileServicesSubmenu a, #mobileConditionsSubmenu a').forEach((link) => {
       link.addEventListener('click', () => {
         panel.classList.add('hidden');
         iconOpen.classList.remove('hidden');
@@ -191,7 +302,7 @@ import { siteConfig } from '../config/site.js';
       });
     });
 
-    // Services submenu tap-to-expand
+    // Services submenu toggle
     const servicesToggle = document.getElementById('mobileServicesToggle');
     const servicesSubmenu = document.getElementById('mobileServicesSubmenu');
     const servicesChevron = document.getElementById('mobileServicesChevron');
@@ -203,6 +314,21 @@ import { siteConfig } from '../config/site.js';
         servicesSubmenu.classList.toggle('flex');
         servicesChevron.classList.toggle('rotate-180');
         servicesToggle.setAttribute('aria-expanded', String(isHidden));
+      });
+    }
+
+    // Conditions submenu toggle (NEW)
+    const conditionsToggle = document.getElementById('mobileConditionsToggle');
+    const conditionsSubmenu = document.getElementById('mobileConditionsSubmenu');
+    const conditionsChevron = document.getElementById('mobileConditionsChevron');
+
+    if (conditionsToggle && conditionsSubmenu && conditionsChevron) {
+      conditionsToggle.addEventListener('click', () => {
+        const isHidden = conditionsSubmenu.classList.contains('hidden');
+        conditionsSubmenu.classList.toggle('hidden');
+        conditionsSubmenu.classList.toggle('flex');
+        conditionsChevron.classList.toggle('rotate-180');
+        conditionsToggle.setAttribute('aria-expanded', String(isHidden));
       });
     }
   });

@@ -1,0 +1,148 @@
+---
+// src/components/StatsBar.astro
+const googleReviewsUrl = 'https://share.google/UGVT60Semdn8hnpuv';
+
+const stats = [
+  {
+    id: 'doctors',
+    end: 3,
+    decimals: 0,
+    suffix: '',
+    label: 'AIIMS-trained dermatologists',
+  },
+  {
+    id: 'rating',
+    end: 4.9,
+    decimals: 1,
+    suffix: '',
+    label: 'Google rating',
+    sub: '370+ reviews',
+    href: googleReviewsUrl,
+  },
+  {
+    id: 'patients',
+    end: 5000,
+    decimals: 0,
+    suffix: '+',
+    label: 'Satisfied patients',
+  },
+  {
+    id: 'experience',
+    end: 20,
+    decimals: 0,
+    suffix: '+',
+    label: 'Years combined experience',
+  },
+];
+---
+
+<section class="bg-champagne-50 py-14 md:py-16 px-6 border-y border-champagne-200">
+  <div class="max-w-7xl mx-auto">
+    <div
+      id="statsBarGrid"
+      class="rounded-2xl bg-brand-900 border border-brand-800 shadow-xl overflow-hidden"
+    >
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat, i) => {
+          const cellClass = [
+            'relative px-6 py-10 md:py-12 text-center flex flex-col items-center justify-center',
+            i > 0 ? 'border-t border-white/10 sm:border-t-0' : '',
+            i % 2 === 1 ? 'sm:border-l sm:border-white/10' : '',
+            i > 1 ? 'lg:border-t-0' : '',
+            i > 0 ? 'lg:border-l lg:border-white/10' : '',
+          ].join(' ');
+
+          const inner = (
+            <>
+              <p
+                class="text-4xl md:text-5xl font-extrabold tracking-tight text-white tabular-nums"
+                data-stat-value
+                data-end={stat.end}
+                data-decimals={stat.decimals}
+                data-suffix={stat.suffix}
+              >
+                0{stat.suffix}
+              </p>
+              <p class="mt-3 text-sm font-semibold text-brand-100 leading-snug">
+                {stat.label}
+              </p>
+              {stat.sub && (
+                <p class="mt-1 text-xs text-brand-300">{stat.sub}</p>
+              )}
+            </>
+          );
+
+          return stat.href ? (
+            <a
+              href={stat.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class={`${cellClass} group hover:bg-white/5 transition-colors`}
+            >
+              {inner}
+              <span class="mt-3 text-xs font-medium text-brand-200 group-hover:text-white transition-colors">
+                View reviews →
+              </span>
+            </a>
+          ) : (
+            <div class={cellClass}>{inner}</div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function animateValue(el, end, decimals, suffix, duration = 1400) {
+    const start = 0;
+    const startTime = performance.now();
+
+    function frame(now) {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = start + (end - start) * eased;
+      el.textContent =
+        (decimals > 0 ? current.toFixed(decimals) : Math.round(current).toLocaleString('en-IN')) +
+        suffix;
+      if (progress < 1) requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  function runStatsAnimation() {
+    document.querySelectorAll('[data-stat-value]').forEach((el) => {
+      if (el.dataset.animated === 'true') return;
+      el.dataset.animated = 'true';
+      const end = parseFloat(el.dataset.end || '0');
+      const decimals = parseInt(el.dataset.decimals || '0', 10);
+      const suffix = el.dataset.suffix || '';
+      animateValue(el, end, decimals, suffix);
+    });
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    const grid = document.getElementById('statsBarGrid');
+    if (!grid) return;
+
+    grid.querySelectorAll('[data-stat-value]').forEach((el) => {
+      el.dataset.animated = 'false';
+      el.textContent = '0' + (el.dataset.suffix || '');
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            runStatsAnimation();
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(grid);
+  });
+</script>

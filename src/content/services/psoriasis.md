@@ -1,6 +1,6 @@
 ---
-title: "Psoriasis Treatment"
-metaDescription: "Psoriasis diagnosis and long-term management in KK Nagar, Chennai. Evidence-based care for a chronic condition from AIIMS-trained dermatologists."
+title: "Psoriasis Treatment in Chennai | KK Nagar"
+metaDescription: "Psoriasis diagnosis & long-term management in KK Nagar, Chennai. Topical therapy, phototherapy guidance. AIIMS-trained dermatologists."
 heroEyebrow: "Clinical Dermatology"
 heroHeadline: "Psoriasis Treatment"
 heroSubheadline: "Psoriasis is a chronic condition best managed with a sustained plan, not a search for a single cure."
