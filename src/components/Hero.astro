@@ -3,20 +3,20 @@ import { siteConfig } from '../config/site.js';
 const { title, subtitle, eyebrow, credentials, ctaText, whatsappText } = Astro.props;
 ---
 
-<section class="relative overflow-hidden border-b border-slate-200/70 bg-[radial-gradient(circle_at_50%_26%,#ffffff_0%,#f5f7fb_58%,#edf1f7_100%)]">
+<section class="relative overflow-hidden border-b border-brand-100 bg-[radial-gradient(circle_at_50%_26%,#ffffff_0%,#fbf8fc_58%,#f3ecf5_100%)]">
 
   <div class="relative mx-auto grid max-w-7xl gap-10 px-[22px] pb-16 pt-16 md:px-6 md:py-20 lg:min-h-[650px] lg:grid-cols-[.88fr_1.12fr] lg:items-center">
     <div class="order-1 mx-auto max-w-3xl text-center reveal-up lg:mx-0 lg:text-left">
-      <p class="mx-auto mb-7 inline-flex items-center gap-2 rounded-full bg-[#e2e8f3] px-4 py-2 text-[12px] font-semibold text-[#293957] lg:mx-0">
+      <p class="mx-auto mb-7 inline-flex items-center gap-2 rounded-full bg-brand-100 px-4 py-2 text-[12px] font-semibold text-brand-800 lg:mx-0">
         <svg aria-hidden="true" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.5-2.9 8-7 10-4.1-2-7-5.5-7-10V6l7-3z"/><path d="m9.5 12 1.6 1.6 3.6-3.8"/></svg>
         {credentials}
       </p>
-      <p class="mb-4 text-[27px] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#2e4779] sm:text-4xl lg:text-2xl lg:text-brand-700">{eyebrow}</p>
+      <p class="mb-4 text-[27px] font-extrabold leading-[1.08] tracking-[-0.045em] text-brand-700 sm:text-4xl lg:text-2xl">{eyebrow}</p>
       <h1 class="mx-auto max-w-[330px] text-[34px] font-extrabold leading-[1.2] tracking-[-0.04em] text-[#0e172b] sm:max-w-2xl sm:text-5xl lg:mx-0 lg:text-[4.2rem] lg:leading-[1.04]">{title}</h1>
       <p class="mx-auto mt-7 max-w-[350px] text-[16px] leading-[1.65] text-slate-600 sm:max-w-2xl md:text-lg lg:mx-0">{subtitle}</p>
 
       <div class="mt-8 flex w-full flex-col gap-3 reveal-up reveal-up-delay sm:mx-auto sm:max-w-lg lg:mx-0 lg:max-w-none lg:flex-row lg:flex-wrap lg:items-center">
-        <a href="/book" data-track="booking-click" class="inline-flex min-h-14 w-full items-center justify-center rounded-xl bg-[#2e4779] px-7 py-4 text-[15px] font-bold text-white shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-[#243a66] lg:w-auto">{ctaText}</a>
+        <a href="/book" data-track="booking-click" class="inline-flex min-h-14 w-full items-center justify-center rounded-xl bg-brand-700 px-7 py-4 text-[15px] font-bold text-white shadow-lg shadow-brand-900/15 transition hover:-translate-y-0.5 hover:bg-brand-800 lg:w-auto">{ctaText}</a>
         <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-white/80 px-7 py-4 text-[15px] font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 lg:w-auto">
           <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-2.1-1.05-3.47-3.18-3.57-3.33-.173-.297-.018-.458.13-.606.298-.296.595-.694.743-1.041.1-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.24-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487 2.98 1.288 2.98.859 3.518.805.536-.05 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347Z"/><path d="M12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.88 11.88 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893C23.946 5.343 18.607.003 12.05 0Zm0 21.785h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 5.45 0 9.884 4.437 9.881 9.892-.003 5.45-4.437 9.884-9.885 9.884Z"/></svg>
           {whatsappText}
