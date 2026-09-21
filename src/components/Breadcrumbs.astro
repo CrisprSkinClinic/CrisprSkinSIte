@@ -30,13 +30,13 @@ const schema = {
 
 <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
-<nav aria-label="Breadcrumb" class="max-w-4xl mx-auto px-6 pt-6 text-sm leading-none">
-  <ol class="flex items-center flex-wrap gap-1 text-slate-500 leading-none">
+<nav aria-label="Breadcrumb" class="bg-[#f8f7f8] border-b border-slate-200/70 px-5 sm:px-6 py-3.5 text-xs sm:text-sm leading-none">
+  <ol class="max-w-7xl mx-auto flex items-center flex-nowrap overflow-hidden gap-1 text-slate-500 leading-none">
     {allItems.map((item, index) => (
-      <li class="flex items-center gap-1 leading-none">
+      <li class={`flex items-center gap-1 leading-none ${index === allItems.length - 1 ? 'min-w-0 flex-1' : 'shrink-0'}`}>
         {index > 0 && <span class="mx-1 text-slate-300">/</span>}
         {index === allItems.length - 1 ? (
-          <span class="font-semibold text-slate-700 leading-none">{item.name}</span>
+          <span class="font-semibold text-slate-700 leading-none truncate block">{item.name}</span>
         ) : (
           <a href={item.url} class="hover:text-brand-600 transition-colors inline-block leading-none">{item.name}</a>
         )}

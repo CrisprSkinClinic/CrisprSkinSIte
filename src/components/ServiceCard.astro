@@ -15,9 +15,9 @@ const { title, description, link, image, alt, priority = false } = Astro.props;
 
 const isOptimized = image && typeof image === 'object' && 'src' in image;
 ---
-<a href={link} class="bg-white rounded-2xl shadow-sm border border-champagne-200 overflow-hidden hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full">
+<a href={link} class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-900/10 hover:border-brand-300 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
   
-  <div class="relative aspect-square overflow-hidden bg-champagne-50">
+  <div class="relative aspect-[4/3] overflow-hidden bg-brand-50">
     {isOptimized ? (
       <Image
         src={image}
@@ -29,7 +29,7 @@ const isOptimized = image && typeof image === 'object' && 'src' in image;
         formats={['avif', 'webp']}
         quality={80}
         loading={priority ? "eager" : "lazy"}
-        class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]"
+        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
     ) : (
       <img 
@@ -39,7 +39,7 @@ const isOptimized = image && typeof image === 'object' && 'src' in image;
         height="500"
         loading={priority ? "eager" : "lazy"}
         decoding="async"
-        class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]"
+        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         onerror={`this.onerror=null;this.src='https://placehold.co/500x500/F7F2EB/223154?text=${encodeURIComponent(title)}'`}
       />
     )}

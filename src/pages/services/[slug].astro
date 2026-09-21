@@ -131,24 +131,26 @@ const medicalServiceSchema = {
     { name: data.title, url: `/services/${entry.slug}` }
   ]} />
 
-  <section class="bg-brand-900 text-white py-20 px-6">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
-      <div class="md:w-1/2">
+  <section class="bg-[#fdfcfc] py-12 md:py-20 px-5 md:px-6 border-b border-slate-200/70">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-[.9fr_1.1fr] items-center gap-10 md:gap-14">
+      <div>
         {data.heroEyebrow && (
-          <span class="text-brand-300 font-bold tracking-wider uppercase text-sm mb-4 block">{data.heroEyebrow}</span>
+          <span class="text-brand-600 font-bold tracking-[0.18em] uppercase text-xs mb-5 block">{data.heroEyebrow}</span>
         )}
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">{data.heroHeadline}</h1>
-        <p class="text-xl text-brand-100 mb-8 leading-relaxed">
+        <h1 class="text-4xl md:text-6xl text-slate-950 mb-6 leading-[1.05]">{data.heroHeadline}</h1>
+        <p class="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
           {data.heroSubheadline}
         </p>
-        <a href="#book" class="bg-white text-brand-900 font-bold px-8 py-3 rounded-md shadow-lg hover:bg-brand-50 transition inline-block">
+        <a href="#book" class="bg-brand-700 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-brand-900/15 hover:bg-brand-800 transition inline-flex items-center gap-3">
           {data.ctaTitle || `Book a ${data.title} Evaluation`}
+          <span aria-hidden="true">→</span>
         </a>
+        <p class="mt-5 text-xs font-semibold text-slate-500">Consultation first · Treatment only when indicated</p>
       </div>
 
       {optimizedHero ? (
-        <div class="md:w-1/2 w-full">
-          <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-square">
+        <div class="w-full">
+          <div class="rounded-2xl shadow-xl shadow-slate-900/10 border border-slate-200 bg-white overflow-hidden aspect-[4/3] p-1.5">
             <Image
               src={optimizedHero}
               alt={heroAlt}
@@ -159,13 +161,13 @@ const medicalServiceSchema = {
               formats={['avif', 'webp']}
               quality={80}
               loading="eager"
-              class="w-full h-full object-contain"
+              class="w-full h-full object-cover rounded-xl"
             />
           </div>
         </div>
       ) : heroImageSrc && (
-        <div class="md:w-1/2 w-full">
-          <div class="rounded-2xl shadow-2xl border-4 border-white/10 bg-brand-800 overflow-hidden aspect-square">
+        <div class="w-full">
+          <div class="rounded-2xl shadow-xl shadow-slate-900/10 border border-slate-200 bg-white overflow-hidden aspect-[4/3] p-1.5">
             <img
               src={heroImageSrc}
               alt={heroAlt}
@@ -173,7 +175,7 @@ const medicalServiceSchema = {
               height="700"
               loading="eager"
               decoding="async"
-              class="w-full h-full object-contain"
+              class="w-full h-full object-cover rounded-xl"
               onerror={`this.onerror=null;this.src='https://placehold.co/700x700/0f172a/ffffff?text=${encodeURIComponent(data.title)}'`}
             />
           </div>

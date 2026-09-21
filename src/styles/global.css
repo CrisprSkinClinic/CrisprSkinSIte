@@ -6,3 +6,56 @@ html {
   scroll-behavior: smooth;
 }
 
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: #fdfcfc;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(103, 60, 114, 0.12);
+  box-shadow: 0 14px 38px rgba(35, 27, 38, 0.08);
+  backdrop-filter: blur(16px) saturate(115%);
+  -webkit-backdrop-filter: blur(16px) saturate(115%);
+}
+
+.glass-dark {
+  background: rgba(46, 16, 101, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 50px rgba(46, 16, 101, 0.24);
+  backdrop-filter: blur(20px) saturate(135%);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+}
+
+h1, h2, .font-display {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+::selection {
+  background: #f0cfe8;
+  color: #351231;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-up {
+    animation: reveal-up .75s cubic-bezier(.22, 1, .36, 1) both;
+  }
+  .reveal-up-delay { animation-delay: .14s; }
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1023px) {
+  .mobile-glass-card {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(103, 60, 114, 0.12);
+    box-shadow: 0 12px 32px rgba(35, 27, 38, 0.07);
+    backdrop-filter: blur(14px) saturate(110%);
+    -webkit-backdrop-filter: blur(14px) saturate(110%);
+  }
+}

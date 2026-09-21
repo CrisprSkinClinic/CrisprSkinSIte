@@ -26,11 +26,11 @@ const schema = {
 
 <section class="py-20 px-6 bg-white border-t border-slate-200">
   <div class="max-w-4xl mx-auto">
-    <h2 class="text-3xl font-bold text-brand-900 mb-10 text-center">Frequently Asked Questions</h2>
+    <h2 class="text-3xl font-bold text-[#0e172b] mb-10 text-center">Frequently Asked Questions</h2>
     
     <div class="space-y-4">
       {sortedFaqs.map((faq) => (
-        <details class="group bg-champagne-50 rounded-lg border border-slate-200 overflow-hidden">
+        <details class="group bg-brand-50 rounded-xl border border-slate-200 overflow-hidden">
           <summary class="flex items-center justify-between cursor-pointer p-6 font-bold text-lg text-slate-900 group-hover:text-brand-600 transition">
             {faq.data.question}
             <span class="transition group-open:rotate-180">

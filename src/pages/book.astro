@@ -8,14 +8,15 @@ const pageDescription = `Schedule your appointment at ${siteConfig.name} in KK N
 ---
 
 <MainLayout title={pageTitle} description={pageDescription}>
-  <section class="bg-brand-900 text-white py-16 px-6 text-center">
+  <section class="bg-[#fdfcfc] py-14 md:py-20 px-6 text-center border-b border-slate-200/70">
     <div class="max-w-3xl mx-auto">
-      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Book Your Appointment</h1>
-      <p class="text-xl text-brand-200">Select an available time slot below to secure your consultation.</p>
+      <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-600 mb-4">Online booking</p>
+      <h1 class="text-4xl md:text-6xl text-slate-950 mb-4">Book Your Appointment</h1>
+      <p class="text-xl text-slate-600">Select an available time slot below to secure your consultation.</p>
     </div>
   </section>
 
-  <section class="py-16 px-6 bg-champagne-50 relative -mt-8">
+  <section class="py-12 md:py-16 px-5 md:px-6 bg-brand-50/40">
     <BookingCalendar />
   </section>
 
