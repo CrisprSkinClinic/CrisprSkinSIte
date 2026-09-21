@@ -15,9 +15,9 @@ const { title, description, link, image, alt, priority = false } = Astro.props;
 
 const isOptimized = image && typeof image === 'object' && 'src' in image;
 ---
-<a href={link} class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-900/10 hover:border-[#aebdd2] hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+<a href={link} class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-900/10 hover:border-brand-300 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
   
-  <div class="relative aspect-[4/3] overflow-hidden bg-[#edf1f7]">
+  <div class="relative aspect-[4/3] overflow-hidden bg-brand-50">
     {isOptimized ? (
       <Image
         src={image}
@@ -46,9 +46,9 @@ const isOptimized = image && typeof image === 'object' && 'src' in image;
   </div>
   
   <div class="p-6 md:p-8 flex flex-col flex-grow">
-    <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-[#2e4779] transition-colors">{title}</h3>
+    <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-brand-600 transition-colors">{title}</h3>
     <p class="text-slate-600 text-sm leading-relaxed mb-6 flex-grow">{description}</p>
-    <span class="text-[#2e4779] font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
+    <span class="text-brand-600 font-semibold text-sm mt-auto flex items-center gap-1 group-hover:gap-2 transition-all">
       Learn More <span aria-hidden="true">&rarr;</span>
     </span>
   </div>
