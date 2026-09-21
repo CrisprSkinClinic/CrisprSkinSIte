@@ -36,23 +36,25 @@ const stats = [
 ];
 ---
 
-<section class="border-y border-[#eaddea] bg-[#fbf8fc] px-[22px] py-14 md:px-6 md:py-12">
+<section class="border-y border-[#eaddea] bg-[#fbf8fc] px-[22px] py-10 md:px-6 md:py-12">
   <div class="max-w-7xl mx-auto">
     <div
       id="statsBarGrid"
-      class="overflow-hidden rounded-2xl bg-[radial-gradient(circle_at_top_left,_rgba(226,72,145,0.18),_transparent_34%),linear-gradient(145deg,_#3d2145_0%,_#582d62_48%,_#713d7c_100%)] shadow-xl shadow-[#54295f]/20 ring-1 ring-white/20"
+      class="overflow-hidden rounded-2xl border border-[#e5d5e7] bg-white shadow-xl shadow-[#54295f]/[0.08]"
     >
-      <div class="grid grid-cols-1 lg:grid-cols-4">
+      <div class="grid grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => {
           const cellClass = [
-            'relative min-h-[170px] px-4 py-8 md:px-6 md:py-7 text-center flex flex-col items-center justify-center',
-            i > 0 ? 'border-t border-white/15 lg:border-l lg:border-t-0' : '',
+            'relative min-h-[154px] px-3 py-7 md:min-h-[170px] md:px-6 md:py-7 text-center flex flex-col items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(226,72,145,0.08),_transparent_58%)]',
+            i % 2 === 1 ? 'border-l border-[#eaddea] lg:border-l' : 'lg:border-l',
+            i > 1 ? 'border-t border-[#eaddea] lg:border-t-0' : '',
+            i === 0 ? 'lg:border-l-0' : '',
           ].join(' ');
 
           const inner = (
             <>
               <p
-                class="text-4xl font-extrabold tracking-tight text-white tabular-nums"
+                class="text-[2.15rem] font-extrabold tracking-tight text-[#6f3578] tabular-nums md:text-4xl"
                 data-stat-value
                 data-end={stat.end}
                 data-decimals={stat.decimals}
@@ -60,11 +62,11 @@ const stats = [
               >
                 0{stat.suffix}
               </p>
-              <p class="mt-3 max-w-[12rem] text-xs font-medium text-[#f5eaf5] leading-snug">
+              <p class="mt-3 max-w-[10rem] text-[11px] font-semibold text-[#3f3344] leading-snug md:max-w-[12rem] md:text-xs">
                 {stat.label}
               </p>
               {stat.sub && (
-                <p class="mt-1 text-[11px] text-[#dcbfdf]">{stat.sub}</p>
+                <p class="mt-1 text-[10px] text-[#927e96] md:text-[11px]">{stat.sub}</p>
               )}
             </>
           );
@@ -74,10 +76,10 @@ const stats = [
               href={stat.href}
               target="_blank"
               rel="noopener noreferrer"
-              class={`${cellClass} group hover:bg-white/[0.06] transition-colors`}
+              class={`${cellClass} group hover:bg-[#faf5fb] transition-colors`}
             >
               {inner}
-              <span class="mt-4 text-[11px] font-medium text-[#e8cee9] group-hover:text-white transition-colors">
+              <span class="mt-3 text-[10px] font-semibold text-[#a3478e] group-hover:text-[#6f3578] transition-colors md:mt-4 md:text-[11px]">
                 View reviews →
               </span>
             </a>
