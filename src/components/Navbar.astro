@@ -4,17 +4,12 @@ import { siteConfig } from '../config/site.js';
 <header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/80 transition-all duration-300">
   <div class="max-w-7xl mx-auto px-[22px] sm:px-6 h-[72px] lg:h-24 flex justify-between items-center">
 
-    <a href="/" class="hidden lg:flex items-center gap-3 group" aria-label={`${siteConfig.name} home`}>
-      <img src="/images/crispr-mark.svg" alt="" width="44" height="44" class="h-8 w-8 lg:h-11 lg:w-11" />
-      <span class="flex flex-col justify-center">
-        <span class="text-lg lg:text-2xl font-semibold text-brand-700 tracking-[0.08em] leading-none group-hover:text-brand-600 transition-colors">CRISPR</span>
-        <span class="text-[0.48rem] lg:text-[0.58rem] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">Skin &amp; Hair Clinic</span>
-      </span>
+    <a href="/" class="hidden lg:flex items-center" aria-label={`${siteConfig.name} home`}>
+      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="373" class="h-12 w-auto object-contain" />
     </a>
 
-    <a href="/" class="flex min-w-0 flex-col lg:hidden" aria-label={`${siteConfig.name} home`}>
-      <span class="whitespace-nowrap text-[19px] font-extrabold leading-none tracking-[-0.055em] text-slate-950">CRISPR Skin and Hair Clinic</span>
-      <span class="mt-1 text-[8px] font-bold uppercase tracking-[0.13em] text-slate-500">Dermatology · Hair · Aesthetics</span>
+    <a href="/" class="flex min-w-0 items-center lg:hidden" aria-label={`${siteConfig.name} home`}>
+      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="373" class="h-9 max-w-[270px] w-auto object-contain object-left" />
     </a>
 
     <nav class="hidden lg:flex space-x-7 items-center px-2 py-3">
