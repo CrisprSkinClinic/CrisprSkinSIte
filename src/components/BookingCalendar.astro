@@ -27,6 +27,8 @@ const { defaultService, defaultDoctorId } = Astro.props;
     <input type="text" id="lastName" placeholder="Last Name" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
     <input type="tel" id="phone" placeholder="Mobile Number (+91...)" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
 
+    <div id="returningPatientMessage" class="hidden rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900" role="status" aria-live="polite"></div>
+
     <select id="doctor" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
       <option value="" disabled selected>Select Doctor...</option>
       <option value="any">No preference</option>
@@ -101,6 +103,8 @@ const { defaultService, defaultDoctorId } = Astro.props;
   document.addEventListener('astro:page-load', () => {
     let selectedTime = "";
     let selectedSlotDoctorIds = null; // set when booking without a doctor preference
+    let isReturningPatient = false;
+    let lookupSequence = 0;
 
     const root = document.getElementById('bookingCalendarRoot');
     const dateInput = document.getElementById('date');
@@ -110,6 +114,11 @@ const { defaultService, defaultDoctorId } = Astro.props;
     const errorMessage = document.getElementById('errorMessage');
     const serviceSelect = document.getElementById('service');
     const doctorSelect = document.getElementById('doctor');
+    const prefixSelect = document.getElementById('prefix');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    const phoneInput = document.getElementById('phone');
+    const returningPatientMessage = document.getElementById('returningPatientMessage');
 
     const todayStr = new Date().toISOString().split('T')[0];
     if (dateInput) {
@@ -169,6 +178,64 @@ const { defaultService, defaultDoctorId } = Astro.props;
       errorMessage.textContent = message;
       errorMessage?.classList.remove('hidden');
     }
+
+    function enteredName() {
+      return `${prefixSelect?.value || ''} ${firstNameInput?.value || ''} ${lastNameInput?.value || ''}`.trim();
+    }
+
+    function displayDate(dateStr) {
+      return new Date(`${dateStr}T00:00:00Z`).toLocaleDateString('en-IN', {
+        day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+      });
+    }
+
+    function clearReturningPatient() {
+      isReturningPatient = false;
+      returningPatientMessage?.classList.add('hidden');
+      if (returningPatientMessage) returningPatientMessage.textContent = '';
+    }
+
+    async function checkReturningPatient() {
+      const name = enteredName();
+      const phone = phoneInput?.value || '';
+      const phoneDigits = phone.replace(/\D/g, '').slice(-10);
+      const requestNumber = ++lookupSequence;
+
+      clearReturningPatient();
+      if (!firstNameInput?.value.trim() || phoneDigits.length !== 10) return;
+
+      try {
+        const response = await fetch('/.netlify/functions/public-returning-patient', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone }),
+        });
+        const result = await response.json();
+        if (requestNumber !== lookupSequence || !response.ok || !result.found) return;
+
+        const last = result.lastAppointment;
+        const doctorOption = Array.from(doctorSelect?.options || []).find(
+          (option) => option.value === last.doctorId
+        );
+        if (doctorOption && doctorSelect) {
+          doctorSelect.value = last.doctorId;
+          if (dateInput?.value) loadAvailableSlots(dateInput.value);
+        }
+
+        isReturningPatient = true;
+        if (returningPatientMessage) {
+          returningPatientMessage.textContent = `Welcome back. Your last appointment was on ${displayDate(last.date)} with Dr. ${last.doctorName}. We have selected the same doctor for your review appointment, but you may change the doctor.`;
+          returningPatientMessage.classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error('Returning patient lookup failed:', error);
+      }
+    }
+
+    phoneInput?.addEventListener('blur', checkReturningPatient);
+    firstNameInput?.addEventListener('blur', checkReturningPatient);
+    lastNameInput?.addEventListener('blur', checkReturningPatient);
+    prefixSelect?.addEventListener('change', checkReturningPatient);
 
     function renderSlots(slots) {
       selectedTime = "";
@@ -310,6 +377,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
               service,
               date,
               time: selectedTime,
+              appointmentType: isReturningPatient ? 'review' : 'new',
             }),
           });
 
