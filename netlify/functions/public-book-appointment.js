@@ -72,6 +72,7 @@ exports.handler = async (event) => {
     // these server-side, rather than trusting a doctor choice made
     // client-side or baked in at page-load time.
     candidateDoctorIds,
+    appointmentType,
   } = payload || {};
 
   const missing = [];
@@ -246,6 +247,11 @@ exports.handler = async (event) => {
     const { data: existingRows, error: patientLookupError } = await supabase.rpc("find_patient_by_phone", { p_phone: phone });
     if (patientLookupError) throw patientLookupError;
 
+    const matchedPatient = (existingRows || []).find(
+      (row) => normalizeName(row.name) === normalizeName(name)
+    );
+    const isReviewAppointment = appointmentType === "review" && Boolean(matchedPatient);
+
     let patientId;
     if (existingRows && existingRows.length > 0) {
       patientId = existingRows[0].id;
@@ -265,7 +271,7 @@ exports.handler = async (event) => {
     // patients has no email column, so it's folded into the appointment
     // notes alongside the selected service -- same free-text approach
     // already used for service, since there's no dedicated column for it.
-    const notesParts = [service];
+    const notesParts = [isReviewAppointment ? "Review appointment" : "New appointment", service];
     if (email) notesParts.push(`Email: ${email}`);
     notesParts.push("Booked via website self-service");
     const notes = notesParts.join(" | ");
@@ -375,6 +381,15 @@ function normalizeTime(t) {
   }
 
   return t.length === 5 ? `${t}:00` : t;
+}
+
+function normalizeName(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/^(mr|mrs|ms|miss|dr)\.?\s+/, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
 }
 
 function ok(body, statusCode = 200) {
