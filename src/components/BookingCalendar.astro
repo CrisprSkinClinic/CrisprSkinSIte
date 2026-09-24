@@ -12,7 +12,20 @@ const { defaultService, defaultDoctorId } = Astro.props;
 >
 
   <div class="md:w-1/2 space-y-5 pr-0 md:pr-8 border-b md:border-b-0 md:border-r border-slate-200/60 pb-8 md:pb-0">
-    <h3 class="text-2xl font-bold text-brand-900 mb-6">Patient Details</h3>
+    <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+      <h3 class="text-2xl font-bold text-brand-900">Patient Details</h3>
+      <a href="/manage-appointment" class="text-sm font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Already booked? Manage my appointment</a>
+    </div>
+
+    <div>
+      <p class="text-sm font-semibold text-slate-700 mb-2">Who is this appointment for?</p>
+      <div id="bookingFor" class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Who is this appointment for?">
+        <button type="button" role="radio" aria-checked="true" data-for="self" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-brand-600 border-brand-600 text-white">Myself</button>
+        <button type="button" role="radio" aria-checked="false" data-for="family" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-white border-slate-200 text-brand-900">Family member</button>
+        <button type="button" role="radio" aria-checked="false" data-for="friend" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-white border-slate-200 text-brand-900">Friend</button>
+      </div>
+      <p id="bookingForHint" class="hidden mt-2 text-sm text-slate-600">Enter the patient's name below and your own WhatsApp number — the code and confirmation come to you.</p>
+    </div>
 
     <div class="flex gap-3">
       <select id="prefix" class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-1/4">
@@ -21,11 +34,26 @@ const { defaultService, defaultDoctorId } = Astro.props;
         <option value="Mrs.">Mrs.</option>
         <option value="Dr.">Dr.</option>
       </select>
-      <input type="text" id="firstName" placeholder="First Name" required class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-3/4" />
+      <input type="text" id="firstName" placeholder="First Name" autocomplete="given-name" required class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-3/4" />
     </div>
 
-    <input type="text" id="lastName" placeholder="Last Name" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
-    <input type="tel" id="phone" placeholder="Mobile Number (+91...)" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+    <input type="text" id="lastName" placeholder="Last Name" autocomplete="family-name" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+    <div class="flex gap-3">
+      <input type="tel" id="phone" placeholder="WhatsApp Mobile Number" autocomplete="tel-national" inputmode="tel" required class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+      <button type="button" id="sendOtpBtn" class="px-4 rounded-xl bg-brand-100 text-brand-900 font-semibold whitespace-nowrap hover:bg-brand-200 transition disabled:opacity-50">Send code</button>
+    </div>
+    <div id="otpBlock" class="hidden space-y-2">
+      <div id="otpEntry" class="flex gap-3">
+        <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none tracking-widest" />
+        <button type="button" id="verifyOtpBtn" class="px-5 rounded-xl bg-brand-600 text-white font-semibold whitespace-nowrap hover:bg-brand-700 transition disabled:opacity-50">Verify</button>
+      </div>
+      <p id="otpStatus" class="text-sm text-slate-600"></p>
+    </div>
+    <div id="familyPicker" class="hidden space-y-2">
+      <p class="text-sm font-semibold text-slate-700">Patients on this number — tap to fill in</p>
+      <div id="familyChips" class="flex flex-wrap gap-2"></div>
+    </div>
+    <div id="returningPatientMessage" class="hidden rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900" role="status" aria-live="polite"></div>
 
     <select id="doctor" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
       <option value="" disabled selected>Select Doctor...</option>
@@ -94,6 +122,13 @@ const { defaultService, defaultDoctorId } = Astro.props;
     </div>
 
     <div id="errorMessage" class="hidden mt-4 text-center p-3 bg-red-100 text-red-800 rounded-lg font-medium"></div>
+    <div id="reschedulePrompt" class="hidden mt-4 p-4 rounded-xl border border-brand-200 bg-brand-50 text-brand-900 text-sm leading-relaxed space-y-3" role="status" aria-live="polite">
+      <p id="rescheduleText"></p>
+      <div id="rescheduleActions" class="flex flex-col sm:flex-row gap-3">
+        <button type="button" id="rescheduleBtn" class="flex-1 py-3 px-4 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition disabled:opacity-50">Move it</button>
+        <button type="button" id="keepBtn" class="flex-1 py-3 px-4 rounded-xl border border-brand-200 bg-white text-brand-900 font-semibold hover:bg-brand-100 transition">Keep my existing appointment</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -110,6 +145,210 @@ const { defaultService, defaultDoctorId } = Astro.props;
     const errorMessage = document.getElementById('errorMessage');
     const serviceSelect = document.getElementById('service');
     const doctorSelect = document.getElementById('doctor');
+    const phoneInput = document.getElementById('phone');
+    const sendOtpBtn = document.getElementById('sendOtpBtn');
+    const otpBlock = document.getElementById('otpBlock');
+    const otpInput = document.getElementById('otp');
+    const otpStatus = document.getElementById('otpStatus');
+    const otpEntry = document.getElementById('otpEntry');
+    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+    const returningPatientMessage = document.getElementById('returningPatientMessage');
+    const reschedulePrompt = document.getElementById('reschedulePrompt');
+    const rescheduleText = document.getElementById('rescheduleText');
+    const rescheduleActions = document.getElementById('rescheduleActions');
+    const rescheduleBtn = document.getElementById('rescheduleBtn');
+    const keepBtn = document.getElementById('keepBtn');
+    let lastBookingBody = null;
+    const hideReschedule = () => reschedulePrompt?.classList.add('hidden');
+    let isReturningPatient = false;
+    let lookupSequence = 0;
+    let bookingFor = 'self';
+    const bookingForHint = document.getElementById('bookingForHint');
+    const familyPicker = document.getElementById('familyPicker');
+    const familyChips = document.getElementById('familyChips');
+    const prefixSelect = document.getElementById('prefix');
+
+    document.querySelectorAll('#bookingFor .booking-for').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        bookingFor = btn.dataset.for;
+        document.querySelectorAll('#bookingFor .booking-for').forEach((b) => {
+          const on = b === btn;
+          b.setAttribute('aria-checked', String(on));
+          b.classList.toggle('bg-brand-600', on); b.classList.toggle('border-brand-600', on); b.classList.toggle('text-white', on);
+          b.classList.toggle('bg-white', !on); b.classList.toggle('border-slate-200', !on); b.classList.toggle('text-brand-900', !on);
+        });
+        bookingForHint?.classList.toggle('hidden', bookingFor === 'self');
+        document.getElementById('firstName').placeholder = bookingFor === 'self' ? 'First Name' : "Patient's First Name";
+        document.getElementById('lastName').placeholder = bookingFor === 'self' ? 'Last Name' : "Patient's Last Name";
+        if (otpToken) checkReturningPatient();
+      });
+    });
+
+    // Fills the name fields from a stored full name like "Mr. Arunkumar S".
+    function fillName(fullName) {
+      const words = String(fullName || '').trim().split(/\s+/);
+      const title = words[0] && /^(mr|mrs|ms|miss|dr|master|baby)\.?$/i.test(words[0]) ? words.shift() : null;
+      if (title && prefixSelect) {
+        if (!Array.from(prefixSelect.options).some((o) => o.value === title)) prefixSelect.add(new Option(title, title));
+        prefixSelect.value = title;
+      }
+      document.getElementById('firstName').value = words.length > 1 ? words.slice(0, -1).join(' ') : (words[0] || '');
+      document.getElementById('lastName').value = words.length > 1 ? words[words.length - 1] : '';
+    }
+
+    function renderFamilyChips(patients) {
+      if (!familyChips || !familyPicker) return;
+      familyChips.innerHTML = '';
+      if (!patients?.length) { familyPicker.classList.add('hidden'); return; }
+      const current = enteredName().toLowerCase();
+      patients.forEach((p) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.textContent = p.name;
+        const on = p.name.toLowerCase() === current;
+        chip.className = `px-3 py-2 rounded-full border text-sm font-medium transition ${on ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-brand-200 text-brand-900 hover:bg-brand-50'}`;
+        chip.addEventListener('click', () => { fillName(p.name); checkReturningPatient(); });
+        familyChips.appendChild(chip);
+      });
+      const someoneNew = document.createElement('button');
+      someoneNew.type = 'button';
+      someoneNew.textContent = '+ Someone new';
+      someoneNew.className = 'px-3 py-2 rounded-full border border-dashed border-slate-300 text-sm font-medium text-slate-600 hover:bg-slate-50';
+      someoneNew.addEventListener('click', () => {
+        document.getElementById('firstName').value = '';
+        document.getElementById('lastName').value = '';
+        clearReturningPatient();
+        renderFamilyChips(patients);
+        document.getElementById('firstName').focus();
+      });
+      familyChips.appendChild(someoneNew);
+      familyPicker.classList.remove('hidden');
+    }
+
+    // WhatsApp verification: a booking is only accepted with the code sent to
+    // this exact number (checked server-side in public-book-appointment).
+    const phoneDigits = (v) => String(v || '').replace(/\D/g, '').slice(-10);
+    let otpSentTo = '';
+    let otpToken = '';
+    let verifiedPhone = '';
+    let resendTimer = null;
+
+    function setStatus(text, ok) {
+      if (!otpStatus) return;
+      otpStatus.textContent = text;
+      otpStatus.className = ok ? 'text-sm font-semibold text-green-700' : 'text-sm text-slate-600';
+    }
+
+    function clearReturningPatient() {
+      isReturningPatient = false;
+      lookupSequence += 1;
+      returningPatientMessage?.classList.add('hidden');
+      if (returningPatientMessage) returningPatientMessage.textContent = '';
+    }
+
+    function enteredName() {
+      const p = document.getElementById('prefix')?.value || '';
+      const f = document.getElementById('firstName')?.value || '';
+      const l = document.getElementById('lastName')?.value || '';
+      return `${p} ${f} ${l}`.trim().replace(/\s+/g, ' ');
+    }
+
+    // Runs only after the number is verified: the server refuses the lookup
+    // without this phone's unused verification token.
+    async function checkReturningPatient() {
+      clearReturningPatient();
+      if (!otpToken || !verifiedPhone) return;
+      const requestNumber = lookupSequence;
+      try {
+        const response = await fetch('/.netlify/functions/public-returning-patient', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: enteredName(), phone: phoneInput.value, otpToken }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (requestNumber !== lookupSequence || !response.ok) return;
+        renderFamilyChips(result.patientsOnNumber);
+        if (!result.found) return;
+        const last = result.lastConsultation;
+        const lastDate = new Date(`${last.date}T00:00:00Z`).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+        const doctorOption = Array.from(doctorSelect?.options || []).find((o) => o.value === last.doctorId);
+        if (doctorOption && doctorSelect) {
+          doctorSelect.value = last.doctorId;
+          if (dateInput?.value) loadAvailableSlots(dateInput.value);
+        }
+        isReturningPatient = true;
+        if (returningPatientMessage) {
+          const who = bookingFor === 'self' ? 'Welcome back. Your' : `Welcome back. ${enteredName()}'s`;
+          returningPatientMessage.textContent = `${who} last consultation was on ${lastDate}${last.doctorName ? ` with Dr. ${last.doctorName}` : ''}. ${doctorOption ? 'We have selected the same doctor for this review — you can change this.' : 'This will be booked as a review.'}`;
+          returningPatientMessage.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Returning patient lookup failed:', err);
+      }
+    }
+
+    ['firstName', 'lastName'].forEach((id) => document.getElementById(id)?.addEventListener('blur', () => { if (otpToken) checkReturningPatient(); }));
+    document.getElementById('prefix')?.addEventListener('change', () => { if (otpToken) checkReturningPatient(); });
+
+    function resetOtp() {
+      clearReturningPatient();
+      familyPicker?.classList.add('hidden');
+      otpSentTo = '';
+      otpToken = '';
+      verifiedPhone = '';
+      if (otpInput) otpInput.value = '';
+      otpBlock?.classList.add('hidden');
+      otpEntry?.classList.remove('hidden');
+      sendOtpBtn?.classList.remove('hidden');
+      if (resendTimer) clearInterval(resendTimer);
+      resendTimer = null;
+      if (sendOtpBtn) { sendOtpBtn.disabled = false; sendOtpBtn.innerText = 'Send code'; }
+    }
+
+    phoneInput?.addEventListener('input', () => {
+      if ((otpSentTo || verifiedPhone) && phoneDigits(phoneInput.value) !== (verifiedPhone || otpSentTo)) resetOtp();
+    });
+
+    sendOtpBtn?.addEventListener('click', async () => {
+      errorMessage?.classList.add('hidden');
+      const digits = phoneDigits(phoneInput?.value);
+      if (!/^[6-9]\d{9}$/.test(digits)) {
+        showError('Enter a valid 10-digit mobile number that uses WhatsApp.');
+        return;
+      }
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.innerText = 'Sending…';
+      try {
+        const response = await fetch('/.netlify/functions/send-booking-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneInput.value }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
+        otpSentTo = digits;
+        otpBlock?.classList.remove('hidden');
+        setStatus(`Code sent on WhatsApp to +91 ${digits}. Enter it and tap Verify (expires in 5 minutes).`, false);
+        otpInput?.focus();
+        let wait = 30;
+        sendOtpBtn.innerText = `Resend in ${wait}s`;
+        resendTimer = setInterval(() => {
+          wait -= 1;
+          if (wait <= 0) {
+            clearInterval(resendTimer);
+            resendTimer = null;
+            sendOtpBtn.disabled = false;
+            sendOtpBtn.innerText = 'Resend code';
+          } else {
+            sendOtpBtn.innerText = `Resend in ${wait}s`;
+          }
+        }, 1000);
+      } catch (err) {
+        showError(err.message);
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.innerText = 'Send code';
+      }
+    });
 
     const todayStr = new Date().toISOString().split('T')[0];
     if (dateInput) {
@@ -171,6 +410,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
     }
 
     function renderSlots(slots) {
+      hideReschedule();
       selectedTime = "";
       selectedSlotDoctorIds = null;
       if (slots.length === 0) {
@@ -189,6 +429,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
           btn.classList.add('bg-brand-600', 'text-white');
           selectedTime = slot.display;
           selectedSlotDoctorIds = slot.doctorIds || null;
+          hideReschedule();
         });
         slotsContainer.appendChild(btn);
 
@@ -262,6 +503,81 @@ const { defaultService, defaultDoctorId } = Astro.props;
       loadAvailableSlots(dateInput.value);
     }
 
+    async function verifyCode() {
+      errorMessage?.classList.add('hidden');
+      const code = String(otpInput?.value || '').replace(/\D/g, '');
+      if (code.length !== 6) {
+        showError('Enter the 6-digit code from WhatsApp.');
+        otpInput?.focus();
+        return;
+      }
+      verifyOtpBtn.disabled = true;
+      verifyOtpBtn.innerText = 'Checking…';
+      try {
+        const response = await fetch('/.netlify/functions/verify-booking-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneInput.value, code }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.success || !result.token) throw new Error(result.error || 'Could not verify the code.');
+        otpToken = result.token;
+        verifiedPhone = otpSentTo;
+        if (resendTimer) clearInterval(resendTimer);
+        resendTimer = null;
+        otpEntry?.classList.add('hidden');
+        sendOtpBtn?.classList.add('hidden');
+        setStatus(`✓ +91 ${verifiedPhone} verified`, true);
+        checkReturningPatient();
+      } catch (err) {
+        showError(err.message);
+        otpInput?.focus();
+      } finally {
+        verifyOtpBtn.disabled = false;
+        verifyOtpBtn.innerText = 'Verify';
+      }
+    }
+
+    verifyOtpBtn?.addEventListener('click', verifyCode);
+    otpInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); verifyCode(); } });
+
+    async function submitBooking(body) {
+      const response = await fetch('/.netlify/functions/public-book-appointment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const result = await response.json().catch(() => ({}));
+      return { response, result };
+    }
+
+    rescheduleBtn?.addEventListener('click', async () => {
+      if (!lastBookingBody) return;
+      errorMessage?.classList.add('hidden');
+      rescheduleBtn.disabled = true;
+      rescheduleBtn.innerText = 'Moving…';
+      try {
+        const { response, result } = await submitBooking({ ...lastBookingBody, reschedule: true });
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not move your appointment. Please call the clinic.');
+        window.gtag?.('event', 'booking_rescheduled', { event_category: 'engagement', event_label: lastBookingBody.service });
+        hideReschedule();
+        if (successMessage) successMessage.textContent = `Your appointment has been moved from ${result.from} to ${result.to}. We have sent the new time on WhatsApp.`;
+        successMessage?.classList.remove('hidden');
+        confirmBtn.style.display = 'none';
+      } catch (err) {
+        hideReschedule();
+        showError(err.message);
+        if (/verif/i.test(err.message || '')) resetOtp();
+      } finally {
+        rescheduleBtn.disabled = false;
+      }
+    });
+
+    keepBtn?.addEventListener('click', () => {
+      rescheduleActions?.classList.add('hidden');
+      if (rescheduleText) rescheduleText.textContent = 'No changes made — your existing appointment stays as it is. To book another day, choose a different date.';
+    });
+
     if (confirmBtn) {
       confirmBtn.addEventListener('click', async () => {
         const prefix = document.getElementById('prefix').value;
@@ -279,6 +595,14 @@ const { defaultService, defaultDoctorId } = Astro.props;
           return;
         }
 
+        if (!otpToken || verifiedPhone !== phoneDigits(phone)) {
+          showError(otpSentTo
+            ? "Tap Verify to confirm the WhatsApp code before booking."
+            : "Verify your mobile number first: tap Send code and enter the code we send on WhatsApp.");
+          (otpSentTo ? otpInput : sendOtpBtn)?.focus();
+          return;
+        }
+
         // "any" (no preference) bookings don't have a single doctorId --
         // they carry the list of doctors actually free at the selected
         // time, and the server picks one at random and re-verifies
@@ -292,28 +616,47 @@ const { defaultService, defaultDoctorId } = Astro.props;
         // patients.name in AppointmentManager is a single text column,
         // so prefix/first/last are concatenated here -- the split-name
         // concept ends at this form layer.
-        const name = `${prefix} ${fName} ${lName}`.trim();
+        // Patients often type their full name into First Name and then the surname
+        // again into Last Name ("Sunni Tamil" + "Tamil"); drop the repeat. A
+        // single-word first name is left alone so names like "Ram Ram" survive.
+        const first = fName.trim().replace(/\s+/g, ' ');
+        const last = lName.trim().replace(/\s+/g, ' ');
+        const firstWords = first.split(' ');
+        const surnameRepeated = last !== '' && firstWords.length > 1 &&
+          firstWords.slice(-last.split(' ').length).join(' ').toLowerCase() === last.toLowerCase();
+        const name = [prefix, first, surnameRepeated ? '' : last].filter(Boolean).join(' ');
+
+        lastBookingBody = {
+          name,
+          phone,
+          ...(isNoPreference
+            ? { candidateDoctorIds: selectedSlotDoctorIds }
+            : { doctorId }),
+          service,
+          date,
+          time: selectedTime,
+          otpToken,
+          appointmentType: isReturningPatient ? 'review' : 'new',
+          bookingFor,
+        };
 
         try {
+          hideReschedule();
           confirmBtn.innerText = "Securing Slot...";
           confirmBtn.disabled = true;
 
-          const response = await fetch('/.netlify/functions/public-book-appointment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name,
-              phone,
-              ...(isNoPreference
-                ? { candidateDoctorIds: selectedSlotDoctorIds }
-                : { doctorId }),
-              service,
-              date,
-              time: selectedTime,
-            }),
-          });
+          const { response, result } = await submitBooking(lastBookingBody);
 
-          const result = await response.json();
+          if (response.status === 409 && result.existing && result.canReschedule) {
+            const doctorText = !isNoPreference && doctorSelect?.selectedOptions?.[0]?.text ? ` with ${doctorSelect.selectedOptions[0].text}` : '';
+            if (rescheduleText) rescheduleText.textContent = `${result.error} Would you like to move it to ${selectedTime}${doctorText} instead?`;
+            if (rescheduleBtn) rescheduleBtn.innerText = `Move it to ${selectedTime}`;
+            rescheduleActions?.classList.remove('hidden');
+            reschedulePrompt?.classList.remove('hidden');
+            confirmBtn.innerText = "Confirm Appointment";
+            confirmBtn.disabled = false;
+            return;
+          }
 
           if (!response.ok || !result.success) {
             window.gtag?.('event', 'booking_failed', {
@@ -337,6 +680,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
         } catch (err) {
           console.error("Error booking:", err);
           showError(err.message || "Could not complete your booking. Please try again or call us directly.");
+          if (/verif/i.test(err.message || "")) resetOtp();
           confirmBtn.innerText = "Confirm Appointment";
           confirmBtn.disabled = false;
         }
