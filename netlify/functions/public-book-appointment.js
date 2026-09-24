@@ -72,14 +72,15 @@ exports.handler = async (event) => {
     // these server-side, rather than trusting a doctor choice made
     // client-side or baked in at page-load time.
     candidateDoctorIds,
-    // WhatsApp code sent by send-booking-otp.js to this phone number.
-    otp,
+    // One-time token from verify-booking-otp.js proving the patient
+    // verified this phone number with a WhatsApp code.
+    otpToken,
   } = payload || {};
 
   const missing = [];
   if (!name) missing.push("name");
   if (!phone) missing.push("phone");
-  if (!otp) missing.push("otp");
+  if (!otpToken) missing.push("otpToken (verify your WhatsApp number first)");
   if (!service) missing.push("service");
   if (!date) missing.push("date");
   if (!time) missing.push("time");
@@ -238,22 +239,28 @@ exports.handler = async (event) => {
       return ok({ success: false, error: lastFailureReason }, 409);
     }
 
-    // ---- Verify the WhatsApp code ----
+    // ---- Use up the phone verification ----
     //
-    // Checked after the slot is confirmed free (so a taken slot doesn't burn a
-    // valid code) and before any patient or appointment row is written. The
-    // RPC is service_role-only, marks the code used, and counts wrong attempts.
+    // Consumed after the slot is confirmed free (so a taken slot doesn't burn
+    // the patient's verification) and before any patient or appointment row
+    // is written. Service_role-only RPC: the token must belong to this phone,
+    // be unused, and be under 30 minutes old.
     const canonicalPhone = canonicalIndianMobile(phone);
     if (!canonicalPhone) {
       return ok({ success: false, error: "Enter a valid 10-digit Indian mobile number that uses WhatsApp." }, 400);
     }
-    const { data: otpValid, error: otpError } = await supabase.rpc("service_verify_phone_otp_no_session", {
+    const { data: tokenValid, error: tokenError } = await supabase.rpc("service_consume_phone_otp_token", {
       p_phone: canonicalPhone,
-      p_code: String(otp).replace(/\D/g, ""),
+      p_token: String(otpToken),
     });
-    if (otpError) throw otpError;
-    if (!otpValid) {
-      return ok({ success: false, error: "The WhatsApp code is incorrect or has expired. Request a new code and try again." }, 400);
+    if (tokenError) {
+      if (/uuid/i.test(tokenError.message || "")) {
+        return ok({ success: false, error: "Your phone verification has expired. Please verify your WhatsApp number again." }, 400);
+      }
+      throw tokenError;
+    }
+    if (!tokenValid) {
+      return ok({ success: false, error: "Your phone verification has expired. Please verify your WhatsApp number again." }, 400);
     }
 
     // ---- Find or create the patient ----
@@ -383,7 +390,7 @@ exports.handler = async (event) => {
 //   - "HH:MM" / "HH:MM:SS" (24-hour, e.g. from schedule_overrides/slot_templates rows)
 //   - "h:mm AM/PM" / "hh:mm AM/PM" (12-hour display strings, e.g. BookingCalendar.astro's
 //     selectedTime, which comes from generateSlotsForSession as "09:30 AM")
-// Must match send-booking-otp.js: codes are stored against a hash of this exact form.
+// Must match send-booking-otp.js / verify-booking-otp.js: codes are stored against a hash of this exact form.
 function canonicalIndianMobile(raw) {
   let digits = String(raw || "").replace(/\D/g, "");
   if (digits.length === 11 && digits.startsWith("0")) digits = digits.slice(1);

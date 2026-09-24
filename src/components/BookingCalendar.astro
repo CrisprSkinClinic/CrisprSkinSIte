@@ -30,7 +30,10 @@ const { defaultService, defaultDoctorId } = Astro.props;
       <button type="button" id="sendOtpBtn" class="px-4 rounded-xl bg-brand-100 text-brand-900 font-semibold whitespace-nowrap hover:bg-brand-200 transition disabled:opacity-50">Send code</button>
     </div>
     <div id="otpBlock" class="hidden space-y-2">
-      <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code from WhatsApp" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none tracking-widest" />
+      <div id="otpEntry" class="flex gap-3">
+        <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none tracking-widest" />
+        <button type="button" id="verifyOtpBtn" class="px-5 rounded-xl bg-brand-600 text-white font-semibold whitespace-nowrap hover:bg-brand-700 transition disabled:opacity-50">Verify</button>
+      </div>
       <p id="otpStatus" class="text-sm text-slate-600"></p>
     </div>
 
@@ -122,24 +125,38 @@ const { defaultService, defaultDoctorId } = Astro.props;
     const otpBlock = document.getElementById('otpBlock');
     const otpInput = document.getElementById('otp');
     const otpStatus = document.getElementById('otpStatus');
+    const otpEntry = document.getElementById('otpEntry');
+    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
 
     // WhatsApp verification: a booking is only accepted with the code sent to
     // this exact number (checked server-side in public-book-appointment).
     const phoneDigits = (v) => String(v || '').replace(/\D/g, '').slice(-10);
     let otpSentTo = '';
+    let otpToken = '';
+    let verifiedPhone = '';
     let resendTimer = null;
+
+    function setStatus(text, ok) {
+      if (!otpStatus) return;
+      otpStatus.textContent = text;
+      otpStatus.className = ok ? 'text-sm font-semibold text-green-700' : 'text-sm text-slate-600';
+    }
 
     function resetOtp() {
       otpSentTo = '';
+      otpToken = '';
+      verifiedPhone = '';
       if (otpInput) otpInput.value = '';
       otpBlock?.classList.add('hidden');
+      otpEntry?.classList.remove('hidden');
+      sendOtpBtn?.classList.remove('hidden');
       if (resendTimer) clearInterval(resendTimer);
       resendTimer = null;
       if (sendOtpBtn) { sendOtpBtn.disabled = false; sendOtpBtn.innerText = 'Send code'; }
     }
 
     phoneInput?.addEventListener('input', () => {
-      if (otpSentTo && phoneDigits(phoneInput.value) !== otpSentTo) resetOtp();
+      if ((otpSentTo || verifiedPhone) && phoneDigits(phoneInput.value) !== (verifiedPhone || otpSentTo)) resetOtp();
     });
 
     sendOtpBtn?.addEventListener('click', async () => {
@@ -161,7 +178,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
         if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
         otpSentTo = digits;
         otpBlock?.classList.remove('hidden');
-        if (otpStatus) otpStatus.textContent = `Code sent on WhatsApp to +91 ${digits}. It expires in 5 minutes.`;
+        setStatus(`Code sent on WhatsApp to +91 ${digits}. Enter it and tap Verify (expires in 5 minutes).`, false);
         otpInput?.focus();
         let wait = 30;
         sendOtpBtn.innerText = `Resend in ${wait}s`;
@@ -334,6 +351,43 @@ const { defaultService, defaultDoctorId } = Astro.props;
       loadAvailableSlots(dateInput.value);
     }
 
+    async function verifyCode() {
+      errorMessage?.classList.add('hidden');
+      const code = String(otpInput?.value || '').replace(/\D/g, '');
+      if (code.length !== 6) {
+        showError('Enter the 6-digit code from WhatsApp.');
+        otpInput?.focus();
+        return;
+      }
+      verifyOtpBtn.disabled = true;
+      verifyOtpBtn.innerText = 'Checking…';
+      try {
+        const response = await fetch('/.netlify/functions/verify-booking-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneInput.value, code }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.success || !result.token) throw new Error(result.error || 'Could not verify the code.');
+        otpToken = result.token;
+        verifiedPhone = otpSentTo;
+        if (resendTimer) clearInterval(resendTimer);
+        resendTimer = null;
+        otpEntry?.classList.add('hidden');
+        sendOtpBtn?.classList.add('hidden');
+        setStatus(`✓ +91 ${verifiedPhone} verified`, true);
+      } catch (err) {
+        showError(err.message);
+        otpInput?.focus();
+      } finally {
+        verifyOtpBtn.disabled = false;
+        verifyOtpBtn.innerText = 'Verify';
+      }
+    }
+
+    verifyOtpBtn?.addEventListener('click', verifyCode);
+    otpInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); verifyCode(); } });
+
     if (confirmBtn) {
       confirmBtn.addEventListener('click', async () => {
         const prefix = document.getElementById('prefix').value;
@@ -351,9 +405,10 @@ const { defaultService, defaultDoctorId } = Astro.props;
           return;
         }
 
-        const otp = String(otpInput?.value || '').replace(/\D/g, '');
-        if (!otpSentTo || otpSentTo !== phoneDigits(phone) || otp.length !== 6) {
-          showError("Verify your mobile number: tap Send code and enter the 6-digit code we send on WhatsApp.");
+        if (!otpToken || verifiedPhone !== phoneDigits(phone)) {
+          showError(otpSentTo
+            ? "Tap Verify to confirm the WhatsApp code before booking."
+            : "Verify your mobile number first: tap Send code and enter the code we send on WhatsApp.");
           (otpSentTo ? otpInput : sendOtpBtn)?.focus();
           return;
         }
@@ -397,7 +452,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
               service,
               date,
               time: selectedTime,
-              otp,
+              otpToken,
             }),
           });
 
@@ -425,7 +480,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
         } catch (err) {
           console.error("Error booking:", err);
           showError(err.message || "Could not complete your booking. Please try again or call us directly.");
-          if (/code/i.test(err.message || "")) otpInput?.focus();
+          if (/verif/i.test(err.message || "")) resetOtp();
           confirmBtn.innerText = "Confirm Appointment";
           confirmBtn.disabled = false;
         }
