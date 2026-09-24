@@ -72,11 +72,14 @@ exports.handler = async (event) => {
     // these server-side, rather than trusting a doctor choice made
     // client-side or baked in at page-load time.
     candidateDoctorIds,
+    // WhatsApp code sent by send-booking-otp.js to this phone number.
+    otp,
   } = payload || {};
 
   const missing = [];
   if (!name) missing.push("name");
   if (!phone) missing.push("phone");
+  if (!otp) missing.push("otp");
   if (!service) missing.push("service");
   if (!date) missing.push("date");
   if (!time) missing.push("time");
@@ -235,6 +238,24 @@ exports.handler = async (event) => {
       return ok({ success: false, error: lastFailureReason }, 409);
     }
 
+    // ---- Verify the WhatsApp code ----
+    //
+    // Checked after the slot is confirmed free (so a taken slot doesn't burn a
+    // valid code) and before any patient or appointment row is written. The
+    // RPC is service_role-only, marks the code used, and counts wrong attempts.
+    const canonicalPhone = canonicalIndianMobile(phone);
+    if (!canonicalPhone) {
+      return ok({ success: false, error: "Enter a valid 10-digit Indian mobile number that uses WhatsApp." }, 400);
+    }
+    const { data: otpValid, error: otpError } = await supabase.rpc("service_verify_phone_otp_no_session", {
+      p_phone: canonicalPhone,
+      p_code: String(otp).replace(/\D/g, ""),
+    });
+    if (otpError) throw otpError;
+    if (!otpValid) {
+      return ok({ success: false, error: "The WhatsApp code is incorrect or has expired. Request a new code and try again." }, 400);
+    }
+
     // ---- Find or create the patient ----
 
     // patients.name/phone are encrypted columns (name_enc/phone_enc) --
@@ -362,6 +383,14 @@ exports.handler = async (event) => {
 //   - "HH:MM" / "HH:MM:SS" (24-hour, e.g. from schedule_overrides/slot_templates rows)
 //   - "h:mm AM/PM" / "hh:mm AM/PM" (12-hour display strings, e.g. BookingCalendar.astro's
 //     selectedTime, which comes from generateSlotsForSession as "09:30 AM")
+// Must match send-booking-otp.js: codes are stored against a hash of this exact form.
+function canonicalIndianMobile(raw) {
+  let digits = String(raw || "").replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("0")) digits = digits.slice(1);
+  if (digits.length === 12 && digits.startsWith("91")) digits = digits.slice(2);
+  return /^[6-9]\d{9}$/.test(digits) ? `91${digits}` : null;
+}
+
 function normalizeTime(t) {
   if (!t) return t;
 

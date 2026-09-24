@@ -25,7 +25,14 @@ const { defaultService, defaultDoctorId } = Astro.props;
     </div>
 
     <input type="text" id="lastName" placeholder="Last Name" autocomplete="family-name" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
-    <input type="tel" id="phone" placeholder="Mobile Number (+91...)" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+    <div class="flex gap-3">
+      <input type="tel" id="phone" placeholder="WhatsApp Mobile Number" autocomplete="tel-national" inputmode="tel" required class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+      <button type="button" id="sendOtpBtn" class="px-4 rounded-xl bg-brand-100 text-brand-900 font-semibold whitespace-nowrap hover:bg-brand-200 transition disabled:opacity-50">Send code</button>
+    </div>
+    <div id="otpBlock" class="hidden space-y-2">
+      <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code from WhatsApp" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none tracking-widest" />
+      <p id="otpStatus" class="text-sm text-slate-600"></p>
+    </div>
 
     <select id="doctor" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
       <option value="" disabled selected>Select Doctor...</option>
@@ -110,6 +117,71 @@ const { defaultService, defaultDoctorId } = Astro.props;
     const errorMessage = document.getElementById('errorMessage');
     const serviceSelect = document.getElementById('service');
     const doctorSelect = document.getElementById('doctor');
+    const phoneInput = document.getElementById('phone');
+    const sendOtpBtn = document.getElementById('sendOtpBtn');
+    const otpBlock = document.getElementById('otpBlock');
+    const otpInput = document.getElementById('otp');
+    const otpStatus = document.getElementById('otpStatus');
+
+    // WhatsApp verification: a booking is only accepted with the code sent to
+    // this exact number (checked server-side in public-book-appointment).
+    const phoneDigits = (v) => String(v || '').replace(/\D/g, '').slice(-10);
+    let otpSentTo = '';
+    let resendTimer = null;
+
+    function resetOtp() {
+      otpSentTo = '';
+      if (otpInput) otpInput.value = '';
+      otpBlock?.classList.add('hidden');
+      if (resendTimer) clearInterval(resendTimer);
+      resendTimer = null;
+      if (sendOtpBtn) { sendOtpBtn.disabled = false; sendOtpBtn.innerText = 'Send code'; }
+    }
+
+    phoneInput?.addEventListener('input', () => {
+      if (otpSentTo && phoneDigits(phoneInput.value) !== otpSentTo) resetOtp();
+    });
+
+    sendOtpBtn?.addEventListener('click', async () => {
+      errorMessage?.classList.add('hidden');
+      const digits = phoneDigits(phoneInput?.value);
+      if (!/^[6-9]\d{9}$/.test(digits)) {
+        showError('Enter a valid 10-digit mobile number that uses WhatsApp.');
+        return;
+      }
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.innerText = 'Sending…';
+      try {
+        const response = await fetch('/.netlify/functions/send-booking-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneInput.value }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
+        otpSentTo = digits;
+        otpBlock?.classList.remove('hidden');
+        if (otpStatus) otpStatus.textContent = `Code sent on WhatsApp to +91 ${digits}. It expires in 5 minutes.`;
+        otpInput?.focus();
+        let wait = 30;
+        sendOtpBtn.innerText = `Resend in ${wait}s`;
+        resendTimer = setInterval(() => {
+          wait -= 1;
+          if (wait <= 0) {
+            clearInterval(resendTimer);
+            resendTimer = null;
+            sendOtpBtn.disabled = false;
+            sendOtpBtn.innerText = 'Resend code';
+          } else {
+            sendOtpBtn.innerText = `Resend in ${wait}s`;
+          }
+        }, 1000);
+      } catch (err) {
+        showError(err.message);
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.innerText = 'Send code';
+      }
+    });
 
     const todayStr = new Date().toISOString().split('T')[0];
     if (dateInput) {
@@ -279,6 +351,13 @@ const { defaultService, defaultDoctorId } = Astro.props;
           return;
         }
 
+        const otp = String(otpInput?.value || '').replace(/\D/g, '');
+        if (!otpSentTo || otpSentTo !== phoneDigits(phone) || otp.length !== 6) {
+          showError("Verify your mobile number: tap Send code and enter the 6-digit code we send on WhatsApp.");
+          (otpSentTo ? otpInput : sendOtpBtn)?.focus();
+          return;
+        }
+
         // "any" (no preference) bookings don't have a single doctorId --
         // they carry the list of doctors actually free at the selected
         // time, and the server picks one at random and re-verifies
@@ -318,6 +397,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
               service,
               date,
               time: selectedTime,
+              otp,
             }),
           });
 
@@ -345,6 +425,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
         } catch (err) {
           console.error("Error booking:", err);
           showError(err.message || "Could not complete your booking. Please try again or call us directly.");
+          if (/code/i.test(err.message || "")) otpInput?.focus();
           confirmBtn.innerText = "Confirm Appointment";
           confirmBtn.disabled = false;
         }
