@@ -18,6 +18,11 @@ const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 
 // CRISPR Skin and Hair Clinic's three dermatology doctors. Kept in sync with
 // the same list in public-available-slots.js.
+//
+// The AppointmentManager database is shared with Crispr Eye Care's website, so
+// every patient-history lookup below is limited to these doctors: an eye visit
+// is not a dermatology "last consultation", and the one-booking-per-day rule
+// and Manage My Appointment only cover this clinic's appointments.
 const CLINIC_DOCTOR_IDS = [
   "514ff136-ee45-4d49-89b5-d128d96aef62", // Karthik L
   "d5372165-fc7e-47e8-aee6-ce02e7fefc71", // Narayanan A
@@ -226,6 +231,7 @@ async function lastConsultation(supabase, canonicalPhone, name) {
     .from("appointments")
     .select("slot_date, doctor_id, doctors(name)")
     .eq("patient_id", patient.id)
+    .in("doctor_id", CLINIC_DOCTOR_IDS)
     .lte("slot_date", clinicNow().date)
     .in("status", ["seen", "complete"])
     .is("deleted_at", null)
@@ -238,12 +244,13 @@ async function lastConsultation(supabase, canonicalPhone, name) {
   return { patientId: patient.id, date: visit.slot_date, doctorId: visit.doctor_id, doctorName: visit.doctors?.name || null };
 }
 
-/** The patient's first non-cancelled appointment on a date, optionally ignoring one being moved. */
+/** The patient's first non-cancelled appointment at this clinic on a date, optionally ignoring one being moved. */
 async function appointmentOnDay(supabase, patientId, slotDate, ignoreAppointmentId = null) {
   let q = supabase
     .from("appointments")
     .select("id, slot_time, status, linked_group_id, doctor_id, notes, doctors(name)")
     .eq("patient_id", patientId)
+    .in("doctor_id", CLINIC_DOCTOR_IDS)
     .eq("slot_date", slotDate)
     .neq("status", "cancelled")
     .is("deleted_at", null);
@@ -258,8 +265,10 @@ function canChangeOnline(appointment) {
   return appointment.status === "booked" && !appointment.linked_group_id;
 }
 
+// Written to reception's audit trail. `action` uses reception's action names
+// (APPOINTMENT_CREATE / APPOINTMENT_RESCHEDULE / APPOINTMENT_CANCEL).
 async function logForReception(supabase, action, details) {
-  const { error } = await supabase.from("booking_audit_log").insert({ action, details, performed_by: "Website (patient)" });
+  const { error } = await supabase.from("booking_audit_log").insert({ action, details, performed_by: "Website (patient)", source_app: "website" });
   if (error) console.error("booking_audit_log insert failed:", error.message);
 }
 

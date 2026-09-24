@@ -47,7 +47,8 @@ exports.handler = async (event) => {
       .is("deleted_at", null)
       .maybeSingle();
     if (apptError && !/uuid/i.test(apptError.message || "")) throw apptError;
-    const patient = appt && patients.find((p) => p.id === appt.patient_id);
+    // Only this clinic's appointments are managed here (the database is shared with the eye clinic).
+    const patient = appt && core.CLINIC_DOCTOR_IDS.includes(appt.doctor_id) && patients.find((p) => p.id === appt.patient_id);
     if (!appt || !patient) return core.json(404, { error: "Appointment not found for this number." });
     if (!core.canChangeOnline(appt) || core.isPast(appt.slot_date, appt.slot_time)) {
       return core.json(409, { error: "This appointment can't be changed online. Please call the clinic." });
@@ -64,7 +65,7 @@ exports.handler = async (event) => {
         .maybeSingle();
       if (cancelError) throw cancelError;
       if (!cancelled) return core.json(409, { error: "This appointment can't be changed online. Please call the clinic." });
-      await core.logForReception(supabase, "CANCEL", `${patient.name} cancelled their appointment on ${oldWhen} via website`);
+      await core.logForReception(supabase, "APPOINTMENT_CANCEL", `${patient.name} cancelled their appointment on ${oldWhen} via website`);
       return core.json(200, { success: true, cancelled: true });
     }
 
@@ -74,6 +75,9 @@ exports.handler = async (event) => {
       if (!slotDate || !slotTime) return core.json(400, { error: "Choose a new date and time." });
 
       // Same doctor unless the patient picked another (or "no preference").
+      if (payload.doctorId && payload.doctorId !== "any" && !core.CLINIC_DOCTOR_IDS.includes(String(payload.doctorId))) {
+        return core.json(400, { error: "Unknown doctor." });
+      }
       const candidates = payload.doctorId && payload.doctorId !== "any"
         ? [String(payload.doctorId)]
         : Array.isArray(payload.candidateDoctorIds) && payload.candidateDoctorIds.length
@@ -103,7 +107,7 @@ exports.handler = async (event) => {
 
       const { data: newDoctor } = await supabase.from("doctors").select("name").eq("id", slot.doctorId).maybeSingle();
       const newWhen = `${core.displayDate(slotDate)} at ${core.displayTime(slotTime)}${newDoctor?.name ? ` with Dr. ${newDoctor.name}` : ""}`;
-      await core.logForReception(supabase, "RESCHEDULE", `${patient.name} moved their appointment from ${oldWhen} to ${newWhen} via website`);
+      await core.logForReception(supabase, "APPOINTMENT_RESCHEDULE", `${patient.name} moved their appointment from ${oldWhen} to ${newWhen} via website`);
       await core.sendConfirmation(supabase, {
         serviceRoleKey, canonicalPhone, name: patient.name, doctorId: slot.doctorId, slotDate, slotTime, appointmentId: appt.id,
       });
@@ -126,6 +130,7 @@ async function upcoming(supabase, patients) {
     .from("appointments")
     .select("id, patient_id, doctor_id, slot_date, slot_time, status, linked_group_id, notes, doctors(name)")
     .in("patient_id", patients.map((p) => p.id))
+    .in("doctor_id", core.CLINIC_DOCTOR_IDS)
     .gte("slot_date", core.clinicNow().date)
     .in("status", ["booked", "arrived"])
     .is("deleted_at", null)

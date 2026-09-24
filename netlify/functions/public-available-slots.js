@@ -61,6 +61,9 @@ exports.handler = async (event) => {
     (event.httpMethod === "GET"
       ? event.queryStringParameters && event.queryStringParameters.doctorId
       : safeParse(event.body)?.doctorId) || null;
+  if (requestedDoctorId && !CLINIC_DOCTOR_IDS.includes(requestedDoctorId)) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Unknown doctor." }) };
+  }
 
   if (!date) {
     return { statusCode: 400, body: JSON.stringify({ error: "Missing required field: date" }) };
@@ -243,7 +246,13 @@ async function computeSlotsForDoctor(supabase, doctorId, slotDate, dayOfWeek) {
     bookedCounts[row.slot_time] = (bookedCounts[row.slot_time] || 0) + 1;
   }
 
+  // Today's times that have already passed can't be booked (the booking
+  // function refuses them), so don't offer them.
+  const nowIst = new Date(Date.now() + 330 * 60000).toISOString();
+  const pastCutoff = slotDate === nowIst.slice(0, 10) ? nowIst.slice(11, 16) : null;
+
   const slots = candidateTimes
+    .filter(({ time24 }) => !pastCutoff || time24 > pastCutoff)
     .filter(({ time24 }) => !blockedTimes.has(time24) && !blockedTimes.has(`${time24}:00`))
     .filter(({ time24, maxPerSlot }) => (bookedCounts[`${time24}:00`] || bookedCounts[time24] || 0) < maxPerSlot)
     .sort((a, b) => timeToMinutes(a.time24) - timeToMinutes(b.time24))
