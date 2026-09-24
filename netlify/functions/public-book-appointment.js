@@ -54,6 +54,9 @@ exports.handler = async (event) => {
   if (!service) missing.push("service");
   if (!date) missing.push("date");
   if (!time) missing.push("time");
+  if (requestedDoctorId && !core.CLINIC_DOCTOR_IDS.includes(String(requestedDoctorId))) {
+    return core.json(400, { success: false, error: "Unknown doctor." });
+  }
   if (!requestedDoctorId && !(Array.isArray(candidateDoctorIds) && candidateDoctorIds.length > 0)) {
     missing.push("doctorId (or candidateDoctorIds for no-preference bookings)");
   }

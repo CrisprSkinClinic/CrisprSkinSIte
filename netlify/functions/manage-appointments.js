@@ -75,6 +75,9 @@ exports.handler = async (event) => {
       if (!slotDate || !slotTime) return core.json(400, { error: "Choose a new date and time." });
 
       // Same doctor unless the patient picked another (or "no preference").
+      if (payload.doctorId && payload.doctorId !== "any" && !core.CLINIC_DOCTOR_IDS.includes(String(payload.doctorId))) {
+        return core.json(400, { error: "Unknown doctor." });
+      }
       const candidates = payload.doctorId && payload.doctorId !== "any"
         ? [String(payload.doctorId)]
         : Array.isArray(payload.candidateDoctorIds) && payload.candidateDoctorIds.length
