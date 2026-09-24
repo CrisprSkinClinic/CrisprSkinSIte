@@ -21,10 +21,10 @@ const { defaultService, defaultDoctorId } = Astro.props;
         <option value="Mrs.">Mrs.</option>
         <option value="Dr.">Dr.</option>
       </select>
-      <input type="text" id="firstName" placeholder="First Name" required class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-3/4" />
+      <input type="text" id="firstName" placeholder="First Name" autocomplete="given-name" required class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-3/4" />
     </div>
 
-    <input type="text" id="lastName" placeholder="Last Name" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+    <input type="text" id="lastName" placeholder="Last Name" autocomplete="family-name" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
     <input type="tel" id="phone" placeholder="Mobile Number (+91...)" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
 
     <select id="doctor" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
@@ -292,7 +292,15 @@ const { defaultService, defaultDoctorId } = Astro.props;
         // patients.name in AppointmentManager is a single text column,
         // so prefix/first/last are concatenated here -- the split-name
         // concept ends at this form layer.
-        const name = `${prefix} ${fName} ${lName}`.trim();
+        // Patients often type their full name into First Name and then the surname
+        // again into Last Name ("Sunni Tamil" + "Tamil"); drop the repeat. A
+        // single-word first name is left alone so names like "Ram Ram" survive.
+        const first = fName.trim().replace(/\s+/g, ' ');
+        const last = lName.trim().replace(/\s+/g, ' ');
+        const firstWords = first.split(' ');
+        const surnameRepeated = last !== '' && firstWords.length > 1 &&
+          firstWords.slice(-last.split(' ').length).join(' ').toLowerCase() === last.toLowerCase();
+        const name = [prefix, first, surnameRepeated ? '' : last].filter(Boolean).join(' ');
 
         try {
           confirmBtn.innerText = "Securing Slot...";
