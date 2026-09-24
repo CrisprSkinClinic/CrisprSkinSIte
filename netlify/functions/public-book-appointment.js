@@ -12,6 +12,8 @@
 // manage-bookings.js, this endpoint is intentionally public, so all trust
 // boundaries are enforced by the validation logic below, not by auth.
 
+const { lastConsultation } = require("./public-returning-patient");
+
 let createClient;
 try {
   createClient = require("@supabase/supabase-js").createClient;
@@ -75,6 +77,9 @@ exports.handler = async (event) => {
     // One-time token from verify-booking-otp.js proving the patient
     // verified this phone number with a WhatsApp code.
     otpToken,
+    // "review" when the form greeted a returning patient. Only a hint: the
+    // server re-checks the verified patient's history before labelling it.
+    appointmentType,
   } = payload || {};
 
   const missing = [];
@@ -265,22 +270,20 @@ exports.handler = async (event) => {
 
     // ---- Find or create the patient ----
 
-    // patients.name/phone are encrypted columns (name_enc/phone_enc) --
-    // a direct .eq("phone", phone) filter can't match encrypted values,
-    // so lookup goes through the find_patient_by_phone RPC (hash-based
-    // exact match) instead, and insertion goes through
-    // insert_patient_encrypted so the new row's PII is encrypted from
-    // the start rather than ever touching the table in plaintext.
-    const { data: existingRows, error: patientLookupError } = await supabase.rpc("find_patient_by_phone", { p_phone: phone });
-    if (patientLookupError) throw patientLookupError;
+    // patients.name/phone are encrypted, so lookup goes through a hash-matching
+    // RPC and inserts through insert_patient_encrypted. Reuse an existing patient
+    // only when the name matches too: family members share numbers, and a
+    // different name on the same number is a different person, not a typo.
+    const past = await lastConsultation(supabase, canonicalPhone, name);
+    const isReview = appointmentType === "review" && Boolean(past?.date);
 
     let patientId;
-    if (existingRows && existingRows.length > 0) {
-      patientId = existingRows[0].id;
+    if (past?.patientId) {
+      patientId = past.patientId;
     } else {
       const { data: newPatientId, error: insertPatientError } = await supabase.rpc("insert_patient_encrypted", {
         p_name: name,
-        p_phone: phone,
+        p_phone: canonicalPhone.slice(2),
         p_dob: null,
         p_gender: null,
         p_address: null,
@@ -293,7 +296,9 @@ exports.handler = async (event) => {
     // patients has no email column, so it's folded into the appointment
     // notes alongside the selected service -- same free-text approach
     // already used for service, since there's no dedicated column for it.
-    const notesParts = [service];
+    // The first " | " part is the visit type reception's Today screen, filters and
+    // payment categories read, so a review must lead with "Review".
+    const notesParts = isReview ? ["Review", service] : [service];
     if (email) notesParts.push(`Email: ${email}`);
     notesParts.push("Booked via website self-service");
     const notes = notesParts.join(" | ");

@@ -36,6 +36,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
       </div>
       <p id="otpStatus" class="text-sm text-slate-600"></p>
     </div>
+    <div id="returningPatientMessage" class="hidden rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900" role="status" aria-live="polite"></div>
 
     <select id="doctor" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
       <option value="" disabled selected>Select Doctor...</option>
@@ -127,6 +128,9 @@ const { defaultService, defaultDoctorId } = Astro.props;
     const otpStatus = document.getElementById('otpStatus');
     const otpEntry = document.getElementById('otpEntry');
     const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+    const returningPatientMessage = document.getElementById('returningPatientMessage');
+    let isReturningPatient = false;
+    let lookupSequence = 0;
 
     // WhatsApp verification: a booking is only accepted with the code sent to
     // this exact number (checked server-side in public-book-appointment).
@@ -142,7 +146,56 @@ const { defaultService, defaultDoctorId } = Astro.props;
       otpStatus.className = ok ? 'text-sm font-semibold text-green-700' : 'text-sm text-slate-600';
     }
 
+    function clearReturningPatient() {
+      isReturningPatient = false;
+      lookupSequence += 1;
+      returningPatientMessage?.classList.add('hidden');
+      if (returningPatientMessage) returningPatientMessage.textContent = '';
+    }
+
+    function enteredName() {
+      const p = document.getElementById('prefix')?.value || '';
+      const f = document.getElementById('firstName')?.value || '';
+      const l = document.getElementById('lastName')?.value || '';
+      return `${p} ${f} ${l}`.trim().replace(/\s+/g, ' ');
+    }
+
+    // Runs only after the number is verified: the server refuses the lookup
+    // without this phone's unused verification token.
+    async function checkReturningPatient() {
+      clearReturningPatient();
+      if (!otpToken || !verifiedPhone) return;
+      const requestNumber = lookupSequence;
+      try {
+        const response = await fetch('/.netlify/functions/public-returning-patient', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: enteredName(), phone: phoneInput.value, otpToken }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (requestNumber !== lookupSequence || !response.ok || !result.found) return;
+        const last = result.lastConsultation;
+        const lastDate = new Date(`${last.date}T00:00:00Z`).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+        const doctorOption = Array.from(doctorSelect?.options || []).find((o) => o.value === last.doctorId);
+        if (doctorOption && doctorSelect) {
+          doctorSelect.value = last.doctorId;
+          if (dateInput?.value) loadAvailableSlots(dateInput.value);
+        }
+        isReturningPatient = true;
+        if (returningPatientMessage) {
+          returningPatientMessage.textContent = `Welcome back. Your last consultation was on ${lastDate}${last.doctorName ? ` with Dr. ${last.doctorName}` : ''}. ${doctorOption ? 'We have selected the same doctor for your review — you can change this.' : 'This will be booked as a review.'}`;
+          returningPatientMessage.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Returning patient lookup failed:', err);
+      }
+    }
+
+    ['firstName', 'lastName'].forEach((id) => document.getElementById(id)?.addEventListener('blur', () => { if (otpToken) checkReturningPatient(); }));
+    document.getElementById('prefix')?.addEventListener('change', () => { if (otpToken) checkReturningPatient(); });
+
     function resetOtp() {
+      clearReturningPatient();
       otpSentTo = '';
       otpToken = '';
       verifiedPhone = '';
@@ -376,6 +429,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
         otpEntry?.classList.add('hidden');
         sendOtpBtn?.classList.add('hidden');
         setStatus(`✓ +91 ${verifiedPhone} verified`, true);
+        checkReturningPatient();
       } catch (err) {
         showError(err.message);
         otpInput?.focus();
@@ -453,6 +507,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
               date,
               time: selectedTime,
               otpToken,
+              appointmentType: isReturningPatient ? 'review' : 'new',
             }),
           });
 
