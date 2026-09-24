@@ -80,6 +80,9 @@ exports.handler = async (event) => {
     // "review" when the form greeted a returning patient. Only a hint: the
     // server re-checks the verified patient's history before labelling it.
     appointmentType,
+    // true when the patient chose "Move it to this time" after being told they
+    // already have an appointment that day.
+    reschedule,
   } = payload || {};
 
   const missing = [];
@@ -284,7 +287,7 @@ exports.handler = async (event) => {
     if (past?.patientId) {
       const { data: sameDay, error: sameDayError } = await supabase
         .from("appointments")
-        .select("slot_time, doctors(name)")
+        .select("id, slot_time, status, linked_group_id, doctor_id, notes, doctors(name)")
         .eq("patient_id", past.patientId)
         .eq("slot_date", slotDate)
         .neq("status", "cancelled")
@@ -295,13 +298,58 @@ exports.handler = async (event) => {
       if (sameDayError) throw sameDayError;
       if (sameDay) {
         const displayDay = new Date(`${slotDate}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" });
-        const [bh, bm] = String(sameDay.slot_time).split(":");
-        const bookedTime = `${((parseInt(bh, 10) + 11) % 12) + 1}:${bm} ${parseInt(bh, 10) >= 12 ? "PM" : "AM"}`;
+        const bookedTime = displayTime(sameDay.slot_time);
         const withDoctor = sameDay.doctors?.name ? ` with Dr. ${sameDay.doctors.name}` : "";
-        return ok({
-          success: false,
-          error: `You already have an appointment on ${displayDay} at ${bookedTime}${withDoctor}. Only one booking per day is allowed online — please call the clinic to change it.`,
-        }, 409);
+        // Online moves are limited to a plain single-slot booking the patient
+        // hasn't arrived for yet; anything else is reception's to change.
+        const canReschedule = sameDay.status === "booked" && !sameDay.linked_group_id;
+
+        if (!reschedule) {
+          return ok({
+            success: false,
+            error: canReschedule
+              ? `You already have an appointment on ${displayDay} at ${bookedTime}${withDoctor}. Only one booking per day is allowed online.`
+              : `You already have an appointment on ${displayDay} at ${bookedTime}${withDoctor}. Only one booking per day is allowed online — please call the clinic to change it.`,
+            existing: { date: slotDate, time: bookedTime, doctorName: sameDay.doctors?.name || null },
+            canReschedule,
+          }, 409);
+        }
+        if (!canReschedule) {
+          return ok({ success: false, error: "This appointment can't be changed online. Please call the clinic." }, 409);
+        }
+
+        const { data: moveConsumed, error: moveConsumeError } = await supabase.rpc("service_consume_phone_otp_token", {
+          p_phone: canonicalPhone,
+          p_token: String(otpToken),
+        });
+        if (moveConsumeError) throw moveConsumeError;
+        if (!moveConsumed) return verificationExpired();
+
+        // Update in place: the appointment id is referenced by notifications,
+        // bills and clinical records, so it must not be deleted and re-created.
+        const movedNote = String(sameDay.notes || "").includes("Rescheduled via website")
+          ? sameDay.notes
+          : [sameDay.notes, "Rescheduled via website"].filter(Boolean).join(" | ");
+        const { data: moved, error: moveError } = await supabase
+          .from("appointments")
+          .update({ doctor_id: doctorId, slot_time: slotTime, notes: movedNote })
+          .eq("id", sameDay.id)
+          .eq("status", "booked")
+          .select("id")
+          .maybeSingle();
+        if (moveError) throw moveError;
+        if (!moved) return ok({ success: false, error: "This appointment can't be changed online. Please call the clinic." }, 409);
+
+        const { data: newDoctor } = await supabase.from("doctors").select("name").eq("id", doctorId).maybeSingle();
+        const { error: auditError } = await supabase.from("booking_audit_log").insert({
+          action: "RESCHEDULE",
+          details: `${name} moved their ${slotDate} appointment from ${bookedTime}${withDoctor} to ${displayTime(slotTime)}${newDoctor?.name ? ` with Dr. ${newDoctor.name}` : ""} via website`,
+          performed_by: "Website (patient)",
+        });
+        if (auditError) console.error("Reschedule audit log failed:", auditError.message);
+
+        await sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId: sameDay.id });
+        return ok({ success: true, rescheduled: true, appointment_id: sameDay.id, from: bookedTime, to: displayTime(slotTime) });
       }
     }
 
@@ -357,62 +405,8 @@ exports.handler = async (event) => {
       .single();
     if (insertAppointmentError) throw insertAppointmentError;
 
-    // ---- Send WhatsApp confirmation (best-effort, never blocks the booking) ----
-    //
-    // Calls a dedicated Supabase Edge Function (send-wa-appointment-confirmation)
-    // rather than send-whatsapp-meta directly, since this Netlify function has
-    // no staff login -- it authenticates with the service_role key it already
-    // holds for its other Supabase calls, so no new secret is needed here.
-    // Meta credentials stay living only in Supabase.
-    //
-    // Deliberately fire-and-forget with respect to the booking response: if
-    // the WhatsApp send fails (template not approved for this language, Meta
-    // outage, malformed phone, etc.), the booking itself must still succeed
-    // and return success to the patient -- a confirmation message is a nice-
-    // to-have, not a precondition for the appointment being real.
-    try {
-      const { data: doctorRow, error: doctorLookupError } = await supabase
-        .from("doctors")
-        .select("name")
-        .eq("id", doctorId)
-        .single();
-      if (doctorLookupError) throw doctorLookupError;
-
-      const confirmationPhone = phone.replace(/^\+/, "");
-      const sendPhone = confirmationPhone.length === 10 ? `91${confirmationPhone}` : confirmationPhone;
-
-      const displayDate = new Date(`${slotDate}T00:00:00Z`).toLocaleDateString("en-GB", {
-        day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
-      });
-      const [hh, mm] = slotTime.split(":");
-      const hourNum = parseInt(hh, 10);
-      const displayTime = `${((hourNum + 11) % 12) + 1}:${mm} ${hourNum >= 12 ? "PM" : "AM"}`;
-
-      const confirmationRes = await fetch(
-        `${SUPABASE_URL}/functions/v1/send-wa-appointment-confirmation`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${serviceRoleKey}`,
-          },
-          body: JSON.stringify({
-            phone: sendPhone,
-            patient_name: name,
-            doctor_name: doctorRow?.name ? `Dr. ${doctorRow.name}` : "your doctor",
-            date: displayDate,
-            time: displayTime,
-            appointment_id: appointment.id,
-          }),
-        }
-      );
-      if (!confirmationRes.ok) {
-        const errBody = await confirmationRes.json().catch(() => ({}));
-        console.error("WhatsApp confirmation send failed:", errBody.error || confirmationRes.status);
-      }
-    } catch (whatsappError) {
-      console.error("WhatsApp confirmation send threw:", whatsappError.message);
-    }
+    // Best-effort: a failed WhatsApp confirmation never fails the booking.
+    await sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId: appointment.id });
 
     return ok({ success: true, appointment_id: appointment.id });
   } catch (error) {
@@ -432,6 +426,45 @@ exports.handler = async (event) => {
 //   - "HH:MM" / "HH:MM:SS" (24-hour, e.g. from schedule_overrides/slot_templates rows)
 //   - "h:mm AM/PM" / "hh:mm AM/PM" (12-hour display strings, e.g. BookingCalendar.astro's
 //     selectedTime, which comes from generateSlotsForSession as "09:30 AM")
+// "13:30:00" -> "1:30 PM"
+function displayTime(t) {
+  const [hh, mm] = String(t).split(":");
+  const hour = parseInt(hh, 10);
+  return `${((hour + 11) % 12) + 1}:${mm} ${hour >= 12 ? "PM" : "AM"}`;
+}
+
+// Sends the approved WhatsApp appointment confirmation through the
+// send-wa-appointment-confirmation Edge Function (Meta credentials stay in
+// Supabase). Best-effort: failures are logged, never thrown, because the
+// booking itself has already succeeded.
+async function sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId }) {
+  try {
+    const { data: doctorRow, error: doctorLookupError } = await supabase.from("doctors").select("name").eq("id", doctorId).single();
+    if (doctorLookupError) throw doctorLookupError;
+    const displayDate = new Date(`${slotDate}T00:00:00Z`).toLocaleDateString("en-GB", {
+      day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+    });
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/send-wa-appointment-confirmation`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
+      body: JSON.stringify({
+        phone: canonicalPhone,
+        patient_name: name,
+        doctor_name: doctorRow?.name ? `Dr. ${doctorRow.name}` : "your doctor",
+        date: displayDate,
+        time: displayTime(slotTime),
+        appointment_id: appointmentId,
+      }),
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      console.error("WhatsApp confirmation send failed:", errBody.error || res.status);
+    }
+  } catch (whatsappError) {
+    console.error("WhatsApp confirmation send threw:", whatsappError.message);
+  }
+}
+
 // Must match send-booking-otp.js / verify-booking-otp.js: codes are stored against a hash of this exact form.
 function canonicalIndianMobile(raw) {
   let digits = String(raw || "").replace(/\D/g, "");

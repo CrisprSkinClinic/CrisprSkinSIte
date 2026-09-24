@@ -105,6 +105,13 @@ const { defaultService, defaultDoctorId } = Astro.props;
     </div>
 
     <div id="errorMessage" class="hidden mt-4 text-center p-3 bg-red-100 text-red-800 rounded-lg font-medium"></div>
+    <div id="reschedulePrompt" class="hidden mt-4 p-4 rounded-xl border border-brand-200 bg-brand-50 text-brand-900 text-sm leading-relaxed space-y-3" role="status" aria-live="polite">
+      <p id="rescheduleText"></p>
+      <div id="rescheduleActions" class="flex flex-col sm:flex-row gap-3">
+        <button type="button" id="rescheduleBtn" class="flex-1 py-3 px-4 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition disabled:opacity-50">Move it</button>
+        <button type="button" id="keepBtn" class="flex-1 py-3 px-4 rounded-xl border border-brand-200 bg-white text-brand-900 font-semibold hover:bg-brand-100 transition">Keep my existing appointment</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -129,6 +136,13 @@ const { defaultService, defaultDoctorId } = Astro.props;
     const otpEntry = document.getElementById('otpEntry');
     const verifyOtpBtn = document.getElementById('verifyOtpBtn');
     const returningPatientMessage = document.getElementById('returningPatientMessage');
+    const reschedulePrompt = document.getElementById('reschedulePrompt');
+    const rescheduleText = document.getElementById('rescheduleText');
+    const rescheduleActions = document.getElementById('rescheduleActions');
+    const rescheduleBtn = document.getElementById('rescheduleBtn');
+    const keepBtn = document.getElementById('keepBtn');
+    let lastBookingBody = null;
+    const hideReschedule = () => reschedulePrompt?.classList.add('hidden');
     let isReturningPatient = false;
     let lookupSequence = 0;
 
@@ -313,6 +327,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
     }
 
     function renderSlots(slots) {
+      hideReschedule();
       selectedTime = "";
       selectedSlotDoctorIds = null;
       if (slots.length === 0) {
@@ -331,6 +346,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
           btn.classList.add('bg-brand-600', 'text-white');
           selectedTime = slot.display;
           selectedSlotDoctorIds = slot.doctorIds || null;
+          hideReschedule();
         });
         slotsContainer.appendChild(btn);
 
@@ -442,6 +458,43 @@ const { defaultService, defaultDoctorId } = Astro.props;
     verifyOtpBtn?.addEventListener('click', verifyCode);
     otpInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); verifyCode(); } });
 
+    async function submitBooking(body) {
+      const response = await fetch('/.netlify/functions/public-book-appointment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const result = await response.json().catch(() => ({}));
+      return { response, result };
+    }
+
+    rescheduleBtn?.addEventListener('click', async () => {
+      if (!lastBookingBody) return;
+      errorMessage?.classList.add('hidden');
+      rescheduleBtn.disabled = true;
+      rescheduleBtn.innerText = 'Moving…';
+      try {
+        const { response, result } = await submitBooking({ ...lastBookingBody, reschedule: true });
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not move your appointment. Please call the clinic.');
+        window.gtag?.('event', 'booking_rescheduled', { event_category: 'engagement', event_label: lastBookingBody.service });
+        hideReschedule();
+        if (successMessage) successMessage.textContent = `Your appointment has been moved from ${result.from} to ${result.to}. We have sent the new time on WhatsApp.`;
+        successMessage?.classList.remove('hidden');
+        confirmBtn.style.display = 'none';
+      } catch (err) {
+        hideReschedule();
+        showError(err.message);
+        if (/verif/i.test(err.message || '')) resetOtp();
+      } finally {
+        rescheduleBtn.disabled = false;
+      }
+    });
+
+    keepBtn?.addEventListener('click', () => {
+      rescheduleActions?.classList.add('hidden');
+      if (rescheduleText) rescheduleText.textContent = 'No changes made — your existing appointment stays as it is. To book another day, choose a different date.';
+    });
+
     if (confirmBtn) {
       confirmBtn.addEventListener('click', async () => {
         const prefix = document.getElementById('prefix').value;
@@ -490,28 +543,36 @@ const { defaultService, defaultDoctorId } = Astro.props;
           firstWords.slice(-last.split(' ').length).join(' ').toLowerCase() === last.toLowerCase();
         const name = [prefix, first, surnameRepeated ? '' : last].filter(Boolean).join(' ');
 
+        lastBookingBody = {
+          name,
+          phone,
+          ...(isNoPreference
+            ? { candidateDoctorIds: selectedSlotDoctorIds }
+            : { doctorId }),
+          service,
+          date,
+          time: selectedTime,
+          otpToken,
+          appointmentType: isReturningPatient ? 'review' : 'new',
+        };
+
         try {
+          hideReschedule();
           confirmBtn.innerText = "Securing Slot...";
           confirmBtn.disabled = true;
 
-          const response = await fetch('/.netlify/functions/public-book-appointment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name,
-              phone,
-              ...(isNoPreference
-                ? { candidateDoctorIds: selectedSlotDoctorIds }
-                : { doctorId }),
-              service,
-              date,
-              time: selectedTime,
-              otpToken,
-              appointmentType: isReturningPatient ? 'review' : 'new',
-            }),
-          });
+          const { response, result } = await submitBooking(lastBookingBody);
 
-          const result = await response.json();
+          if (response.status === 409 && result.existing && result.canReschedule) {
+            const doctorText = !isNoPreference && doctorSelect?.selectedOptions?.[0]?.text ? ` with ${doctorSelect.selectedOptions[0].text}` : '';
+            if (rescheduleText) rescheduleText.textContent = `${result.error} Would you like to move it to ${selectedTime}${doctorText} instead?`;
+            if (rescheduleBtn) rescheduleBtn.innerText = `Move it to ${selectedTime}`;
+            rescheduleActions?.classList.remove('hidden');
+            reschedulePrompt?.classList.remove('hidden');
+            confirmBtn.innerText = "Confirm Appointment";
+            confirmBtn.disabled = false;
+            return;
+          }
 
           if (!response.ok || !result.success) {
             window.gtag?.('event', 'booking_failed', {
