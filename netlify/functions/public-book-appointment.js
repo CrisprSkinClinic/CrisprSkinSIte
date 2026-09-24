@@ -244,38 +244,75 @@ exports.handler = async (event) => {
       return ok({ success: false, error: lastFailureReason }, 409);
     }
 
-    // ---- Use up the phone verification ----
+    // ---- Check the phone verification ----
     //
-    // Consumed after the slot is confirmed free (so a taken slot doesn't burn
-    // the patient's verification) and before any patient or appointment row
-    // is written. Service_role-only RPC: the token must belong to this phone,
-    // be unused, and be under 30 minutes old.
+    // Runs after the slot is confirmed free. The token is only checked here and
+    // consumed below, once the one-booking-per-day rule has passed, so neither a
+    // taken slot nor a duplicate attempt burns the patient's verification.
+    // Service_role-only RPCs: the token must belong to this phone, be unused,
+    // and be under 30 minutes old.
     const canonicalPhone = canonicalIndianMobile(phone);
     if (!canonicalPhone) {
       return ok({ success: false, error: "Enter a valid 10-digit Indian mobile number that uses WhatsApp." }, 400);
     }
-    const { data: tokenValid, error: tokenError } = await supabase.rpc("service_consume_phone_otp_token", {
+    const verificationExpired = () =>
+      ok({ success: false, error: "Your phone verification has expired. Please verify your WhatsApp number again." }, 400);
+    const { data: tokenLooksValid, error: peekError } = await supabase.rpc("service_peek_phone_otp_token", {
       p_phone: canonicalPhone,
       p_token: String(otpToken),
     });
-    if (tokenError) {
-      if (/uuid/i.test(tokenError.message || "")) {
-        return ok({ success: false, error: "Your phone verification has expired. Please verify your WhatsApp number again." }, 400);
-      }
-      throw tokenError;
+    if (peekError) {
+      if (/uuid/i.test(peekError.message || "")) return verificationExpired();
+      throw peekError;
     }
-    if (!tokenValid) {
-      return ok({ success: false, error: "Your phone verification has expired. Please verify your WhatsApp number again." }, 400);
-    }
+    if (!tokenLooksValid) return verificationExpired();
 
-    // ---- Find or create the patient ----
-
+    // ---- Find the patient ----
+    //
     // patients.name/phone are encrypted, so lookup goes through a hash-matching
     // RPC and inserts through insert_patient_encrypted. Reuse an existing patient
     // only when the name matches too: family members share numbers, and a
     // different name on the same number is a different person, not a typo.
     const past = await lastConsultation(supabase, canonicalPhone, name);
     const isReview = appointmentType === "review" && Boolean(past?.date);
+
+    // ---- One website booking per patient per day ----
+    //
+    // Only after verification, so the reply can't be used to learn someone
+    // else's appointment. Family members on the same number are different
+    // patients and can still book the same day.
+    if (past?.patientId) {
+      const { data: sameDay, error: sameDayError } = await supabase
+        .from("appointments")
+        .select("slot_time, doctors(name)")
+        .eq("patient_id", past.patientId)
+        .eq("slot_date", slotDate)
+        .neq("status", "cancelled")
+        .is("deleted_at", null)
+        .order("slot_time", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (sameDayError) throw sameDayError;
+      if (sameDay) {
+        const displayDay = new Date(`${slotDate}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" });
+        const [bh, bm] = String(sameDay.slot_time).split(":");
+        const bookedTime = `${((parseInt(bh, 10) + 11) % 12) + 1}:${bm} ${parseInt(bh, 10) >= 12 ? "PM" : "AM"}`;
+        const withDoctor = sameDay.doctors?.name ? ` with Dr. ${sameDay.doctors.name}` : "";
+        return ok({
+          success: false,
+          error: `You already have an appointment on ${displayDay} at ${bookedTime}${withDoctor}. Only one booking per day is allowed online — please call the clinic to change it.`,
+        }, 409);
+      }
+    }
+
+    const { data: tokenConsumed, error: consumeError } = await supabase.rpc("service_consume_phone_otp_token", {
+      p_phone: canonicalPhone,
+      p_token: String(otpToken),
+    });
+    if (consumeError) throw consumeError;
+    if (!tokenConsumed) return verificationExpired();
+
+    // ---- Create the patient if new ----
 
     let patientId;
     if (past?.patientId) {
