@@ -11,15 +11,7 @@
 // Meta credentials stay in Supabase; this function only needs the project URL.
 
 const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
-
-// Codes are stored against a hash of the exact phone string, so sending and
-// verifying must use one canonical form: "91" + the 10-digit Indian mobile.
-function canonicalIndianMobile(raw) {
-  let digits = String(raw || "").replace(/\D/g, "");
-  if (digits.length === 11 && digits.startsWith("0")) digits = digits.slice(1);
-  if (digits.length === 12 && digits.startsWith("91")) digits = digits.slice(2);
-  return /^[6-9]\d{9}$/.test(digits) ? `91${digits}` : null;
-}
+const { canonicalIndianMobile } = require("./lib/booking-core");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {

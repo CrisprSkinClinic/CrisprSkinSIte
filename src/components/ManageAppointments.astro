@@ -1,0 +1,258 @@
+---
+// src/components/ManageAppointments.astro
+//
+// "Manage my appointment": verify the WhatsApp number, then see, reschedule or
+// cancel upcoming appointments for everyone registered on it. All checks are
+// server-side in netlify/functions/manage-appointments.js.
+import { siteConfig } from '../config/site.js';
+const clinicPhone = siteConfig.contact.phone;
+const clinicTel = clinicPhone.replace(/[^0-9+]/g, '');
+---
+
+<div
+  id="manageRoot"
+  data-clinic-phone={clinicPhone}
+  data-clinic-tel={clinicTel}
+  data-doctors={JSON.stringify(siteConfig.doctors.map((d) => ({ id: d.dbId, name: d.name })))}
+  class="max-w-3xl mx-auto p-5 md:p-8 bg-white border border-slate-200 rounded-2xl shadow-lg space-y-5"
+>
+  <div id="manageVerify" class="space-y-4">
+    <h3 class="text-2xl font-bold text-brand-900">Find your appointments</h3>
+    <p class="text-slate-600">Enter the WhatsApp number you booked with. We'll send a code to confirm it's you, then show every upcoming appointment on that number — including family members'.</p>
+    <div class="flex gap-3">
+      <input type="tel" id="mPhone" placeholder="WhatsApp Mobile Number" autocomplete="tel-national" inputmode="tel" class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+      <button type="button" id="mSendBtn" class="px-4 rounded-xl bg-brand-100 text-brand-900 font-semibold whitespace-nowrap hover:bg-brand-200 transition disabled:opacity-50">Send code</button>
+    </div>
+    <div id="mOtpBlock" class="hidden space-y-2">
+      <div class="flex gap-3">
+        <input type="text" id="mOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none tracking-widest" />
+        <button type="button" id="mVerifyBtn" class="px-5 rounded-xl bg-brand-600 text-white font-semibold whitespace-nowrap hover:bg-brand-700 transition disabled:opacity-50">Verify</button>
+      </div>
+      <p id="mOtpStatus" class="text-sm text-slate-600"></p>
+    </div>
+  </div>
+
+  <div id="manageList" class="hidden space-y-4">
+    <div class="flex flex-wrap items-baseline justify-between gap-2">
+      <h3 class="text-2xl font-bold text-brand-900">Upcoming appointments</h3>
+      <p id="mVerifiedAs" class="text-sm font-semibold text-green-700"></p>
+    </div>
+    <div id="mNotice" class="hidden p-3 rounded-lg bg-green-100 text-green-800 font-medium" role="status" aria-live="polite"></div>
+    <div id="mCards" class="space-y-4"></div>
+    <a href="/book" class="inline-block text-sm font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Book another appointment</a>
+  </div>
+
+  <div id="mError" class="hidden p-3 bg-red-100 text-red-800 rounded-lg font-medium" role="alert"></div>
+</div>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const root = document.getElementById('manageRoot');
+    if (!root) return;
+    const doctors = JSON.parse(root.dataset.doctors || '[]');
+    const clinicPhone = root.dataset.clinicPhone;
+    const clinicTel = root.dataset.clinicTel;
+    const $ = (id) => document.getElementById(id);
+    const phoneInput = $('mPhone'), sendBtn = $('mSendBtn'), otpBlock = $('mOtpBlock'), otpInput = $('mOtp');
+    const verifyBtn = $('mVerifyBtn'), otpStatus = $('mOtpStatus'), errorBox = $('mError'), notice = $('mNotice'), cards = $('mCards');
+
+    let otpToken = '';
+    let resendTimer = null;
+    const showError = (msg) => { errorBox.textContent = msg; errorBox.classList.remove('hidden'); };
+    const clearError = () => errorBox.classList.add('hidden');
+    const showNotice = (msg) => { notice.textContent = msg; notice.classList.remove('hidden'); };
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const todayIst = () => new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10);
+    const nowIstHHMM = () => new Date(Date.now() + 330 * 60000).toISOString().slice(11, 16);
+    const to24 = (display) => {
+      const m = String(display).match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
+      if (!m) return display;
+      let h = parseInt(m[1], 10) % 12; if (m[3].toUpperCase() === 'PM') h += 12;
+      return `${String(h).padStart(2, '0')}:${m[2]}`;
+    };
+
+    async function post(url, body) {
+      const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const result = await response.json().catch(() => ({}));
+      return { response, result };
+    }
+    const manage = (action, extra = {}) => post('/.netlify/functions/manage-appointments', { action, phone: phoneInput.value, otpToken, ...extra });
+
+    sendBtn.addEventListener('click', async () => {
+      clearError();
+      const digits = phoneInput.value.replace(/\D/g, '').slice(-10);
+      if (!/^[6-9]\d{9}$/.test(digits)) return showError('Enter a valid 10-digit mobile number that uses WhatsApp.');
+      sendBtn.disabled = true; sendBtn.innerText = 'Sending…';
+      try {
+        const { response, result } = await post('/.netlify/functions/send-booking-otp', { phone: phoneInput.value });
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
+        otpBlock.classList.remove('hidden');
+        otpStatus.textContent = `Code sent on WhatsApp to +91 ${digits}. Enter it and tap Verify (expires in 5 minutes).`;
+        otpInput.focus();
+        let wait = 30; sendBtn.innerText = `Resend in ${wait}s`;
+        resendTimer = setInterval(() => {
+          wait -= 1;
+          if (wait <= 0) { clearInterval(resendTimer); sendBtn.disabled = false; sendBtn.innerText = 'Resend code'; }
+          else sendBtn.innerText = `Resend in ${wait}s`;
+        }, 1000);
+      } catch (err) {
+        showError(err.message); sendBtn.disabled = false; sendBtn.innerText = 'Send code';
+      }
+    });
+
+    async function verify() {
+      clearError();
+      const code = otpInput.value.replace(/\D/g, '');
+      if (code.length !== 6) return showError('Enter the 6-digit code from WhatsApp.');
+      verifyBtn.disabled = true; verifyBtn.innerText = 'Checking…';
+      try {
+        const { response, result } = await post('/.netlify/functions/verify-booking-otp', { phone: phoneInput.value, code });
+        if (!response.ok || !result.token) throw new Error(result.error || 'Could not verify the code.');
+        otpToken = result.token;
+        if (resendTimer) clearInterval(resendTimer);
+        $('manageVerify').classList.add('hidden');
+        $('manageList').classList.remove('hidden');
+        $('mVerifiedAs').textContent = `✓ +91 ${phoneInput.value.replace(/\D/g, '').slice(-10)}`;
+        await loadList();
+      } catch (err) {
+        showError(err.message); otpInput.focus();
+      } finally {
+        verifyBtn.disabled = false; verifyBtn.innerText = 'Verify';
+      }
+    }
+    verifyBtn.addEventListener('click', verify);
+    otpInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); verify(); } });
+
+    function expired() {
+      otpToken = '';
+      $('manageList').classList.add('hidden');
+      $('manageVerify').classList.remove('hidden');
+      otpBlock.classList.add('hidden'); otpInput.value = '';
+      sendBtn.disabled = false; sendBtn.innerText = 'Send code';
+      showError('Your verification has expired. Please verify your WhatsApp number again.');
+    }
+
+    async function loadList() {
+      cards.innerHTML = '<p class="text-slate-500 text-sm">Loading…</p>';
+      const { response, result } = await manage('list');
+      if (response.status === 403) return expired();
+      if (!response.ok) { cards.innerHTML = ''; return showError(result.error || 'Could not load your appointments.'); }
+      renderCards(result.appointments || []);
+    }
+
+    function renderCards(list) {
+      cards.innerHTML = '';
+      if (!list.length) {
+        cards.innerHTML = '<p class="text-slate-600">No upcoming appointments on this number.</p>';
+        return;
+      }
+      list.forEach((a) => {
+        const card = document.createElement('article');
+        card.className = 'p-4 md:p-5 rounded-xl border border-slate-200 bg-white space-y-3';
+        card.innerHTML = `
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h4 class="text-lg font-bold text-brand-900">${esc(a.patientName)}</h4>
+              <p class="text-slate-700 font-medium">${esc(a.dateLabel)} · ${esc(a.time)}</p>
+              <p class="text-sm text-slate-600">${a.doctorName ? `Dr. ${esc(a.doctorName)} · ` : ''}${esc(a.service)}</p>
+            </div>
+            ${a.status === 'arrived' ? '<span class="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-bold">Checked in</span>' : ''}
+          </div>
+          ${a.canChange ? `
+            <div class="flex flex-wrap gap-2" data-actions>
+              <button type="button" data-reschedule class="px-4 py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 transition">Reschedule</button>
+              <button type="button" data-cancel class="px-4 py-2 rounded-xl border border-red-200 bg-white text-red-700 text-sm font-semibold hover:bg-red-50 transition">Cancel appointment</button>
+            </div>
+            <div data-panel class="hidden space-y-3 pt-3 border-t border-slate-200">
+              <p class="text-sm font-semibold text-slate-700">Choose a new date and time</p>
+              <select data-doctor class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
+                ${doctors.map((d) => `<option value="${esc(d.id)}" ${d.id === a.doctorId ? 'selected' : ''}>${esc(d.name)}${d.id === a.doctorId ? ' (current)' : ''}</option>`).join('')}
+                <option value="any">No preference</option>
+              </select>
+              <input type="date" data-date min="${todayIst()}" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
+              <div data-slots class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" data-confirm disabled class="px-4 py-2 rounded-xl bg-brand-900 text-white text-sm font-semibold hover:bg-brand-800 transition disabled:opacity-50">Confirm new time</button>
+                <button type="button" data-close class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold">Close</button>
+              </div>
+            </div>` : `<p class="text-sm text-slate-600">To change this appointment, please call <a class="font-semibold text-brand-700 underline" href="tel:${esc(clinicTel)}">${esc(clinicPhone)}</a>.</p>`}
+        `;
+        cards.appendChild(card);
+        if (a.canChange) wireCard(card, a);
+      });
+    }
+
+    function wireCard(card, a) {
+      const panel = card.querySelector('[data-panel]');
+      const doctorSel = card.querySelector('[data-doctor]');
+      const dateIn = card.querySelector('[data-date]');
+      const slotsBox = card.querySelector('[data-slots]');
+      const confirmBtn = card.querySelector('[data-confirm]');
+      let chosen = null;
+
+      async function loadSlots() {
+        chosen = null; confirmBtn.disabled = true;
+        if (!dateIn.value) { slotsBox.innerHTML = ''; return; }
+        slotsBox.innerHTML = '<p class="col-span-full text-sm text-slate-500">Checking availability…</p>';
+        const doctorParam = doctorSel.value === 'any' ? '' : `&doctorId=${encodeURIComponent(doctorSel.value)}`;
+        try {
+          const response = await fetch(`/.netlify/functions/public-available-slots?date=${encodeURIComponent(dateIn.value)}${doctorParam}`);
+          const data = await response.json();
+          if (!response.ok || data.error) throw new Error(data.error || 'Could not load availability.');
+          const isToday = dateIn.value === todayIst();
+          const slots = (data.slots || []).filter((s) => !isToday || to24(s.display) > nowIstHHMM());
+          if (!slots.length) { slotsBox.innerHTML = `<p class="col-span-full text-sm text-slate-500">${esc(data.reason || 'No free slots on this date. Try another day.')}</p>`; return; }
+          slotsBox.innerHTML = '';
+          slots.forEach((s) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = s.display;
+            b.className = 'py-2 border border-brand-200 rounded-lg text-sm text-brand-800 hover:bg-brand-50 transition font-medium';
+            b.addEventListener('click', () => {
+              // Selected state drops the hover/dark-text classes, which would otherwise win.
+              slotsBox.querySelectorAll('button').forEach((x) => { x.classList.remove('bg-brand-600', 'text-white'); x.classList.add('text-brand-800', 'hover:bg-brand-50'); });
+              b.classList.remove('text-brand-800', 'hover:bg-brand-50');
+              b.classList.add('bg-brand-600', 'text-white');
+              chosen = s; confirmBtn.disabled = false;
+            });
+            slotsBox.appendChild(b);
+          });
+        } catch (err) {
+          slotsBox.innerHTML = `<p class="col-span-full text-sm text-red-600">${esc(err.message)}</p>`;
+        }
+      }
+
+      card.querySelector('[data-reschedule]').addEventListener('click', () => { panel.classList.toggle('hidden'); if (!panel.classList.contains('hidden')) dateIn.focus(); });
+      card.querySelector('[data-close]').addEventListener('click', () => panel.classList.add('hidden'));
+      doctorSel.addEventListener('change', loadSlots);
+      dateIn.addEventListener('change', loadSlots);
+
+      confirmBtn.addEventListener('click', async () => {
+        if (!chosen) return;
+        clearError(); notice.classList.add('hidden');
+        confirmBtn.disabled = true; confirmBtn.innerText = 'Moving…';
+        const doctorChoice = doctorSel.value === 'any'
+          ? { candidateDoctorIds: chosen.doctorIds || [] }
+          : { doctorId: doctorSel.value };
+        const { response, result } = await manage('reschedule', { appointmentId: a.id, date: dateIn.value, time: chosen.display, ...doctorChoice });
+        confirmBtn.innerText = 'Confirm new time';
+        if (response.status === 403) return expired();
+        if (!response.ok || !result.success) { confirmBtn.disabled = false; return showError(result.error || 'Could not move the appointment.'); }
+        window.gtag?.('event', 'booking_rescheduled', { event_category: 'engagement', event_label: 'manage_page' });
+        showNotice(`${a.patientName}'s appointment is moved from ${result.from} to ${result.to}. We have sent the new time on WhatsApp.`);
+        await loadList();
+      });
+
+      card.querySelector('[data-cancel]').addEventListener('click', async () => {
+        if (!window.confirm(`Cancel ${a.patientName}'s appointment on ${a.dateLabel} at ${a.time}?`)) return;
+        clearError(); notice.classList.add('hidden');
+        const { response, result } = await manage('cancel', { appointmentId: a.id });
+        if (response.status === 403) return expired();
+        if (!response.ok || !result.success) return showError(result.error || 'Could not cancel the appointment.');
+        window.gtag?.('event', 'booking_cancelled', { event_category: 'engagement', event_label: 'manage_page' });
+        showNotice(`${a.patientName}'s appointment on ${a.dateLabel} at ${a.time} is cancelled.`);
+        await loadList();
+      });
+    }
+  });
+</script>

@@ -12,7 +12,20 @@ const { defaultService, defaultDoctorId } = Astro.props;
 >
 
   <div class="md:w-1/2 space-y-5 pr-0 md:pr-8 border-b md:border-b-0 md:border-r border-slate-200/60 pb-8 md:pb-0">
-    <h3 class="text-2xl font-bold text-brand-900 mb-6">Patient Details</h3>
+    <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+      <h3 class="text-2xl font-bold text-brand-900">Patient Details</h3>
+      <a href="/manage-appointment" class="text-sm font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Already booked? Manage my appointment</a>
+    </div>
+
+    <div>
+      <p class="text-sm font-semibold text-slate-700 mb-2">Who is this appointment for?</p>
+      <div id="bookingFor" class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Who is this appointment for?">
+        <button type="button" role="radio" aria-checked="true" data-for="self" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-brand-600 border-brand-600 text-white">Myself</button>
+        <button type="button" role="radio" aria-checked="false" data-for="family" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-white border-slate-200 text-brand-900">Family member</button>
+        <button type="button" role="radio" aria-checked="false" data-for="friend" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-white border-slate-200 text-brand-900">Friend</button>
+      </div>
+      <p id="bookingForHint" class="hidden mt-2 text-sm text-slate-600">Enter the patient's name below and your own WhatsApp number — the code and confirmation come to you.</p>
+    </div>
 
     <div class="flex gap-3">
       <select id="prefix" class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-1/4">
@@ -35,6 +48,10 @@ const { defaultService, defaultDoctorId } = Astro.props;
         <button type="button" id="verifyOtpBtn" class="px-5 rounded-xl bg-brand-600 text-white font-semibold whitespace-nowrap hover:bg-brand-700 transition disabled:opacity-50">Verify</button>
       </div>
       <p id="otpStatus" class="text-sm text-slate-600"></p>
+    </div>
+    <div id="familyPicker" class="hidden space-y-2">
+      <p class="text-sm font-semibold text-slate-700">Patients on this number — tap to fill in</p>
+      <div id="familyChips" class="flex flex-wrap gap-2"></div>
     </div>
     <div id="returningPatientMessage" class="hidden rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900" role="status" aria-live="polite"></div>
 
@@ -145,6 +162,68 @@ const { defaultService, defaultDoctorId } = Astro.props;
     const hideReschedule = () => reschedulePrompt?.classList.add('hidden');
     let isReturningPatient = false;
     let lookupSequence = 0;
+    let bookingFor = 'self';
+    const bookingForHint = document.getElementById('bookingForHint');
+    const familyPicker = document.getElementById('familyPicker');
+    const familyChips = document.getElementById('familyChips');
+    const prefixSelect = document.getElementById('prefix');
+
+    document.querySelectorAll('#bookingFor .booking-for').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        bookingFor = btn.dataset.for;
+        document.querySelectorAll('#bookingFor .booking-for').forEach((b) => {
+          const on = b === btn;
+          b.setAttribute('aria-checked', String(on));
+          b.classList.toggle('bg-brand-600', on); b.classList.toggle('border-brand-600', on); b.classList.toggle('text-white', on);
+          b.classList.toggle('bg-white', !on); b.classList.toggle('border-slate-200', !on); b.classList.toggle('text-brand-900', !on);
+        });
+        bookingForHint?.classList.toggle('hidden', bookingFor === 'self');
+        document.getElementById('firstName').placeholder = bookingFor === 'self' ? 'First Name' : "Patient's First Name";
+        document.getElementById('lastName').placeholder = bookingFor === 'self' ? 'Last Name' : "Patient's Last Name";
+        if (otpToken) checkReturningPatient();
+      });
+    });
+
+    // Fills the name fields from a stored full name like "Mr. Arunkumar S".
+    function fillName(fullName) {
+      const words = String(fullName || '').trim().split(/\s+/);
+      const title = words[0] && /^(mr|mrs|ms|miss|dr|master|baby)\.?$/i.test(words[0]) ? words.shift() : null;
+      if (title && prefixSelect) {
+        if (!Array.from(prefixSelect.options).some((o) => o.value === title)) prefixSelect.add(new Option(title, title));
+        prefixSelect.value = title;
+      }
+      document.getElementById('firstName').value = words.length > 1 ? words.slice(0, -1).join(' ') : (words[0] || '');
+      document.getElementById('lastName').value = words.length > 1 ? words[words.length - 1] : '';
+    }
+
+    function renderFamilyChips(patients) {
+      if (!familyChips || !familyPicker) return;
+      familyChips.innerHTML = '';
+      if (!patients?.length) { familyPicker.classList.add('hidden'); return; }
+      const current = enteredName().toLowerCase();
+      patients.forEach((p) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.textContent = p.name;
+        const on = p.name.toLowerCase() === current;
+        chip.className = `px-3 py-2 rounded-full border text-sm font-medium transition ${on ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-brand-200 text-brand-900 hover:bg-brand-50'}`;
+        chip.addEventListener('click', () => { fillName(p.name); checkReturningPatient(); });
+        familyChips.appendChild(chip);
+      });
+      const someoneNew = document.createElement('button');
+      someoneNew.type = 'button';
+      someoneNew.textContent = '+ Someone new';
+      someoneNew.className = 'px-3 py-2 rounded-full border border-dashed border-slate-300 text-sm font-medium text-slate-600 hover:bg-slate-50';
+      someoneNew.addEventListener('click', () => {
+        document.getElementById('firstName').value = '';
+        document.getElementById('lastName').value = '';
+        clearReturningPatient();
+        renderFamilyChips(patients);
+        document.getElementById('firstName').focus();
+      });
+      familyChips.appendChild(someoneNew);
+      familyPicker.classList.remove('hidden');
+    }
 
     // WhatsApp verification: a booking is only accepted with the code sent to
     // this exact number (checked server-side in public-book-appointment).
@@ -187,7 +266,9 @@ const { defaultService, defaultDoctorId } = Astro.props;
           body: JSON.stringify({ name: enteredName(), phone: phoneInput.value, otpToken }),
         });
         const result = await response.json().catch(() => ({}));
-        if (requestNumber !== lookupSequence || !response.ok || !result.found) return;
+        if (requestNumber !== lookupSequence || !response.ok) return;
+        renderFamilyChips(result.patientsOnNumber);
+        if (!result.found) return;
         const last = result.lastConsultation;
         const lastDate = new Date(`${last.date}T00:00:00Z`).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
         const doctorOption = Array.from(doctorSelect?.options || []).find((o) => o.value === last.doctorId);
@@ -197,7 +278,8 @@ const { defaultService, defaultDoctorId } = Astro.props;
         }
         isReturningPatient = true;
         if (returningPatientMessage) {
-          returningPatientMessage.textContent = `Welcome back. Your last consultation was on ${lastDate}${last.doctorName ? ` with Dr. ${last.doctorName}` : ''}. ${doctorOption ? 'We have selected the same doctor for your review — you can change this.' : 'This will be booked as a review.'}`;
+          const who = bookingFor === 'self' ? 'Welcome back. Your' : `Welcome back. ${enteredName()}'s`;
+          returningPatientMessage.textContent = `${who} last consultation was on ${lastDate}${last.doctorName ? ` with Dr. ${last.doctorName}` : ''}. ${doctorOption ? 'We have selected the same doctor for this review — you can change this.' : 'This will be booked as a review.'}`;
           returningPatientMessage.classList.remove('hidden');
         }
       } catch (err) {
@@ -210,6 +292,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
 
     function resetOtp() {
       clearReturningPatient();
+      familyPicker?.classList.add('hidden');
       otpSentTo = '';
       otpToken = '';
       verifiedPhone = '';
@@ -554,6 +637,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
           time: selectedTime,
           otpToken,
           appointmentType: isReturningPatient ? 'review' : 'new',
+          bookingFor,
         };
 
         try {

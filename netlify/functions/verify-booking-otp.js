@@ -13,14 +13,7 @@ try {
 }
 
 const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
-
-// Must match send-booking-otp.js: codes are stored against a hash of this exact form.
-function canonicalIndianMobile(raw) {
-  let digits = String(raw || "").replace(/\D/g, "");
-  if (digits.length === 11 && digits.startsWith("0")) digits = digits.slice(1);
-  if (digits.length === 12 && digits.startsWith("91")) digits = digits.slice(2);
-  return /^[6-9]\d{9}$/.test(digits) ? `91${digits}` : null;
-}
+const { canonicalIndianMobile } = require("./lib/booking-core");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {

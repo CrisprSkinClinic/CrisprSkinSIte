@@ -1,0 +1,22 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import ManageAppointments from '../components/ManageAppointments.astro';
+import { siteConfig } from '../config/site.js';
+
+const pageTitle = `Manage My Appointment | ${siteConfig.name}`;
+const pageDescription = `Reschedule or cancel your appointment at ${siteConfig.name}. Verify your WhatsApp number to see your upcoming appointments.`;
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+  <section class="bg-[#fdfcfc] py-14 md:py-20 px-6 text-center border-b border-slate-200/70">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-600 mb-4">Your appointments</p>
+      <h1 class="text-4xl md:text-6xl text-slate-950 mb-4">Manage My Appointment</h1>
+      <p class="text-xl text-slate-600">Reschedule or cancel an upcoming appointment for yourself or a family member.</p>
+    </div>
+  </section>
+
+  <section class="py-12 md:py-16 px-5 md:px-6 bg-brand-50/40">
+    <ManageAppointments />
+  </section>
+</MainLayout>
