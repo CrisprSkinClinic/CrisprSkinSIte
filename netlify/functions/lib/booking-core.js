@@ -258,8 +258,10 @@ function canChangeOnline(appointment) {
   return appointment.status === "booked" && !appointment.linked_group_id;
 }
 
+// Written to reception's audit trail. `action` uses reception's action names
+// (APPOINTMENT_CREATE / APPOINTMENT_RESCHEDULE / APPOINTMENT_CANCEL).
 async function logForReception(supabase, action, details) {
-  const { error } = await supabase.from("booking_audit_log").insert({ action, details, performed_by: "Website (patient)" });
+  const { error } = await supabase.from("booking_audit_log").insert({ action, details, performed_by: "Website (patient)", source_app: "website" });
   if (error) console.error("booking_audit_log insert failed:", error.message);
 }
 

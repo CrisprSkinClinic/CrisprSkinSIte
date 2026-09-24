@@ -64,7 +64,7 @@ exports.handler = async (event) => {
         .maybeSingle();
       if (cancelError) throw cancelError;
       if (!cancelled) return core.json(409, { error: "This appointment can't be changed online. Please call the clinic." });
-      await core.logForReception(supabase, "CANCEL", `${patient.name} cancelled their appointment on ${oldWhen} via website`);
+      await core.logForReception(supabase, "APPOINTMENT_CANCEL", `${patient.name} cancelled their appointment on ${oldWhen} via website`);
       return core.json(200, { success: true, cancelled: true });
     }
 
@@ -103,7 +103,7 @@ exports.handler = async (event) => {
 
       const { data: newDoctor } = await supabase.from("doctors").select("name").eq("id", slot.doctorId).maybeSingle();
       const newWhen = `${core.displayDate(slotDate)} at ${core.displayTime(slotTime)}${newDoctor?.name ? ` with Dr. ${newDoctor.name}` : ""}`;
-      await core.logForReception(supabase, "RESCHEDULE", `${patient.name} moved their appointment from ${oldWhen} to ${newWhen} via website`);
+      await core.logForReception(supabase, "APPOINTMENT_RESCHEDULE", `${patient.name} moved their appointment from ${oldWhen} to ${newWhen} via website`);
       await core.sendConfirmation(supabase, {
         serviceRoleKey, canonicalPhone, name: patient.name, doctorId: slot.doctorId, slotDate, slotTime, appointmentId: appt.id,
       });

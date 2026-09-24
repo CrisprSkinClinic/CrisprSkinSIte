@@ -129,7 +129,7 @@ exports.handler = async (event) => {
         if (!moved) return core.json(409, { success: false, error: "This appointment can't be changed online. Please call the clinic." });
 
         const { data: newDoctor } = await supabase.from("doctors").select("name").eq("id", doctorId).maybeSingle();
-        await core.logForReception(supabase, "RESCHEDULE",
+        await core.logForReception(supabase, "APPOINTMENT_RESCHEDULE",
           `${name} moved their ${slotDate} appointment from ${bookedTime}${withDoctor} to ${core.displayTime(slotTime)}${newDoctor?.name ? ` with Dr. ${newDoctor.name}` : ""} via website`);
         await core.sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId: sameDay.id });
         return core.json(200, { success: true, rescheduled: true, appointment_id: sameDay.id, from: bookedTime, to: core.displayTime(slotTime) });
@@ -175,6 +175,10 @@ exports.handler = async (event) => {
       .select("id")
       .single();
     if (insertAppointmentError) throw insertAppointmentError;
+
+    const { data: bookedDoctor } = await supabase.from("doctors").select("name").eq("id", doctorId).maybeSingle();
+    await core.logForReception(supabase, "APPOINTMENT_CREATE",
+      `Booked ${name}${past?.patientId ? "" : " (new patient)"} for ${isReview ? `Review · ${service}` : service} on ${core.displayDate(slotDate)} at ${core.displayTime(slotTime)}${bookedDoctor?.name ? ` with Dr. ${bookedDoctor.name}` : ""} via website${BOOKING_FOR_NOTES[bookingFor] ? ` (${BOOKING_FOR_NOTES[bookingFor].toLowerCase()})` : ""}`);
 
     // Best-effort: a failed WhatsApp confirmation never fails the booking.
     await core.sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId: appointment.id });
