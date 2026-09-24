@@ -47,7 +47,8 @@ exports.handler = async (event) => {
       .is("deleted_at", null)
       .maybeSingle();
     if (apptError && !/uuid/i.test(apptError.message || "")) throw apptError;
-    const patient = appt && patients.find((p) => p.id === appt.patient_id);
+    // Only this clinic's appointments are managed here (the database is shared with the eye clinic).
+    const patient = appt && core.CLINIC_DOCTOR_IDS.includes(appt.doctor_id) && patients.find((p) => p.id === appt.patient_id);
     if (!appt || !patient) return core.json(404, { error: "Appointment not found for this number." });
     if (!core.canChangeOnline(appt) || core.isPast(appt.slot_date, appt.slot_time)) {
       return core.json(409, { error: "This appointment can't be changed online. Please call the clinic." });
@@ -126,6 +127,7 @@ async function upcoming(supabase, patients) {
     .from("appointments")
     .select("id, patient_id, doctor_id, slot_date, slot_time, status, linked_group_id, notes, doctors(name)")
     .in("patient_id", patients.map((p) => p.id))
+    .in("doctor_id", core.CLINIC_DOCTOR_IDS)
     .gte("slot_date", core.clinicNow().date)
     .in("status", ["booked", "arrived"])
     .is("deleted_at", null)
