@@ -1,8 +1,8 @@
 // netlify/functions/verify-booking-otp.js
 //
 // Checks the WhatsApp code the patient typed into BookingCalendar.astro and,
-// if it matches, returns a one-time verification token. public-book-appointment
-// accepts a booking only with an unused token for that phone (valid 30 minutes),
+// if it matches, returns a verification token. The booking page and its functions
+// accept it for that phone for 30 minutes after verification (not used up by a booking),
 // so the patient verifies once and can still pick another slot if theirs is taken.
 
 let createClient;
