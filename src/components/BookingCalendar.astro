@@ -1,690 +1,554 @@
 ---
 // src/components/BookingCalendar.astro
-import { siteConfig } from '../config/site.js';
-const { defaultService, defaultDoctorId } = Astro.props;
+//
+// One page to book and manage appointments, phone first:
+//   1. Verify the WhatsApp number (nothing else is shown before this).
+//   2. "Patients on this number": each patient's last visit and upcoming appointments,
+//      with Reschedule / Cancel, and "Book for <name>" / "+ Someone new".
+//   3. Book (doctor pre-selected from the last visit; a returning patient is a Review)
+//      or pick a new time for a reschedule.
+//   4. Confirmation with add-to-calendar and directions.
+// Verification is kept in this tab for its 30 minutes. Every rule (who may be booked,
+// limits, the 2-hour change cut-off) is enforced by the Netlify functions.
+//
+// Kept identical on the CRISPR Skin and Crispr Eye Care websites; site specifics live in
+// src/config/booking.js.
+import { bookingConfig } from '../config/booking.js';
+const { defaultService, defaultDoctorId, heading } = Astro.props;
+const { doctors, services, clinicPhone } = bookingConfig;
+const clinicTel = clinicPhone.replace(/[^0-9+]/g, '');
+const singleDoctor = doctors.length === 1;
+const inputClass = 'w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none';
 ---
 
 <div
-  id="bookingCalendarRoot"
-  data-default-service={defaultService || ''}
+  id="bookingRoot"
+  data-default-service={defaultService || bookingConfig.defaultService || ''}
   data-default-doctor-id={defaultDoctorId || ''}
-  class="max-w-5xl mx-auto p-5 md:p-8 bg-white border border-slate-200 rounded-2xl shadow-lg flex flex-col md:flex-row gap-8"
+  data-config={JSON.stringify({ doctors, clinicName: bookingConfig.clinicName, addressLine: bookingConfig.addressLine, mapsUrl: bookingConfig.mapsUrl, clinicPhone, clinicTel })}
+  class="max-w-3xl mx-auto p-5 md:p-8 bg-white border border-slate-200 rounded-2xl shadow-lg"
 >
+  <p id="bkNotice" class="hidden mb-4 p-3 rounded-xl bg-green-50 border border-green-200 text-green-800 text-sm font-medium" role="status" aria-live="polite"></p>
+  <p id="bkError" class="hidden mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm font-medium" role="alert"></p>
 
-  <div class="md:w-1/2 space-y-5 pr-0 md:pr-8 border-b md:border-b-0 md:border-r border-slate-200/60 pb-8 md:pb-0">
-    <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
-      <h3 class="text-2xl font-bold text-brand-900">Patient Details</h3>
-      <a href="/manage-appointment" class="text-sm font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Already booked? Manage my appointment</a>
-    </div>
-
+  <!-- 1. Verify the number -->
+  <section id="stepPhone" class="space-y-4">
     <div>
-      <p class="text-sm font-semibold text-slate-700 mb-2">Who is this appointment for?</p>
-      <div id="bookingFor" class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Who is this appointment for?">
-        <button type="button" role="radio" aria-checked="true" data-for="self" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-brand-600 border-brand-600 text-white">Myself</button>
-        <button type="button" role="radio" aria-checked="false" data-for="family" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-white border-slate-200 text-brand-900">Family member</button>
-        <button type="button" role="radio" aria-checked="false" data-for="friend" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-white border-slate-200 text-brand-900">Friend</button>
-      </div>
-      <p id="bookingForHint" class="hidden mt-2 text-sm text-slate-600">Enter the patient's name below and your own WhatsApp number — the code and confirmation come to you.</p>
+      <h3 class="text-2xl font-bold text-brand-900">{heading || 'Book or manage an appointment'}</h3>
+      <p class="text-slate-600 mt-1">Start with your WhatsApp number. We'll send a 6-digit code to verify it.</p>
     </div>
-
     <div class="flex gap-3">
-      <select id="prefix" class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-1/4">
-        <option value="Mr.">Mr.</option>
-        <option value="Ms.">Ms.</option>
-        <option value="Mrs.">Mrs.</option>
-        <option value="Dr.">Dr.</option>
-      </select>
-      <input type="text" id="firstName" placeholder="First Name" autocomplete="given-name" required class="p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none w-3/4" />
+      <input type="tel" id="bkPhone" placeholder="WhatsApp mobile number" autocomplete="tel-national" inputmode="tel" class={`flex-1 min-w-0 ${inputClass}`} />
+      <button type="button" id="bkSend" class="px-4 rounded-xl bg-brand-600 text-white font-semibold whitespace-nowrap hover:bg-brand-700 transition disabled:opacity-50">Send code</button>
     </div>
-
-    <input type="text" id="lastName" placeholder="Last Name" autocomplete="family-name" required class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
-    <div class="flex gap-3">
-      <input type="tel" id="phone" placeholder="WhatsApp Mobile Number" autocomplete="tel-national" inputmode="tel" required class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
-      <button type="button" id="sendOtpBtn" class="px-4 rounded-xl bg-brand-100 text-brand-900 font-semibold whitespace-nowrap hover:bg-brand-200 transition disabled:opacity-50">Send code</button>
-    </div>
-    <div id="otpBlock" class="hidden space-y-2">
-      <div id="otpEntry" class="flex gap-3">
-        <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none tracking-widest" />
-        <button type="button" id="verifyOtpBtn" class="px-5 rounded-xl bg-brand-600 text-white font-semibold whitespace-nowrap hover:bg-brand-700 transition disabled:opacity-50">Verify</button>
+    <div id="bkOtpBlock" class="hidden space-y-2">
+      <div class="flex gap-3">
+        <input type="text" id="bkOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" class={`flex-1 min-w-0 tracking-widest ${inputClass}`} />
+        <button type="button" id="bkVerify" class="px-5 rounded-xl bg-brand-900 text-white font-semibold whitespace-nowrap hover:bg-brand-800 transition disabled:opacity-50">Verify</button>
       </div>
-      <p id="otpStatus" class="text-sm text-slate-600"></p>
+      <p id="bkOtpStatus" class="text-sm text-slate-600"></p>
     </div>
-    <div id="familyPicker" class="hidden space-y-2">
-      <p class="text-sm font-semibold text-slate-700">Patients on this number — tap to fill in</p>
-      <div id="familyChips" class="flex flex-wrap gap-2"></div>
+    <p class="text-xs text-slate-500">Your number is used only to confirm and manage your appointments. No WhatsApp? Call <a class="font-semibold text-brand-700 underline" href={`tel:${clinicTel}`}>{clinicPhone}</a> to book.</p>
+  </section>
+
+  <!-- 2. Patients on this number -->
+  <section id="stepPeople" class="hidden space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <p class="text-sm font-semibold text-green-700" id="bkVerifiedLabel"></p>
+      <button type="button" id="bkChangeNumber" class="text-sm font-semibold text-brand-700 underline underline-offset-2">Use a different number</button>
     </div>
-    <div id="returningPatientMessage" class="hidden rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900" role="status" aria-live="polite"></div>
+    <h3 class="text-2xl font-bold text-brand-900">Who is this for?</h3>
+    <div id="bkPeople" class="space-y-4"></div>
+    <button type="button" id="bkSomeoneNew" class="w-full py-4 rounded-xl border-2 border-dashed border-brand-200 text-brand-800 font-semibold hover:bg-brand-50 transition">+ Book for someone new</button>
+  </section>
 
-    <select id="doctor" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
-      <option value="" disabled selected>Select Doctor...</option>
-      <option value="any">No preference</option>
-      {siteConfig.doctors.map((doc) => (
-        <option value={doc.dbId}>{doc.name}</option>
-      ))}
-    </select>
+  <!-- 3. Book or reschedule -->
+  <section id="stepBook" class="hidden space-y-5">
+    <button type="button" id="bkBack" class="text-sm font-semibold text-brand-700 underline underline-offset-2">‹ Back</button>
+    <h3 id="bkBookTitle" class="text-2xl font-bold text-brand-900"></h3>
+    <div id="bkPatientSummary" class="hidden rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900"></div>
 
-    <select id="service" class="w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none">
-      <option value="" disabled>Select Service...</option>
-      <option value="General Consultation">General Dermatology Consultation</option>
-      <optgroup label="Hair">
-        <option value="Hair Transplant (FUE)">Hair Transplant (FUE)</option>
-        <option value="Hair Loss">Hair Loss</option>
-        <option value="Female Hair Loss">Female Hair Loss</option>
-        <option value="Alopecia Areata">Alopecia Areata</option>
-        <option value="Dandruff">Dandruff</option>
-      </optgroup>
-      <optgroup label="Skin">
-        <option value="Acne">Acne</option>
-        <option value="Acne Scars">Acne Scars</option>
-        <option value="Pigmentation">Pigmentation</option>
-        <option value="Melasma">Melasma</option>
-        <option value="Vitiligo">Vitiligo</option>
-        <option value="Psoriasis">Psoriasis</option>
-        <option value="Eczema">Eczema</option>
-        <option value="Urticaria">Urticaria</option>
-        <option value="Skin Allergy">Skin Allergy</option>
-        <option value="Fungal Infections">Fungal Infections</option>
-        <option value="Warts, Moles & Skin Tags">Warts, Moles & Skin Tags</option>
-        <option value="Nail Disorders">Nail Disorders</option>
-      </optgroup>
-      <optgroup label="Cosmetic">
-        <option value="Chemical Peels">Chemical Peels</option>
-        <option value="Botox">Botox</option>
-        <option value="Fillers">Fillers</option>
-        <option value="Laser Hair Reduction">Laser Hair Reduction</option>
-        <option value="Anti-ageing">Anti-ageing</option>
-        <option value="Skin Rejuvenation">Skin Rejuvenation</option>
-      </optgroup>
-      <optgroup label="Pediatric">
-        <option value="Pediatric Dermatology">Pediatric Dermatology</option>
-        <option value="Birthmarks">Birthmarks</option>
-        <option value="Atopic Dermatitis">Atopic Dermatitis</option>
-        <option value="Viral Skin Infections">Viral Skin Infections</option>
-      </optgroup>
-    </select>
-  </div>
-
-  <div class="md:w-1/2 flex flex-col">
-    <h3 class="text-2xl font-bold text-brand-900 mb-6">Select Slot</h3>
-
-    <input type="date" id="date" required class="w-full p-3 mb-6 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
-
-    <div id="slotsContainer" class="grid grid-cols-2 gap-3 mb-8">
-      <p class="col-span-2 text-slate-400 text-sm">Select a doctor and date to see available times.</p>
-    </div>
-
-    <button id="confirmBtn" class="mt-auto w-full py-4 bg-brand-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-800 transition disabled:opacity-50">
-      Confirm Appointment
-    </button>
-
-    <div id="successMessage" class="hidden mt-4 text-center p-3 bg-green-100 text-green-800 rounded-lg font-medium">
-      Appointment confirmed successfully!
-    </div>
-
-    <div id="errorMessage" class="hidden mt-4 text-center p-3 bg-red-100 text-red-800 rounded-lg font-medium"></div>
-    <div id="reschedulePrompt" class="hidden mt-4 p-4 rounded-xl border border-brand-200 bg-brand-50 text-brand-900 text-sm leading-relaxed space-y-3" role="status" aria-live="polite">
-      <p id="rescheduleText"></p>
-      <div id="rescheduleActions" class="flex flex-col sm:flex-row gap-3">
-        <button type="button" id="rescheduleBtn" class="flex-1 py-3 px-4 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition disabled:opacity-50">Move it</button>
-        <button type="button" id="keepBtn" class="flex-1 py-3 px-4 rounded-xl border border-brand-200 bg-white text-brand-900 font-semibold hover:bg-brand-100 transition">Keep my existing appointment</button>
+    <div id="bkNewPerson" class="hidden space-y-4">
+      <div>
+        <p class="text-sm font-semibold text-slate-700 mb-2">This appointment is for</p>
+        <div id="bkFor" class="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Who is this appointment for?">
+          <button type="button" role="radio" data-for="self" class="bk-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition">Myself</button>
+          <button type="button" role="radio" data-for="family" class="bk-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition">Family member</button>
+          <button type="button" role="radio" data-for="friend" class="bk-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition">Friend</button>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <select id="bkPrefix" class={`w-1/4 ${inputClass}`}>
+          <option value="Mr.">Mr.</option><option value="Ms.">Ms.</option><option value="Mrs.">Mrs.</option><option value="Dr.">Dr.</option><option value="Master">Master</option><option value="Baby">Baby</option>
+        </select>
+        <input type="text" id="bkFirst" placeholder="First name" autocomplete="given-name" class={`w-3/4 ${inputClass}`} />
+      </div>
+      <input type="text" id="bkLast" placeholder="Last name" autocomplete="family-name" class={inputClass} />
+      <div class="grid grid-cols-2 gap-3">
+        <label class="text-sm text-slate-600">Date of birth <span class="text-slate-400">(optional)</span>
+          <input type="date" id="bkDob" class={`mt-1 ${inputClass}`} />
+        </label>
+        <label class="text-sm text-slate-600">Gender <span class="text-slate-400">(optional)</span>
+          <select id="bkGender" class={`mt-1 ${inputClass}`}><option value="">—</option><option value="female">Female</option><option value="male">Male</option><option value="other">Other</option></select>
+        </label>
       </div>
     </div>
-  </div>
+
+    <div id="bkDoctorWrap" class={singleDoctor ? 'hidden' : ''}>
+      <label class="text-sm font-semibold text-slate-700">Doctor
+        <select id="bkDoctor" class={`mt-1 ${inputClass}`}>
+          {!singleDoctor && <option value="" disabled selected>Select doctor…</option>}
+          {!singleDoctor && <option value="any">No preference</option>}
+          {doctors.map((doctor) => <option value={doctor.id} selected={singleDoctor}>{doctor.name}</option>)}
+        </select>
+      </label>
+    </div>
+    <div id="bkServiceWrap">
+      <label class="text-sm font-semibold text-slate-700">Reason for visit
+        <select id="bkService" class={`mt-1 ${inputClass}`}>
+          {services.map((group) => group.group
+            ? <optgroup label={group.group}>{group.items.map(([value, label]) => <option value={value}>{label || value}</option>)}</optgroup>
+            : group.items.map(([value, label]) => <option value={value}>{label || value}</option>))}
+        </select>
+      </label>
+    </div>
+    <label class="block text-sm font-semibold text-slate-700">Date
+      <input type="date" id="bkDate" class={`mt-1 ${inputClass}`} />
+    </label>
+    <div>
+      <p class="text-sm font-semibold text-slate-700 mb-2">Time</p>
+      <div id="bkSlots" class="grid grid-cols-3 gap-2"><p class="col-span-3 text-slate-400 text-sm">Select a doctor and date to see available times.</p></div>
+    </div>
+    <div id="bkMove" class="hidden p-4 rounded-xl border border-brand-200 bg-brand-50 text-brand-900 text-sm leading-relaxed space-y-3" role="status" aria-live="polite">
+      <p id="bkMoveText"></p>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="button" id="bkMoveBtn" class="flex-1 py-3 px-4 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition disabled:opacity-50">Move it</button>
+        <button type="button" id="bkKeepBtn" class="flex-1 py-3 px-4 rounded-xl border border-brand-200 bg-white text-brand-900 font-semibold hover:bg-brand-100 transition">Keep the existing appointment</button>
+      </div>
+    </div>
+    <button type="button" id="bkConfirm" class="w-full py-4 bg-brand-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-800 transition disabled:opacity-50">Confirm appointment</button>
+  </section>
+
+  <!-- 4. Done -->
+  <section id="stepDone" class="hidden space-y-5">
+    <div class="text-center">
+      <div class="mx-auto mb-3 w-14 h-14 rounded-full bg-green-100 text-green-700 grid place-items-center text-3xl" aria-hidden="true">✓</div>
+      <h3 id="bkDoneTitle" class="text-2xl font-bold text-brand-900">Appointment confirmed</h3>
+      <p id="bkDoneSub" class="text-slate-600 mt-1"></p>
+    </div>
+    <dl id="bkDoneDetails" class="rounded-xl border border-slate-200 divide-y divide-slate-100 text-sm"></dl>
+    <div class="grid grid-cols-2 gap-3">
+      <button type="button" id="bkIcs" class="py-3 rounded-xl border border-brand-200 bg-white text-brand-900 font-semibold hover:bg-brand-50 transition">Add to calendar</button>
+      <a id="bkMaps" target="_blank" rel="noopener" href={bookingConfig.mapsUrl} class="py-3 rounded-xl border border-brand-200 bg-white text-brand-900 font-semibold hover:bg-brand-50 transition text-center">Directions</a>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <button type="button" id="bkAnother" class="py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition">Book for another person</button>
+      <button type="button" id="bkDone" class="py-3 rounded-xl bg-brand-900 text-white font-semibold hover:bg-brand-800 transition">Done</button>
+    </div>
+  </section>
 </div>
 
 <script>
   document.addEventListener('astro:page-load', () => {
-    let selectedTime = "";
-    let selectedSlotDoctorIds = null; // set when booking without a doctor preference
+    const root = document.getElementById('bookingRoot');
+    if (!root) return;
+    const cfg = JSON.parse(root.dataset.config || '{}');
+    const $ = (id) => document.getElementById(id);
+    const steps = ['stepPhone', 'stepPeople', 'stepBook', 'stepDone'];
+    const SESSION_KEY = 'crispr-booking-verification';
+    const VERIFIED_FOR_MS = 29 * 60 * 1000; // the server accepts a verification for 30 minutes
 
-    const root = document.getElementById('bookingCalendarRoot');
-    const dateInput = document.getElementById('date');
-    const slotsContainer = document.getElementById('slotsContainer');
-    const confirmBtn = document.getElementById('confirmBtn');
-    const successMessage = document.getElementById('successMessage');
-    const errorMessage = document.getElementById('errorMessage');
-    const serviceSelect = document.getElementById('service');
-    const doctorSelect = document.getElementById('doctor');
-    const phoneInput = document.getElementById('phone');
-    const sendOtpBtn = document.getElementById('sendOtpBtn');
-    const otpBlock = document.getElementById('otpBlock');
-    const otpInput = document.getElementById('otp');
-    const otpStatus = document.getElementById('otpStatus');
-    const otpEntry = document.getElementById('otpEntry');
-    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
-    const returningPatientMessage = document.getElementById('returningPatientMessage');
-    const reschedulePrompt = document.getElementById('reschedulePrompt');
-    const rescheduleText = document.getElementById('rescheduleText');
-    const rescheduleActions = document.getElementById('rescheduleActions');
-    const rescheduleBtn = document.getElementById('rescheduleBtn');
-    const keepBtn = document.getElementById('keepBtn');
-    let lastBookingBody = null;
-    const hideReschedule = () => reschedulePrompt?.classList.add('hidden');
-    let isReturningPatient = false;
-    let lookupSequence = 0;
-    let bookingFor = 'self';
-    const bookingForHint = document.getElementById('bookingForHint');
-    const familyPicker = document.getElementById('familyPicker');
-    const familyChips = document.getElementById('familyChips');
-    const prefixSelect = document.getElementById('prefix');
+    const state = {
+      phone: '', token: '',
+      people: [], maxPerDay: 2,
+      patient: null,          // existing patient being booked for, or null for someone new
+      bookingFor: 'self',
+      reschedule: null,       // upcoming visit being moved
+      slot: null,             // { time24, display, doctorIds }
+      lastBody: null,
+      done: null,
+    };
 
-    document.querySelectorAll('#bookingFor .booking-for').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        bookingFor = btn.dataset.for;
-        document.querySelectorAll('#bookingFor .booking-for').forEach((b) => {
-          const on = b === btn;
-          b.setAttribute('aria-checked', String(on));
-          b.classList.toggle('bg-brand-600', on); b.classList.toggle('border-brand-600', on); b.classList.toggle('text-white', on);
-          b.classList.toggle('bg-white', !on); b.classList.toggle('border-slate-200', !on); b.classList.toggle('text-brand-900', !on);
-        });
-        bookingForHint?.classList.toggle('hidden', bookingFor === 'self');
-        document.getElementById('firstName').placeholder = bookingFor === 'self' ? 'First Name' : "Patient's First Name";
-        document.getElementById('lastName').placeholder = bookingFor === 'self' ? 'Last Name' : "Patient's Last Name";
-        if (otpToken) checkReturningPatient();
-      });
-    });
-
-    // Fills the name fields from a stored full name like "Mr. Arunkumar S".
-    function fillName(fullName) {
-      const words = String(fullName || '').trim().split(/\s+/);
-      const title = words[0] && /^(mr|mrs|ms|miss|dr|master|baby)\.?$/i.test(words[0]) ? words.shift() : null;
-      if (title && prefixSelect) {
-        if (!Array.from(prefixSelect.options).some((o) => o.value === title)) prefixSelect.add(new Option(title, title));
-        prefixSelect.value = title;
-      }
-      document.getElementById('firstName').value = words.length > 1 ? words.slice(0, -1).join(' ') : (words[0] || '');
-      document.getElementById('lastName').value = words.length > 1 ? words[words.length - 1] : '';
+    // ---------- small helpers ----------
+    const digits10 = (v) => String(v || '').replace(/\D/g, '').slice(-10);
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const todayIst = () => new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10);
+    const track = (step, extra = {}) => window.gtag?.('event', 'booking_step', { event_category: 'booking', step, ...extra });
+    function show(step) {
+      steps.forEach((s) => $(s).classList.toggle('hidden', s !== step));
+      // Bring the form back into view only if its top has scrolled off (never on page load).
+      if (root.getBoundingClientRect().top < 0) root.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-
-    function renderFamilyChips(patients) {
-      if (!familyChips || !familyPicker) return;
-      familyChips.innerHTML = '';
-      if (!patients?.length) { familyPicker.classList.add('hidden'); return; }
-      const current = enteredName().toLowerCase();
-      patients.forEach((p) => {
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        chip.textContent = p.name;
-        const on = p.name.toLowerCase() === current;
-        chip.className = `px-3 py-2 rounded-full border text-sm font-medium transition ${on ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-brand-200 text-brand-900 hover:bg-brand-50'}`;
-        chip.addEventListener('click', () => { fillName(p.name); checkReturningPatient(); });
-        familyChips.appendChild(chip);
-      });
-      const someoneNew = document.createElement('button');
-      someoneNew.type = 'button';
-      someoneNew.textContent = '+ Someone new';
-      someoneNew.className = 'px-3 py-2 rounded-full border border-dashed border-slate-300 text-sm font-medium text-slate-600 hover:bg-slate-50';
-      someoneNew.addEventListener('click', () => {
-        document.getElementById('firstName').value = '';
-        document.getElementById('lastName').value = '';
-        clearReturningPatient();
-        renderFamilyChips(patients);
-        document.getElementById('firstName').focus();
-      });
-      familyChips.appendChild(someoneNew);
-      familyPicker.classList.remove('hidden');
-    }
-
-    // WhatsApp verification: a booking is only accepted with the code sent to
-    // this exact number (checked server-side in public-book-appointment).
-    const phoneDigits = (v) => String(v || '').replace(/\D/g, '').slice(-10);
-    let otpSentTo = '';
-    let otpToken = '';
-    let verifiedPhone = '';
-    let resendTimer = null;
-
-    function setStatus(text, ok) {
-      if (!otpStatus) return;
-      otpStatus.textContent = text;
-      otpStatus.className = ok ? 'text-sm font-semibold text-green-700' : 'text-sm text-slate-600';
-    }
-
-    function clearReturningPatient() {
-      isReturningPatient = false;
-      lookupSequence += 1;
-      returningPatientMessage?.classList.add('hidden');
-      if (returningPatientMessage) returningPatientMessage.textContent = '';
-    }
-
-    function enteredName() {
-      const p = document.getElementById('prefix')?.value || '';
-      const f = document.getElementById('firstName')?.value || '';
-      const l = document.getElementById('lastName')?.value || '';
-      return `${p} ${f} ${l}`.trim().replace(/\s+/g, ' ');
-    }
-
-    // Runs only after the number is verified: the server refuses the lookup
-    // without this phone's unused verification token.
-    async function checkReturningPatient() {
-      clearReturningPatient();
-      if (!otpToken || !verifiedPhone) return;
-      const requestNumber = lookupSequence;
-      try {
-        const response = await fetch('/.netlify/functions/public-returning-patient', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: enteredName(), phone: phoneInput.value, otpToken }),
-        });
-        const result = await response.json().catch(() => ({}));
-        if (requestNumber !== lookupSequence || !response.ok) return;
-        renderFamilyChips(result.patientsOnNumber);
-        if (!result.found) return;
-        const last = result.lastConsultation;
-        const lastDate = new Date(`${last.date}T00:00:00Z`).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
-        const doctorOption = Array.from(doctorSelect?.options || []).find((o) => o.value === last.doctorId);
-        if (doctorOption && doctorSelect) {
-          doctorSelect.value = last.doctorId;
-          if (dateInput?.value) loadAvailableSlots(dateInput.value);
-        }
-        isReturningPatient = true;
-        if (returningPatientMessage) {
-          const who = bookingFor === 'self' ? 'Welcome back. Your' : `Welcome back. ${enteredName()}'s`;
-          returningPatientMessage.textContent = `${who} last consultation was on ${lastDate}${last.doctorName ? ` with Dr. ${last.doctorName}` : ''}. ${doctorOption ? 'We have selected the same doctor for this review — you can change this.' : 'This will be booked as a review.'}`;
-          returningPatientMessage.classList.remove('hidden');
-        }
-      } catch (err) {
-        console.error('Returning patient lookup failed:', err);
-      }
-    }
-
-    ['firstName', 'lastName'].forEach((id) => document.getElementById(id)?.addEventListener('blur', () => { if (otpToken) checkReturningPatient(); }));
-    document.getElementById('prefix')?.addEventListener('change', () => { if (otpToken) checkReturningPatient(); });
-
-    function resetOtp() {
-      clearReturningPatient();
-      familyPicker?.classList.add('hidden');
-      otpSentTo = '';
-      otpToken = '';
-      verifiedPhone = '';
-      if (otpInput) otpInput.value = '';
-      otpBlock?.classList.add('hidden');
-      otpEntry?.classList.remove('hidden');
-      sendOtpBtn?.classList.remove('hidden');
-      if (resendTimer) clearInterval(resendTimer);
-      resendTimer = null;
-      if (sendOtpBtn) { sendOtpBtn.disabled = false; sendOtpBtn.innerText = 'Send code'; }
-    }
-
-    phoneInput?.addEventListener('input', () => {
-      if ((otpSentTo || verifiedPhone) && phoneDigits(phoneInput.value) !== (verifiedPhone || otpSentTo)) resetOtp();
-    });
-
-    sendOtpBtn?.addEventListener('click', async () => {
-      errorMessage?.classList.add('hidden');
-      const digits = phoneDigits(phoneInput?.value);
-      if (!/^[6-9]\d{9}$/.test(digits)) {
-        showError('Enter a valid 10-digit mobile number that uses WhatsApp.');
-        return;
-      }
-      sendOtpBtn.disabled = true;
-      sendOtpBtn.innerText = 'Sending…';
-      try {
-        const response = await fetch('/.netlify/functions/send-booking-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: phoneInput.value }),
-        });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
-        otpSentTo = digits;
-        otpBlock?.classList.remove('hidden');
-        setStatus(`Code sent on WhatsApp to +91 ${digits}. Enter it and tap Verify (expires in 5 minutes).`, false);
-        otpInput?.focus();
-        let wait = 30;
-        sendOtpBtn.innerText = `Resend in ${wait}s`;
-        resendTimer = setInterval(() => {
-          wait -= 1;
-          if (wait <= 0) {
-            clearInterval(resendTimer);
-            resendTimer = null;
-            sendOtpBtn.disabled = false;
-            sendOtpBtn.innerText = 'Resend code';
-          } else {
-            sendOtpBtn.innerText = `Resend in ${wait}s`;
-          }
-        }, 1000);
-      } catch (err) {
-        showError(err.message);
-        sendOtpBtn.disabled = false;
-        sendOtpBtn.innerText = 'Send code';
-      }
-    });
-
-    const todayStr = new Date().toISOString().split('T')[0];
-    if (dateInput) {
-      dateInput.min = todayStr;
-      dateInput.value = todayStr;
-    }
-
-    // Randomize the doctor dropdown order on each page load, so no doctor
-    // is positioned first by default (this runs before the defaultDoctorId
-    // pre-selection below, so a page that intentionally pre-selects a
-    // specific doctor, e.g. pediatric-dermatology -> Narayanan A, still
-    // works correctly regardless of the shuffled order).
-    if (doctorSelect) {
-      const placeholderOption = doctorSelect.querySelector('option[value=""]');
-      const noPreferenceOption = doctorSelect.querySelector('option[value="any"]');
-      const doctorOptions = Array.from(doctorSelect.options).filter(
-        (opt) => opt.value !== '' && opt.value !== 'any'
-      );
-      for (let i = doctorOptions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [doctorOptions[i], doctorOptions[j]] = [doctorOptions[j], doctorOptions[i]];
-      }
-      doctorSelect.innerHTML = '';
-      if (placeholderOption) doctorSelect.appendChild(placeholderOption);
-      if (noPreferenceOption) doctorSelect.appendChild(noPreferenceOption);
-      doctorOptions.forEach((opt) => doctorSelect.appendChild(opt));
-    }
-
-    // Pre-select the doctor when this booking form is embedded on a
-    // doctor-specific page (e.g. that doctor's own bio page), read from
-    // the data-default-doctor-id attribute set in the frontmatter above.
-    const defaultDoctorId = root?.dataset.defaultDoctorId;
-    if (doctorSelect && defaultDoctorId) {
-      const matchingDoctorOption = Array.from(doctorSelect.options).find(
-        (opt) => opt.value === defaultDoctorId
-      );
-      if (matchingDoctorOption) {
-        doctorSelect.value = defaultDoctorId;
-      }
-    }
-
-    // Pre-select the service based on which landing page (or service
-    // page) this booking form is embedded in, read from the
-    // data-default-service attribute set in the frontmatter above.
-    // Falls back to the placeholder if the value doesn't match any option.
-    const defaultService = root?.dataset.defaultService;
-    if (serviceSelect && defaultService) {
-      const matchingOption = Array.from(serviceSelect.options).find(
-        (opt) => opt.value === defaultService
-      );
-      if (matchingOption) {
-        serviceSelect.value = defaultService;
-      }
-    }
-
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage?.classList.remove('hidden');
-    }
-
-    function renderSlots(slots) {
-      hideReschedule();
-      selectedTime = "";
-      selectedSlotDoctorIds = null;
-      if (slots.length === 0) {
-        slotsContainer.innerHTML = '<p class="col-span-2 text-slate-500 text-sm">No slots available on this date. Please try another day, or call us directly.</p>';
-        return;
-      }
-      slotsContainer.innerHTML = '';
-      slots.forEach((slot, index) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'time-slot py-3 border border-brand-200 rounded-lg text-brand-800 hover:bg-brand-50 transition font-medium';
-        btn.textContent = slot.display;
-        btn.dataset.time = slot.display;
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.time-slot').forEach((b) => b.classList.remove('bg-brand-600', 'text-white'));
-          btn.classList.add('bg-brand-600', 'text-white');
-          selectedTime = slot.display;
-          selectedSlotDoctorIds = slot.doctorIds || null;
-          hideReschedule();
-        });
-        slotsContainer.appendChild(btn);
-
-        // Auto-select the first available slot, while still letting
-        // the user click a different one afterward.
-        if (index === 0) {
-          btn.classList.add('bg-brand-600', 'text-white');
-          selectedTime = slot.display;
-          selectedSlotDoctorIds = slot.doctorIds || null;
-        }
-      });
-    }
-
-    // Fetches available slots from the public-available-slots Netlify
-    // Function, which computes availability against AppointmentManager's
-    // real slot_templates/schedule_overrides/appointments tables --
-    // replacing the old direct queries against eye-clinic-site's own,
-    // now-stale schedule_sessions/blocked_dates/blocked_slots tables.
-    async function loadAvailableSlots(dateStr) {
-      const doctorId = doctorSelect?.value;
-      if (!doctorId) {
-        slotsContainer.innerHTML = '<p class="col-span-2 text-slate-400 text-sm">Select a doctor to see available times.</p>';
-        return;
-      }
-
-      slotsContainer.innerHTML = '<p class="col-span-2 text-slate-400 text-sm">Checking availability...</p>';
-      errorMessage?.classList.add('hidden');
-
-      try {
-        // "any" means no preference -- omit doctorId so the function
-        // fans out across all three doctors and returns merged slots.
-        const doctorParam = doctorId === 'any' ? '' : `&doctorId=${encodeURIComponent(doctorId)}`;
-        const response = await fetch(`/.netlify/functions/public-available-slots?date=${encodeURIComponent(dateStr)}${doctorParam}`);
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-          throw new Error(data.error || 'Could not load availability.');
-        }
-
-        if (data.reason) {
-          slotsContainer.innerHTML = `<p class="col-span-2 text-slate-500 text-sm">${data.reason}</p>`;
-          return;
-        }
-
-        renderSlots(data.slots || []);
-      } catch (err) {
-        console.error("Error loading availability:", err);
-        slotsContainer.innerHTML = '<p class="col-span-2 text-red-500 text-sm">Could not load availability. Please try again.</p>';
-      }
-    }
-
-    dateInput?.addEventListener('change', (e) => {
-      const selectedDate = e.target.value;
-      if (selectedDate) loadAvailableSlots(selectedDate);
-    });
-
-    doctorSelect?.addEventListener('change', () => {
-      if (doctorSelect.value) {
-        window.gtag?.('event', 'doctor_selected', {
-          event_category: 'engagement',
-          event_label: doctorSelect.value === 'any' ? 'no_preference' : 'specific_doctor',
-        });
-      }
-      if (dateInput?.value) loadAvailableSlots(dateInput.value);
-    });
-
-    // Load today's slots immediately on page load only if a doctor is
-    // already selected (e.g. pre-selected via defaultDoctorId) -- otherwise
-    // wait for the patient to pick one, since availability is doctor-specific.
-    if (dateInput?.value && doctorSelect?.value) {
-      loadAvailableSlots(dateInput.value);
-    }
-
-    async function verifyCode() {
-      errorMessage?.classList.add('hidden');
-      const code = String(otpInput?.value || '').replace(/\D/g, '');
-      if (code.length !== 6) {
-        showError('Enter the 6-digit code from WhatsApp.');
-        otpInput?.focus();
-        return;
-      }
-      verifyOtpBtn.disabled = true;
-      verifyOtpBtn.innerText = 'Checking…';
-      try {
-        const response = await fetch('/.netlify/functions/verify-booking-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: phoneInput.value, code }),
-        });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok || !result.success || !result.token) throw new Error(result.error || 'Could not verify the code.');
-        otpToken = result.token;
-        verifiedPhone = otpSentTo;
-        if (resendTimer) clearInterval(resendTimer);
-        resendTimer = null;
-        otpEntry?.classList.add('hidden');
-        sendOtpBtn?.classList.add('hidden');
-        setStatus(`✓ +91 ${verifiedPhone} verified`, true);
-        checkReturningPatient();
-      } catch (err) {
-        showError(err.message);
-        otpInput?.focus();
-      } finally {
-        verifyOtpBtn.disabled = false;
-        verifyOtpBtn.innerText = 'Verify';
-      }
-    }
-
-    verifyOtpBtn?.addEventListener('click', verifyCode);
-    otpInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); verifyCode(); } });
-
-    async function submitBooking(body) {
-      const response = await fetch('/.netlify/functions/public-book-appointment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+    function notice(text) { const el = $('bkNotice'); el.textContent = text; el.classList.toggle('hidden', !text); }
+    function error(text) { const el = $('bkError'); el.textContent = text; el.classList.toggle('hidden', !text); }
+    function clearMessages() { notice(''); error(''); }
+    async function post(fn, body) {
+      const response = await fetch(`/.netlify/functions/${fn}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const result = await response.json().catch(() => ({}));
+      if (response.status === 403 || result.expired) { expireVerification(result.error); throw Object.assign(new Error(result.error || 'Please verify again.'), { handled: true }); }
       return { response, result };
     }
 
-    rescheduleBtn?.addEventListener('click', async () => {
-      if (!lastBookingBody) return;
-      errorMessage?.classList.add('hidden');
-      rescheduleBtn.disabled = true;
-      rescheduleBtn.innerText = 'Moving…';
+    // ---------- verification (kept in this tab for 30 minutes) ----------
+    function saveVerification() {
+      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify({ phone: state.phone, token: state.token, at: Date.now() })); } catch {}
+    }
+    function loadVerification() {
       try {
-        const { response, result } = await submitBooking({ ...lastBookingBody, reschedule: true });
-        if (!response.ok || !result.success) throw new Error(result.error || 'Could not move your appointment. Please call the clinic.');
-        window.gtag?.('event', 'booking_rescheduled', { event_category: 'engagement', event_label: lastBookingBody.service });
-        hideReschedule();
-        if (successMessage) successMessage.textContent = `Your appointment has been moved from ${result.from} to ${result.to}. We have sent the new time on WhatsApp.`;
-        successMessage?.classList.remove('hidden');
-        confirmBtn.style.display = 'none';
-      } catch (err) {
-        hideReschedule();
-        showError(err.message);
-        if (/verif/i.test(err.message || '')) resetOtp();
-      } finally {
-        rescheduleBtn.disabled = false;
+        const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+        if (saved && saved.token && Date.now() - saved.at < VERIFIED_FOR_MS) return saved;
+      } catch {}
+      return null;
+    }
+    function forgetVerification() { try { sessionStorage.removeItem(SESSION_KEY); } catch {} }
+    function expireVerification(message) {
+      forgetVerification();
+      state.token = '';
+      resetOtp();
+      show('stepPhone');
+      error(message || 'Your verification has expired. Please verify your WhatsApp number again.');
+    }
+
+    let resendTimer = null, otpSentTo = '';
+    function resetOtp() {
+      otpSentTo = '';
+      $('bkOtp').value = '';
+      $('bkOtpBlock').classList.add('hidden');
+      if (resendTimer) clearInterval(resendTimer);
+      resendTimer = null;
+      $('bkSend').disabled = false; $('bkSend').innerText = 'Send code';
+    }
+    $('bkPhone').addEventListener('input', () => { if (otpSentTo && digits10($('bkPhone').value) !== otpSentTo) resetOtp(); });
+
+    $('bkSend').addEventListener('click', async () => {
+      clearMessages();
+      const d = digits10($('bkPhone').value);
+      if (!/^[6-9]\d{9}$/.test(d)) { error('Enter a valid 10-digit mobile number that uses WhatsApp.'); return; }
+      const btn = $('bkSend');
+      btn.disabled = true; btn.innerText = 'Sending…';
+      try {
+        const response = await fetch('/.netlify/functions/send-booking-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: $('bkPhone').value }) });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
+        otpSentTo = d;
+        track('code_sent');
+        $('bkOtpBlock').classList.remove('hidden');
+        $('bkOtpStatus').textContent = `Code sent on WhatsApp to +91 ${d}. It expires in 5 minutes.`;
+        $('bkOtp').focus();
+        let wait = 30;
+        btn.innerText = `Resend in ${wait}s`;
+        resendTimer = setInterval(() => {
+          wait -= 1;
+          if (wait <= 0) { clearInterval(resendTimer); resendTimer = null; btn.disabled = false; btn.innerText = 'Resend code'; }
+          else btn.innerText = `Resend in ${wait}s`;
+        }, 1000);
+      } catch (e) {
+        error(e.message); btn.disabled = false; btn.innerText = 'Send code';
       }
     });
 
-    keepBtn?.addEventListener('click', () => {
-      rescheduleActions?.classList.add('hidden');
-      if (rescheduleText) rescheduleText.textContent = 'No changes made — your existing appointment stays as it is. To book another day, choose a different date.';
-    });
+    async function verifyCode() {
+      clearMessages();
+      const code = String($('bkOtp').value || '').replace(/\D/g, '');
+      if (code.length !== 6) { error('Enter the 6-digit code from WhatsApp.'); return; }
+      const btn = $('bkVerify');
+      btn.disabled = true; btn.innerText = 'Checking…';
+      try {
+        const response = await fetch('/.netlify/functions/verify-booking-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: $('bkPhone').value, code }) });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.success || !result.token) throw new Error(result.error || 'Could not verify the code.');
+        state.phone = otpSentTo; state.token = result.token;
+        saveVerification();
+        if (resendTimer) clearInterval(resendTimer);
+        track('verified');
+        await loadPeople();
+      } catch (e) {
+        if (!e.handled) error(e.message);
+      } finally {
+        btn.disabled = false; btn.innerText = 'Verify';
+      }
+    }
+    $('bkVerify').addEventListener('click', verifyCode);
+    $('bkOtp').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); verifyCode(); } });
+    $('bkChangeNumber').addEventListener('click', () => { forgetVerification(); state.token = ''; resetOtp(); $('bkPhone').value = ''; clearMessages(); show('stepPhone'); $('bkPhone').focus(); });
 
-    if (confirmBtn) {
-      confirmBtn.addEventListener('click', async () => {
-        const prefix = document.getElementById('prefix').value;
-        const fName = document.getElementById('firstName').value;
-        const lName = document.getElementById('lastName').value;
-        const phone = document.getElementById('phone').value;
-        const doctorId = doctorSelect?.value;
-        const service = document.getElementById('service').value;
-        const date = dateInput.value;
+    // ---------- 2. patients on this number ----------
+    async function loadPeople() {
+      const { response, result } = await post('number-overview', { phone: state.phone, otpToken: state.token });
+      if (!response.ok) throw new Error(result.error || 'Could not load your appointments.');
+      state.people = result.patients || [];
+      state.maxPerDay = result.maxPerDay || 2;
+      $('bkVerifiedLabel').textContent = `✓ +91 ${state.phone} verified`;
+      if (!state.people.length) { startBooking(null); return; }
+      renderPeople();
+      show('stepPeople');
+    }
 
-        errorMessage?.classList.add('hidden');
+    function renderPeople() {
+      const box = $('bkPeople');
+      box.innerHTML = state.people.map((p, i) => {
+        const last = p.lastConsultation
+          ? `<p class="text-sm text-slate-600">Last visit: ${esc(p.lastConsultation.dateLabel)}${p.lastConsultation.doctorName ? ` with Dr. ${esc(p.lastConsultation.doctorName)}` : ''}</p>`
+          : '<p class="text-sm text-slate-500">No previous visit at this clinic</p>';
+        const upcoming = p.upcoming.map((a) => `
+          <div class="rounded-xl bg-brand-50 border border-brand-100 p-3 space-y-2">
+            <p class="text-sm"><span class="font-semibold text-brand-900">${esc(a.dateLabel)} · ${esc(a.time)}</span>${a.doctorName ? ` · Dr. ${esc(a.doctorName)}` : ''}<br><span class="text-slate-600">${esc(a.service)}${a.status === 'arrived' ? ' · Checked in' : ''}</span></p>
+            ${a.canChange
+              ? `<div class="flex gap-2"><button type="button" data-resched="${esc(a.id)}" class="px-4 py-2 rounded-xl bg-white border border-brand-200 text-brand-900 text-sm font-semibold hover:bg-brand-100 transition">Reschedule</button><button type="button" data-cancel="${esc(a.id)}" class="px-4 py-2 rounded-xl bg-white border border-red-200 text-red-700 text-sm font-semibold hover:bg-red-50 transition">Cancel</button></div>`
+              : `<p class="text-xs text-slate-600">${esc(a.changeNote || '')} <a class="font-semibold text-brand-700 underline" href="tel:${esc(cfg.clinicTel)}">${esc(cfg.clinicPhone)}</a></p>`}
+          </div>`).join('');
+        return `<article class="rounded-2xl border border-slate-200 p-4 space-y-3">
+          <div><h4 class="text-lg font-bold text-brand-900">${esc(p.name)}</h4>${last}</div>
+          ${upcoming}
+          <button type="button" data-book="${i}" class="w-full py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition">Book for ${esc(p.name)}</button>
+        </article>`;
+      }).join('');
+      box.querySelectorAll('[data-book]').forEach((b) => b.addEventListener('click', () => startBooking(state.people[Number(b.dataset.book)])));
+      box.querySelectorAll('[data-resched]').forEach((b) => b.addEventListener('click', () => {
+        const visit = state.people.flatMap((p) => p.upcoming).find((a) => a.id === b.dataset.resched);
+        if (visit) startReschedule(visit);
+      }));
+      box.querySelectorAll('[data-cancel]').forEach((b) => b.addEventListener('click', () => cancelVisit(b.dataset.cancel, b)));
+    }
+    $('bkSomeoneNew').addEventListener('click', () => startBooking(null));
 
-        if (!fName || !phone || !doctorId || !service || !date || !selectedTime) {
-          showError("Please fill in all details, select a doctor, and choose an available time slot.");
-          return;
-        }
+    async function cancelVisit(id, btn) {
+      const visit = state.people.flatMap((p) => p.upcoming).find((a) => a.id === id);
+      if (!visit || !window.confirm(`Cancel ${visit.patientName}'s appointment on ${visit.dateLabel} at ${visit.time}?`)) return;
+      clearMessages();
+      btn.disabled = true; btn.innerText = 'Cancelling…';
+      try {
+        const { response, result } = await post('manage-appointments', { action: 'cancel', phone: state.phone, otpToken: state.token, appointmentId: id });
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not cancel the appointment.');
+        track('cancelled');
+        await loadPeople();
+        notice(`${visit.patientName}'s appointment on ${visit.dateLabel} at ${visit.time} has been cancelled.`);
+      } catch (e) {
+        if (!e.handled) error(e.message);
+        btn.disabled = false; btn.innerText = 'Cancel';
+      }
+    }
 
-        if (!otpToken || verifiedPhone !== phoneDigits(phone)) {
-          showError(otpSentTo
-            ? "Tap Verify to confirm the WhatsApp code before booking."
-            : "Verify your mobile number first: tap Send code and enter the code we send on WhatsApp.");
-          (otpSentTo ? otpInput : sendOtpBtn)?.focus();
-          return;
-        }
+    // ---------- 3. book / reschedule ----------
+    const doctorSelect = $('bkDoctor'), dateInput = $('bkDate'), serviceSelect = $('bkService');
+    dateInput.min = todayIst();
+    const defaultService = root.dataset.defaultService;
+    const defaultDoctorId = root.dataset.defaultDoctorId;
+    const hasDoctor = (id) => Array.from(doctorSelect.options).some((o) => o.value === id);
 
-        // "any" (no preference) bookings don't have a single doctorId --
-        // they carry the list of doctors actually free at the selected
-        // time, and the server picks one at random and re-verifies
-        // availability before committing.
-        const isNoPreference = doctorId === 'any';
-        if (isNoPreference && (!selectedSlotDoctorIds || selectedSlotDoctorIds.length === 0)) {
-          showError("That time slot's doctor information is missing. Please reselect a time.");
-          return;
-        }
-
-        // patients.name in AppointmentManager is a single text column,
-        // so prefix/first/last are concatenated here -- the split-name
-        // concept ends at this form layer.
-        // Patients often type their full name into First Name and then the surname
-        // again into Last Name ("Sunni Tamil" + "Tamil"); drop the repeat. A
-        // single-word first name is left alone so names like "Ram Ram" survive.
-        const first = fName.trim().replace(/\s+/g, ' ');
-        const last = lName.trim().replace(/\s+/g, ' ');
-        const firstWords = first.split(' ');
-        const surnameRepeated = last !== '' && firstWords.length > 1 &&
-          firstWords.slice(-last.split(' ').length).join(' ').toLowerCase() === last.toLowerCase();
-        const name = [prefix, first, surnameRepeated ? '' : last].filter(Boolean).join(' ');
-
-        lastBookingBody = {
-          name,
-          phone,
-          ...(isNoPreference
-            ? { candidateDoctorIds: selectedSlotDoctorIds }
-            : { doctorId }),
-          service,
-          date,
-          time: selectedTime,
-          otpToken,
-          appointmentType: isReturningPatient ? 'review' : 'new',
-          bookingFor,
-        };
-
-        try {
-          hideReschedule();
-          confirmBtn.innerText = "Securing Slot...";
-          confirmBtn.disabled = true;
-
-          const { response, result } = await submitBooking(lastBookingBody);
-
-          if (response.status === 409 && result.existing && result.canReschedule) {
-            const doctorText = !isNoPreference && doctorSelect?.selectedOptions?.[0]?.text ? ` with ${doctorSelect.selectedOptions[0].text}` : '';
-            if (rescheduleText) rescheduleText.textContent = `${result.error} Would you like to move it to ${selectedTime}${doctorText} instead?`;
-            if (rescheduleBtn) rescheduleBtn.innerText = `Move it to ${selectedTime}`;
-            rescheduleActions?.classList.remove('hidden');
-            reschedulePrompt?.classList.remove('hidden');
-            confirmBtn.innerText = "Confirm Appointment";
-            confirmBtn.disabled = false;
-            return;
-          }
-
-          if (!response.ok || !result.success) {
-            window.gtag?.('event', 'booking_failed', {
-              event_category: 'engagement',
-              event_label: service,
-              error_message: result.error || 'unknown_error',
-            });
-            throw new Error(result.error || "Could not complete your booking. Please try again or call us directly.");
-          }
-
-          window.gtag?.('event', 'booking_completed', {
-            event_category: 'conversion',
-            event_label: service,
-            doctor_preference: isNoPreference ? 'no_preference' : 'specific_doctor',
-            doctor_id: isNoPreference ? undefined : doctorId,
-          });
-
-          successMessage?.classList.remove('hidden');
-          confirmBtn.style.display = 'none';
-
-        } catch (err) {
-          console.error("Error booking:", err);
-          showError(err.message || "Could not complete your booking. Please try again or call us directly.");
-          if (/verif/i.test(err.message || "")) resetOtp();
-          confirmBtn.innerText = "Confirm Appointment";
-          confirmBtn.disabled = false;
-        }
+    function setFor(value) {
+      state.bookingFor = value;
+      document.querySelectorAll('#bkFor .bk-for').forEach((b) => {
+        const on = b.dataset.for === value;
+        b.setAttribute('aria-checked', String(on));
+        b.className = `bk-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition ${on ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-slate-200 text-brand-900'}`;
       });
+    }
+    document.querySelectorAll('#bkFor .bk-for').forEach((b) => b.addEventListener('click', () => setFor(b.dataset.for)));
+
+    function startBooking(patient) {
+      clearMessages();
+      state.patient = patient; state.reschedule = null; state.slot = null;
+      $('bkMove').classList.add('hidden');
+      $('bkBack').classList.toggle('hidden', !state.people.length);
+      $('bkServiceWrap').classList.remove('hidden');
+      $('bkNewPerson').classList.toggle('hidden', Boolean(patient));
+      const summary = $('bkPatientSummary');
+      if (patient) {
+        $('bkBookTitle').textContent = `Book for ${patient.name}`;
+        const last = patient.lastConsultation;
+        summary.innerHTML = last
+          ? `Last visit: <b>${esc(last.dateLabel)}</b>${last.doctorName ? ` with <b>Dr. ${esc(last.doctorName)}</b>` : ''}. This will be booked as a review${last.doctorId && hasDoctor(last.doctorId) ? ' with the same doctor — you can change this' : ''}.`
+          : 'This will be booked as a new consultation.';
+        summary.classList.remove('hidden');
+        doctorSelect.value = last?.doctorId && hasDoctor(last.doctorId) ? last.doctorId : (defaultDoctorId && hasDoctor(defaultDoctorId) ? defaultDoctorId : doctorSelect.options[0].value);
+      } else {
+        $('bkBookTitle').textContent = 'Book for someone new';
+        summary.classList.add('hidden');
+        setFor(state.people.length ? 'family' : 'self');
+        ['bkFirst', 'bkLast', 'bkDob'].forEach((id) => { $(id).value = ''; });
+        $('bkGender').value = '';
+        doctorSelect.value = defaultDoctorId && hasDoctor(defaultDoctorId) ? defaultDoctorId : doctorSelect.options[0].value;
+      }
+      if (defaultService && Array.from(serviceSelect.options).some((o) => o.value === defaultService)) serviceSelect.value = defaultService;
+      if (!dateInput.value || dateInput.value < todayIst()) dateInput.value = todayIst();
+      $('bkConfirm').innerText = 'Confirm appointment';
+      track('patient_selected', { patient: patient ? 'existing' : 'new' });
+      show('stepBook');
+      loadSlots();
+    }
+
+    function startReschedule(visit) {
+      clearMessages();
+      state.reschedule = visit; state.patient = state.people.find((p) => p.id === visit.patientId) || null; state.slot = null;
+      $('bkMove').classList.add('hidden');
+      $('bkBack').classList.remove('hidden');
+      $('bkNewPerson').classList.add('hidden');
+      $('bkServiceWrap').classList.add('hidden');
+      $('bkBookTitle').textContent = `Reschedule ${visit.patientName}'s appointment`;
+      const summary = $('bkPatientSummary');
+      summary.innerHTML = `Currently <b>${esc(visit.dateLabel)} at ${esc(visit.time)}</b>${visit.doctorName ? ` with Dr. ${esc(visit.doctorName)}` : ''}. Choose a new date and time.`;
+      summary.classList.remove('hidden');
+      if (hasDoctor(visit.doctorId)) doctorSelect.value = visit.doctorId;
+      dateInput.value = visit.date >= todayIst() ? visit.date : todayIst();
+      $('bkConfirm').innerText = 'Confirm new time';
+      track('reschedule_started');
+      show('stepBook');
+      loadSlots();
+    }
+
+    $('bkBack').addEventListener('click', () => { clearMessages(); state.people.length ? show('stepPeople') : show('stepPhone'); });
+
+    async function loadSlots() {
+      state.slot = null;
+      $('bkMove').classList.add('hidden');
+      const box = $('bkSlots');
+      const doctorId = doctorSelect.value;
+      if (!doctorId || !dateInput.value) { box.innerHTML = '<p class="col-span-3 text-slate-400 text-sm">Select a doctor and date to see available times.</p>'; return; }
+      box.innerHTML = '<p class="col-span-3 text-slate-400 text-sm">Checking availability…</p>';
+      try {
+        const q = `date=${encodeURIComponent(dateInput.value)}${doctorId === 'any' ? '' : `&doctorId=${encodeURIComponent(doctorId)}`}`;
+        const response = await fetch(`/.netlify/functions/public-available-slots?${q}`);
+        const data = await response.json();
+        if (!response.ok || data.error) throw new Error(data.error || 'Could not load availability.');
+        let slots = data.slots || [];
+        if (state.reschedule) slots = slots.filter((s) => !(dateInput.value === state.reschedule.date && s.display.replace(/^0/, '') === state.reschedule.time && (doctorId === state.reschedule.doctorId)));
+        if (!slots.length) { box.innerHTML = `<p class="col-span-3 text-slate-500 text-sm">${esc(data.reason || 'No times left on this date. Please try another day, or call the clinic.')}</p>`; return; }
+        box.innerHTML = '';
+        slots.forEach((slot) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'bk-slot py-3 border border-brand-200 rounded-lg text-brand-800 hover:bg-brand-50 transition font-medium';
+          b.textContent = slot.display;
+          b.addEventListener('click', () => {
+            box.querySelectorAll('.bk-slot').forEach((x) => { x.classList.remove('bg-brand-600', 'text-white', 'border-brand-600'); x.classList.add('text-brand-800', 'hover:bg-brand-50'); });
+            b.classList.remove('text-brand-800', 'hover:bg-brand-50');
+            b.classList.add('bg-brand-600', 'text-white', 'border-brand-600');
+            state.slot = slot;
+            $('bkMove').classList.add('hidden');
+          });
+          box.appendChild(b);
+        });
+      } catch (e) {
+        box.innerHTML = '<p class="col-span-3 text-red-600 text-sm">Could not load availability. Please try again.</p>';
+      }
+    }
+    dateInput.addEventListener('change', loadSlots);
+    doctorSelect.addEventListener('change', loadSlots);
+
+    // "Sunni Tamil" + "Tamil" → "Mr. Sunni Tamil": drop a surname typed twice. A single-word
+    // first name is left alone so names like "Ram Ram" survive.
+    function newPersonName() {
+      const first = $('bkFirst').value.trim().replace(/\s+/g, ' ');
+      const last = $('bkLast').value.trim().replace(/\s+/g, ' ');
+      if (!first) return '';
+      const words = first.split(' ');
+      const repeated = last !== '' && words.length > 1 && words.slice(-last.split(' ').length).join(' ').toLowerCase() === last.toLowerCase();
+      return [$('bkPrefix').value, first, repeated ? '' : last].filter(Boolean).join(' ');
+    }
+
+    async function submit(extra = {}) {
+      clearMessages();
+      if (!state.slot) { error('Choose a time.'); return; }
+      const doctorId = doctorSelect.value;
+      const noPreference = doctorId === 'any';
+      const confirmBtn = $('bkConfirm');
+      confirmBtn.disabled = true; confirmBtn.innerText = 'Saving…';
+      try {
+        if (state.reschedule) {
+          const { response, result } = await post('manage-appointments', {
+            action: 'reschedule', phone: state.phone, otpToken: state.token, appointmentId: state.reschedule.id,
+            date: dateInput.value, time: state.slot.display,
+            ...(noPreference ? { candidateDoctorIds: state.slot.doctorIds || [] } : { doctorId }),
+          });
+          if (!response.ok || !result.success) throw new Error(result.error || 'Could not move the appointment.');
+          track('rescheduled');
+          finish({ title: 'Appointment moved', sub: `From ${result.from}.`, patientName: state.reschedule.patientName, doctorName: String(result.to || '').split(' with Dr. ')[1] || null, date: dateInput.value, time24: state.slot.time24, timeLabel: state.slot.display, service: state.reschedule.service });
+          return;
+        }
+        const name = state.patient ? null : newPersonName();
+        if (!state.patient && !name) throw new Error('Enter the patient\'s name.');
+        const body = {
+          phone: state.phone, otpToken: state.token,
+          ...(state.patient ? { patientId: state.patient.id } : { name, dob: $('bkDob').value || undefined, gender: $('bkGender').value || undefined, bookingFor: state.bookingFor }),
+          service: serviceSelect.value, date: dateInput.value, time: state.slot.display,
+          ...(noPreference ? { candidateDoctorIds: state.slot.doctorIds || [] } : { doctorId }),
+          ...extra,
+        };
+        state.lastBody = body;
+        const { response, result } = await post('public-book-appointment', body);
+        if (response.status === 409 && result.existing) {
+          $('bkMoveText').textContent = result.canReschedule ? `${result.error} Move it to ${state.slot.display} instead?` : result.error;
+          $('bkMoveBtn').innerText = `Move it to ${state.slot.display}`;
+          $('bkMoveBtn').classList.toggle('hidden', !result.canReschedule);
+          $('bkMove').classList.remove('hidden');
+          return;
+        }
+        if (!response.ok || !result.success) {
+          if (result.limitReached) track('limit_reached');
+          window.gtag?.('event', 'booking_failed', { event_category: 'engagement', event_label: body.service, error_message: result.error || 'unknown_error' });
+          throw new Error(result.error || 'Could not complete your booking. Please try again or call the clinic.');
+        }
+        const a = result.appointment || {};
+        if (result.rescheduled) track('rescheduled'); else {
+          track('confirmed', { patient: state.patient ? 'existing' : 'new' });
+          window.gtag?.('event', 'booking_completed', { event_category: 'conversion', event_label: body.service, doctor_preference: noPreference ? 'no_preference' : 'specific_doctor', doctor_id: noPreference ? undefined : doctorId });
+        }
+        finish({ title: result.rescheduled ? 'Appointment moved' : 'Appointment confirmed', sub: result.rescheduled ? `From ${result.from}.` : '', patientName: a.patientName, doctorName: a.doctorName, date: a.date || dateInput.value, time24: state.slot.time24, timeLabel: a.time || state.slot.display, service: a.service || body.service });
+      } catch (e) {
+        if (!e.handled) error(e.message);
+      } finally {
+        confirmBtn.disabled = false; confirmBtn.innerText = state.reschedule ? 'Confirm new time' : 'Confirm appointment';
+      }
+    }
+    $('bkConfirm').addEventListener('click', () => submit());
+    $('bkMoveBtn').addEventListener('click', () => { $('bkMove').classList.add('hidden'); submit({ reschedule: true }); });
+    $('bkKeepBtn').addEventListener('click', () => { $('bkMove').classList.add('hidden'); notice('No changes made — the existing appointment stays as it is. Choose another date to book a different day.'); });
+
+    // ---------- 4. done ----------
+    function finish(done) {
+      state.done = done;
+      clearMessages();
+      $('bkDoneTitle').textContent = done.title;
+      $('bkDoneSub').textContent = `${done.sub ? `${done.sub} ` : ''}We've sent the details on WhatsApp to +91 ${state.phone}.`;
+      const dateLabel = new Date(`${done.date}T00:00:00Z`).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+      const rows = [['Patient', done.patientName], ['Doctor', done.doctorName ? `Dr. ${done.doctorName}` : ''], ['When', `${dateLabel} · ${String(done.timeLabel).replace(/^0/, '')}`], ['Reason', done.service], ['Where', `${cfg.clinicName}, ${cfg.addressLine}`]];
+      $('bkDoneDetails').innerHTML = rows.filter(([, v]) => v).map(([k, v]) => `<div class="flex gap-4 p-3"><dt class="w-20 shrink-0 text-slate-500">${esc(k)}</dt><dd class="font-medium text-slate-900">${esc(v)}</dd></div>`).join('');
+      show('stepDone');
+    }
+
+    $('bkIcs').addEventListener('click', () => {
+      const d = state.done;
+      if (!d) return;
+      const start = new Date(`${d.date}T${d.time24}:00+05:30`);
+      const end = new Date(start.getTime() + 30 * 60000);
+      const stamp = (t) => t.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+      const icsText = (v) => String(v || '').replace(/[\\,;]/g, (c) => `\\${c}`).replace(/\n/g, '\\n');
+      const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//CRISPR//Appointment//EN', 'BEGIN:VEVENT',
+        `UID:${stamp(start)}-${Math.random().toString(36).slice(2)}@crispr`, `DTSTAMP:${stamp(new Date())}`, `DTSTART:${stamp(start)}`, `DTEND:${stamp(end)}`,
+        `SUMMARY:${icsText(`${cfg.clinicName} appointment${d.doctorName ? ` with Dr. ${d.doctorName}` : ''}`)}`,
+        `LOCATION:${icsText(`${cfg.clinicName}, ${cfg.addressLine}`)}`,
+        `DESCRIPTION:${icsText(`${d.patientName} · ${d.service}. To change it, visit the website or call ${cfg.clinicPhone}.`)}`,
+        'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+      a.download = 'appointment.ics';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      track('added_to_calendar');
+    });
+    $('bkAnother').addEventListener('click', async () => { clearMessages(); try { await loadPeople(); } catch (e) { if (!e.handled) error(e.message); } });
+    $('bkDone').addEventListener('click', async () => { clearMessages(); try { await loadPeople(); } catch (e) { if (!e.handled) error(e.message); } });
+
+    // ---------- start: resume a verification made in this tab ----------
+    const saved = loadVerification();
+    if (saved) {
+      state.phone = saved.phone; state.token = saved.token;
+      $('bkPhone').value = saved.phone;
+      track('verification_restored');
+      loadPeople().catch((e) => { if (!e.handled) { show('stepPhone'); error(e.message); } });
+    } else {
+      show('stepPhone');
     }
   });
 </script>

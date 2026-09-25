@@ -1,4 +1,4 @@
-// netlify/functions/lib/booking-core.js
+// netlify/functions/lib/booking-core.cjs (.cjs so it loads as CommonJS whatever the site package.json says)
 //
 // Shared by the public booking functions (book, returning-patient, manage,
 // OTP send/verify). Not a function itself: Netlify only deploys a folder as a
@@ -16,18 +16,13 @@ try {
 
 const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 
-// CRISPR Skin and Hair Clinic's three dermatology doctors. Kept in sync with
-// the same list in public-available-slots.js.
-//
-// The AppointmentManager database is shared with Crispr Eye Care's website, so
-// every patient-history lookup below is limited to these doctors: an eye visit
-// is not a dermatology "last consultation", and the one-booking-per-day rule
-// and Manage My Appointment only cover this clinic's appointments.
-const CLINIC_DOCTOR_IDS = [
-  "514ff136-ee45-4d49-89b5-d128d96aef62", // Karthik L
-  "d5372165-fc7e-47e8-aee6-ce02e7fefc71", // Narayanan A
-  "519dbd89-d3d9-4ee9-8923-5fabbe51cf2e", // Narayanan B
-];
+// This clinic's doctors (lib/clinic.cjs, the one file that differs between the websites).
+const { CLINIC_DOCTOR_IDS } = require("./clinic.cjs");
+
+// Online changes stop this close to the appointment; after that the patient calls the clinic.
+const CHANGE_CUTOFF_MINUTES = 120;
+// Visits one verified number can hold on one day at this clinic (all patients on it together).
+const MAX_VISITS_PER_NUMBER_PER_DAY = 2;
 
 // Maps JS Date#getUTCDay() (0 = Sunday) to slot_templates.day_of_week enum values.
 const DAY_OF_WEEK_BY_INDEX = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -227,6 +222,12 @@ async function patientsOnPhone(supabase, canonicalPhone) {
 async function lastConsultation(supabase, canonicalPhone, name) {
   const patient = (await patientsOnPhone(supabase, canonicalPhone)).find((row) => normalizeName(row.name) === normalizeName(name));
   if (!patient) return null;
+  return lastConsultationFor(supabase, patient.id);
+}
+
+/** A patient's last seen/completed consultation at this clinic: { patientId, date, doctorId, doctorName } (date null if none). */
+async function lastConsultationFor(supabase, patientId) {
+  const patient = { id: patientId };
   const { data: visit, error } = await supabase
     .from("appointments")
     .select("slot_date, doctor_id, doctors(name)")
@@ -248,7 +249,7 @@ async function lastConsultation(supabase, canonicalPhone, name) {
 async function appointmentOnDay(supabase, patientId, slotDate, ignoreAppointmentId = null) {
   let q = supabase
     .from("appointments")
-    .select("id, slot_time, status, linked_group_id, doctor_id, notes, doctors(name)")
+    .select("id, slot_date, slot_time, status, linked_group_id, doctor_id, notes, doctors(name)")
     .eq("patient_id", patientId)
     .in("doctor_id", CLINIC_DOCTOR_IDS)
     .eq("slot_date", slotDate)
@@ -260,9 +261,108 @@ async function appointmentOnDay(supabase, patientId, slotDate, ignoreAppointment
   return data;
 }
 
-/** Online changes are limited to a plain single-slot booking the patient hasn't arrived for yet. */
+function minutesUntil(slotDate, slotTime) {
+  return (Date.parse(`${slotDate}T${normalizeTime(slotTime)}+05:30`) - Date.now()) / 60000;
+}
+
+/**
+ * Why an appointment can't be changed (rescheduled or cancelled) online, or null when it can:
+ * only a plain single-slot booking the patient hasn't arrived for, more than
+ * CHANGE_CUTOFF_MINUTES before it starts.
+ */
+function changeBlockReason(appointment) {
+  if (appointment.status === "arrived") return "You're already checked in for this appointment.";
+  if (appointment.status !== "booked") return "This appointment can't be changed online. Please call the clinic.";
+  if (appointment.linked_group_id) return "This appointment was booked at the clinic. Please call the clinic to change it.";
+  if (minutesUntil(appointment.slot_date, appointment.slot_time) < CHANGE_CUTOFF_MINUTES) {
+    return "It's less than 2 hours to this appointment. Please call the clinic to change it.";
+  }
+  return null;
+}
+
 function canChangeOnline(appointment) {
-  return appointment.status === "booked" && !appointment.linked_group_id;
+  return !changeBlockReason(appointment);
+}
+
+/** Visits (a multi-slot visit counts once) the given patients hold at this clinic on a date. */
+async function visitsOnDay(supabase, patientIds, slotDate, ignoreAppointmentId = null) {
+  if (!patientIds.length) return 0;
+  let q = supabase
+    .from("appointments")
+    .select("id, linked_group_id")
+    .in("patient_id", patientIds)
+    .in("doctor_id", CLINIC_DOCTOR_IDS)
+    .eq("slot_date", slotDate)
+    .neq("status", "cancelled")
+    .is("deleted_at", null);
+  if (ignoreAppointmentId) q = q.neq("id", ignoreAppointmentId);
+  const { data, error } = await q;
+  if (error) throw error;
+  return new Set((data || []).map((a) => a.linked_group_id || a.id)).size;
+}
+
+function dailyLimitMessage(slotDate) {
+  return `This number already has ${MAX_VISITS_PER_NUMBER_PER_DAY} appointments on ${displayDate(slotDate)}. Online booking allows ${MAX_VISITS_PER_NUMBER_PER_DAY} per number per day — please choose another day or call the clinic.`;
+}
+
+/** Upcoming, not-cancelled visits at this clinic for these patients, one entry per visit. */
+async function upcomingVisits(supabase, patients) {
+  if (!patients.length) return [];
+  const nameById = new Map(patients.map((p) => [p.id, p.name]));
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("id, patient_id, doctor_id, slot_date, slot_time, status, linked_group_id, notes, doctors(name)")
+    .in("patient_id", patients.map((p) => p.id))
+    .in("doctor_id", CLINIC_DOCTOR_IDS)
+    .gte("slot_date", clinicNow().date)
+    .in("status", ["booked", "arrived"])
+    .is("deleted_at", null)
+    .order("slot_date", { ascending: true })
+    .order("slot_time", { ascending: true });
+  if (error) throw error;
+  const seen = new Set();
+  const visits = [];
+  for (const a of data || []) {
+    if (isPast(a.slot_date, a.slot_time) && a.status === "booked") continue;
+    const key = a.linked_group_id || a.id;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const parts = String(a.notes || "").split("|").map((s) => s.trim()).filter(Boolean);
+    const blocked = changeBlockReason(a);
+    visits.push({
+      id: a.id,
+      patientId: a.patient_id,
+      patientName: nameById.get(a.patient_id) || "Patient",
+      date: a.slot_date,
+      dateLabel: displayDate(a.slot_date, true),
+      time: displayTime(a.slot_time),
+      doctorId: a.doctor_id,
+      doctorName: a.doctors?.name || null,
+      service: parts[0] === "Review" ? `Review · ${parts[1] || "Consultation"}` : parts[0] || "Consultation",
+      status: a.status,
+      canChange: !blocked,
+      changeNote: blocked,
+    });
+  }
+  return visits;
+}
+
+/**
+ * Everything the verified number's owner sees: each patient on the number with their last
+ * consultation and upcoming visits at this clinic.
+ */
+async function numberOverview(supabase, canonicalPhone) {
+  const patients = await patientsOnPhone(supabase, canonicalPhone);
+  const [upcoming, lasts] = await Promise.all([
+    upcomingVisits(supabase, patients),
+    Promise.all(patients.map((p) => lastConsultationFor(supabase, p.id))),
+  ]);
+  return patients.map((p, i) => ({
+    id: p.id,
+    name: p.name,
+    lastConsultation: lasts[i]?.date ? { date: lasts[i].date, dateLabel: displayDate(lasts[i].date, true), doctorId: lasts[i].doctorId, doctorName: lasts[i].doctorName } : null,
+    upcoming: upcoming.filter((v) => v.patientId === p.id),
+  }));
 }
 
 // Written to reception's audit trail. `action` uses reception's action names
@@ -280,9 +380,10 @@ function appendNote(notes, note) {
  * Sends the approved WhatsApp appointment confirmation via the
  * send-wa-appointment-confirmation Edge Function (Meta credentials stay in
  * Supabase). Best-effort: failures are logged, never thrown, because the
- * booking itself has already succeeded.
+ * booking itself has already succeeded. noPreference picks the confirmation
+ * template that leaves out the doctor's name.
  */
-async function sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId }) {
+async function sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId, noPreference = false }) {
   try {
     const { data: doctorRow, error: doctorLookupError } = await supabase.from("doctors").select("name").eq("id", doctorId).single();
     if (doctorLookupError) throw doctorLookupError;
@@ -296,6 +397,8 @@ async function sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name
         date: displayDate(slotDate, true),
         time: displayTime(slotTime),
         appointment_id: appointmentId,
+        // No doctor chosen: the Edge Function sends the template without a doctor name.
+        no_preference: Boolean(noPreference),
       }),
     });
     if (!res.ok) {
@@ -321,12 +424,20 @@ module.exports = {
   isPast,
   shuffle,
   findAvailableDoctor,
+  CHANGE_CUTOFF_MINUTES,
+  MAX_VISITS_PER_NUMBER_PER_DAY,
   tokenIsValid,
   consumeToken,
   patientsOnPhone,
   lastConsultation,
+  lastConsultationFor,
   appointmentOnDay,
+  changeBlockReason,
   canChangeOnline,
+  visitsOnDay,
+  dailyLimitMessage,
+  upcomingVisits,
+  numberOverview,
   logForReception,
   appendNote,
   sendConfirmation,

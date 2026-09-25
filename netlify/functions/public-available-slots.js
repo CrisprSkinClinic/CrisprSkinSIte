@@ -23,14 +23,8 @@ try {
 
 const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 
-// CRISPR Skin and Hair Clinic's three dermatology doctors. Used to fan out
-// availability across all three when a patient books without a doctor
-// preference, rather than silently defaulting to any one of them.
-const CLINIC_DOCTOR_IDS = [
-  "514ff136-ee45-4d49-89b5-d128d96aef62", // Karthik L
-  "d5372165-fc7e-47e8-aee6-ce02e7fefc71", // Narayanan A
-  "519dbd89-d3d9-4ee9-8923-5fabbe51cf2e", // Narayanan B
-];
+// This clinic's doctors (lib/clinic.cjs, the one file that differs between the websites).
+const { CLINIC_DOCTOR_IDS } = require("./lib/clinic.cjs");
 
 const DAY_OF_WEEK_BY_INDEX = [
   "sunday",
@@ -52,11 +46,8 @@ exports.handler = async (event) => {
       ? event.queryStringParameters && event.queryStringParameters.date
       : safeParse(event.body)?.date;
 
-  // doctorId is intentionally optional. When omitted, we fan out across
-  // all three dermatology doctors and return combined slots -- this is
-  // the "no preference" path for new patients, and it's genuinely
-  // unbiased (every doctor's real availability is shown) rather than
-  // silently picking one doctor on the patient's behalf.
+  // doctorId is optional. When omitted, availability is merged across all of
+  // CLINIC_DOCTOR_IDS (the "no preference" path).
   const requestedDoctorId =
     (event.httpMethod === "GET"
       ? event.queryStringParameters && event.queryStringParameters.doctorId
@@ -123,7 +114,7 @@ exports.handler = async (event) => {
       return ok(perDoctorResults[0]);
     }
 
-    // No-preference path: merge slots from all three doctors. Each merged
+    // No-preference path: merge slots from all the clinic's doctors. Each merged
     // slot records which doctor(s) actually have that time open, so the
     // booking step can assign the doctor the patient implicitly selected
     // by picking that time -- ties (multiple doctors free at the same
