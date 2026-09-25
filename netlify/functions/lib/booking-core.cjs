@@ -380,9 +380,10 @@ function appendNote(notes, note) {
  * Sends the approved WhatsApp appointment confirmation via the
  * send-wa-appointment-confirmation Edge Function (Meta credentials stay in
  * Supabase). Best-effort: failures are logged, never thrown, because the
- * booking itself has already succeeded.
+ * booking itself has already succeeded. noPreference picks the confirmation
+ * template that leaves out the doctor's name.
  */
-async function sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId }) {
+async function sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId, noPreference = false }) {
   try {
     const { data: doctorRow, error: doctorLookupError } = await supabase.from("doctors").select("name").eq("id", doctorId).single();
     if (doctorLookupError) throw doctorLookupError;
@@ -396,6 +397,8 @@ async function sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name
         date: displayDate(slotDate, true),
         time: displayTime(slotTime),
         appointment_id: appointmentId,
+        // No doctor chosen: the Edge Function sends the template without a doctor name.
+        no_preference: Boolean(noPreference),
       }),
     });
     if (!res.ok) {

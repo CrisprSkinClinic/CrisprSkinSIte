@@ -77,6 +77,8 @@ exports.handler = async (event) => {
       if (payload.doctorId && payload.doctorId !== "any" && !core.CLINIC_DOCTOR_IDS.includes(String(payload.doctorId))) {
         return core.json(400, { error: "Unknown doctor." });
       }
+      const noPreference = payload.doctorId === "any"
+        || (!payload.doctorId && Array.isArray(payload.candidateDoctorIds) && payload.candidateDoctorIds.length > 0);
       const candidates = payload.doctorId && payload.doctorId !== "any"
         ? [String(payload.doctorId)]
         : Array.isArray(payload.candidateDoctorIds) && payload.candidateDoctorIds.length
@@ -113,7 +115,7 @@ exports.handler = async (event) => {
       const newWhen = `${core.displayDate(slotDate)} at ${core.displayTime(slotTime)}${newDoctor?.name ? ` with Dr. ${newDoctor.name}` : ""}`;
       await core.logForReception(supabase, "APPOINTMENT_RESCHEDULE", `${patient.name} moved their appointment from ${oldWhen} to ${newWhen} via website`);
       await core.sendConfirmation(supabase, {
-        serviceRoleKey, canonicalPhone, name: patient.name, doctorId: slot.doctorId, slotDate, slotTime, appointmentId: appt.id,
+        serviceRoleKey, canonicalPhone, name: patient.name, doctorId: slot.doctorId, slotDate, slotTime, appointmentId: appt.id, noPreference,
       });
       return core.json(200, { success: true, rescheduled: true, from: oldWhen, to: newWhen });
     }

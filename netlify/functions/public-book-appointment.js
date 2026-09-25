@@ -140,7 +140,7 @@ exports.handler = async (event) => {
         const { data: newDoctor } = await supabase.from("doctors").select("name").eq("id", doctorId).maybeSingle();
         await core.logForReception(supabase, "APPOINTMENT_RESCHEDULE",
           `${patientName} moved their ${slotDate} appointment from ${bookedTime}${withDoctor} to ${core.displayTime(slotTime)}${newDoctor?.name ? ` with Dr. ${newDoctor.name}` : ""} via website`);
-        await core.sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name: patientName, doctorId, slotDate, slotTime, appointmentId: sameDay.id });
+        await core.sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name: patientName, doctorId, slotDate, slotTime, appointmentId: sameDay.id, noPreference: !requestedDoctorId });
         return core.json(200, {
           success: true, rescheduled: true, appointment_id: sameDay.id, from: bookedTime, to: core.displayTime(slotTime),
           appointment: { patientName, doctorName: newDoctor?.name || null, date: slotDate, dateLabel: core.displayDate(slotDate, true), time: core.displayTime(slotTime), service },
@@ -173,6 +173,7 @@ exports.handler = async (event) => {
     const notesParts = isReview ? ["Review", service] : [service];
     if (email) notesParts.push(`Email: ${email}`);
     if (BOOKING_FOR_NOTES[bookingFor]) notesParts.push(BOOKING_FOR_NOTES[bookingFor]);
+    if (!requestedDoctorId) notesParts.push("No doctor preference");
     notesParts.push("Booked via website self-service");
 
     const { data: appointment, error: insertAppointmentError } = await supabase
@@ -195,7 +196,7 @@ exports.handler = async (event) => {
       `Booked ${patientName}${patient ? "" : " (new patient)"} for ${isReview ? `Review · ${service}` : service} on ${core.displayDate(slotDate)} at ${core.displayTime(slotTime)}${bookedDoctor?.name ? ` with Dr. ${bookedDoctor.name}` : ""} via website${BOOKING_FOR_NOTES[bookingFor] ? ` (${BOOKING_FOR_NOTES[bookingFor].toLowerCase()})` : ""}`);
 
     // Best-effort: a failed WhatsApp confirmation never fails the booking.
-    await core.sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name: patientName, doctorId, slotDate, slotTime, appointmentId: appointment.id });
+    await core.sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name: patientName, doctorId, slotDate, slotTime, appointmentId: appointment.id, noPreference: !requestedDoctorId });
     return core.json(200, {
       success: true,
       appointment_id: appointment.id,
