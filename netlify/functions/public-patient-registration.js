@@ -15,8 +15,11 @@
 // the client, converted to ISO here), gender, email, phone, address
 // (now split into pincode/area/city/state -- auto-filled from the
 // pincode via India Post's API on the client -- plus a door/street
-// free-text field), occupation, referral source(+other). All
-// required, same as the wizard. This does NOT include wizard Steps
+// free-text field), occupation, referral source(+details). All
+// required, same as the wizard. The phone must be verified: the form sends
+// the one-time token from verify-booking-otp, which is used up here. A
+// patient under 18 must give a guardian's name, and a friend/family or
+// doctor referral carries the referrer's name in referral_other_details. This does NOT include wizard Steps
 // 2-5 (health background, symptom picker, diagnosis questions,
 // consent) -- those belong to the separate, not-yet-built
 // patient_intake_forms feature.
@@ -50,6 +53,14 @@ function parseDOBToISO(str) {
   // becoming March) by checking the parts round-trip exactly.
   if (d.getFullYear() !== yyyy || d.getMonth() !== mm - 1 || d.getDate() !== dd) return null;
   return `${yyyyStr}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+}
+
+// True when someone born on isoDob (YYYY-MM-DD) is under 18 today (IST).
+function isMinor(isoDob) {
+  const today = new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10);
+  const [y, m, d] = isoDob.split("-").map(Number);
+  const eighteenth = `${y + 18}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  return today < eighteenth;
 }
 
 exports.handler = async (event) => {
@@ -97,6 +108,8 @@ exports.handler = async (event) => {
     occupation,
     referralSource,
     referralOtherDetails,
+    guardianName,
+    otpToken,
   } = payload || {};
 
   const VALID_SALUTATIONS = ["Mr.", "Ms.", "Mrs.", "Dr.", "Master", "Baby"];
@@ -153,8 +166,21 @@ exports.handler = async (event) => {
   if (!referralSource || !VALID_REFERRAL_SOURCES.includes(referralSource)) {
     return { statusCode: 400, body: JSON.stringify({ error: "Please let us know how you heard about us." }) };
   }
-  if (referralSource === "Other" && !String(referralOtherDetails || "").trim()) {
-    return { statusCode: 400, body: JSON.stringify({ error: "Please specify how you heard about us." }) };
+  const REFERRAL_DETAIL_ERRORS = {
+    "Friend/Family Referral": "Please enter the name of the person who referred you.",
+    "Doctor Referral": "Please enter the referring doctor's name.",
+    Other: "Please specify how you heard about us.",
+  };
+  const referralDetails = REFERRAL_DETAIL_ERRORS[referralSource] ? String(referralOtherDetails || "").trim() : "";
+  if (REFERRAL_DETAIL_ERRORS[referralSource] && !referralDetails) {
+    return { statusCode: 400, body: JSON.stringify({ error: REFERRAL_DETAIL_ERRORS[referralSource] }) };
+  }
+  const guardian = isMinor(isoDob) ? String(guardianName || "").trim() : "";
+  if (isMinor(isoDob) && !guardian) {
+    return { statusCode: 400, body: JSON.stringify({ error: "A parent or guardian's name is required for patients under 18." }) };
+  }
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(otpToken || ""))) {
+    return { statusCode: 403, body: JSON.stringify({ verificationExpired: true, error: "Please verify your WhatsApp number." }) };
   }
 
   const fullName = name && String(name).trim()
@@ -164,6 +190,16 @@ exports.handler = async (event) => {
   const supabase = createClient(SUPABASE_URL, serviceRoleKey);
 
   try {
+    // Use up the WhatsApp verification token (stored against the 91-prefixed number).
+    const { data: tokenOk, error: tokenError } = await supabase.rpc("service_consume_phone_otp_token", {
+      p_phone: `91${String(phone).trim()}`,
+      p_token: String(otpToken),
+    });
+    if (tokenError) throw tokenError;
+    if (!tokenOk) {
+      return { statusCode: 403, body: JSON.stringify({ verificationExpired: true, error: "Your WhatsApp verification has expired. Please verify your number again." }) };
+    }
+
     // patient_registration_requests stores all PII in encrypted
     // columns (name_enc, phone_enc, etc.) -- a direct .insert() with
     // plaintext field names would fail since those columns no longer
@@ -186,7 +222,8 @@ exports.handler = async (event) => {
       p_address: String(address).trim(),
       p_occupation: String(occupation).trim(),
       p_referral_source: referralSource,
-      p_referral_other_details: referralSource === "Other" ? String(referralOtherDetails).trim() : null,
+      p_referral_other_details: referralDetails || null,
+      p_guardian_name: guardian || null,
     });
     if (error) throw error;
 
