@@ -6,7 +6,7 @@
 // NOT directly into the real patients table -- every submission
 // requires staff approval before becoming a real patient record.
 //
-// One card, no sections. The phone number must be verified with a WhatsApp
+// One card with three tinted groups (not collapsible). The phone number must be verified with a WhatsApp
 // code (send-booking-otp / verify-booking-otp); the server consumes the
 // one-time token, so a registration can only carry a number its owner holds.
 // Under-18s must give a guardian's name, and a friend/family or doctor
@@ -15,7 +15,7 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import { siteConfig } from '../config/site.js';
 
-const field = "w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition";
+const field = "w-full bg-white px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition";
 const label = "text-sm font-semibold text-slate-700 mb-1 block";
 ---
 
@@ -26,9 +26,11 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
       Register your details ahead of your visit. Our front desk will review and confirm your registration -- there's nothing further you need to do after submitting.
     </p>
 
-    <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-champagne-200 p-5 sm:p-8 md:p-12">
-      <form id="reg-form" class="space-y-5" novalidate>
+    <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-champagne-200 p-3 sm:p-6 md:p-10">
+      <form id="reg-form" class="space-y-4" novalidate>
 
+        <div role="group" aria-labelledby="reg-part-1" class="rounded-xl bg-brand-50 border border-brand-100 p-4 md:p-6 space-y-5">
+          <h2 id="reg-part-1" class="text-base font-bold text-brand-900">1. About You</h2>
         <!-- Phone, verified with a WhatsApp code -->
         <div>
           <label for="reg-phone" class={label}>WhatsApp Number *</label>
@@ -112,6 +114,10 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
           <p class="text-slate-400 text-xs mt-1">Needed because the patient is under 18.</p>
         </div>
 
+        </div>
+
+        <div role="group" aria-labelledby="reg-part-2" class="rounded-xl bg-gold-50 border border-gold-100 p-4 md:p-6 space-y-5">
+          <h2 id="reg-part-2" class="text-base font-bold text-brand-900">2. Contact Details</h2>
         <div>
           <label for="reg-email" class={label}>Email Address *</label>
           <input type="email" id="reg-email" required placeholder="you@example.com" autocomplete="email" inputmode="email" class={field} />
@@ -147,6 +153,10 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
           <p id="reg-address-counter" class="text-slate-500 text-xs mt-1">0/10 characters</p>
         </div>
 
+        </div>
+
+        <div role="group" aria-labelledby="reg-part-3" class="rounded-xl bg-champagne-100/60 border border-champagne-200 p-4 md:p-6 space-y-5">
+          <h2 id="reg-part-3" class="text-base font-bold text-brand-900">3. A Little More</h2>
         <div>
           <label for="reg-occupation" class={label}>Occupation *</label>
           <input type="text" id="reg-occupation" required placeholder="Your occupation" autocomplete="organization-title" class={field} />
@@ -169,6 +179,8 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
         <div id="reg-referral-other-group" class="hidden">
           <label for="reg-referral-other" id="reg-referral-other-label" class={label}>Please specify *</label>
           <input type="text" id="reg-referral-other" placeholder="How did you hear about us?" class={field} />
+        </div>
+
         </div>
 
         <button type="submit" id="reg-review-btn"
