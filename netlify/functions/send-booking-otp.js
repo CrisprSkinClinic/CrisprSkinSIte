@@ -11,7 +11,7 @@
 // Meta credentials stay in Supabase; this function only needs the project URL.
 
 const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
-const { canonicalIndianMobile } = require("./lib/booking-core");
+const { canonicalIndianMobile } = require("./lib/booking-core.cjs");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {

@@ -10,7 +10,7 @@ export const bookingConfig = {
   clinicPhone: siteConfig.contact.phone,
   addressLine,
   mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteConfig.name}, ${addressLine}`)}`,
-  // Doctors open to online booking; must match CLINIC_DOCTOR_IDS in netlify/functions/lib/booking-core.js.
+  // Doctors open to online booking; must match netlify/functions/lib/clinic.cjs.
   doctors: siteConfig.doctors.map((doctor) => ({ id: doctor.dbId, name: doctor.name })),
   services: [
     { group: null, items: [['General Consultation', 'General Dermatology Consultation']] },

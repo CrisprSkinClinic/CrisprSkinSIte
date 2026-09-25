@@ -1,4 +1,4 @@
-// netlify/functions/lib/booking-core.js
+// netlify/functions/lib/booking-core.cjs (.cjs so it loads as CommonJS whatever the site package.json says)
 //
 // Shared by the public booking functions (book, returning-patient, manage,
 // OTP send/verify). Not a function itself: Netlify only deploys a folder as a
@@ -16,18 +16,8 @@ try {
 
 const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 
-// CRISPR Skin and Hair Clinic's three dermatology doctors. Kept in sync with
-// the same list in public-available-slots.js.
-//
-// The AppointmentManager database is shared with Crispr Eye Care's website, so
-// every patient-history lookup below is limited to these doctors: an eye visit
-// is not a dermatology "last consultation", and the one-booking-per-day rule
-// and Manage My Appointment only cover this clinic's appointments.
-const CLINIC_DOCTOR_IDS = [
-  "514ff136-ee45-4d49-89b5-d128d96aef62", // Karthik L
-  "d5372165-fc7e-47e8-aee6-ce02e7fefc71", // Narayanan A
-  "519dbd89-d3d9-4ee9-8923-5fabbe51cf2e", // Narayanan B
-];
+// This clinic's doctors (lib/clinic.cjs, the one file that differs between the websites).
+const { CLINIC_DOCTOR_IDS } = require("./clinic.cjs");
 
 // Online changes stop this close to the appointment; after that the patient calls the clinic.
 const CHANGE_CUTOFF_MINUTES = 120;

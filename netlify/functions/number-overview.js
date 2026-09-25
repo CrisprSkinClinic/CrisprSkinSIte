@@ -10,7 +10,7 @@
 //
 // POST { phone, otpToken }
 
-const core = require("./lib/booking-core");
+const core = require("./lib/booking-core.cjs");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return core.json(405, { error: "Method Not Allowed" });

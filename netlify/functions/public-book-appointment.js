@@ -14,7 +14,7 @@
 //   - a returning patient (seen here before) is booked as a Review.
 // The service-role key never leaves the server.
 
-const core = require("./lib/booking-core");
+const core = require("./lib/booking-core.cjs");
 
 const BOOKING_FOR_NOTES = { family: "Booked by family member", friend: "Booked by friend" };
 const GENDERS = ["male", "female", "other"];
