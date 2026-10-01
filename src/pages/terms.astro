@@ -1,0 +1,94 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { siteConfig } from '../config/site.js';
+
+const pageTitle = "Terms of Service";
+const pageDescription = `The terms that apply when you use the ${siteConfig.name} website and online appointment features.`;
+
+const lastUpdated = "October 2026";
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+  <div class="max-w-3xl mx-auto py-16 px-6">
+    <h1 class="text-4xl font-extrabold text-brand-900 mb-2">Terms of Service</h1>
+    <p class="text-sm text-slate-500 mb-10">Last updated: {lastUpdated}</p>
+
+    <div class="prose prose-slate max-w-none space-y-8 text-slate-700 leading-relaxed">
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">1. Acceptance of Terms</h2>
+        <p>
+          By using the {siteConfig.name} website ({siteConfig.url}) or its online appointment features, you agree to these Terms of Service. If you do not agree, please do not use the website.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">2. Information Only, Not Medical Advice</h2>
+        <p>
+          Content on this website is provided for general information. It is not a diagnosis or a substitute for an in-person consultation with a qualified dermatologist. Please do not delay or disregard medical advice because of something you read here. In an emergency, contact your nearest hospital.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">3. Appointments</h2>
+        <p>
+          Submitting an appointment request or booking online does not guarantee a consultation until the clinic confirms it. We may reschedule or cancel an appointment where necessary and will contact you using the details you provide. Please give accurate contact information.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">4. Your Responsibilities</h2>
+        <ul class="list-disc pl-6 space-y-1">
+          <li>Provide accurate information when you make a request or booking.</li>
+          <li>Do not misuse the website, attempt to disrupt it, or try to access areas meant for clinic staff.</li>
+          <li>If you submit a request for a minor, you confirm that you are their parent or legal guardian.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">5. Privacy</h2>
+        <p>
+          How we handle your personal information is described in our <a href="/privacy" class="text-brand-600 hover:underline">Privacy Policy</a>, which forms part of these Terms.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">6. Intellectual Property</h2>
+        <p>
+          The text, images and design on this website belong to {siteConfig.name} or its licensors. You may view and share pages for personal, non-commercial use, but may not copy or republish our content without written permission.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">7. Limitation of Liability</h2>
+        <p>
+          We take reasonable care to keep the website accurate and available, but we provide it "as is" and do not guarantee uninterrupted access. To the extent permitted by law, {siteConfig.name} is not liable for losses arising from your use of the website. Nothing here limits any rights you have under applicable Indian law.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">8. Changes to These Terms</h2>
+        <p>
+          We may update these Terms from time to time. The "Last updated" date above shows the latest revision. Continued use of the website means you accept the updated Terms.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">9. Governing Law</h2>
+        <p>
+          These Terms are governed by the laws of India. Disputes are subject to the jurisdiction of the courts in Chennai, Tamil Nadu.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-bold text-brand-900 mb-3">10. Contact Us</h2>
+        <ul class="list-none space-y-1">
+          <li><strong>Phone:</strong> <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="text-brand-600 hover:underline">{siteConfig.contact.phone}</a></li>
+          <li><strong>Email:</strong> <a href={`mailto:${siteConfig.contact.email}`} class="text-brand-600 hover:underline">{siteConfig.contact.email}</a></li>
+          <li><strong>Address:</strong> {siteConfig.contact.address.street}, {siteConfig.contact.address.locality}, {siteConfig.contact.address.city} - {siteConfig.contact.address.postalCode}</li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+</MainLayout>
