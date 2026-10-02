@@ -151,6 +151,11 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
           <p id="reg-address-counter" class="text-[#7b8495] text-xs mt-1">0/10 characters</p>
         </div>
 
+        <div id="reg-address-preview-group" class="hidden">
+          <span class={label}>Your address (preview)</span>
+          <p id="reg-address-preview" aria-live="polite" class="rounded-xl bg-[#faf9fb] border border-dashed border-[#d9d3df] px-4 py-3 text-[#46536b] text-base leading-relaxed select-text"></p>
+        </div>
+
         </div>
 
         <div role="group" aria-labelledby="reg-part-3" class="rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-5 md:p-7 space-y-5">
@@ -313,6 +318,22 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
   });
 
   // --- Address character counter ---
+  // Read-only preview of the full address, built from the fields above.
+  function updateAddressPreview() {
+    const parts = [
+      $('reg-address').value.trim(),
+      $('reg-area').value,
+      $('reg-city').value.trim(),
+      $('reg-state').value.trim(),
+    ].filter(Boolean);
+    const pin = $('reg-pincode').value.trim();
+    let text = parts.join(', ');
+    if (pin) text += (text ? ' - ' : '') + pin;
+    $('reg-address-preview').textContent = text;
+    $('reg-address-preview-group').classList.toggle('hidden', !text);
+  }
+  setInterval(updateAddressPreview, 300);
+
   $('reg-address').addEventListener('input', (e) => {
     $('reg-address-counter').textContent = `${e.target.value.length}/10 characters`;
   });
