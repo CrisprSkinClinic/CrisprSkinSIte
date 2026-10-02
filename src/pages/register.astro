@@ -15,31 +15,31 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import { siteConfig } from '../config/site.js';
 
-const field = "w-full bg-white px-4 py-3 border border-slate-300 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition";
-const label = "text-sm font-semibold text-slate-700 mb-1 block";
+const field = "w-full bg-white px-4 py-3 border border-[#e5e2e8] rounded-xl focus:border-[#9b4fa2] focus:ring-2 focus:ring-[#9b4fa2]/20 outline-none transition";
+const label = "text-sm font-semibold text-[#46536b] mb-1 block";
 ---
 
 <MainLayout title={`Patient Registration | ${siteConfig.name}`} description="Register as a new patient at CRISPR Skin and Hair Clinic ahead of your visit." bare>
   <div class="max-w-3xl mx-auto py-10 md:py-16 px-4 md:px-6">
-    <h1 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-3 text-center">Patient Registration</h1>
+    <h1 class="text-3xl md:text-4xl font-extrabold text-[#17233d] mb-3 text-center">Patient Registration</h1>
     <div class="mb-10"></div>
 
-    <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-champagne-200 p-3 sm:p-6 md:p-10">
+    <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-[#e5e2e8] p-3 sm:p-6 md:p-10">
       <form id="reg-form" class="space-y-4" novalidate>
 
-        <div role="group" aria-labelledby="reg-part-1" class="rounded-xl bg-white border border-slate-300 p-4 md:p-6 space-y-5">
-          <h2 id="reg-part-1" class="text-base font-bold text-brand-900">1. About You</h2>
+        <div role="group" aria-labelledby="reg-part-1" class="rounded-xl bg-white border border-[#e5e2e8] p-4 md:p-6 space-y-5">
+          <h2 id="reg-part-1" class="text-base font-bold text-[#17233d]">1. About You</h2>
         <!-- Phone, verified with a WhatsApp code -->
         <div>
           <label for="reg-phone" class={label}>WhatsApp Number *</label>
           <div class="flex gap-2">
             <div class="relative flex-1 min-w-0">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">+91</span>
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#7b8495]">+91</span>
               <input type="tel" id="reg-phone" required placeholder="10-digit mobile" autocomplete="tel-national" inputmode="numeric" maxlength="10"
                      class={`${field} pl-12`} />
             </div>
             <button type="button" id="reg-send-code"
-                    class="shrink-0 px-4 rounded-xl font-semibold bg-brand-900 text-white hover:bg-brand-800 transition disabled:opacity-50">
+                    class="shrink-0 px-4 rounded-xl font-semibold bg-[#9b4fa2] text-white hover:bg-[#84358c] transition disabled:opacity-50">
               Verify
             </button>
           </div>
@@ -49,13 +49,13 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
               <input type="text" id="reg-code" placeholder="6-digit code" autocomplete="one-time-code" inputmode="numeric" maxlength="6"
                      class={`${field} flex-1 min-w-0 tracking-widest`} />
               <button type="button" id="reg-verify-code"
-                      class="shrink-0 px-4 rounded-xl font-semibold bg-brand-900 text-white hover:bg-brand-800 transition disabled:opacity-50">
+                      class="shrink-0 px-4 rounded-xl font-semibold bg-[#9b4fa2] text-white hover:bg-[#84358c] transition disabled:opacity-50">
                 Confirm
               </button>
             </div>
-            <button type="button" id="reg-resend" class="text-sm text-brand-700 font-semibold mt-2 hover:underline">Resend code</button>
+            <button type="button" id="reg-resend" class="text-sm text-[#84358c] font-semibold mt-2 hover:underline">Resend code</button>
           </div>
-          <p id="reg-phone-status" class="text-slate-500 text-xs mt-1 min-h-[1rem]"></p>
+          <p id="reg-phone-status" class="text-[#7b8495] text-xs mt-1 min-h-[1rem]"></p>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -97,25 +97,25 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
           <label for="reg-dob" class={label}>Date of Birth *</label>
           <div class="flex gap-2">
             <input type="text" id="reg-dob" required placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10" autocomplete="bday" class={field} />
-            <label for="reg-dob-picker" class="shrink-0 w-12 flex items-center justify-center border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 transition" aria-label="Pick date from calendar">
-              <svg class="w-5 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <label for="reg-dob-picker" class="shrink-0 w-12 flex items-center justify-center border border-[#e5e2e8] rounded-xl cursor-pointer hover:bg-[#f6edf8] transition" aria-label="Pick date from calendar">
+              <svg class="w-5 h-5 text-[#7b8495]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
               <input type="date" id="reg-dob-picker" class="sr-only" />
             </label>
           </div>
-          <p id="reg-dob-error" class="text-slate-500 text-xs mt-1 min-h-[1rem]"></p>
-          <p class="text-slate-400 text-xs">Type it in, or tap the calendar icon to pick a date. <span id="reg-age-display"></span></p>
+          <p id="reg-dob-error" class="text-[#7b8495] text-xs mt-1 min-h-[1rem]"></p>
+          <p class="text-[#7b8495] text-xs">Type it in, or tap the calendar icon to pick a date. <span id="reg-age-display"></span></p>
         </div>
 
         <div id="reg-guardian-group" class="hidden">
           <label for="reg-guardian" class={label}>Parent / Guardian Name *</label>
           <input type="text" id="reg-guardian" placeholder="Parent or guardian's full name" class={field} />
-          <p class="text-slate-400 text-xs mt-1">Needed because the patient is under 18.</p>
+          <p class="text-[#7b8495] text-xs mt-1">Needed because the patient is under 18.</p>
         </div>
 
         </div>
 
-        <div role="group" aria-labelledby="reg-part-2" class="rounded-xl bg-white border border-slate-300 p-4 md:p-6 space-y-5">
-          <h2 id="reg-part-2" class="text-base font-bold text-brand-900">2. Contact Details</h2>
+        <div role="group" aria-labelledby="reg-part-2" class="rounded-xl bg-white border border-[#e5e2e8] p-4 md:p-6 space-y-5">
+          <h2 id="reg-part-2" class="text-base font-bold text-[#17233d]">2. Contact Details</h2>
         <div>
           <label for="reg-email" class={label}>Email Address *</label>
           <input type="email" id="reg-email" required placeholder="you@example.com" autocomplete="email" inputmode="email" class={field} />
@@ -124,12 +124,12 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
         <div>
           <label for="reg-pincode" class={label}>Pincode *</label>
           <input type="text" id="reg-pincode" required placeholder="6-digit pincode" inputmode="numeric" maxlength="6" autocomplete="postal-code" class={field} />
-          <p id="reg-pincode-status" class="text-slate-500 text-xs mt-1 min-h-[1rem]"></p>
+          <p id="reg-pincode-status" class="text-[#7b8495] text-xs mt-1 min-h-[1rem]"></p>
         </div>
 
         <div>
           <label for="reg-area" class={label}>Area *</label>
-          <select id="reg-area" required disabled class={`${field} disabled:bg-slate-50 disabled:text-slate-400`}>
+          <select id="reg-area" required disabled class={`${field} disabled:bg-[#faf9fb] disabled:text-[#7b8495]`}>
             <option value="">Enter pincode first</option>
           </select>
         </div>
@@ -148,13 +148,13 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
         <div>
           <label for="reg-address" class={label}>Door No. / Apartment / Street *</label>
           <textarea id="reg-address" required rows="2" placeholder="Door no., apartment, street" autocomplete="street-address" class={field}></textarea>
-          <p id="reg-address-counter" class="text-slate-500 text-xs mt-1">0/10 characters</p>
+          <p id="reg-address-counter" class="text-[#7b8495] text-xs mt-1">0/10 characters</p>
         </div>
 
         </div>
 
-        <div role="group" aria-labelledby="reg-part-3" class="rounded-xl bg-white border border-slate-300 p-4 md:p-6 space-y-5">
-          <h2 id="reg-part-3" class="text-base font-bold text-brand-900">3. A Little More</h2>
+        <div role="group" aria-labelledby="reg-part-3" class="rounded-xl bg-white border border-[#e5e2e8] p-4 md:p-6 space-y-5">
+          <h2 id="reg-part-3" class="text-base font-bold text-[#17233d]">3. A Little More</h2>
         <div>
           <label for="reg-occupation" class={label}>Occupation *</label>
           <input type="text" id="reg-occupation" required placeholder="Your occupation" autocomplete="organization-title" class={field} />
@@ -182,7 +182,7 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
         </div>
 
         <button type="submit" id="reg-review-btn"
-                class="w-full bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98] mt-2">
+                class="w-full bg-[#9b4fa2] hover:bg-[#84358c] text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98] mt-2">
           Review My Details
         </button>
         <p id="reg-error" class="text-red-600 text-sm text-center min-h-[1.25rem]"></p>
@@ -191,19 +191,19 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
 
     <!-- Review/preview screen -- shown after "Review My Details" passes validation,
          before anything is actually submitted to the server -->
-    <div id="reg-review-container" class="hidden bg-white rounded-2xl shadow-sm border border-champagne-200 p-5 sm:p-8 md:p-12">
-      <h2 class="text-xl font-bold text-slate-900 mb-1">Review Your Details</h2>
-      <p class="text-slate-500 text-sm mb-6">Please check everything below is correct before submitting.</p>
+    <div id="reg-review-container" class="hidden bg-white rounded-2xl shadow-sm border border-[#e5e2e8] p-5 sm:p-8 md:p-12">
+      <h2 class="text-xl font-bold text-[#17233d] mb-1">Review Your Details</h2>
+      <p class="text-[#7b8495] text-sm mb-6">Please check everything below is correct before submitting.</p>
 
-      <dl id="reg-review-list" class="divide-y divide-slate-100 border-y border-slate-100 mb-8"></dl>
+      <dl id="reg-review-list" class="divide-y divide-[#e5e2e8] border-y border-[#e5e2e8] mb-8"></dl>
 
       <div class="flex flex-col sm:flex-row gap-3">
         <button type="button" id="reg-back-btn"
-                class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
+                class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold border border-[#e5e2e8] text-[#46536b] hover:bg-[#f6edf8] transition">
           Back to Edit
         </button>
         <button type="button" id="reg-confirm-btn"
-                class="w-full flex-1 bg-brand-900 hover:bg-brand-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98]">
+                class="w-full flex-1 bg-[#9b4fa2] hover:bg-[#84358c] text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98]">
           Confirm &amp; Submit
         </button>
       </div>
@@ -211,17 +211,22 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
     </div>
 
     <!-- Shown briefly after successful submission, before redirecting home -->
-    <div id="reg-success-container" class="hidden bg-white rounded-2xl shadow-sm border border-champagne-200 p-10 text-center">
+    <div id="reg-success-container" class="hidden bg-white rounded-2xl shadow-sm border border-[#e5e2e8] p-10 text-center">
       <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
       </div>
-      <h2 class="text-xl font-bold text-slate-900 mb-2">Registration Submitted</h2>
-      <p class="text-slate-600">
+      <h2 class="text-xl font-bold text-[#17233d] mb-2">Registration Submitted</h2>
+      <p class="text-[#46536b]">
         Thank you -- your registration has been received and is pending review by our front desk. Taking you back to our homepage...
       </p>
     </div>
   </div>
 </MainLayout>
+
+<style is:global>
+  /* CRISPR palette (matches the reception app) */
+  body { background: #faf9fb; }
+</style>
 
 <script is:inline>
   const $ = (id) => document.getElementById(id);
@@ -320,7 +325,7 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
   function setPhoneStatus(text, tone) {
     const el = $('reg-phone-status');
     el.textContent = text;
-    el.className = `text-xs mt-1 min-h-[1rem] ${tone === 'ok' ? 'text-green-700 font-semibold' : tone === 'error' ? 'text-red-600' : 'text-slate-500'}`;
+    el.className = `text-xs mt-1 min-h-[1rem] ${tone === 'ok' ? 'text-green-700 font-semibold' : tone === 'error' ? 'text-red-600' : 'text-[#7b8495]'}`;
   }
   function resetVerification() {
     verifiedPhone = '';
@@ -496,8 +501,8 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
   const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   function reviewRow(label, value) {
     return `<div class="py-3 grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-4">
-      <dt class="text-sm font-semibold text-slate-500">${label}</dt>
-      <dd class="sm:col-span-2 text-slate-800">${escapeHtml(value)}</dd>
+      <dt class="text-sm font-semibold text-[#7b8495]">${label}</dt>
+      <dd class="sm:col-span-2 text-[#17233d]">${escapeHtml(value)}</dd>
     </div>`;
   }
 
