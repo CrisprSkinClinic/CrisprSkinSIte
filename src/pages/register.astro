@@ -15,31 +15,31 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import { siteConfig } from '../config/site.js';
 
-const field = "w-full bg-white px-4 py-3 border border-[#e5e2e8] rounded-xl focus:border-[#9b4fa2] focus:ring-2 focus:ring-[#9b4fa2]/20 outline-none transition";
-const label = "text-sm font-semibold text-[#46536b] mb-1 block";
+const field = "w-full bg-white px-4 py-3.5 text-base text-[#17233d] placeholder:text-[#a9a3b3] border border-[#d9d3df] rounded-xl focus:border-[#9b4fa2] focus:ring-4 focus:ring-[#9b4fa2]/15 outline-none transition";
+const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
 ---
 
 <MainLayout title={`Patient Registration | ${siteConfig.name}`} description="Register as a new patient at CRISPR Skin and Hair Clinic ahead of your visit." bare>
-  <div class="max-w-3xl mx-auto py-10 md:py-16 px-4 md:px-6">
-    <h1 class="text-3xl md:text-4xl font-extrabold text-[#17233d] mb-3 text-center">Patient Registration</h1>
-    <div class="mb-10"></div>
+  <div class="max-w-xl mx-auto pt-6 pb-10 md:pt-10 md:pb-16 px-4">
+    <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[150px] mx-auto mb-4" />
+    <h1 class="text-2xl md:text-3xl font-extrabold text-[#17233d] mb-6 text-center">Patient Registration</h1>
 
-    <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-[#e5e2e8] p-3 sm:p-6 md:p-10">
-      <form id="reg-form" class="space-y-4" novalidate>
+    <div id="reg-form-container">
+      <form id="reg-form" class="space-y-5" novalidate>
 
-        <div role="group" aria-labelledby="reg-part-1" class="rounded-xl bg-white border border-[#e5e2e8] p-4 md:p-6 space-y-5">
-          <h2 id="reg-part-1" class="text-base font-bold text-[#17233d]">1. About You</h2>
+        <div role="group" aria-labelledby="reg-part-1" class="rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-5 md:p-7 space-y-5">
+          <h2 id="reg-part-1" class="flex items-center gap-3 text-lg font-bold text-[#17233d]"><span class="w-7 h-7 rounded-full bg-[#f6edf8] text-[#84358c] text-sm font-bold flex items-center justify-center">1</span>About You</h2>
         <!-- Phone, verified with a WhatsApp code -->
         <div>
           <label for="reg-phone" class={label}>WhatsApp Number *</label>
           <div class="flex gap-2">
             <div class="relative flex-1 min-w-0">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#7b8495]">+91</span>
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#46536b] font-semibold">+91</span>
               <input type="tel" id="reg-phone" required placeholder="10-digit mobile" autocomplete="tel-national" inputmode="numeric" maxlength="10"
-                     class={`${field} pl-12`} />
+                     class={`${field} pl-14 tracking-wide`} />
             </div>
             <button type="button" id="reg-send-code"
-                    class="shrink-0 px-4 rounded-xl font-semibold bg-[#9b4fa2] text-white hover:bg-[#84358c] transition disabled:opacity-50">
+                    class="shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-white hover:bg-[#84358c] transition disabled:opacity-50">
               Verify
             </button>
           </div>
@@ -49,7 +49,7 @@ const label = "text-sm font-semibold text-[#46536b] mb-1 block";
               <input type="text" id="reg-code" placeholder="6-digit code" autocomplete="one-time-code" inputmode="numeric" maxlength="6"
                      class={`${field} flex-1 min-w-0 tracking-widest`} />
               <button type="button" id="reg-verify-code"
-                      class="shrink-0 px-4 rounded-xl font-semibold bg-[#9b4fa2] text-white hover:bg-[#84358c] transition disabled:opacity-50">
+                      class="shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-white hover:bg-[#84358c] transition disabled:opacity-50">
                 Confirm
               </button>
             </div>
@@ -97,13 +97,13 @@ const label = "text-sm font-semibold text-[#46536b] mb-1 block";
           <label for="reg-dob" class={label}>Date of Birth *</label>
           <div class="flex gap-2">
             <input type="text" id="reg-dob" required placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10" autocomplete="bday" class={field} />
-            <label for="reg-dob-picker" class="shrink-0 w-12 flex items-center justify-center border border-[#e5e2e8] rounded-xl cursor-pointer hover:bg-[#f6edf8] transition" aria-label="Pick date from calendar">
+            <label for="reg-dob-picker" class="shrink-0 w-14 flex items-center justify-center border border-[#d9d3df] bg-white rounded-xl cursor-pointer hover:bg-[#f6edf8] transition" aria-label="Pick date from calendar">
               <svg class="w-5 h-5 text-[#7b8495]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
               <input type="date" id="reg-dob-picker" class="sr-only" />
             </label>
           </div>
           <p id="reg-dob-error" class="text-[#7b8495] text-xs mt-1 min-h-[1rem]"></p>
-          <p class="text-[#7b8495] text-xs">Type it in, or tap the calendar icon to pick a date. <span id="reg-age-display"></span></p>
+          <p class="text-[#7b8495] text-xs">Type it, or tap the calendar. <span id="reg-age-display"></span></p>
         </div>
 
         <div id="reg-guardian-group" class="hidden">
@@ -114,8 +114,8 @@ const label = "text-sm font-semibold text-[#46536b] mb-1 block";
 
         </div>
 
-        <div role="group" aria-labelledby="reg-part-2" class="rounded-xl bg-white border border-[#e5e2e8] p-4 md:p-6 space-y-5">
-          <h2 id="reg-part-2" class="text-base font-bold text-[#17233d]">2. Contact Details</h2>
+        <div role="group" aria-labelledby="reg-part-2" class="rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-5 md:p-7 space-y-5">
+          <h2 id="reg-part-2" class="flex items-center gap-3 text-lg font-bold text-[#17233d]"><span class="w-7 h-7 rounded-full bg-[#f6edf8] text-[#84358c] text-sm font-bold flex items-center justify-center">2</span>Contact Details</h2>
         <div>
           <label for="reg-email" class={label}>Email Address *</label>
           <input type="email" id="reg-email" required placeholder="you@example.com" autocomplete="email" inputmode="email" class={field} />
@@ -153,8 +153,8 @@ const label = "text-sm font-semibold text-[#46536b] mb-1 block";
 
         </div>
 
-        <div role="group" aria-labelledby="reg-part-3" class="rounded-xl bg-white border border-[#e5e2e8] p-4 md:p-6 space-y-5">
-          <h2 id="reg-part-3" class="text-base font-bold text-[#17233d]">3. A Little More</h2>
+        <div role="group" aria-labelledby="reg-part-3" class="rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-5 md:p-7 space-y-5">
+          <h2 id="reg-part-3" class="flex items-center gap-3 text-lg font-bold text-[#17233d]"><span class="w-7 h-7 rounded-full bg-[#f6edf8] text-[#84358c] text-sm font-bold flex items-center justify-center">3</span>A Little More</h2>
         <div>
           <label for="reg-occupation" class={label}>Occupation *</label>
           <input type="text" id="reg-occupation" required placeholder="Your occupation" autocomplete="organization-title" class={field} />
@@ -182,7 +182,7 @@ const label = "text-sm font-semibold text-[#46536b] mb-1 block";
         </div>
 
         <button type="submit" id="reg-review-btn"
-                class="w-full bg-[#9b4fa2] hover:bg-[#84358c] text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98] mt-2">
+                class="w-full bg-[#9b4fa2] hover:bg-[#84358c] text-white font-bold py-4 text-base rounded-xl shadow-md transition active:scale-[0.98] mt-2">
           Review My Details
         </button>
         <p id="reg-error" class="text-red-600 text-sm text-center min-h-[1.25rem]"></p>
@@ -191,7 +191,7 @@ const label = "text-sm font-semibold text-[#46536b] mb-1 block";
 
     <!-- Review/preview screen -- shown after "Review My Details" passes validation,
          before anything is actually submitted to the server -->
-    <div id="reg-review-container" class="hidden bg-white rounded-2xl shadow-sm border border-[#e5e2e8] p-5 sm:p-8 md:p-12">
+    <div id="reg-review-container" class="hidden bg-white rounded-2xl shadow-sm border border-[#e5e2e8] p-5 sm:p-8">
       <h2 class="text-xl font-bold text-[#17233d] mb-1">Review Your Details</h2>
       <p class="text-[#7b8495] text-sm mb-6">Please check everything below is correct before submitting.</p>
 
@@ -199,11 +199,11 @@ const label = "text-sm font-semibold text-[#46536b] mb-1 block";
 
       <div class="flex flex-col sm:flex-row gap-3">
         <button type="button" id="reg-back-btn"
-                class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold border border-[#e5e2e8] text-[#46536b] hover:bg-[#f6edf8] transition">
+                class="w-full sm:w-auto px-6 py-4 text-base rounded-xl font-semibold border border-[#d9d3df] text-[#46536b] hover:bg-[#f6edf8] transition">
           Back to Edit
         </button>
         <button type="button" id="reg-confirm-btn"
-                class="w-full flex-1 bg-[#9b4fa2] hover:bg-[#84358c] text-white font-bold py-3.5 rounded-xl shadow-lg transition active:scale-[0.98]">
+                class="w-full flex-1 bg-[#9b4fa2] hover:bg-[#84358c] text-white font-bold py-4 text-base rounded-xl shadow-md transition active:scale-[0.98]">
           Confirm &amp; Submit
         </button>
       </div>
