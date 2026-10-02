@@ -19,17 +19,15 @@ const field = "w-full bg-white px-4 py-3 border border-slate-300 rounded-xl focu
 const label = "text-sm font-semibold text-slate-700 mb-1 block";
 ---
 
-<MainLayout title={`Patient Registration | ${siteConfig.name}`} description="Register as a new patient at CRISPR Skin and Hair Clinic ahead of your visit.">
+<MainLayout title={`Patient Registration | ${siteConfig.name}`} description="Register as a new patient at CRISPR Skin and Hair Clinic ahead of your visit." bare>
   <div class="max-w-3xl mx-auto py-10 md:py-16 px-4 md:px-6">
     <h1 class="text-3xl md:text-4xl font-extrabold text-brand-900 mb-3 text-center">Patient Registration</h1>
-    <p class="text-slate-600 text-center mb-10">
-      Register your details ahead of your visit. Our front desk will review and confirm your registration -- there's nothing further you need to do after submitting.
-    </p>
+    <div class="mb-10"></div>
 
     <div id="reg-form-container" class="bg-white rounded-2xl shadow-sm border border-champagne-200 p-3 sm:p-6 md:p-10">
       <form id="reg-form" class="space-y-4" novalidate>
 
-        <div role="group" aria-labelledby="reg-part-1" class="rounded-xl bg-brand-50 border border-brand-100 p-4 md:p-6 space-y-5">
+        <div role="group" aria-labelledby="reg-part-1" class="rounded-xl bg-white border border-slate-300 p-4 md:p-6 space-y-5">
           <h2 id="reg-part-1" class="text-base font-bold text-brand-900">1. About You</h2>
         <!-- Phone, verified with a WhatsApp code -->
         <div>
@@ -116,7 +114,7 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
 
         </div>
 
-        <div role="group" aria-labelledby="reg-part-2" class="rounded-xl bg-gold-50 border border-gold-100 p-4 md:p-6 space-y-5">
+        <div role="group" aria-labelledby="reg-part-2" class="rounded-xl bg-white border border-slate-300 p-4 md:p-6 space-y-5">
           <h2 id="reg-part-2" class="text-base font-bold text-brand-900">2. Contact Details</h2>
         <div>
           <label for="reg-email" class={label}>Email Address *</label>
@@ -155,7 +153,7 @@ const label = "text-sm font-semibold text-slate-700 mb-1 block";
 
         </div>
 
-        <div role="group" aria-labelledby="reg-part-3" class="rounded-xl bg-champagne-100/60 border border-champagne-200 p-4 md:p-6 space-y-5">
+        <div role="group" aria-labelledby="reg-part-3" class="rounded-xl bg-white border border-slate-300 p-4 md:p-6 space-y-5">
           <h2 id="reg-part-3" class="text-base font-bold text-brand-900">3. A Little More</h2>
         <div>
           <label for="reg-occupation" class={label}>Occupation *</label>

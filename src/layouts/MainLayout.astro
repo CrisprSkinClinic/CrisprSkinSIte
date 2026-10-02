@@ -16,6 +16,8 @@ const {
   // Utility pages may pass true here. Ad landing pages use their own
   // LandingPageLayout, which already handles noindex separately.
   noindex = false,
+  // Focused pages (e.g. registration) hide the site header, footer and bottom action bar.
+  bare = false,
 } = Astro.props;
 
 // Automatically generate the exact canonical URL for the current page
@@ -122,15 +124,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
       </div>
     </div>
     
-    <Navbar />
+    {!bare && <Navbar />}
     
     <main class="flex-grow overflow-hidden">
       <slot />
     </main>
     
-    <Footer />
+    {!bare && <Footer />}
 
-    <FloatingContact />
+    {!bare && <FloatingContact />}
 
     <script>
       // GA4 conversion tracking via event delegation -- a single
