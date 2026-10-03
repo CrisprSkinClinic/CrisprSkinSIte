@@ -102,6 +102,44 @@ exports.handler = async (event) => {
     const past = await core.lastConsultation(supabase, canonicalPhone, name);
     const isReview = appointmentType === "review" && Boolean(past?.date);
 
+    let secondSlotTime = null;
+    if (!isReview) {
+      secondSlotTime = addMinutes(slotTime, 15);
+      let secondCheck = await core.findAvailableDoctor(supabase, {
+        slotDate,
+        slotTime: secondSlotTime,
+        candidates: [doctorId],
+      });
+
+      if (secondCheck.error && !requestedDoctorId) {
+        for (const candidateId of candidates.filter((id) => id !== doctorId)) {
+          const firstCheck = await core.findAvailableDoctor(supabase, {
+            slotDate,
+            slotTime,
+            candidates: [candidateId],
+          });
+          if (firstCheck.error) continue;
+          const nextCheck = await core.findAvailableDoctor(supabase, {
+            slotDate,
+            slotTime: secondSlotTime,
+            candidates: [candidateId],
+          });
+          if (!nextCheck.error) {
+            doctorId = candidateId;
+            secondCheck = nextCheck;
+            break;
+          }
+        }
+      }
+
+      if (secondCheck.error) {
+        return core.json(409, {
+          success: false,
+          error: "A new consultation needs 30 minutes. Please choose another start time.",
+        });
+      }
+    }
+
     // ---- One website booking per patient per day ----
     //
     // Only after verification, so the reply can't reveal someone else's
