@@ -64,6 +64,11 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "Missing required field: date" }) };
   }
 
+  // A follow-up (review) is always with a named doctor; "no preference" is only for a new consultation.
+  if (String(appointmentType).toLowerCase() === "review" && !requestedDoctorId) {
+    return { statusCode: 200, body: JSON.stringify({ slots: [], reason: "Choose a doctor for your follow-up visit." }) };
+  }
+
   if (!createClient) {
     return {
       statusCode: 500,

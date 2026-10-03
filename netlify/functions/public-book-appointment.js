@@ -90,6 +90,12 @@ exports.handler = async (event) => {
     const past = await core.lastConsultation(supabase, canonicalPhone, name);
     const isReview = Boolean(past?.date);
 
+    // A returning patient's follow-up is always with a named doctor (their last doctor is preselected on the
+    // form and can be changed); "no preference" is only for a first, new consultation.
+    if (isReview && !requestedDoctorId) {
+      return core.json(400, { success: false, error: "Please choose a doctor for your follow-up visit. We have selected your last doctor and you can change it." });
+    }
+
     const candidates = requestedDoctorId
       ? [requestedDoctorId]
       : core.shuffle(candidateDoctorIds.filter((id) => core.CLINIC_DOCTOR_IDS.includes(id)));

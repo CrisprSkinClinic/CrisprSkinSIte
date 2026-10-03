@@ -239,7 +239,17 @@ const { defaultService, defaultDoctorId } = Astro.props;
       otpStatus.className = ok ? 'text-sm font-semibold text-green-700' : 'text-sm text-slate-600';
     }
 
+    // "No preference" is only for a first (new) consultation. A returning patient's follow-up needs a named
+    // doctor, so the option is switched off for them and back on when they are no longer treated as returning.
+    function setNoPreferenceAllowed(allowed) {
+      const option = doctorSelect?.querySelector('option[value="any"]');
+      if (!option) return;
+      option.disabled = !allowed;
+      option.hidden = !allowed;
+    }
+
     function clearReturningPatient() {
+      setNoPreferenceAllowed(true);
       isReturningPatient = false;
       lookupSequence += 1;
       returningPatientMessage?.classList.add('hidden');
@@ -277,10 +287,12 @@ const { defaultService, defaultDoctorId } = Astro.props;
           if (dateInput?.value) loadAvailableSlots(dateInput.value);
         }
         isReturningPatient = true;
-        if (dateInput?.value && doctorSelect?.value) loadAvailableSlots(dateInput.value);
+        setNoPreferenceAllowed(false);
+        if (doctorSelect && (doctorSelect.value === 'any' || !doctorSelect.value)) doctorSelect.value = '';
+        if (dateInput?.value) loadAvailableSlots(dateInput.value);
         if (returningPatientMessage) {
           const who = bookingFor === 'self' ? 'Welcome back. Your' : `Welcome back. ${enteredName()}'s`;
-          returningPatientMessage.textContent = `${who} last consultation was on ${lastDate}${last.doctorName ? ` with Dr. ${last.doctorName}` : ''}. ${doctorOption ? 'We have selected the same doctor for this review — you can change this.' : 'This will be booked as a review.'}`;
+          returningPatientMessage.textContent = `${who} last consultation was on ${lastDate}${last.doctorName ? ` with Dr. ${last.doctorName}` : ''}. ${doctorOption ? 'We have selected the same doctor for this review — you can change this.' : 'This will be booked as a review. Please choose a doctor.'}`;
           returningPatientMessage.classList.remove('hidden');
         }
       } catch (err) {
