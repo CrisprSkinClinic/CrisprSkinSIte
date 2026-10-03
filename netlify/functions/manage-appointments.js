@@ -83,9 +83,6 @@ exports.handler = async (event) => {
         : Array.isArray(payload.candidateDoctorIds) && payload.candidateDoctorIds.length
           ? core.shuffle(payload.candidateDoctorIds.filter((id) => core.CLINIC_DOCTOR_IDS.includes(id)))
           : [appt.doctor_id];
-      const slot = await core.findAvailableDoctor(supabase, { slotDate, slotTime, candidates, ignoreAppointmentId: appt.id });
-      if (slot.error) return core.json(409, { error: slot.error });
-
       // One website booking per patient per day also applies to the new date.
       const clash = await core.appointmentOnDay(supabase, patient.id, slotDate, appt.id);
       if (clash) {
@@ -94,16 +91,24 @@ exports.handler = async (event) => {
         });
       }
 
-      // Update in place: the id is referenced by notifications, bills and records.
-      const { data: moved, error: moveError } = await supabase
-        .from("appointments")
-        .update({ doctor_id: slot.doctorId, slot_date: slotDate, slot_time: slotTime, notes: core.appendNote(appt.notes, "Rescheduled via website") })
-        .eq("id", appt.id)
-        .eq("status", "booked")
-        .select("id")
-        .maybeSingle();
-      if (moveError) throw moveError;
-      if (!moved) return core.json(409, { error: "This appointment can't be changed online. Please call the clinic." });
+      // Moved in place and atomically (the id is referenced by notifications, bills and records):
+      // the database re-checks capacity under its booking lock and picks the first candidate doctor who fits.
+      const { data: movedRows, error: moveError } = await supabase.rpc("service_public_move_appointment", {
+        p_appointment_id: appt.id,
+        p_candidates: candidates,
+        p_slot_date: slotDate,
+        p_slot_time: slotTime,
+        p_note: "Rescheduled via website",
+      });
+      if (moveError) {
+        if (/capacity|available|booked|full|procedure|leave|blocked|past|can't be changed/i.test(moveError.message)) {
+          return core.json(409, { error: "That time isn't available. Please choose another slot." });
+        }
+        throw moveError;
+      }
+      const assignedDoctorId = (Array.isArray(movedRows) ? movedRows[0] : movedRows)?.assigned_doctor_id;
+      if (!assignedDoctorId) return core.json(409, { error: "This appointment can't be changed online. Please call the clinic." });
+      const slot = { doctorId: assignedDoctorId };
 
       const { data: newDoctor } = await supabase.from("doctors").select("name").eq("id", slot.doctorId).maybeSingle();
       const newWhen = `${core.displayDate(slotDate)} at ${core.displayTime(slotTime)}${newDoctor?.name ? ` with Dr. ${newDoctor.name}` : ""}`;

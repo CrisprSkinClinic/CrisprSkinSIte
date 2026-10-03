@@ -13,12 +13,6 @@ const core = require("./lib/booking-core");
 
 const BOOKING_FOR_NOTES = { family: "Booked by family member", friend: "Booked by friend" };
 
-function addMinutes(time, minutes) {
-  const [h, m] = String(time).slice(0, 5).split(":").map(Number);
-  const total = h * 60 + m + minutes;
-  return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}:00`;
-}
-
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
@@ -72,15 +66,8 @@ exports.handler = async (event) => {
   if (configError) return core.json(500, { error: configError });
 
   try {
-    // ---- Validate the requested slot is actually bookable ----
     const slotDate = String(date);
     const slotTime = core.normalizeTime(String(time));
-    const candidates = requestedDoctorId
-      ? [requestedDoctorId]
-      : core.shuffle(candidateDoctorIds.filter((id) => core.CLINIC_DOCTOR_IDS.includes(id)));
-    const slot = await core.findAvailableDoctor(supabase, { slotDate, slotTime, candidates });
-    if (slot.error) return core.json(409, { success: false, error: slot.error });
-    let doctorId = slot.doctorId;
 
     // ---- Check the phone verification ----
     //
@@ -94,50 +81,39 @@ exports.handler = async (event) => {
       core.json(400, { success: false, error: "Your phone verification has expired. Please verify your WhatsApp number again." });
     if (!(await core.tokenIsValid(supabase, canonicalPhone, otpToken))) return verificationExpired();
 
-    // ---- Find the patient ----
+    // ---- Find the patient; the server alone decides Review vs New ----
     //
     // Reuse an existing patient only when the name matches too: family members
     // share numbers, and a different name on the same number is a different
-    // person, not a typo.
+    // person, not a typo. A past consultation makes this a 15-minute Review
+    // whatever the form sent; otherwise it is a 30-minute New consultation.
     const past = await core.lastConsultation(supabase, canonicalPhone, name);
-    const isReview = appointmentType === "review" && Boolean(past?.date);
+    const isReview = Boolean(past?.date);
 
-    let secondSlotTime = null;
-    if (!isReview) {
-      secondSlotTime = addMinutes(slotTime, 15);
-      let secondCheck = await core.findAvailableDoctor(supabase, {
-        slotDate,
-        slotTime: secondSlotTime,
-        candidates: [doctorId],
+    const candidates = requestedDoctorId
+      ? [requestedDoctorId]
+      : core.shuffle(candidateDoctorIds.filter((id) => core.CLINIC_DOCTOR_IDS.includes(id)));
+    if (!candidates.length) return core.json(400, { success: false, error: "Unknown doctor." });
+
+    // ---- Early check that the slot is offered ----
+    //
+    // Not authoritative (the atomic booking below is), but it lets a taken slot
+    // be reported before the verification token is used up. New consultations
+    // are only offered where one doctor is free for the whole 30 minutes.
+    const { data: starts, error: startsError } = await supabase.rpc("service_public_available_starts", {
+      p_date: slotDate,
+      p_doctor_ids: candidates,
+      p_is_new: !isReview,
+    });
+    if (startsError) throw startsError;
+    const wanted = slotTime.slice(0, 5);
+    if (!(starts || []).some((row) => String(row.slot_time).slice(0, 5) === wanted)) {
+      return core.json(409, {
+        success: false,
+        error: isReview
+          ? "That time is no longer available. Please choose another slot."
+          : "A new consultation needs 30 minutes. Please choose another start time.",
       });
-
-      if (secondCheck.error && !requestedDoctorId) {
-        for (const candidateId of candidates.filter((id) => id !== doctorId)) {
-          const firstCheck = await core.findAvailableDoctor(supabase, {
-            slotDate,
-            slotTime,
-            candidates: [candidateId],
-          });
-          if (firstCheck.error) continue;
-          const nextCheck = await core.findAvailableDoctor(supabase, {
-            slotDate,
-            slotTime: secondSlotTime,
-            candidates: [candidateId],
-          });
-          if (!nextCheck.error) {
-            doctorId = candidateId;
-            secondCheck = nextCheck;
-            break;
-          }
-        }
-      }
-
-      if (secondCheck.error) {
-        return core.json(409, {
-          success: false,
-          error: "A new consultation needs 30 minutes. Please choose another start time.",
-        });
-      }
     }
 
     // ---- One website booking per patient per day ----
@@ -163,17 +139,23 @@ exports.handler = async (event) => {
         if (!canReschedule) return core.json(409, { success: false, error: "This appointment can't be changed online. Please call the clinic." });
         if (!(await core.consumeToken(supabase, canonicalPhone, otpToken))) return verificationExpired();
 
-        // Update in place: the appointment id is referenced by notifications,
+        // Move in place, atomically: the appointment id is referenced by notifications,
         // bills and clinical records, so it must not be deleted and re-created.
-        const { data: moved, error: moveError } = await supabase
-          .from("appointments")
-          .update({ doctor_id: doctorId, slot_time: slotTime, notes: core.appendNote(sameDay.notes, "Rescheduled via website") })
-          .eq("id", sameDay.id)
-          .eq("status", "booked")
-          .select("id")
-          .maybeSingle();
-        if (moveError) throw moveError;
-        if (!moved) return core.json(409, { success: false, error: "This appointment can't be changed online. Please call the clinic." });
+        const { data: movedRows, error: moveError } = await supabase.rpc("service_public_move_appointment", {
+          p_appointment_id: sameDay.id,
+          p_candidates: candidates,
+          p_slot_date: slotDate,
+          p_slot_time: slotTime,
+          p_note: "Rescheduled via website",
+        });
+        if (moveError) {
+          if (/capacity|available|booked|full|procedure|leave|blocked|past|can't be changed/i.test(moveError.message)) {
+            return core.json(409, { success: false, error: "That time was just taken or can't be used. Please choose another slot." });
+          }
+          throw moveError;
+        }
+        const doctorId = (Array.isArray(movedRows) ? movedRows[0] : movedRows)?.assigned_doctor_id;
+        if (!doctorId) return core.json(409, { success: false, error: "This appointment can't be changed online. Please call the clinic." });
 
         const { data: newDoctor } = await supabase.from("doctors").select("name").eq("id", doctorId).maybeSingle();
         await core.logForReception(supabase, "APPOINTMENT_RESCHEDULE",
@@ -208,49 +190,25 @@ exports.handler = async (event) => {
     if (BOOKING_FOR_NOTES[bookingFor]) notesParts.push(BOOKING_FOR_NOTES[bookingFor]);
     notesParts.push("Booked via website self-service");
 
-    const { data: appointment, error: insertAppointmentError } = await supabase
-      .from("appointments")
-      .insert({
-        patient_id: patientId,
-        doctor_id: doctorId,
-        slot_date: slotDate,
-        slot_time: slotTime,
-        status: "booked",
-        notes: notesParts.join(" | "),
-        booked_by: null,
-      })
-      .select("id")
-      .single();
-    if (insertAppointmentError) throw insertAppointmentError;
-
-    if (!isReview) {
-      const groupId = appointment.id;
-      const { error: groupError } = await supabase
-        .from("appointments")
-        .update({ linked_group_id: groupId })
-        .eq("id", appointment.id);
-      if (groupError) {
-        await supabase.from("appointments").delete().eq("id", appointment.id);
-        throw groupError;
+    // Both rows of a New consultation commit together, or neither does; the database re-checks
+    // every rule under its booking lock, so two people choosing the same time cannot both succeed.
+    const { data: bookedRows, error: bookError } = await supabase.rpc("service_public_book_appointment", {
+      p_patient_id: patientId,
+      p_candidates: candidates,
+      p_slot_date: slotDate,
+      p_slot_time: slotTime,
+      p_is_new: !isReview,
+      p_notes: notesParts.join(" | "),
+    });
+    if (bookError) {
+      if (/capacity|available|booked|full|procedure|leave|blocked|past/i.test(bookError.message)) {
+        return core.json(409, { success: false, error: "That time was just taken. Please choose another slot and verify again if asked." });
       }
-
-      const { error: secondInsertError } = await supabase
-        .from("appointments")
-        .insert({
-          patient_id: patientId,
-          doctor_id: doctorId,
-          slot_date: slotDate,
-          slot_time: secondSlotTime,
-          status: "booked",
-          notes: notesParts.join(" | "),
-          booked_by: null,
-          linked_group_id: groupId,
-        });
-      if (secondInsertError) {
-        await supabase.from("appointments").delete().eq("linked_group_id", groupId);
-        throw secondInsertError;
-      }
+      throw bookError;
     }
+    const bookedRow = Array.isArray(bookedRows) ? bookedRows[0] : bookedRows;
+    const doctorId = bookedRow.assigned_doctor_id;
+    const appointment = { id: bookedRow.appointment_ids[0] };
 
     const { data: bookedDoctor } = await supabase.from("doctors").select("name").eq("id", doctorId).maybeSingle();
     await core.logForReception(supabase, "APPOINTMENT_CREATE",

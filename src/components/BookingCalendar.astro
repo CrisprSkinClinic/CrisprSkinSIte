@@ -351,7 +351,8 @@ const { defaultService, defaultDoctorId } = Astro.props;
       }
     });
 
-    const todayStr = new Date().toISOString().split('T')[0];
+    // Clinic (IST) date, not the UTC date: between midnight and 5:30 AM IST UTC is still yesterday.
+    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
     if (dateInput) {
       dateInput.min = todayStr;
       dateInput.value = todayStr;
