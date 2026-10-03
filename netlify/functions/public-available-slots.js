@@ -61,6 +61,10 @@ exports.handler = async (event) => {
     (event.httpMethod === "GET"
       ? event.queryStringParameters && event.queryStringParameters.doctorId
       : safeParse(event.body)?.doctorId) || null;
+  const appointmentType =
+    (event.httpMethod === "GET"
+      ? event.queryStringParameters && event.queryStringParameters.appointmentType
+      : safeParse(event.body)?.appointmentType) || "new";
   if (requestedDoctorId && !CLINIC_DOCTOR_IDS.includes(requestedDoctorId)) {
     return { statusCode: 400, body: JSON.stringify({ error: "Unknown doctor." }) };
   }
@@ -114,7 +118,7 @@ exports.handler = async (event) => {
     const doctorIdsToCheck = requestedDoctorId ? [requestedDoctorId] : CLINIC_DOCTOR_IDS;
 
     const perDoctorResults = await Promise.all(
-      doctorIdsToCheck.map((id) => computeSlotsForDoctor(supabase, id, slotDate, dayOfWeek))
+      doctorIdsToCheck.map((id) => computeSlotsForDoctor(supabase, id, slotDate, dayOfWeek, appointmentType))
     );
 
     if (requestedDoctorId) {
@@ -167,7 +171,7 @@ exports.handler = async (event) => {
 
 // Computes available slots for exactly one doctor on one date. Shared by
 // both the single-doctor path and the no-preference fan-out.
-async function computeSlotsForDoctor(supabase, doctorId, slotDate, dayOfWeek) {
+async function computeSlotsForDoctor(supabase, doctorId, slotDate, dayOfWeek, appointmentType = "new") {
   // Read the doctor's current slot duration live -- this used to be a
   // hardcoded constant, which meant changing it in AppointmentManager's
   // doctors table had no effect on the website until someone noticed and
@@ -251,12 +255,18 @@ async function computeSlotsForDoctor(supabase, doctorId, slotDate, dayOfWeek) {
   const nowIst = new Date(Date.now() + 330 * 60000).toISOString();
   const pastCutoff = slotDate === nowIst.slice(0, 10) ? nowIst.slice(11, 16) : null;
 
-  const slots = candidateTimes
+  let slots = candidateTimes
     .filter(({ time24 }) => !pastCutoff || time24 > pastCutoff)
     .filter(({ time24 }) => !blockedTimes.has(time24) && !blockedTimes.has(`${time24}:00`))
     .filter(({ time24, maxPerSlot }) => (bookedCounts[`${time24}:00`] || bookedCounts[time24] || 0) < maxPerSlot)
-    .sort((a, b) => timeToMinutes(a.time24) - timeToMinutes(b.time24))
-    .map(({ time24 }) => ({ time24, display: to12Hour(time24) }));
+    .sort((a, b) => timeToMinutes(a.time24) - timeToMinutes(b.time24));
+
+  if (String(appointmentType).toLowerCase() !== "review") {
+    const availableTimes = new Set(slots.map((slot) => slot.time24));
+    slots = slots.filter(({ time24 }) => availableTimes.has(minutesToTime(timeToMinutes(time24) + 15)));
+  }
+
+  slots = slots.map(({ time24 }) => ({ time24, display: to12Hour(time24) }));
 
   return { slots };
 }
