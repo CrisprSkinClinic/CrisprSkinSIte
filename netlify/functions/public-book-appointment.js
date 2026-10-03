@@ -80,7 +80,7 @@ exports.handler = async (event) => {
       : core.shuffle(candidateDoctorIds.filter((id) => core.CLINIC_DOCTOR_IDS.includes(id)));
     const slot = await core.findAvailableDoctor(supabase, { slotDate, slotTime, candidates });
     if (slot.error) return core.json(409, { success: false, error: slot.error });
-    const doctorId = slot.doctorId;
+    let doctorId = slot.doctorId;
 
     // ---- Check the phone verification ----
     //
