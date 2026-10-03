@@ -13,6 +13,12 @@ const core = require("./lib/booking-core");
 
 const BOOKING_FOR_NOTES = { family: "Booked by family member", friend: "Booked by friend" };
 
+function addMinutes(time, minutes) {
+  const [h, m] = String(time).slice(0, 5).split(":").map(Number);
+  const total = h * 60 + m + minutes;
+  return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}:00`;
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
