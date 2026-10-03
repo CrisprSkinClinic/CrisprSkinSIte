@@ -223,6 +223,35 @@ exports.handler = async (event) => {
       .single();
     if (insertAppointmentError) throw insertAppointmentError;
 
+    if (!isReview) {
+      const groupId = appointment.id;
+      const { error: groupError } = await supabase
+        .from("appointments")
+        .update({ linked_group_id: groupId })
+        .eq("id", appointment.id);
+      if (groupError) {
+        await supabase.from("appointments").delete().eq("id", appointment.id);
+        throw groupError;
+      }
+
+      const { error: secondInsertError } = await supabase
+        .from("appointments")
+        .insert({
+          patient_id: patientId,
+          doctor_id: doctorId,
+          slot_date: slotDate,
+          slot_time: secondSlotTime,
+          status: "booked",
+          notes: notesParts.join(" | "),
+          booked_by: null,
+          linked_group_id: groupId,
+        });
+      if (secondInsertError) {
+        await supabase.from("appointments").delete().eq("linked_group_id", groupId);
+        throw secondInsertError;
+      }
+    }
+
     const { data: bookedDoctor } = await supabase.from("doctors").select("name").eq("id", doctorId).maybeSingle();
     await core.logForReception(supabase, "APPOINTMENT_CREATE",
       `Booked ${name}${past?.patientId ? "" : " (new patient)"} for ${isReview ? `Review · ${service}` : service} on ${core.displayDate(slotDate)} at ${core.displayTime(slotTime)}${bookedDoctor?.name ? ` with Dr. ${bookedDoctor.name}` : ""} via website${BOOKING_FOR_NOTES[bookingFor] ? ` (${BOOKING_FOR_NOTES[bookingFor].toLowerCase()})` : ""}`);
