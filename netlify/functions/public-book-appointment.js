@@ -159,7 +159,7 @@ exports.handler = async (event) => {
     // patients has no email column, so it goes in the notes with the service.
     // The first " | " part is the visit type reception's Today screen, filters
     // and payment categories read, so a review must lead with "Review".
-    const notesParts = isReview ? ["Review", service] : [service];
+    const notesParts = isReview ? ["Review", service] : ["New", service];
     if (email) notesParts.push(`Email: ${email}`);
     if (BOOKING_FOR_NOTES[bookingFor]) notesParts.push(BOOKING_FOR_NOTES[bookingFor]);
     notesParts.push("Booked via website self-service");
