@@ -18,7 +18,7 @@
 // free-text field), occupation, referral source(+details). All
 // required, same as the wizard. The phone must be verified: the form sends
 // the one-time token from verify-booking-otp, which is used up here. A
-// patient under 18 must give a guardian's name, and a friend/family or
+// patient under 18 must give a guardian's name, everyone says whose number it is (own or a family member's), and a friend/family or
 // doctor referral carries the referrer's name in referral_other_details. This does NOT include wizard Steps
 // 2-5 (health background, symptom picker, diagnosis questions,
 // consent) -- those belong to the separate, not-yet-built
@@ -109,6 +109,7 @@ exports.handler = async (event) => {
     referralSource,
     referralOtherDetails,
     guardianName,
+    phoneRelationship,
     otpToken,
   } = payload || {};
 
@@ -175,6 +176,11 @@ exports.handler = async (event) => {
   if (REFERRAL_DETAIL_ERRORS[referralSource] && !referralDetails) {
     return { statusCode: 400, body: JSON.stringify({ error: REFERRAL_DETAIL_ERRORS[referralSource] }) };
   }
+  // Whose number this is. Family members may share one number; "friend" is not accepted.
+  const VALID_PHONE_RELATIONSHIPS = ["self", "spouse", "parent", "child", "sibling", "grandparent", "grandchild", "other_family"];
+  if (!VALID_PHONE_RELATIONSHIPS.includes(phoneRelationship)) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Please tell us whose number this is." }) };
+  }
   const guardian = isMinor(isoDob) ? String(guardianName || "").trim() : "";
   if (isMinor(isoDob) && !guardian) {
     return { statusCode: 400, body: JSON.stringify({ error: "A parent or guardian's name is required for patients under 18." }) };
@@ -224,6 +230,7 @@ exports.handler = async (event) => {
       p_referral_source: referralSource,
       p_referral_other_details: referralDetails || null,
       p_guardian_name: guardian || null,
+      p_phone_relationship: phoneRelationship,
     });
     if (error) throw error;
 

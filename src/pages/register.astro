@@ -112,6 +112,22 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
           <p class="text-[#7b8495] text-xs mt-1">Needed because the patient is under 18.</p>
         </div>
 
+        <div>
+          <label for="reg-phone-relationship" class={label}>Whose WhatsApp number is this? *</label>
+          <select id="reg-phone-relationship" required class={field}>
+            <option value="">Select</option>
+            <option value="self">My own number</option>
+            <option value="spouse">My spouse's number</option>
+            <option value="parent">My parent's number</option>
+            <option value="child">My child's number</option>
+            <option value="sibling">My brother's / sister's number</option>
+            <option value="grandparent">My grandparent's number</option>
+            <option value="grandchild">My grandchild's number</option>
+            <option value="other_family">Another family member's number</option>
+          </select>
+          <p class="text-[#7b8495] text-xs mt-1">Family members can register on one shared number. Each person gets their own record.</p>
+        </div>
+
         </div>
 
         <div role="group" aria-labelledby="reg-part-2" class="rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-5 md:p-7 space-y-5">
@@ -472,6 +488,10 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
     pincodeLookupTimer = setTimeout(() => lookupPincodeArea(e.target.value), 400);
   });
 
+  const RELATIONSHIP_LABELS = {
+    self: 'Myself', spouse: 'My spouse', parent: 'My parent', child: 'My child', sibling: 'My brother / sister',
+    grandparent: 'My grandparent', grandchild: 'My grandchild', other_family: 'Another family member',
+  };
   const GENDER_LABELS = { male: 'Male', female: 'Female', other: 'Other' };
 
   function collectFormValues() {
@@ -484,6 +504,7 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
       dob: $('reg-dob').value.trim(),
       gender: $('reg-gender').value,
       guardianName: age !== null && age < 18 ? $('reg-guardian').value.trim() : '',
+      phoneRelationship: $('reg-phone-relationship').value,
       email: $('reg-email').value.trim(),
       phone: $('reg-phone').value.trim(),
       pincode: $('reg-pincode').value.trim(),
@@ -506,6 +527,7 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
     if (!v.firstName || !v.lastName) return ['Please enter your first and last name.', v.firstName ? 'reg-last-name' : 'reg-first-name'];
     const age = validAge(parseDOB(v.dob));
     if (age === null) return ['Please enter a valid date of birth (DD/MM/YYYY).', 'reg-dob'];
+    if (!v.phoneRelationship) return ['Please tell us whose number this is.', 'reg-phone-relationship'];
     if (age < 18 && !v.guardianName) return ["Please enter the parent or guardian's name.", 'reg-guardian'];
     if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(v.email)) return ['Please enter a valid email address.', 'reg-email'];
     if (!/^[0-9]{6}$/.test(v.pincode)) return ['Please enter a valid 6-digit pincode.', 'reg-pincode'];
@@ -535,6 +557,7 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
       : v.referralSource;
     $('reg-review-list').innerHTML = [
       reviewRow('WhatsApp Number', `+91 ${v.phone} (verified)`),
+      reviewRow('Number belongs to', RELATIONSHIP_LABELS[v.phoneRelationship] || v.phoneRelationship),
       reviewRow('Name', `${v.salutation} ${v.firstName} ${v.lastName}`),
       reviewRow('Gender', GENDER_LABELS[v.gender] || v.gender),
       reviewRow('Date of Birth', `${v.dob} (${age} years)`),
