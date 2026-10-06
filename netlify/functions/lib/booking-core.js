@@ -121,76 +121,6 @@ function shuffle(array) {
   return result;
 }
 
-/**
- * First candidate doctor (in the given order) who has a session covering the
- * slot, isn't on leave or blocked, and has capacity left. `ignoreAppointmentId`
- * leaves out an appointment being moved, so it doesn't count against itself.
- * Returns { doctorId } or { error }.
- */
-async function findAvailableDoctor(supabase, { slotDate, slotTime, candidates, ignoreAppointmentId = null }) {
-  const dayOfWeek = DAY_OF_WEEK_BY_INDEX[new Date(`${slotDate}T00:00:00Z`).getUTCDay()];
-  if (!dayOfWeek || Number.isNaN(new Date(`${slotDate}T00:00:00Z`).getTime())) return { error: "Invalid date." };
-  if (isPast(slotDate, slotTime)) return { error: "That time has already passed. Please choose a later slot." };
-  if (!candidates.length) return { error: "No valid doctor candidates provided." };
-
-  let lastFailureReason = "The selected time is outside available hours.";
-  for (const candidateId of candidates) {
-    const { data: overrides, error: overridesError } = await supabase
-      .from("schedule_overrides")
-      .select("*")
-      .eq("doctor_id", candidateId)
-      .eq("override_date", slotDate);
-    if (overridesError) throw overridesError;
-
-    if ((overrides || []).some((o) => o.override_type === "leave")) {
-      lastFailureReason = "The selected doctor is not available on the selected date.";
-      continue;
-    }
-    if ((overrides || []).some((o) => o.override_type === "blocked_slot" && normalizeTime(o.blocked_slot) === slotTime)) {
-      lastFailureReason = "That time slot is unavailable on the selected date.";
-      continue;
-    }
-
-    const modified = (overrides || []).find((o) => o.override_type === "modified");
-    let inSession = false;
-    let maxPerSlot = 1;
-    if (modified) {
-      inSession = Boolean(modified.modified_start && modified.modified_end &&
-        slotTime >= normalizeTime(modified.modified_start) && slotTime < normalizeTime(modified.modified_end));
-    } else {
-      const { data: templates, error: templatesError } = await supabase
-        .from("slot_templates")
-        .select("*")
-        .eq("doctor_id", candidateId)
-        .eq("day_of_week", dayOfWeek)
-        .eq("is_active", true);
-      if (templatesError) throw templatesError;
-      const template = (templates || []).find(
-        (t) => slotTime >= normalizeTime(t.session_start) && slotTime < normalizeTime(t.session_end)
-      );
-      if (template) { inSession = true; maxPerSlot = template.max_per_slot || 1; }
-    }
-    if (!inSession) continue;
-
-    let countQuery = supabase
-      .from("appointments")
-      .select("id", { count: "exact", head: true })
-      .eq("doctor_id", candidateId)
-      .eq("slot_date", slotDate)
-      .eq("slot_time", slotTime)
-      .not("status", "in", "(cancelled)");
-    if (ignoreAppointmentId) countQuery = countQuery.neq("id", ignoreAppointmentId);
-    const { count, error: countError } = await countQuery;
-    if (countError) throw countError;
-    if ((count || 0) >= maxPerSlot) {
-      lastFailureReason = "That time slot is already fully booked.";
-      continue;
-    }
-    return { doctorId: candidateId };
-  }
-  return { error: lastFailureReason };
-}
-
 /** True when the token from verify-booking-otp is valid and unused for this phone (does not consume it). */
 async function tokenIsValid(supabase, canonicalPhone, token) {
   if (!token) return false;
@@ -320,7 +250,6 @@ module.exports = {
   clinicNow,
   isPast,
   shuffle,
-  findAvailableDoctor,
   tokenIsValid,
   consumeToken,
   patientsOnPhone,

@@ -146,8 +146,9 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
         </div>
 
         <div>
-          <label for="reg-address" class={label}>Door No. / Apartment / Street *</label>
-          <textarea id="reg-address" required rows="2" placeholder="Door no., apartment, street" autocomplete="street-address" class={field}></textarea>
+          <label for="reg-address" class={label}>Door No. / Apartment / Street / Landmark *</label>
+          <textarea id="reg-address" required rows="2" placeholder="e.g. No. 19, Elumalai St, Poothapedu" autocomplete="street-address" class={field}></textarea>
+          <p class="text-[#7b8495] text-xs mt-1">Do not repeat area, district, state or pincode — they are added automatically.</p>
           <p id="reg-address-counter" class="text-[#7b8495] text-xs mt-1">0/10 characters</p>
         </div>
 
@@ -317,11 +318,62 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
     }
   });
 
-  // --- Address character counter ---
-  // Read-only preview of the full address, built from the fields above.
+  // --- Address normalization + preview ---
+  // Keep only house/flat/street/landmark in the free-text address. Structured
+  // locality fields are appended separately, so patients can type naturally
+  // without creating duplicate area/city/pincode text.
+  function addressKey(value) {
+    return String(value || '')
+      .toLowerCase()
+      .replace(/\([^)]*\)/g, ' ')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  }
+
+  function cleanStreetAddress(value, area, city, state, pincode) {
+    const areaFull = addressKey(area);
+    const areaBase = addressKey(String(area || '').replace(/\s*\([^)]*\)\s*$/, ''));
+    const cityKey = addressKey(city);
+    const stateKey = addressKey(state);
+    const pin = String(pincode || '').replace(/\D/g, '');
+    const shortPins = pin.length === 6 ? [pin.slice(-2), pin.slice(-3)] : [];
+    const localityKeys = [areaFull, areaBase, cityKey, stateKey].filter(Boolean);
+    const structured = new Set([...localityKeys, pin].filter(Boolean));
+
+    const duplicateSegment = (segment) => {
+      const key = addressKey(segment);
+      if (!key || structured.has(key)) return true;
+      const digits = String(segment || '').replace(/\D/g, '');
+      if (pin && digits === pin) return true;
+      return localityKeys.some((locality) =>
+        shortPins.some((suffix) => key === `${locality} ${suffix}`) ||
+        (pin && key === `${locality} ${pin}`)
+      );
+    };
+
+    return String(value || '')
+      .split(',')
+      .map((part) => part.trim())
+      .filter((part) => part && !duplicateSegment(part))
+      .join(', ')
+      .replace(/\s+/g, ' ')
+      .replace(/[\s,;-]+$/, '')
+      .trim();
+  }
+
+  function currentCleanStreetAddress() {
+    return cleanStreetAddress(
+      $('reg-address').value,
+      $('reg-area').value,
+      $('reg-city').value,
+      $('reg-state').value,
+      $('reg-pincode').value
+    );
+  }
+
   function updateAddressPreview() {
     const parts = [
-      $('reg-address').value.trim(),
+      currentCleanStreetAddress(),
       $('reg-area').value,
       $('reg-city').value.trim(),
       $('reg-state').value.trim(),
@@ -336,6 +388,14 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
 
   $('reg-address').addEventListener('input', (e) => {
     $('reg-address-counter').textContent = `${e.target.value.length}/10 characters`;
+  });
+  $('reg-address').addEventListener('blur', () => {
+    const cleaned = currentCleanStreetAddress();
+    if (cleaned && cleaned !== $('reg-address').value.trim()) {
+      $('reg-address').value = cleaned;
+      $('reg-address-counter').textContent = `${cleaned.length}/10 characters`;
+      updateAddressPreview();
+    }
   });
 
   // --- Phone verification with a WhatsApp code ---
@@ -490,7 +550,7 @@ const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
       area: $('reg-area').value,
       city: $('reg-city').value.trim(),
       state: $('reg-state').value.trim(),
-      address: $('reg-address').value.trim(),
+      address: cleanStreetAddress($('reg-address').value, $('reg-area').value, $('reg-city').value, $('reg-state').value, $('reg-pincode').value),
       occupation: $('reg-occupation').value.trim(),
       referralSource,
       referralOtherDetails: REFERRAL_FOLLOW_UP[referralSource] ? $('reg-referral-other').value.trim() : '',

@@ -63,6 +63,45 @@ function isMinor(isoDob) {
   return today < eighteenth;
 }
 
+function addressKey(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function cleanStreetAddress(value, area, city, state, pincode) {
+  const areaFull = addressKey(area);
+  const areaBase = addressKey(String(area || "").replace(/\s*\([^)]*\)\s*$/, ""));
+  const cityKey = addressKey(city);
+  const stateKey = addressKey(state);
+  const pin = String(pincode || "").replace(/\D/g, "");
+  const shortPins = pin.length === 6 ? [pin.slice(-2), pin.slice(-3)] : [];
+  const localityKeys = [areaFull, areaBase, cityKey, stateKey].filter(Boolean);
+  const structured = new Set([...localityKeys, pin].filter(Boolean));
+
+  const duplicateSegment = (segment) => {
+    const key = addressKey(segment);
+    if (!key || structured.has(key)) return true;
+    const digits = String(segment || "").replace(/\D/g, "");
+    if (pin && digits === pin) return true;
+    return localityKeys.some((locality) =>
+      shortPins.some((suffix) => key === `${locality} ${suffix}`) ||
+      (pin && key === `${locality} ${pin}`)
+    );
+  };
+
+  return String(value || "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part) => part && !duplicateSegment(part))
+    .join(", ")
+    .replace(/\s+/g, " ")
+    .replace(/[\s,;-]+$/, "")
+    .trim();
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
@@ -157,8 +196,9 @@ exports.handler = async (event) => {
   if (!state || !String(state).trim()) {
     return { statusCode: 400, body: JSON.stringify({ error: "State is required." }) };
   }
-  if (!address || String(address).trim().length < 10) {
-    return { statusCode: 400, body: JSON.stringify({ error: "Please enter your door no. / apartment / street." }) };
+  const cleanedAddress = cleanStreetAddress(address, area, city, state, pincode);
+  if (!cleanedAddress || cleanedAddress.length < 10) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Please enter your door no. / apartment / street / landmark without repeating area, city, state or pincode." }) };
   }
   if (!occupation || !String(occupation).trim()) {
     return { statusCode: 400, body: JSON.stringify({ error: "Occupation is required." }) };
@@ -219,7 +259,7 @@ exports.handler = async (event) => {
       p_area: String(area).trim(),
       p_city: String(city).trim(),
       p_state: String(state).trim(),
-      p_address: String(address).trim(),
+      p_address: cleanedAddress,
       p_occupation: String(occupation).trim(),
       p_referral_source: referralSource,
       p_referral_other_details: referralDetails || null,
