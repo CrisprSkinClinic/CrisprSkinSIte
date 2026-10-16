@@ -132,21 +132,23 @@ const label = "text-[13px] font-semibold text-[#17233d] mb-1 block";
 
         </div>
 
-        <div role="group" aria-labelledby="reg-part-2" class="rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-4 sm:p-6 space-y-4">
+        <div role="group" aria-labelledby="reg-part-2" class="rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-4 sm:p-5 space-y-3">
           <h2 id="reg-part-2" class="flex items-center gap-3 text-base font-bold text-[#17233d]"><span class="w-7 h-7 rounded-full bg-[#f6edf8] text-[#84358c] text-sm font-bold flex items-center justify-center">2</span>Contact Details</h2>
-        <div class="rounded-xl bg-[#fcf8fd] border border-[#ead7ec] p-3">
-          <label for="reg-email" class={label}>Email Address <span class="font-normal text-[#7b8495]">(optional)</span></label>
-          <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email" inputmode="email" class={field} />
-          <p class="mt-1.5 text-xs text-[#665674]">For receiving reports and receipts, if you wish.</p>
+        <!-- Compact first row: pincode followed by a wider optional email field. -->
+        <div class="grid grid-cols-[minmax(0,0.38fr)_minmax(0,0.62fr)] gap-2.5">
+          <div class="min-w-0">
+            <label for="reg-pincode" class={label}>Pincode *</label>
+            <input type="text" id="reg-pincode" required placeholder="6-digit PIN" inputmode="numeric" maxlength="6" autocomplete="postal-code" class={field} />
+          </div>
+          <div class="min-w-0">
+            <label for="reg-email" class={label}>Email <span class="font-normal text-[#7b8495]">(optional)</span></label>
+            <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email" inputmode="email" class={`${field} !border-[#d4b9d7] bg-[#fcf8fd]`} />
+          </div>
         </div>
+        <p id="reg-pincode-status" aria-live="polite" class="text-xs text-[#7b8495] empty:hidden"></p>
 
-        <div>
-          <label for="reg-pincode" class={label}>Pincode *</label>
-          <input type="text" id="reg-pincode" required placeholder="6-digit pincode" inputmode="numeric" maxlength="6" autocomplete="postal-code" class={field} />
-          <p id="reg-pincode-status" class="text-[#7b8495] text-xs mt-1 min-h-[1rem]"></p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
+        <!-- Area and district directly below the PIN field. -->
+        <div class="grid grid-cols-2 gap-2.5">
           <div class="min-w-0">
             <label for="reg-area" class={label}>Area *</label>
             <select id="reg-area" required disabled class={`${field} disabled:bg-[#faf9fb] disabled:text-[#7b8495]`}>
@@ -167,14 +169,11 @@ const label = "text-[13px] font-semibold text-[#17233d] mb-1 block";
         </div>
 
         <div>
-          <label for="reg-address" class={label}>Door No. / Apartment / Street *</label>
-          <textarea id="reg-address" required rows="2" placeholder="Door no., apartment, street" autocomplete="street-address" class={field}></textarea>
-          <p id="reg-address-counter" class="text-[#7b8495] text-xs mt-1">0/10 characters</p>
-        </div>
-
-        <div id="reg-address-preview-group" class="hidden">
-          <span class={label}>Your address (preview)</span>
-          <p id="reg-address-preview" aria-live="polite" class="rounded-xl bg-[#faf9fb] border border-dashed border-[#d9d3df] px-3 py-2 text-[#46536b] text-sm leading-relaxed select-text"></p>
+          <div class="flex items-baseline justify-between gap-2">
+            <label for="reg-address" class={label}>Door No. / Apartment / Street *</label>
+            <span id="reg-address-counter" class="text-[11px] text-[#7b8495] whitespace-nowrap empty:hidden">10 characters min.</span>
+          </div>
+          <textarea id="reg-address" required rows="1" placeholder="Door no., apartment, street" autocomplete="street-address" class={`${field} resize-none overflow-hidden`}></textarea>
         </div>
 
         </div>
@@ -339,25 +338,14 @@ const label = "text-[13px] font-semibold text-[#17233d] mb-1 block";
     }
   });
 
-  // --- Address character counter ---
-  // Read-only preview of the full address, built from the fields above.
-  function updateAddressPreview() {
-    const parts = [
-      $('reg-address').value.trim(),
-      $('reg-area').value,
-      $('reg-city').value.trim(),
-      $('reg-state').value.trim(),
-    ].filter(Boolean);
-    const pin = $('reg-pincode').value.trim();
-    let text = parts.join(', ');
-    if (pin) text += (text ? ' - ' : '') + pin;
-    $('reg-address-preview').textContent = text;
-    $('reg-address-preview-group').classList.toggle('hidden', !text);
-  }
-  setInterval(updateAddressPreview, 300);
-
+  // Expand the street-address field only when needed, without a duplicate
+  // live address-preview box. The final Review dialog contains the full address.
   $('reg-address').addEventListener('input', (e) => {
-    $('reg-address-counter').textContent = `${e.target.value.length}/10 characters`;
+    const textarea = e.target;
+    const characters = textarea.value.trim().length;
+    $('reg-address-counter').textContent = characters < 10 ? `${characters}/10 characters` : '';
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.max(textarea.scrollHeight, 44)}px`;
   });
 
   // --- Screen transitions and WhatsApp verification ---
