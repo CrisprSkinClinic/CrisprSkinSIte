@@ -215,10 +215,10 @@ const label = "text-[13px] font-semibold text-[#17233d] mb-1 block";
       </form>
     </div>
 
-    <!-- Review/preview screen -- shown after "Review My Details" passes validation,
-         before anything is actually submitted to the server -->
-    <div id="reg-review-container" class="hidden bg-white rounded-2xl shadow-sm border border-[#e5e2e8] p-5 sm:p-8">
-      <h2 class="text-xl font-bold text-[#17233d] mb-1">Review Your Details</h2>
+    <!-- Final review is a dialog within Step 2, not a third registration screen. -->
+    <div id="reg-review-container" role="dialog" aria-modal="true" aria-labelledby="reg-review-title" class="hidden fixed inset-0 z-[70] bg-[#17233d]/50 overflow-y-auto px-4 py-6 sm:py-10">
+      <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-[#e5e2e8] p-5 sm:p-8">
+      <h2 id="reg-review-title" class="text-xl font-bold text-[#17233d] mb-1">Review Your Details</h2>
       <p class="text-[#7b8495] text-sm mb-6">Please check everything below is correct before submitting.</p>
 
       <dl id="reg-review-list" class="divide-y divide-[#e5e2e8] border-y border-[#e5e2e8] mb-8"></dl>
@@ -234,6 +234,7 @@ const label = "text-[13px] font-semibold text-[#17233d] mb-1 block";
         </button>
       </div>
       <p id="reg-submit-error" class="text-red-600 text-sm text-center min-h-[1.25rem] mt-3"></p>
+      </div>
     </div>
 
     <!-- Shown briefly after successful submission, before redirecting home -->
@@ -642,6 +643,17 @@ const label = "text-[13px] font-semibold text-[#17233d] mb-1 block";
     $('reg-review-btn').focus();
   }
   $('reg-back-btn').addEventListener('click', backToForm);
+  $('reg-review-container').addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !$('reg-confirm-btn').disabled) backToForm();
+    if (e.key === 'Tab') {
+      const buttons = [$('reg-back-btn'), $('reg-confirm-btn')].filter((button) => !button.disabled);
+      if (!buttons.length) return;
+      const first = buttons[0];
+      const last = buttons[buttons.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
 
   // --- "Confirm & Submit" -> calls the API, then redirects home ---
   $('reg-confirm-btn').addEventListener('click', async () => {
