@@ -15,8 +15,8 @@
 // the client, converted to ISO here), gender, email, phone, address
 // (now split into pincode/area/city/state -- auto-filled from the
 // pincode via India Post's API on the client -- plus a door/street
-// free-text field), occupation, referral source(+details). All
-// required, same as the wizard. The phone must be verified: the form sends
+// free-text field), optional occupation, referral source(+details).
+// Email and occupation can be omitted; other fields stay required. The phone must be verified: the form sends
 // the one-time token from verify-booking-otp, which is used up here. A
 // patient under 18 must give a guardian's name, and a friend/family or
 // doctor referral carries the referrer's name in referral_other_details. This does NOT include wizard Steps
@@ -139,8 +139,10 @@ exports.handler = async (event) => {
   if (!gender || !["male", "female", "other"].includes(gender)) {
     return { statusCode: 400, body: JSON.stringify({ error: "Gender must be male, female, or other." }) };
   }
-  if (!email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(String(email).trim())) {
-    return { statusCode: 400, body: JSON.stringify({ error: "A valid email address is required." }) };
+  const normalizedEmail = String(email || "").trim();
+  const normalizedOccupation = String(occupation || "").trim();
+  if (normalizedEmail && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(normalizedEmail)) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Please enter a valid email address." }) };
   }
   if (!phone || !/^[6-9][0-9]{9}$/.test(String(phone).trim())) {
     return { statusCode: 400, body: JSON.stringify({ error: "A valid 10-digit phone number is required." }) };
@@ -159,9 +161,6 @@ exports.handler = async (event) => {
   }
   if (!address || String(address).trim().length < 10) {
     return { statusCode: 400, body: JSON.stringify({ error: "Please enter your door no. / apartment / street." }) };
-  }
-  if (!occupation || !String(occupation).trim()) {
-    return { statusCode: 400, body: JSON.stringify({ error: "Occupation is required." }) };
   }
   if (!referralSource || !VALID_REFERRAL_SOURCES.includes(referralSource)) {
     return { statusCode: 400, body: JSON.stringify({ error: "Please let us know how you heard about us." }) };
@@ -214,13 +213,13 @@ exports.handler = async (event) => {
       p_phone: String(phone).trim(),
       p_dob: isoDob,
       p_gender: gender,
-      p_email: String(email).trim(),
+      p_email: normalizedEmail || null,
       p_pincode: String(pincode).trim(),
       p_area: String(area).trim(),
       p_city: String(city).trim(),
       p_state: String(state).trim(),
       p_address: String(address).trim(),
-      p_occupation: String(occupation).trim(),
+      p_occupation: normalizedOccupation || null,
       p_referral_source: referralSource,
       p_referral_other_details: referralDetails || null,
       p_guardian_name: guardian || null,
