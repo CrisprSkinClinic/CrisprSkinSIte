@@ -60,7 +60,8 @@ exports.handler = async (event) => {
   const otherDivisions = (Array.isArray(body.otherDivisions) ? body.otherDivisions : []).slice(0, 30).map((d) => ({
     name: clean(d && d.name, 80), contactName: clean(d && d.contactName, 80), phone: clean(d && d.phone, 15).replace(/[^\d+ ]/g, ""),
   })).filter((d) => d.name);
-  const folder = clean(body.uploadsFolderUrl, 300);
+  const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const uploadIds = (Array.isArray(body.uploadIds) ? body.uploadIds : []).filter((x) => UUID.test(String(x))).slice(0, 10);
 
   const payload = {
     salutation: clean(body.salutation, 10), firstName, lastName: clean(body.lastName, 60), phone, email,
@@ -70,12 +71,13 @@ exports.handler = async (event) => {
     moq: num(body.moq, 10000000), deliveryDays: num(body.deliveryDays, 365), paymentTerms: clean(body.paymentTerms, 120), cashDiscountPercent: num(body.cashDiscountPercent, 100),
     medvolApp: body.medvolApp === true || body.medvolApp === "Yes" ? "true" : body.medvolApp === false || body.medvolApp === "No" ? "false" : "",
     prefStockist: clean(body.prefStockist, 120), secStockist1: clean(body.secStockist1, 120), secStockist2: clean(body.secStockist2, 120),
-    uploadsFolderUrl: /^https:\/\/drive\.google\.com\//.test(folder) ? folder : "",
+    uploadIds,
     priceList, otherDivisions,
   };
   for (const k of Object.keys(payload)) if (payload[k] === "" || payload[k] === null) delete payload[k];
   if (!priceList.length) delete payload.priceList;
   if (!otherDivisions.length) delete payload.otherDivisions;
+  if (!uploadIds.length) delete payload.uploadIds;
   const kind = "rep";
 
   const supabase = createClient(SUPABASE_URL, serviceRoleKey);

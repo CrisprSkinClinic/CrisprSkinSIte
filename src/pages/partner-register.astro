@@ -149,7 +149,7 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
   const val = (id) => $(id).value.trim();
   const inputCls = "w-full bg-white px-3 py-2.5 text-sm text-[#17233d] border border-[#d9d3df] rounded-lg focus:border-[#9b4fa2] focus:ring-2 focus:ring-[#9b4fa2]/15 outline-none";
 
-  let verifiedPhone = '', otpToken = '', chosen = [], folderUrl = '', rows = [], otherDivs = [], options = { distributors: [], companies: [] };
+  let verifiedPhone = '', otpToken = '', chosen = [], uploadIds = [], rows = [], otherDivs = [], options = { distributors: [], companies: [] };
   const KIND_LABELS = { brochure: 'Brochure', rate_list: 'Rate list', visiting_card: 'Visiting card' };
   const guessKind = (n) => (/rate|price|ptr|mrp|list/i.test(n) ? 'rate_list' : /card/i.test(n) ? 'visiting_card' : 'brochure');
   const norm = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -308,7 +308,7 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
   const numStr = (v) => (v === null || v === undefined || v === '' ? '' : String(v));
   function fill(out) {
     const r = out.rep || {};
-    folderUrl = out.uploads_folder_url || '';
+    if (out.upload_id && !uploadIds.includes(out.upload_id)) uploadIds.push(out.upload_id);
     const name = String(r.name || '').replace(/^(mr|ms|mrs|dr)\.?\s+/i, '').trim();
     const sp = name.lastIndexOf(' ');
     if (!val('pr-first')) { $('pr-first').value = sp > 0 ? name.slice(0, sp) : name; $('pr-last').value = sp > 0 ? name.slice(sp + 1) : ''; }
@@ -421,7 +421,7 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
       offerType: val('pr-offer'), buyQty: val('pr-buy'), freeQty: val('pr-free'), marginPercent: val('pr-marginpct'),
       moq: val('pr-moq'), cashDiscountPercent: val('pr-cash'), deliveryDays: val('pr-delivery'), paymentTerms: val('pr-terms'), medvolApp: val('pr-medvol'),
       prefStockist: stockistValue('pr-pref'), secStockist1: stockistValue('pr-sec1'), secStockist2: stockistValue('pr-sec2'), otherDivisions: otherDivs.filter((d) => String(d.name).trim()),
-      uploadsFolderUrl: folderUrl, priceList: rows.filter((r) => String(r.sku).trim()),
+      uploadIds, priceList: rows.filter((r) => String(r.sku).trim()),
     };
   }
   function problem(v) {
