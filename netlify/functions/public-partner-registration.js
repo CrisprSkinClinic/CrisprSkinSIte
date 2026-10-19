@@ -57,6 +57,9 @@ exports.handler = async (event) => {
     category: clean(r && r.category, 80), brand: clean(r && r.brand, 80), ingredients: clean(r && r.ingredients, 300),
     sku: clean(r && r.sku, 120), ptr: num(r && r.ptr, 10000000), mrp: num(r && r.mrp, 10000000), stockist: clean(r && r.stockist, 120),
   })).filter((r) => r.sku);
+  const otherDivisions = (Array.isArray(body.otherDivisions) ? body.otherDivisions : []).slice(0, 30).map((d) => ({
+    name: clean(d && d.name, 80), contactName: clean(d && d.contactName, 80), phone: clean(d && d.phone, 15).replace(/[^\d+ ]/g, ""),
+  })).filter((d) => d.name);
   const folder = clean(body.uploadsFolderUrl, 300);
 
   const payload = {
@@ -68,10 +71,11 @@ exports.handler = async (event) => {
     medvolApp: body.medvolApp === true || body.medvolApp === "Yes" ? "true" : body.medvolApp === false || body.medvolApp === "No" ? "false" : "",
     prefStockist: clean(body.prefStockist, 120), secStockist1: clean(body.secStockist1, 120), secStockist2: clean(body.secStockist2, 120),
     uploadsFolderUrl: /^https:\/\/drive\.google\.com\//.test(folder) ? folder : "",
-    priceList,
+    priceList, otherDivisions,
   };
   for (const k of Object.keys(payload)) if (payload[k] === "" || payload[k] === null) delete payload[k];
   if (!priceList.length) delete payload.priceList;
+  if (!otherDivisions.length) delete payload.otherDivisions;
   const kind = "rep";
 
   const supabase = createClient(SUPABASE_URL, serviceRoleKey);
