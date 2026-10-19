@@ -113,13 +113,20 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
           <div id="pr-divs" class="space-y-3"></div>
         </div>
 
-        <div class={card}>
+        <div class={`${card} md:w-[min(1120px,94vw)] md:relative md:left-1/2 md:-translate-x-1/2`}>
           <div class="flex items-center justify-between gap-3">
             <h2 class="text-lg font-bold text-[#17233d]">Price list <span id="pr-price-count" class="text-sm font-semibold text-[#7b8495]"></span></h2>
             <button type="button" id="pr-add-row" class="text-sm text-[#84358c] font-semibold hover:underline">+ Add product</button>
           </div>
-          <p class="text-xs text-[#7b8495]">PTR is your price to us; MRP is the printed retail price. Tap a product to edit or remove it.</p>
-          <div id="pr-rows" class="space-y-2"></div>
+          <p class="text-xs text-[#7b8495]">PTR is your price to us; MRP is the printed retail price. Click any cell to correct it. Scroll sideways on a phone.</p>
+          <div class="overflow-x-auto -mx-2 px-2 max-h-[70vh] overflow-y-auto rounded-xl border border-[#e5e2e8]">
+            <table class="w-full text-sm border-collapse min-w-[860px]">
+              <thead class="sticky top-0 z-10 bg-[#f6edf8] text-left text-xs font-semibold text-[#46536b]">
+                <tr><th class="px-2 py-2 w-8">#</th><th class="px-2 py-2 min-w-[200px]">Product and pack</th><th class="px-2 py-2 min-w-[130px]">Brand</th><th class="px-2 py-2 min-w-[190px]">Category</th><th class="px-2 py-2 min-w-[220px]">Active ingredients</th><th class="px-2 py-2 w-24">PTR ₹</th><th class="px-2 py-2 w-24">MRP ₹</th><th class="px-2 py-2 min-w-[150px]">Stockist (if different)</th><th class="px-2 py-2 w-8"></th></tr>
+              </thead>
+              <tbody id="pr-rows"></tbody>
+            </table>
+          </div>
         </div>
 
         <p id="pr-error" class="text-red-600 text-sm min-h-[1rem]" role="alert"></p>
@@ -326,43 +333,33 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
   }
   $('pr-offer').addEventListener('change', syncOffer);
 
+  const cell = "w-full bg-transparent px-2 py-2 text-sm text-[#17233d] border border-transparent hover:border-[#d9d3df] focus:border-[#9b4fa2] focus:bg-white rounded-md outline-none";
   function rowHtml(r, i) {
     const cats = CATEGORIES.includes(r.category) || !r.category ? CATEGORIES : [r.category, ...CATEGORIES];
-    const lbl = 'block text-xs font-semibold text-[#46536b] mb-1';
-    return `<details class="rounded-xl border border-[#e5e2e8] bg-[#fdfcfe]" data-i="${i}">
-      <summary class="cursor-pointer list-none px-3 py-3 flex items-center justify-between gap-3">
-        <span class="min-w-0"><span class="block font-semibold text-[#17233d] truncate" data-title>${esc(r.sku || 'New product')}</span><span class="block text-xs text-[#7b8495] truncate" data-sub>${esc(r.brand || '')}</span></span>
-        <span class="shrink-0 text-right text-xs text-[#46536b]" data-prices>${r.ptr ? 'PTR ₹' + esc(r.ptr) : ''}${r.mrp ? '<br>MRP ₹' + esc(r.mrp) : ''}</span>
-      </summary>
-      <div class="px-3 pb-3 space-y-3">
-        <div><label class="${lbl}">Product and pack size</label><input class="${inputCls}" data-f="sku" value="${esc(r.sku)}" /></div>
-        <div><label class="${lbl}">Brand</label><input class="${inputCls}" data-f="brand" value="${esc(r.brand)}" /></div>
-        <div><label class="${lbl}">Category</label><select class="${inputCls}" data-f="category"><option value="">—</option>${cats.map((c) => `<option${c === r.category ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
-        <div><label class="${lbl}">Active ingredients</label><textarea rows="2" class="${inputCls}" data-f="ingredients">${esc(r.ingredients)}</textarea></div>
-        <div class="grid grid-cols-2 gap-3">
-          <div><label class="${lbl}">PTR (₹)</label><input inputmode="decimal" class="${inputCls}" data-f="ptr" value="${esc(r.ptr)}" /></div>
-          <div><label class="${lbl}">MRP (₹)</label><input inputmode="decimal" class="${inputCls}" data-f="mrp" value="${esc(r.mrp)}" /></div>
-        </div>
-        <div><label class="${lbl}">Stockist for this product (if different)</label><input class="${inputCls}" data-f="stockist" list="pr-dist-list" value="${esc(r.stockist)}" /></div>
-        <button type="button" data-remove class="text-sm text-red-600 font-semibold">Remove this product</button>
-      </div></details>`;
+    return `<tr class="border-t border-[#efeaf2] align-top" data-i="${i}">
+      <td class="px-2 py-2 text-xs text-[#7b8495]">${i + 1}</td>
+      <td><input class="${cell} font-semibold" data-f="sku" value="${esc(r.sku)}" aria-label="Product and pack size" /></td>
+      <td><input class="${cell}" data-f="brand" value="${esc(r.brand)}" aria-label="Brand" /></td>
+      <td><select class="${cell}" data-f="category" aria-label="Category"><option value="">—</option>${cats.map((c) => `<option${c === r.category ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></td>
+      <td><input class="${cell} truncate" data-f="ingredients" value="${esc(r.ingredients)}" title="${esc(r.ingredients)}" aria-label="Active ingredients" /></td>
+      <td><input inputmode="decimal" class="${cell} text-right" data-f="ptr" value="${esc(r.ptr)}" aria-label="PTR" /></td>
+      <td><input inputmode="decimal" class="${cell} text-right" data-f="mrp" value="${esc(r.mrp)}" aria-label="MRP" /></td>
+      <td><input class="${cell}" data-f="stockist" list="pr-dist-list" value="${esc(r.stockist)}" aria-label="Stockist" /></td>
+      <td class="px-1 py-1"><button type="button" data-remove class="text-red-600 text-lg leading-none px-2" aria-label="Remove this product" title="Remove">×</button></td></tr>`;
   }
   function renderRows() {
-    $('pr-rows').innerHTML = rows.map(rowHtml).join('') || '<p class="text-sm text-[#7b8495]">No products yet. Add them one by one, or go back and upload a rate list.</p>';
+    $('pr-rows').innerHTML = rows.map(rowHtml).join('') || '<tr><td colspan="9" class="px-3 py-6 text-center text-sm text-[#7b8495]">No products yet. Add them one by one, or upload a rate list above.</td></tr>';
     $('pr-price-count').textContent = rows.length ? `(${rows.length})` : '';
   }
   $('pr-rows').addEventListener('input', (e) => {
-    const d = e.target.closest('details'); const f = e.target.dataset.f; if (!d || !f) return;
-    const r = rows[+d.dataset.i]; r[f] = e.target.value;
-    d.querySelector('[data-title]').textContent = r.sku || 'New product';
-    d.querySelector('[data-sub]').textContent = r.brand || '';
-    d.querySelector('[data-prices]').innerHTML = (r.ptr ? 'PTR ₹' + esc(r.ptr) : '') + (r.mrp ? '<br>MRP ₹' + esc(r.mrp) : '');
+    const tr = e.target.closest('tr'); const f = e.target.dataset.f; if (!tr || !f) return;
+    rows[+tr.dataset.i][f] = e.target.value;
   });
   $('pr-rows').addEventListener('click', (e) => {
     if (!e.target.hasAttribute('data-remove')) return;
-    rows.splice(+e.target.closest('details').dataset.i, 1); renderRows();
+    rows.splice(+e.target.closest('tr').dataset.i, 1); renderRows();
   });
-  $('pr-add-row').addEventListener('click', () => { rows.push({ category: '', brand: '', ingredients: '', sku: '', ptr: '', mrp: '', stockist: '' }); renderRows(); const d = $('pr-rows').lastElementChild; if (d) { d.open = true; d.scrollIntoView({ block: 'center' }); } });
+  $('pr-add-row').addEventListener('click', () => { rows.push({ category: '', brand: '', ingredients: '', sku: '', ptr: '', mrp: '', stockist: '' }); renderRows(); const t = $('pr-rows').lastElementChild; if (t) { t.scrollIntoView({ block: 'center' }); const i = t.querySelector('input'); if (i) i.focus(); } });
 
   function collect() {
     return {
