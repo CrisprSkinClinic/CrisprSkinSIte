@@ -1,0 +1,224 @@
+---
+// src/pages/partner-register.astro
+//
+// Public registration for pharma medical representatives and distributors who want to supply the clinic's
+// pharmacy. The number is verified with a WhatsApp code (send-booking-otp / verify-booking-otp); the form posts to
+// public-partner-registration.js, which files it in partner_registrations. Nothing becomes a Partner in the clinic
+// app until staff approve it. Linked from the WhatsApp invitation: /partner-register?type=rep or ?type=distributor.
+import MainLayout from '../layouts/MainLayout.astro';
+import { siteConfig } from '../config/site.js';
+
+const field = "w-full bg-white px-4 py-3.5 text-base text-[#17233d] placeholder:text-[#a9a3b3] border border-[#d9d3df] rounded-xl focus:border-[#9b4fa2] focus:ring-4 focus:ring-[#9b4fa2]/15 outline-none transition";
+const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
+const card = "rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-5 md:p-7 space-y-5";
+const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-white hover:bg-[#84358c] transition disabled:opacity-50";
+---
+
+<MainLayout title={`Partner Registration | ${siteConfig.name}`} description="Register as a medical representative or distributor for CRISPR Skin and Hair Clinic's pharmacy." bare>
+  <div class="max-w-xl mx-auto pt-6 pb-10 md:pt-10 md:pb-16 px-4">
+    <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[150px] mx-auto mb-4" />
+    <h1 class="text-2xl md:text-3xl font-extrabold text-[#17233d] mb-2 text-center">Partner Registration</h1>
+    <p class="text-center text-[#46536b] mb-6">Register once and our pharmacy team will add you to their supplier list. We review every request.</p>
+
+    <div id="pr-form-container">
+      <form id="pr-form" class="space-y-5" novalidate>
+        <input type="text" name="website" id="pr-website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+
+        <div role="group" aria-label="I am a" class="grid grid-cols-2 gap-2 rounded-2xl bg-[#f6edf8] p-1.5">
+          <button type="button" data-kind="rep" class="pr-kind rounded-xl py-3 font-semibold text-[#17233d]">Medical representative</button>
+          <button type="button" data-kind="distributor" class="pr-kind rounded-xl py-3 font-semibold text-[#17233d]">Distributor</button>
+        </div>
+
+        <div class={card}>
+          <div>
+            <label for="pr-phone" class={label}>WhatsApp Number *</label>
+            <div class="flex gap-2">
+              <div class="relative flex-1 min-w-0">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#46536b] font-semibold">+91</span>
+                <input type="tel" id="pr-phone" placeholder="10-digit mobile" autocomplete="tel-national" inputmode="numeric" maxlength="10" class={`${field} pl-14 tracking-wide`} />
+              </div>
+              <button type="button" id="pr-send-code" class={btn}>Verify</button>
+            </div>
+            <div id="pr-code-group" class="hidden mt-3">
+              <label for="pr-code" class={label}>Enter the 6-digit code sent on WhatsApp</label>
+              <div class="flex gap-2">
+                <input type="text" id="pr-code" placeholder="6-digit code" autocomplete="one-time-code" inputmode="numeric" maxlength="6" class={`${field} flex-1 min-w-0 tracking-widest`} />
+                <button type="button" id="pr-verify-code" class={btn}>Confirm</button>
+              </div>
+              <button type="button" id="pr-resend" class="text-sm text-[#84358c] font-semibold mt-2 hover:underline">Resend code</button>
+            </div>
+            <p id="pr-phone-status" class="text-[#7b8495] text-xs mt-1 min-h-[1rem]"></p>
+          </div>
+        </div>
+
+        <!-- Medical representative -->
+        <div id="pr-rep" class={card}>
+          <h2 class="text-lg font-bold text-[#17233d]">Your details</h2>
+          <div class="grid grid-cols-3 gap-3">
+            <div><label for="pr-salutation" class={label}>Title</label>
+              <select id="pr-salutation" class={field}><option>Mr.</option><option>Ms.</option><option>Mrs.</option><option>Dr.</option></select></div>
+            <div class="col-span-2"><label for="pr-first" class={label}>First name *</label><input id="pr-first" class={field} autocomplete="given-name" /></div>
+          </div>
+          <div><label for="pr-last" class={label}>Last name</label><input id="pr-last" class={field} autocomplete="family-name" /></div>
+          <div><label for="pr-company" class={label}>Company *</label><input id="pr-company" class={field} placeholder="e.g. Cipla, Sun Pharma" autocomplete="organization" /></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label for="pr-division" class={label}>Division</label><input id="pr-division" class={field} placeholder="e.g. Derma" /></div>
+            <div><label for="pr-designation" class={label}>Designation</label><input id="pr-designation" class={field} placeholder="e.g. Area Manager" autocomplete="organization-title" /></div>
+          </div>
+          <div><label for="pr-rep-email" class={label}>Email</label><input id="pr-rep-email" type="email" class={field} autocomplete="email" /></div>
+          <div><label for="pr-distributors" class={label}>Distributors you supply through</label><input id="pr-distributors" class={field} placeholder="Names, separated by commas" /></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label for="pr-delivery" class={label}>Delivery (days)</label><input id="pr-delivery" inputmode="numeric" class={field} /></div>
+            <div><label for="pr-moq" class={label}>Minimum order qty</label><input id="pr-moq" inputmode="numeric" class={field} /></div>
+          </div>
+          <div><label for="pr-terms" class={label}>Payment terms</label><input id="pr-terms" class={field} placeholder="e.g. 30 days credit" /></div>
+          <div><label for="pr-offer" class={label}>Current schemes / offers</label><textarea id="pr-offer" rows="2" class={field}></textarea></div>
+        </div>
+
+        <!-- Distributor -->
+        <div id="pr-dist" class={`${card} hidden`}>
+          <h2 class="text-lg font-bold text-[#17233d]">Distributor details</h2>
+          <div><label for="pr-name" class={label}>Distributor / firm name *</label><input id="pr-name" class={field} autocomplete="organization" /></div>
+          <div><label for="pr-contact" class={label}>Contact person</label><input id="pr-contact" class={field} autocomplete="name" /></div>
+          <div><label for="pr-dist-email" class={label}>Email</label><input id="pr-dist-email" type="email" class={field} autocomplete="email" /></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label for="pr-gstin" class={label}>GSTIN</label><input id="pr-gstin" maxlength="15" class={`${field} uppercase`} /></div>
+            <div><label for="pr-pan" class={label}>PAN</label><input id="pr-pan" maxlength="10" class={`${field} uppercase`} /></div>
+          </div>
+          <div><label for="pr-dl" class={label}>Drug licence number</label><input id="pr-dl" class={field} /></div>
+          <div><label for="pr-address" class={label}>Address</label><textarea id="pr-address" rows="2" class={field}></textarea></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label for="pr-city" class={label}>City</label><input id="pr-city" class={field} /></div>
+            <div><label for="pr-state" class={label}>State</label><input id="pr-state" class={field} /></div>
+          </div>
+          <div><label for="pr-companies" class={label}>Companies you distribute</label><input id="pr-companies" class={field} placeholder="Names, separated by commas" /></div>
+        </div>
+
+        <p id="pr-error" class="text-red-600 text-sm min-h-[1rem]" role="alert"></p>
+        <button type="submit" id="pr-submit" class={`${btn} w-full py-4`}>Submit registration</button>
+      </form>
+    </div>
+
+    <div id="pr-success" class="hidden text-center rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-8">
+      <h2 class="text-xl font-extrabold text-[#17233d] mb-2">Thank you</h2>
+      <p class="text-[#46536b]">Your registration has been sent to our pharmacy team. We will contact you on WhatsApp once it is reviewed.</p>
+    </div>
+  </div>
+</MainLayout>
+
+<style is:global>
+  .pr-kind[aria-pressed="true"] { background: #fff; box-shadow: 0 1px 3px rgba(23, 35, 61, .15); color: #84358c; }
+</style>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  let kind = new URLSearchParams(location.search).get('type') === 'distributor' ? 'distributor' : 'rep';
+  let verifiedPhone = '';
+  let otpToken = '';
+
+  function setKind(k) {
+    kind = k;
+    document.querySelectorAll('.pr-kind').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kind === k)));
+    $('pr-rep').classList.toggle('hidden', k !== 'rep');
+    $('pr-dist').classList.toggle('hidden', k !== 'distributor');
+  }
+  document.querySelectorAll('.pr-kind').forEach((b) => b.addEventListener('click', () => setKind(b.dataset.kind)));
+  setKind(kind);
+
+  function setPhoneStatus(text, tone) {
+    const el = $('pr-phone-status');
+    el.textContent = text;
+    el.className = `text-xs mt-1 min-h-[1rem] ${tone === 'ok' ? 'text-green-700 font-semibold' : tone === 'error' ? 'text-red-600' : 'text-[#7b8495]'}`;
+  }
+  function resetVerification() {
+    verifiedPhone = ''; otpToken = '';
+    $('pr-phone').readOnly = false;
+    $('pr-send-code').textContent = 'Verify';
+    $('pr-code-group').classList.add('hidden');
+    $('pr-code').value = '';
+  }
+  $('pr-phone').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10); setPhoneStatus(''); });
+
+  async function postJson(url, body) {
+    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.success) { const err = new Error(result.error || 'Something went wrong. Please try again.'); err.expired = !!result.verificationExpired; throw err; }
+    return result;
+  }
+
+  async function sendCode() {
+    const phone = $('pr-phone').value.trim();
+    if (!/^[6-9][0-9]{9}$/.test(phone)) { setPhoneStatus('Enter a valid 10-digit mobile number.', 'error'); return; }
+    $('pr-send-code').disabled = true; $('pr-resend').disabled = true;
+    setPhoneStatus('Sending code on WhatsApp...');
+    try {
+      await postJson('/.netlify/functions/send-booking-otp', { phone });
+      $('pr-code-group').classList.remove('hidden');
+      $('pr-code').focus();
+      setPhoneStatus(`Code sent to +91 ${phone} on WhatsApp.`);
+    } catch (err) { setPhoneStatus(err.message, 'error'); }
+    finally { $('pr-send-code').disabled = false; $('pr-resend').disabled = false; }
+  }
+  $('pr-send-code').addEventListener('click', () => {
+    if (verifiedPhone) { resetVerification(); setPhoneStatus(''); $('pr-phone').focus(); return; }
+    sendCode();
+  });
+  $('pr-resend').addEventListener('click', sendCode);
+  $('pr-code').addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+    if (e.target.value.length === 6) $('pr-verify-code').click();
+  });
+  $('pr-verify-code').addEventListener('click', async () => {
+    const phone = $('pr-phone').value.trim();
+    const code = $('pr-code').value.trim();
+    if (code.length !== 6) { setPhoneStatus('Enter the 6-digit code.', 'error'); return; }
+    $('pr-verify-code').disabled = true;
+    try {
+      const result = await postJson('/.netlify/functions/verify-booking-otp', { phone, code });
+      verifiedPhone = phone; otpToken = result.token;
+      $('pr-phone').readOnly = true;
+      $('pr-code-group').classList.add('hidden');
+      $('pr-send-code').textContent = 'Change';
+      setPhoneStatus('✓ Number verified', 'ok');
+    } catch (err) { setPhoneStatus(err.message, 'error'); }
+    finally { $('pr-verify-code').disabled = false; }
+  });
+
+  const val = (id) => $(id).value.trim();
+  function collect() {
+    const base = { kind, phone: verifiedPhone, otpToken, website: val('pr-website') };
+    if (kind === 'rep') {
+      return { ...base, salutation: val('pr-salutation'), firstName: val('pr-first'), lastName: val('pr-last'), company: val('pr-company'), division: val('pr-division'),
+        designation: val('pr-designation'), email: val('pr-rep-email'), distributors: val('pr-distributors'), deliveryDays: val('pr-delivery'), moq: val('pr-moq'),
+        paymentTerms: val('pr-terms'), offerFreeDetails: val('pr-offer') };
+    }
+    return { ...base, name: val('pr-name'), contactPerson: val('pr-contact'), email: val('pr-dist-email'), gstin: val('pr-gstin'), pan: val('pr-pan'), dlNumber: val('pr-dl'),
+      address: val('pr-address'), city: val('pr-city'), state: val('pr-state'), companies: val('pr-companies') };
+  }
+  function problem(v) {
+    if (!verifiedPhone) return 'Please verify your WhatsApp number first.';
+    if (kind === 'rep') { if (!v.firstName) return 'Please enter your first name.'; if (!v.company) return 'Please enter your company.'; }
+    else if (!v.name) return 'Please enter the distributor name.';
+    if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email)) return 'Please enter a valid email address.';
+    return '';
+  }
+
+  $('pr-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const v = collect();
+    const msg = problem(v);
+    $('pr-error').textContent = msg;
+    if (msg) return;
+    const btn = $('pr-submit');
+    btn.disabled = true; btn.textContent = 'Submitting...';
+    try {
+      await postJson('/.netlify/functions/public-partner-registration', v);
+      $('pr-form-container').classList.add('hidden');
+      $('pr-success').classList.remove('hidden');
+      $('pr-success').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      if (err.expired) { resetVerification(); setPhoneStatus('Please verify your number again.', 'error'); }
+      $('pr-error').textContent = err.message;
+    } finally { btn.disabled = false; btn.textContent = 'Submit registration'; }
+  });
+</script>
