@@ -1,6 +1,6 @@
 // netlify/functions/public-partner-registration.js
 //
-// Public function behind /partner-register. Medical representatives and distributors register themselves; the
+// Public function behind /partner-register. Medical representatives register themselves; the
 // request lands in partner_registrations (AppointmentManager Supabase project) and only becomes a Partner in the
 // clinic app once staff approve it. Like public-patient-registration.js the endpoint is public, so trust comes from
 // validation plus the WhatsApp-verified one-time token, which is used up here.
@@ -16,7 +16,6 @@ const SUPABASE_URL = process.env.APPOINTMENT_MANAGER_SUPABASE_URL;
 const fail = (statusCode, error, extra = {}) => ({ statusCode, body: JSON.stringify({ error, ...extra }) });
 const clean = (v, max = 200) => String(v == null ? "" : v).replace(/[\u0000-\u001f]/g, " ").trim().slice(0, max);
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const GSTIN = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
@@ -33,8 +32,6 @@ exports.handler = async (event) => {
   // Bots fill the hidden field; answer as if it worked.
   if (clean(body.website)) return { statusCode: 200, body: JSON.stringify({ success: true }) };
 
-  const kind = body.kind === "distributor" ? "distributor" : body.kind === "rep" ? "rep" : "";
-  if (!kind) return fail(400, "Please choose whether you are a medical representative or a distributor.");
   const phone = clean(body.phone, 10);
   if (!/^[6-9][0-9]{9}$/.test(phone)) return fail(400, "A valid 10-digit mobile number is required.");
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(body.otpToken || ""))) {
@@ -42,31 +39,40 @@ exports.handler = async (event) => {
   }
   const email = clean(body.email, 120);
   if (email && !EMAIL.test(email)) return fail(400, "Please enter a valid email address.");
+  const firstName = clean(body.firstName, 60);
+  const company = clean(body.company, 120);
+  if (!firstName) return fail(400, "Your name is required.");
+  if (!company) return fail(400, "Your company is required.");
 
-  let payload;
-  if (kind === "rep") {
-    const firstName = clean(body.firstName, 60);
-    const company = clean(body.company, 120);
-    if (!firstName) return fail(400, "Your first name is required.");
-    if (!company) return fail(400, "Your company is required.");
-    payload = {
-      salutation: clean(body.salutation, 10), firstName, lastName: clean(body.lastName, 60), phone, email,
-      designation: clean(body.designation, 80), company, division: clean(body.division, 120),
-      distributors: clean(body.distributors, 300), deliveryDays: clean(body.deliveryDays, 3).replace(/\D/g, ""),
-      moq: clean(body.moq, 6).replace(/\D/g, ""), paymentTerms: clean(body.paymentTerms, 120), offerFreeDetails: clean(body.offerFreeDetails, 300),
-    };
-  } else {
-    const name = clean(body.name, 120);
-    if (!name) return fail(400, "The distributor's name is required.");
-    const gstin = clean(body.gstin, 15).toUpperCase();
-    if (gstin && !GSTIN.test(gstin)) return fail(400, "That GSTIN does not look right. Please check it.");
-    payload = {
-      name, contactPerson: clean(body.contactPerson, 80), phone, email, gstin, dlNumber: clean(body.dlNumber, 60),
-      pan: clean(body.pan, 10).toUpperCase(), address: clean(body.address, 300), city: clean(body.city, 80), state: clean(body.state, 80),
-      companies: clean(body.companies, 400),
-    };
-  }
-  for (const k of Object.keys(payload)) if (payload[k] === "") delete payload[k];
+  const num = (v, max) => { const n = Number(String(v == null ? "" : v).replace(/,/g, "")); return Number.isFinite(n) && n >= 0 && n <= max ? n : null; };
+  const OFFER_TYPES = ["Scheme", "Discount", "No_Offer"];
+  const offerType = OFFER_TYPES.includes(body.offerType) ? body.offerType : "";
+  const buy = num(body.buyQty, 100000);
+  const free = num(body.freeQty, 100000);
+  const margin = num(body.marginPercent, 100);
+  let offerFreeDetails = "";
+  if (offerType === "Scheme" && buy && free) offerFreeDetails = `Buy ${buy} get ${free} free`;
+
+  const priceList = (Array.isArray(body.priceList) ? body.priceList : []).slice(0, 400).map((r) => ({
+    category: clean(r && r.category, 80), brand: clean(r && r.brand, 80), ingredients: clean(r && r.ingredients, 300),
+    sku: clean(r && r.sku, 120), ptr: num(r && r.ptr, 10000000), mrp: num(r && r.mrp, 10000000), stockist: clean(r && r.stockist, 120),
+  })).filter((r) => r.sku);
+  const folder = clean(body.uploadsFolderUrl, 300);
+
+  const payload = {
+    salutation: clean(body.salutation, 10), firstName, lastName: clean(body.lastName, 60), phone, email,
+    designation: clean(body.designation, 80), company, division: clean(body.division, 120),
+    offerType: offerType === "No_Offer" ? "No offer" : offerType, offerFreeDetails,
+    offerDiscountPercent: offerType === "Discount" ? margin : null, buyQty: offerType === "Scheme" ? buy : null, freeQty: offerType === "Scheme" ? free : null,
+    moq: num(body.moq, 10000000), deliveryDays: num(body.deliveryDays, 365), paymentTerms: clean(body.paymentTerms, 120), cashDiscountPercent: num(body.cashDiscountPercent, 100),
+    medvolApp: body.medvolApp === true || body.medvolApp === "Yes" ? "true" : body.medvolApp === false || body.medvolApp === "No" ? "false" : "",
+    prefStockist: clean(body.prefStockist, 120), secStockist1: clean(body.secStockist1, 120), secStockist2: clean(body.secStockist2, 120),
+    uploadsFolderUrl: /^https:\/\/drive\.google\.com\//.test(folder) ? folder : "",
+    priceList,
+  };
+  for (const k of Object.keys(payload)) if (payload[k] === "" || payload[k] === null) delete payload[k];
+  if (!priceList.length) delete payload.priceList;
+  const kind = "rep";
 
   const supabase = createClient(SUPABASE_URL, serviceRoleKey);
   try {
