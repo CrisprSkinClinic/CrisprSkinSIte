@@ -70,11 +70,13 @@ exports.handler = async (event) => {
     offerDiscountPercent: offerType === "Discount" ? margin : null, buyQty: offerType === "Scheme" ? buy : null, freeQty: offerType === "Scheme" ? free : null,
     moq: num(body.moq, 10000000), deliveryDays: num(body.deliveryDays, 365), paymentTerms: clean(body.paymentTerms, 120), cashDiscountPercent: num(body.cashDiscountPercent, 100),
     medvolApp: body.medvolApp === true || body.medvolApp === "Yes" ? "true" : body.medvolApp === false || body.medvolApp === "No" ? "false" : "",
+    stockists: (Array.isArray(body.stockists) ? body.stockists : []).map((x) => clean(x, 120)).filter(Boolean).slice(0, 12),
     prefStockist: clean(body.prefStockist, 120), secStockist1: clean(body.secStockist1, 120), secStockist2: clean(body.secStockist2, 120),
     uploadIds,
     priceList, otherDivisions,
   };
   for (const k of Object.keys(payload)) if (payload[k] === "" || payload[k] === null) delete payload[k];
+  if (!payload.stockists || !payload.stockists.length) delete payload.stockists;
   if (!priceList.length) delete payload.priceList;
   if (!otherDivisions.length) delete payload.otherDivisions;
   if (!uploadIds.length) delete payload.uploadIds;

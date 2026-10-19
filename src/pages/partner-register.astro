@@ -97,10 +97,10 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
           </div>
           <div><label for="pr-medvol" class={label}>Do you take orders through the Medvol app?</label>
             <select id="pr-medvol" class={field}><option value="">—</option><option>Yes</option><option>No</option></select></div>
-          <div class="space-y-3">
-            <div><label for="pr-pref" class={label}>Preferred stockist</label><select id="pr-pref" class={field}></select><input id="pr-pref-other" class={`${field} mt-2 hidden`} placeholder="Type the stockist's name" /></div>
-            <div><label for="pr-sec1" class={label}>Second stockist</label><select id="pr-sec1" class={field}></select><input id="pr-sec1-other" class={`${field} mt-2 hidden`} placeholder="Type the stockist's name" /></div>
-            <div><label for="pr-sec2" class={label}>Third stockist</label><select id="pr-sec2" class={field}></select><input id="pr-sec2-other" class={`${field} mt-2 hidden`} placeholder="Type the stockist's name" /></div>
+          <div>
+            <div class="flex items-center justify-between gap-3"><span class={label}>Your distributors (stockists)</span><button type="button" id="pr-add-stockist" class="text-sm text-[#84358c] font-semibold hover:underline">+ Add another distributor</button></div>
+            <p class="text-xs text-[#7b8495] mb-2">Choose the distributors you supply through, from the clinic's list. The first is your preferred one.</p>
+            <div id="pr-stockists" class="space-y-2"></div>
           </div>
         </div>
 
@@ -264,29 +264,35 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
 
   // ---- drop-downs from the clinic's own lists ----
   const OTHER = '__other';
-  function fillStockistSelects() {
-    for (const id of ['pr-pref', 'pr-sec1', 'pr-sec2']) {
-      const cur = $(id).value;
-      $(id).innerHTML = '<option value="">— choose a stockist —</option>' + options.distributors.map((d) => `<option>${esc(d)}</option>`).join('') + `<option value="${OTHER}">Other (type the name)</option>`;
-      if (cur) $(id).value = cur;
-    }
+  let stockists = [{ v: '', other: '' }];
+  const chosenNames = () => stockists.map((x) => (x.v === OTHER ? x.other.trim() : x.v)).filter(Boolean).filter((n, i, a) => a.findIndex((m) => norm(m) === norm(n)) === i);
+  function renderStockists() {
+    $('pr-stockists').innerHTML = stockists.map((x, i) => `<div class="rounded-xl border border-[#e5e2e8] bg-[#fdfcfe] p-3 space-y-2" data-s="${i}">
+      <div class="flex items-center justify-between gap-2"><span class="text-xs font-semibold text-[#46536b]">${i === 0 ? 'Preferred distributor' : 'Distributor ' + (i + 1)}</span>${i > 0 ? '<button type="button" data-srm class="text-xs text-red-600 font-semibold">Remove</button>' : ''}</div>
+      <select data-sel class="${inputCls} w-full"><option value="">— choose a distributor —</option>${options.distributors.map((d) => `<option${d === x.v ? ' selected' : ''}>${esc(d)}</option>`).join('')}<option value="${OTHER}"${x.v === OTHER ? ' selected' : ''}>Other (not in the list)</option></select>
+      <input data-oth class="${inputCls} w-full ${x.v === OTHER ? '' : 'hidden'}" placeholder="Type the distributor's name" value="${esc(x.other)}" /></div>`).join('');
   }
-  function setStockist(id, name) {
+  function setStockist(name) {
     if (!name) return;
     const hit = options.distributors.find((d) => norm(d) === norm(name));
-    if (hit) { $(id).value = hit; } else { $(id).value = OTHER; $(id + '-other').value = name; }
-    syncStockist(id);
+    stockists[0] = hit ? { v: hit, other: '' } : { v: OTHER, other: name };
+    renderStockists(); renderRows();
   }
-  function syncStockist(id) { $(id + '-other').classList.toggle('hidden', $(id).value !== OTHER); }
-  const stockistValue = (id) => ($(id).value === OTHER ? val(id + '-other') : $(id).value);
-  for (const id of ['pr-pref', 'pr-sec1', 'pr-sec2']) $(id).addEventListener('change', () => syncStockist(id));
+  $('pr-stockists').addEventListener('change', (e) => {
+    const d = e.target.closest('[data-s]'); if (!d) return;
+    if (e.target.hasAttribute('data-sel')) { stockists[+d.dataset.s].v = e.target.value; renderStockists(); renderRows(); }
+  });
+  $('pr-stockists').addEventListener('input', (e) => { const d = e.target.closest('[data-s]'); if (d && e.target.hasAttribute('data-oth')) stockists[+d.dataset.s].other = e.target.value; });
+  $('pr-stockists').addEventListener('focusout', (e) => { if (e.target.hasAttribute && e.target.hasAttribute('data-oth')) renderRows(); });
+  $('pr-stockists').addEventListener('click', (e) => { if (e.target.hasAttribute('data-srm')) { stockists.splice(+e.target.closest('[data-s]').dataset.s, 1); renderStockists(); renderRows(); } });
+  $('pr-add-stockist').addEventListener('click', () => { stockists.push({ v: '', other: '' }); renderStockists(); });
   function companyDivisions() { const c = options.companies.find((x) => norm(x.name) === norm(val('pr-company'))); return c ? c.divisions : []; }
   function fillDivisionList() { $('pr-divisions').innerHTML = companyDivisions().map((d) => `<option value="${esc(d)}"></option>`).join(''); }
   $('pr-company').addEventListener('input', fillDivisionList);
-  fillStockistSelects();
+  renderStockists();
   fetch('/.netlify/functions/public-partner-options').then((r) => r.json()).then((o) => {
     options = { distributors: o.distributors || [], companies: o.companies || [] };
-    fillStockistSelects();
+    renderStockists();
     $('pr-dist-list').innerHTML = options.distributors.map((d) => `<option value="${esc(d)}"></option>`).join('');
     $('pr-companies').innerHTML = options.companies.map((c) => `<option value="${esc(c.name)}"></option>`).join('');
     fillDivisionList();
@@ -317,7 +323,7 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
     $('pr-offer').value = ['Scheme', 'Discount', 'No_Offer'].includes(r.offer_type) ? r.offer_type : $('pr-offer').value;
     if (r.offer_type === 'Scheme') { set('pr-buy', numStr(r.buy_or_margin)); set('pr-free', numStr(r.get_free)); }
     if (r.offer_type === 'Discount') set('pr-marginpct', numStr(r.buy_or_margin));
-    set('pr-moq', numStr(r.moq)); set('pr-cash', numStr(r.cash_discount_percent)); set('pr-delivery', numStr(r.delivery_days)); set('pr-terms', r.payment_terms); setStockist('pr-pref', r.stockist);
+    set('pr-moq', numStr(r.moq)); set('pr-cash', numStr(r.cash_discount_percent)); set('pr-delivery', numStr(r.delivery_days)); set('pr-terms', r.payment_terms); setStockist(r.stockist);
     rows = (out.price_list || []).map((p) => ({ category: p.category || '', brand: p.brand || '', ingredients: p.ingredients || '', sku: p.sku || '', ptr: numStr(p.ptr), mrp: numStr(p.mrp), stockist: '' }));
     openKeys = new Set(); query = ''; onlyCheck = false;
     const gs = groupsOf(); allOpen = gs.length <= 3;
@@ -384,7 +390,8 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
               <input class="${fld} min-w-0 col-span-3 sm:col-span-1" data-f="sku" value="${esc(r.sku)}" placeholder="Pack, e.g. Episoft AC 75g" aria-label="Pack" />
               <input class="${fld} text-right min-w-0" inputmode="decimal" data-f="ptr" value="${esc(r.ptr)}" placeholder="PTR ₹" aria-label="PTR" />
               <input class="${fld} text-right min-w-0" inputmode="decimal" data-f="mrp" value="${esc(r.mrp)}" placeholder="MRP ₹" aria-label="MRP" />
-              <button type="button" data-remove class="text-red-600 text-lg leading-none" aria-label="Remove this pack" title="Remove">×</button></div>`; }).join('')}
+              <button type="button" data-remove class="text-red-600 text-lg leading-none" aria-label="Remove this pack" title="Remove">×</button>
+              ${chosenNames().length > 1 ? `<select class="${fld} min-w-0 col-span-3 sm:col-span-4 text-xs" data-f="stockist" aria-label="Distributor for this pack"><option value="">Preferred (${esc(chosenNames()[0])})</option>${chosenNames().slice(1).map((n) => `<option${n === r.stockist ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>` : ''}</div>`; }).join('')}
           </div>
           <button type="button" data-addpack class="text-sm text-[#84358c] font-semibold hover:underline">+ Add a pack to this brand</button>
         </div></details>`;
@@ -420,7 +427,7 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
       salutation: val('pr-salutation'), firstName: val('pr-first'), lastName: val('pr-last'), company: val('pr-company'), division: val('pr-division'), designation: val('pr-designation'), email: val('pr-email'),
       offerType: val('pr-offer'), buyQty: val('pr-buy'), freeQty: val('pr-free'), marginPercent: val('pr-marginpct'),
       moq: val('pr-moq'), cashDiscountPercent: val('pr-cash'), deliveryDays: val('pr-delivery'), paymentTerms: val('pr-terms'), medvolApp: val('pr-medvol'),
-      prefStockist: stockistValue('pr-pref'), secStockist1: stockistValue('pr-sec1'), secStockist2: stockistValue('pr-sec2'), otherDivisions: otherDivs.filter((d) => String(d.name).trim()),
+      stockists: chosenNames(), prefStockist: chosenNames()[0] || '', secStockist1: chosenNames()[1] || '', secStockist2: chosenNames()[2] || '', otherDivisions: otherDivs.filter((d) => String(d.name).trim()),
       uploadIds, priceList: rows.filter((r) => String(r.sku).trim()),
     };
   }
