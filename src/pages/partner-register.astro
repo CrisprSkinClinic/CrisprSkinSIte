@@ -1,0 +1,460 @@
+---
+// src/pages/partner-register.astro
+//
+// Public registration for pharma medical representatives who want to supply the clinic's pharmacy.
+//   1. verify the WhatsApp number (send-booking-otp / verify-booking-otp)
+//   2. upload the brochure and rate list; the extract-partner-registration edge function reads them with AI
+//   3. the rep reviews and corrects everything (details, offer terms, stockists, price list) before submitting
+// The form posts to public-partner-registration.js, which files it in partner_registrations. Nothing becomes a Partner
+// in the clinic app until staff approve it.
+import MainLayout from '../layouts/MainLayout.astro';
+import { siteConfig } from '../config/site.js';
+
+const field = "w-full bg-white px-4 py-3.5 text-base text-[#17233d] placeholder:text-[#a9a3b3] border border-[#d9d3df] rounded-xl focus:border-[#9b4fa2] focus:ring-4 focus:ring-[#9b4fa2]/15 outline-none transition";
+const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
+const card = "rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-5 md:p-7 space-y-5";
+const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-white hover:bg-[#84358c] transition disabled:opacity-50";
+---
+
+<MainLayout title={`Medical Rep Registration | ${siteConfig.name}`} description="Register as a medical representative for CRISPR Skin and Hair Clinic's pharmacy." bare>
+  <div class="max-w-xl mx-auto pt-6 pb-10 md:pt-10 md:pb-16 px-4">
+    <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[150px] mx-auto mb-4" />
+    <h1 class="text-2xl md:text-3xl font-extrabold text-[#17233d] mb-2 text-center">Medical Rep Registration</h1>
+    <p class="text-center text-[#46536b] mb-6">Upload your brochure and rate list. We read them for you and you check everything before submitting.</p>
+
+    <div id="pr-form-container" class="space-y-5">
+      <input type="text" id="pr-website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+
+      <!-- 1. verify -->
+      <div class={card}>
+        <h2 class="text-lg font-bold text-[#17233d]">1. Verify your WhatsApp number</h2>
+        <div>
+          <label for="pr-phone" class={label}>WhatsApp Number *</label>
+          <div class="flex gap-2">
+            <div class="relative flex-1 min-w-0">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#46536b] font-semibold">+91</span>
+              <input type="tel" id="pr-phone" placeholder="10-digit mobile" autocomplete="tel-national" inputmode="numeric" maxlength="10" class={`${field} pl-14 tracking-wide`} />
+            </div>
+            <button type="button" id="pr-send-code" class={btn}>Verify</button>
+          </div>
+          <div id="pr-code-group" class="hidden mt-3">
+            <label for="pr-code" class={label}>Enter the 6-digit code sent on WhatsApp</label>
+            <div class="flex gap-2">
+              <input type="text" id="pr-code" placeholder="6-digit code" autocomplete="one-time-code" inputmode="numeric" maxlength="6" class={`${field} flex-1 min-w-0 tracking-widest`} />
+              <button type="button" id="pr-verify-code" class={btn}>Confirm</button>
+            </div>
+            <button type="button" id="pr-resend" class="text-sm text-[#84358c] font-semibold mt-2 hover:underline">Resend code</button>
+          </div>
+          <p id="pr-phone-status" class="text-[#7b8495] text-xs mt-1 min-h-[1rem]"></p>
+        </div>
+      </div>
+
+      <!-- 2. upload -->
+      <div id="pr-upload" class={`${card} hidden`}>
+        <h2 class="text-lg font-bold text-[#17233d]">2. Upload your brochure and rate list</h2>
+        <p class="text-sm text-[#46536b]">PDF, photo, Excel or CSV, up to 5 files and 15 MB in all. We read them and fill in the form below for you to check. Your files are kept safely with our pharmacy team.</p>
+        <label for="pr-files" class="block cursor-pointer rounded-xl border-2 border-dashed border-[#9b4fa2] bg-[#fbf8fc] px-4 py-7 text-center text-[#84358c] font-semibold hover:bg-[#f6edf8]">Tap to upload brochure or rate list<span class="block text-xs font-normal text-[#7b8495] mt-1">PDF · JPG · PNG · Excel · CSV</span></label>
+        <input type="file" id="pr-files" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.csv,.xlsx,.xls,application/pdf,image/*" class="hidden" />
+        <ul id="pr-file-list" class="text-sm text-[#17233d] space-y-1"></ul>
+        <button type="button" id="pr-read" class={`${btn} w-full py-3.5 hidden`}>Read my documents</button>
+        <p id="pr-read-status" class="text-xs min-h-[1rem] text-[#7b8495]" role="status"></p>
+        <button type="button" id="pr-skip" class="text-sm text-[#84358c] font-semibold hover:underline">I'll type my details in instead</button>
+      </div>
+
+      <!-- 3. review -->
+      <form id="pr-form" class="space-y-5 hidden" novalidate>
+        <div class={card}>
+          <h2 class="text-lg font-bold text-[#17233d]">3. Check and correct your details</h2>
+          <p id="pr-banner" class="rounded-xl bg-[#f6edf8] px-4 py-3 text-sm text-[#46536b]"></p>
+          <div class="grid grid-cols-3 gap-3">
+            <div><label for="pr-salutation" class={label}>Title</label>
+              <select id="pr-salutation" class={field}><option value="">—</option><option>Mr.</option><option>Ms.</option><option>Mrs.</option><option>Dr.</option></select></div>
+            <div class="col-span-2"><label for="pr-first" class={label}>First name *</label><input id="pr-first" class={field} autocomplete="given-name" /></div>
+          </div>
+          <div><label for="pr-last" class={label}>Last name</label><input id="pr-last" class={field} autocomplete="family-name" /></div>
+          <div><label for="pr-company" class={label}>Company *</label><input id="pr-company" list="pr-companies" class={field} placeholder="e.g. Glenmark" autocomplete="off" /><datalist id="pr-companies"></datalist><datalist id="pr-dist-list"></datalist></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label for="pr-division" class={label}>Division</label><input id="pr-division" list="pr-divisions" class={field} placeholder="e.g. Skinnora" autocomplete="off" /><datalist id="pr-divisions"></datalist></div>
+            <div><label for="pr-designation" class={label}>Designation</label><input id="pr-designation" class={field} autocomplete="organization-title" /></div>
+          </div>
+          <div><label for="pr-email" class={label}>Email</label><input id="pr-email" type="email" class={field} autocomplete="email" /></div>
+        </div>
+
+        <div class={card}>
+          <h2 class="text-lg font-bold text-[#17233d]">Offer and terms</h2>
+          <div><label for="pr-offer" class={label}>Offer type</label>
+            <select id="pr-offer" class={field}><option value="">Not sure</option><option value="Scheme">Scheme (buy and get free)</option><option value="Discount">Discount / margin</option><option value="No_Offer">No offer</option></select></div>
+          <div id="pr-scheme" class="grid grid-cols-2 gap-3 hidden">
+            <div><label for="pr-buy" class={label}>Buy (qty)</label><input id="pr-buy" inputmode="decimal" class={field} /></div>
+            <div><label for="pr-free" class={label}>Get free (qty)</label><input id="pr-free" inputmode="decimal" class={field} /></div>
+          </div>
+          <div id="pr-margin" class="hidden"><label for="pr-marginpct" class={label}>Margin / discount (%)</label><input id="pr-marginpct" inputmode="decimal" class={field} /></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label for="pr-moq" class={label}>Minimum order qty</label><input id="pr-moq" inputmode="numeric" class={field} /></div>
+            <div><label for="pr-cash" class={label}>Cash discount (%)</label><input id="pr-cash" inputmode="decimal" class={field} /></div>
+            <div><label for="pr-delivery" class={label}>Delivery (days)</label><input id="pr-delivery" inputmode="numeric" class={field} /></div>
+            <div><label for="pr-terms" class={label}>Payment terms</label><input id="pr-terms" class={field} placeholder="e.g. 7 Days" /></div>
+          </div>
+          <div><label for="pr-medvol" class={label}>Do you take orders through the Medvol app?</label>
+            <select id="pr-medvol" class={field}><option value="">—</option><option>Yes</option><option>No</option></select></div>
+          <div>
+            <div class="flex items-center justify-between gap-3"><span class={label}>Your distributors (stockists)</span><button type="button" id="pr-add-stockist" class="text-sm text-[#84358c] font-semibold hover:underline">+ Add another distributor</button></div>
+            <p class="text-xs text-[#7b8495] mb-2">Choose the distributors you supply through, from the clinic's list. The first is your preferred one.</p>
+            <div id="pr-stockists" class="space-y-2"></div>
+          </div>
+        </div>
+
+        <div class={card}>
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-lg font-bold text-[#17233d]">Other divisions of your company</h2>
+            <button type="button" id="pr-add-div" class="text-sm text-[#84358c] font-semibold hover:underline">+ Add division</button>
+          </div>
+          <p class="text-xs text-[#7b8495]">Optional. Tell us about your company's other divisions (and the person to contact) so we can reach them too.</p>
+          <div id="pr-divs" class="space-y-3"></div>
+        </div>
+
+        <div class={card}>
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-lg font-bold text-[#17233d]">Price list <span id="pr-price-count" class="text-sm font-semibold text-[#7b8495]"></span></h2>
+            <button type="button" id="pr-add-row" class="text-sm text-[#84358c] font-semibold hover:underline">+ Add product</button>
+          </div>
+          <p class="text-xs text-[#7b8495]">Products are grouped by brand. Open a brand to check its packs and prices; the category and ingredients are set once per brand. PTR is your price to us, MRP the printed retail price.</p>
+          <div class="flex flex-wrap items-center gap-2">
+            <input id="pr-search" type="search" placeholder="Search products" class="flex-1 min-w-[140px] bg-white px-3 py-2 text-sm border border-[#d9d3df] rounded-lg outline-none focus:border-[#9b4fa2]" />
+            <button type="button" id="pr-only-check" aria-pressed="false" class="px-3 py-2 text-sm rounded-lg border border-[#d9d3df] bg-white text-[#17233d] font-semibold">Needs a check <span id="pr-check-count"></span></button>
+            <button type="button" id="pr-toggle-all" class="px-3 py-2 text-sm text-[#84358c] font-semibold">Expand all</button>
+          </div>
+          <div id="pr-groups" class="space-y-2"></div>
+        </div>
+
+        <p id="pr-error" class="text-red-600 text-sm min-h-[1rem]" role="alert"></p>
+        <button type="submit" id="pr-submit" class={`${btn} w-full py-4`}>Submit registration</button>
+        <p class="text-xs text-center text-[#7b8495]">Our pharmacy team reviews every registration before adding you.</p>
+      </form>
+    </div>
+
+    <div id="pr-success" class="hidden text-center rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-8">
+      <h2 class="text-xl font-extrabold text-[#17233d] mb-2">Thank you</h2>
+      <p class="text-[#46536b]">Your registration has been sent to our pharmacy team. We will contact you on WhatsApp once it is reviewed.</p>
+    </div>
+  </div>
+</MainLayout>
+
+<script is:inline>
+  const $ = (id) => document.getElementById(id);
+  const EXTRACT_URL = 'https://kdcuoezsopvcsulahlad.supabase.co/functions/v1/extract-partner-registration';
+  const CATEGORIES = ['Acne & Rosacea Therapeutics','Emollients, Moisturizers & Barrier Repair','Sunscreens & Photoprotection','Cleansers, Face Washes & Medicated Shampoos','Topical Antibiotics & Antibacterials','Systemic Antibiotics','Topical Antifungals','Systemic Antifungals','Anti-Dandruff & Scalp Therapeutics','Antihistamines & Anti-Allergics','Topical Corticosteroids','Combination Therapeutics','Pigmentation & Depigmenting Agents','Hair Growth & Hair Care','Antivirals','Psoriasis, Eczema & Immunomodulators','Nutraceuticals, Vitamins & Supplements','Wound Care & Antiseptics','Other'];
+  const MAX_FILES = 5, MAX_BYTES = 15 * 1024 * 1024;
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const val = (id) => $(id).value.trim();
+  const inputCls = "w-full bg-white px-3 py-2.5 text-sm text-[#17233d] border border-[#d9d3df] rounded-lg focus:border-[#9b4fa2] focus:ring-2 focus:ring-[#9b4fa2]/15 outline-none";
+
+  let verifiedPhone = '', otpToken = '', chosen = [], uploadIds = [], rows = [], otherDivs = [], options = { distributors: [], companies: [] };
+  const KIND_LABELS = { brochure: 'Brochure', rate_list: 'Rate list', visiting_card: 'Visiting card' };
+  const guessKind = (n) => (/rate|price|ptr|mrp|list/i.test(n) ? 'rate_list' : /card/i.test(n) ? 'visiting_card' : 'brochure');
+  const norm = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  // ---- phone verification (same flow as the patient registration page) ----
+  function setPhoneStatus(text, tone) {
+    const el = $('pr-phone-status');
+    el.textContent = text;
+    el.className = `text-xs mt-1 min-h-[1rem] ${tone === 'ok' ? 'text-green-700 font-semibold' : tone === 'error' ? 'text-red-600' : 'text-[#7b8495]'}`;
+  }
+  function resetVerification() {
+    verifiedPhone = ''; otpToken = '';
+    $('pr-phone').readOnly = false;
+    $('pr-send-code').textContent = 'Verify';
+    $('pr-code-group').classList.add('hidden');
+    $('pr-code').value = '';
+  }
+  $('pr-phone').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10); setPhoneStatus(''); });
+  async function postJson(url, body) {
+    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || (result.success === false) || result.error) { const err = new Error(result.error || 'Something went wrong. Please try again.'); err.expired = !!result.verificationExpired; throw err; }
+    return result;
+  }
+  async function sendCode() {
+    const phone = $('pr-phone').value.trim();
+    if (!/^[6-9][0-9]{9}$/.test(phone)) { setPhoneStatus('Enter a valid 10-digit mobile number.', 'error'); return; }
+    $('pr-send-code').disabled = true; $('pr-resend').disabled = true;
+    setPhoneStatus('Sending code on WhatsApp...');
+    try {
+      await postJson('/.netlify/functions/send-booking-otp', { phone });
+      $('pr-code-group').classList.remove('hidden');
+      $('pr-code').focus();
+      setPhoneStatus(`Code sent to +91 ${phone} on WhatsApp.`);
+    } catch (err) { setPhoneStatus(err.message, 'error'); }
+    finally { $('pr-send-code').disabled = false; $('pr-resend').disabled = false; }
+  }
+  $('pr-send-code').addEventListener('click', () => {
+    if (verifiedPhone) { resetVerification(); setPhoneStatus(''); $('pr-upload').classList.add('hidden'); $('pr-form').classList.add('hidden'); $('pr-phone').focus(); return; }
+    sendCode();
+  });
+  $('pr-resend').addEventListener('click', sendCode);
+  $('pr-code').addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+    if (e.target.value.length === 6) $('pr-verify-code').click();
+  });
+  $('pr-verify-code').addEventListener('click', async () => {
+    const phone = $('pr-phone').value.trim();
+    const code = $('pr-code').value.trim();
+    if (code.length !== 6) { setPhoneStatus('Enter the 6-digit code.', 'error'); return; }
+    $('pr-verify-code').disabled = true;
+    try {
+      const result = await postJson('/.netlify/functions/verify-booking-otp', { phone, code });
+      verifiedPhone = phone; otpToken = result.token;
+      $('pr-phone').readOnly = true;
+      $('pr-code-group').classList.add('hidden');
+      $('pr-send-code').textContent = 'Change';
+      setPhoneStatus('✓ Number verified', 'ok');
+      $('pr-upload').classList.remove('hidden');
+      $('pr-upload').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) { setPhoneStatus(err.message, 'error'); }
+    finally { $('pr-verify-code').disabled = false; }
+  });
+
+  // ---- choosing and reading the documents ----
+  function renderFiles() {
+    $('pr-file-list').innerHTML = chosen.map((c, i) => `<li class="flex items-center gap-2 rounded-lg bg-[#f6edf8] px-3 py-2"><span class="truncate flex-1 min-w-0">${esc(c.file.name)}</span><select data-kind="${i}" class="shrink-0 text-xs border border-[#d9d3df] rounded-lg bg-white px-2 py-1">${Object.entries(KIND_LABELS).map(([k, l]) => `<option value="${k}"${k === c.kind ? ' selected' : ''}>${l}</option>`).join('')}</select><button type="button" data-rm="${i}" class="text-[#84358c] font-semibold text-xs shrink-0">Remove</button></li>`).join('');
+    $('pr-read').classList.toggle('hidden', !chosen.length);
+  }
+  $('pr-file-list').addEventListener('click', (e) => { const i = e.target.dataset && e.target.dataset.rm; if (i !== undefined) { chosen.splice(+i, 1); renderFiles(); } });
+  $('pr-file-list').addEventListener('change', (e) => { const i = e.target.dataset && e.target.dataset.kind; if (i !== undefined) chosen[+i].kind = e.target.value; });
+  $('pr-files').addEventListener('change', (e) => {
+    for (const f of e.target.files) chosen.push({ file: f, kind: guessKind(f.name) });
+    e.target.value = '';
+    if (chosen.length > MAX_FILES) { chosen = chosen.slice(0, MAX_FILES); $('pr-read-status').textContent = `Only the first ${MAX_FILES} files are used.`; }
+    renderFiles();
+  });
+
+  const toBase64 = (buf) => { let s = ''; const b = new Uint8Array(buf); for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); };
+  function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('Could not load the spreadsheet reader.')); document.head.appendChild(s); }); }
+  async function prepare(c) {
+    const f = c.file, kind = c.kind;
+    const name = f.name || 'document';
+    const ext = name.split('.').pop().toLowerCase();
+    if (ext === 'xlsx' || ext === 'xls') {
+      if (!window.XLSX) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+      const wb = window.XLSX.read(await f.arrayBuffer(), { type: 'array' });
+      const csv = wb.SheetNames.map((n) => `# Sheet: ${n}\n${window.XLSX.utils.sheet_to_csv(wb.Sheets[n])}`).join('\n\n');
+      return { kind, name: name.replace(/\.[^.]+$/, '') + '.csv', mime_type: 'text/csv', base64_data: btoa(unescape(encodeURIComponent(csv))), original_name: name, original_mime: f.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', original_base64: toBase64(await f.arrayBuffer()) };
+    }
+    const mime = f.type || ({ pdf: 'application/pdf', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', csv: 'text/csv' }[ext] || '');
+    return { kind, name, mime_type: mime, base64_data: toBase64(await f.arrayBuffer()) };
+  }
+
+  $('pr-read').addEventListener('click', async () => {
+    if (chosen.reduce((n, c) => n + c.file.size, 0) > MAX_BYTES) { $('pr-read-status').textContent = 'The files are over 15 MB in total. Remove or compress some.'; return; }
+    const btn = $('pr-read');
+    btn.disabled = true; btn.textContent = 'Reading your documents...';
+    $('pr-read-status').textContent = 'This can take up to a minute for a long rate list.';
+    try {
+      const files = [];
+      for (const c of chosen) files.push(await prepare(c));
+      const out = await postJson(EXTRACT_URL, { phone: verifiedPhone, otp_token: otpToken, files });
+      fill(out);
+      $('pr-read-status').textContent = `✓ Read ${out.price_list.length} product${out.price_list.length === 1 ? '' : 's'}. Check the details below. You can upload more files and read again.`;
+    } catch (err) {
+      if (err.expired) { resetVerification(); setPhoneStatus('Please verify your number again.', 'error'); $('pr-upload').classList.add('hidden'); }
+      $('pr-read-status').textContent = err.message + ' You can try again or type your details in.';
+    } finally { btn.disabled = false; btn.textContent = 'Read my documents'; }
+  });
+  $('pr-skip').addEventListener('click', () => fill({ rep: {}, price_list: [], uploads_folder_url: '' }));
+
+  // ---- drop-downs from the clinic's own lists ----
+  const OTHER = '__other';
+  let stockists = [{ v: '', other: '' }];
+  const chosenNames = () => stockists.map((x) => (x.v === OTHER ? x.other.trim() : x.v)).filter(Boolean).filter((n, i, a) => a.findIndex((m) => norm(m) === norm(n)) === i);
+  function renderStockists() {
+    $('pr-stockists').innerHTML = stockists.map((x, i) => `<div class="rounded-xl border border-[#e5e2e8] bg-[#fdfcfe] p-3 space-y-2" data-s="${i}">
+      <div class="flex items-center justify-between gap-2"><span class="text-xs font-semibold text-[#46536b]">${i === 0 ? 'Preferred distributor' : 'Distributor ' + (i + 1)}</span>${i > 0 ? '<button type="button" data-srm class="text-xs text-red-600 font-semibold">Remove</button>' : ''}</div>
+      <select data-sel class="${inputCls} w-full"><option value="">— choose a distributor —</option>${options.distributors.map((d) => `<option${d === x.v ? ' selected' : ''}>${esc(d)}</option>`).join('')}<option value="${OTHER}"${x.v === OTHER ? ' selected' : ''}>Other (not in the list)</option></select>
+      <input data-oth class="${inputCls} w-full ${x.v === OTHER ? '' : 'hidden'}" placeholder="Type the distributor's name" value="${esc(x.other)}" /></div>`).join('');
+  }
+  function setStockist(name) {
+    if (!name) return;
+    const hit = options.distributors.find((d) => norm(d) === norm(name));
+    stockists[0] = hit ? { v: hit, other: '' } : { v: OTHER, other: name };
+    renderStockists(); renderRows();
+  }
+  $('pr-stockists').addEventListener('change', (e) => {
+    const d = e.target.closest('[data-s]'); if (!d) return;
+    if (e.target.hasAttribute('data-sel')) { stockists[+d.dataset.s].v = e.target.value; renderStockists(); renderRows(); }
+  });
+  $('pr-stockists').addEventListener('input', (e) => { const d = e.target.closest('[data-s]'); if (d && e.target.hasAttribute('data-oth')) stockists[+d.dataset.s].other = e.target.value; });
+  $('pr-stockists').addEventListener('focusout', (e) => { if (e.target.hasAttribute && e.target.hasAttribute('data-oth')) renderRows(); });
+  $('pr-stockists').addEventListener('click', (e) => { if (e.target.hasAttribute('data-srm')) { stockists.splice(+e.target.closest('[data-s]').dataset.s, 1); renderStockists(); renderRows(); } });
+  $('pr-add-stockist').addEventListener('click', () => { stockists.push({ v: '', other: '' }); renderStockists(); });
+  function companyDivisions() { const c = options.companies.find((x) => norm(x.name) === norm(val('pr-company'))); return c ? c.divisions : []; }
+  function fillDivisionList() { $('pr-divisions').innerHTML = companyDivisions().map((d) => `<option value="${esc(d)}"></option>`).join(''); }
+  $('pr-company').addEventListener('input', fillDivisionList);
+  renderStockists();
+  fetch('/.netlify/functions/public-partner-options').then((r) => r.json()).then((o) => {
+    options = { distributors: o.distributors || [], companies: o.companies || [] };
+    renderStockists();
+    $('pr-dist-list').innerHTML = options.distributors.map((d) => `<option value="${esc(d)}"></option>`).join('');
+    $('pr-companies').innerHTML = options.companies.map((c) => `<option value="${esc(c.name)}"></option>`).join('');
+    fillDivisionList();
+  }).catch(() => {});
+
+  // ---- other divisions of the company ----
+  function renderDivs() {
+    const opts = companyDivisions().map((d) => `<option value="${esc(d)}"></option>`).join('');
+    $('pr-divs').innerHTML = otherDivs.map((d, i) => `<div class="rounded-xl border border-[#e5e2e8] bg-[#fdfcfe] p-3 space-y-2" data-i="${i}">
+      <input class="${inputCls}" data-f="name" list="pr-divopts" placeholder="Division name" value="${esc(d.name)}" />
+      <div class="grid grid-cols-2 gap-2"><input class="${inputCls}" data-f="contactName" placeholder="Contact person (optional)" value="${esc(d.contactName)}" /><input class="${inputCls}" data-f="phone" inputmode="tel" placeholder="Phone (optional)" value="${esc(d.phone)}" /></div>
+      <button type="button" data-rm class="text-xs text-red-600 font-semibold">Remove</button></div>`).join('') + `<datalist id="pr-divopts">${opts}</datalist>`;
+  }
+  $('pr-divs').addEventListener('input', (e) => { const d = e.target.closest('[data-i]'); if (d && e.target.dataset.f) otherDivs[+d.dataset.i][e.target.dataset.f] = e.target.value; });
+  $('pr-divs').addEventListener('click', (e) => { if (e.target.hasAttribute('data-rm')) { otherDivs.splice(+e.target.closest('[data-i]').dataset.i, 1); renderDivs(); } });
+  $('pr-add-div').addEventListener('click', () => { otherDivs.push({ name: '', contactName: '', phone: '' }); renderDivs(); });
+
+  // ---- review form ----
+  const numStr = (v) => (v === null || v === undefined || v === '' ? '' : String(v));
+  function fill(out) {
+    const r = out.rep || {};
+    if (out.upload_id && !uploadIds.includes(out.upload_id)) uploadIds.push(out.upload_id);
+    const name = String(r.name || '').replace(/^(mr|ms|mrs|dr)\.?\s+/i, '').trim();
+    const sp = name.lastIndexOf(' ');
+    if (!val('pr-first')) { $('pr-first').value = sp > 0 ? name.slice(0, sp) : name; $('pr-last').value = sp > 0 ? name.slice(sp + 1) : ''; }
+    const set = (id, v) => { if (v !== null && v !== undefined && String(v).trim() !== '' && !$(id).value) $(id).value = v; };
+    set('pr-company', r.company); set('pr-division', r.division); set('pr-designation', r.designation); set('pr-email', r.email);
+    $('pr-offer').value = ['Scheme', 'Discount', 'No_Offer'].includes(r.offer_type) ? r.offer_type : $('pr-offer').value;
+    if (r.offer_type === 'Scheme') { set('pr-buy', numStr(r.buy_or_margin)); set('pr-free', numStr(r.get_free)); }
+    if (r.offer_type === 'Discount') set('pr-marginpct', numStr(r.buy_or_margin));
+    set('pr-moq', numStr(r.moq)); set('pr-cash', numStr(r.cash_discount_percent)); set('pr-delivery', numStr(r.delivery_days)); set('pr-terms', r.payment_terms); setStockist(r.stockist);
+    rows = (out.price_list || []).map((p) => ({ category: p.category || '', brand: p.brand || '', ingredients: p.ingredients || '', sku: p.sku || '', ptr: numStr(p.ptr), mrp: numStr(p.mrp), stockist: '' }));
+    openKeys = new Set(); query = ''; onlyCheck = false;
+    const gs = groupsOf(); allOpen = gs.length <= 3;
+    gs.forEach((g) => { if (g.rows.some((i) => needsCheck(rows[i]))) openKeys.add(g.key); });
+    syncOffer(); renderRows(); renderDivs();
+    $('pr-banner').textContent = out.price_list && out.price_list.length ? `We read your documents and filled this in. Everything below can be edited: correct anything that looks wrong, then submit.` : 'Fill in your details below.';
+    $('pr-form').classList.remove('hidden');
+    $('pr-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function syncOffer() {
+    const t = $('pr-offer').value;
+    $('pr-scheme').classList.toggle('hidden', t !== 'Scheme');
+    $('pr-margin').classList.toggle('hidden', t !== 'Discount');
+  }
+  $('pr-offer').addEventListener('change', syncOffer);
+
+  // ---- price list: grouped by brand, one place per brand for category and ingredients ----
+  const fld = "bg-white px-2.5 py-2 text-sm text-[#17233d] border border-[#d9d3df] rounded-lg outline-none focus:border-[#9b4fa2] focus:ring-2 focus:ring-[#9b4fa2]/15";
+  const gkey = (r) => [norm(r.brand), norm(r.category), norm(r.ingredients)].join('|');
+  const num = (v) => (v === '' || v === null || v === undefined || isNaN(+v) ? null : +v);
+  const needsCheck = (r) => { const p = num(r.ptr), m = num(r.mrp); return !String(r.sku).trim() || p === null || m === null || p > m; };
+  let openKeys = new Set(), onlyCheck = false, allOpen = false, query = '';
+  const rupee = (n) => '₹' + (Math.round(n * 100) / 100).toString();
+
+  function groupsOf() {
+    const map = new Map();
+    rows.forEach((r, i) => { const k = gkey(r); if (!map.has(k)) map.set(k, { key: k, rows: [] }); map.get(k).rows.push(i); });
+    return [...map.values()];
+  }
+  function renderRows() {
+    const q = norm(query);
+    const all = groupsOf();
+    const checks = rows.filter(needsCheck).length;
+    $('pr-check-count').textContent = checks ? `(${checks})` : '';
+    $('pr-only-check').setAttribute('aria-pressed', String(onlyCheck));
+    $('pr-only-check').className = `px-3 py-2 text-sm rounded-lg border font-semibold ${onlyCheck ? 'border-[#9b4fa2] bg-[#f6edf8] text-[#84358c]' : 'border-[#d9d3df] bg-white text-[#17233d]'}`;
+    $('pr-price-count').textContent = rows.length ? `(${rows.length} products · ${all.length} brands)` : '';
+    $('pr-toggle-all').textContent = allOpen ? 'Collapse all' : 'Expand all';
+    const html = all.map((g) => {
+      const first = rows[g.rows[0]];
+      const visible = g.rows.filter((i) => (!onlyCheck || needsCheck(rows[i])) && (!q || norm([rows[i].sku, rows[i].brand, rows[i].ingredients].join(' ')).includes(q)));
+      if (!visible.length) return '';
+      const bad = g.rows.filter((i) => needsCheck(rows[i])).length;
+      const prices = g.rows.map((i) => num(rows[i].ptr)).filter((n) => n !== null);
+      const range = prices.length ? (Math.min(...prices) === Math.max(...prices) ? rupee(prices[0]) : `${rupee(Math.min(...prices))} – ${rupee(Math.max(...prices))}`) : '';
+      const open = allOpen || openKeys.has(g.key) || bad > 0 && onlyCheck || !!q || !first.brand;
+      const cats = CATEGORIES.includes(first.category) || !first.category ? CATEGORIES : [first.category, ...CATEGORIES];
+      return `<details class="rounded-xl border ${bad ? 'border-[#f0d9a8]' : 'border-[#e5e2e8]'} bg-[#fdfcfe]" data-key="${esc(g.key)}" data-first="${g.rows[0]}"${open ? ' open' : ''}>
+        <summary class="cursor-pointer list-none px-3 py-3 flex items-center gap-3">
+          <span class="min-w-0 flex-1"><span class="block font-semibold text-[#17233d] truncate">${esc(first.brand || 'New product')}</span>
+            <span class="block text-xs text-[#7b8495] truncate">${esc(first.category || 'No category')} · ${g.rows.length} pack${g.rows.length === 1 ? '' : 's'}${range ? ' · PTR ' + range : ''}</span></span>
+          ${bad ? `<span class="shrink-0 rounded-full bg-[#fff3d6] px-2 py-0.5 text-xs font-semibold text-[#8a5a00]">${bad} to check</span>` : ''}
+          <span class="shrink-0 text-[#7b8495]" aria-hidden="true">▾</span>
+        </summary>
+        <div class="px-3 pb-3 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label class="block text-xs font-semibold text-[#46536b]">Brand<input class="${fld} w-full mt-1 font-normal" data-g="brand" value="${esc(first.brand)}" /></label>
+            <label class="block text-xs font-semibold text-[#46536b]">Category<select class="${fld} w-full mt-1 font-normal" data-g="category"><option value="">—</option>${cats.map((c) => `<option${c === first.category ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>
+          </div>
+          <label class="block text-xs font-semibold text-[#46536b]">Active ingredients<textarea rows="2" class="${fld} w-full mt-1 font-normal" data-g="ingredients">${esc(first.ingredients)}</textarea></label>
+          <div class="space-y-1.5">
+            <div class="hidden sm:grid grid-cols-[1fr_76px_76px_28px] gap-2 text-[11px] font-semibold text-[#7b8495]"><span>Pack</span><span class="text-right">PTR ₹</span><span class="text-right">MRP ₹</span><span></span></div>
+            ${visible.map((i) => { const r = rows[i]; const flag = needsCheck(r); return `<div class="grid grid-cols-[1fr_1fr_28px] sm:grid-cols-[1fr_76px_76px_28px] gap-2 items-center rounded-lg pb-2 sm:pb-0 border-b border-[#efeaf2] sm:border-0 ${flag ? 'bg-[#fff8e6] p-1 -m-1' : ''}" data-i="${i}">
+              <input class="${fld} min-w-0 col-span-3 sm:col-span-1" data-f="sku" value="${esc(r.sku)}" placeholder="Pack, e.g. Episoft AC 75g" aria-label="Pack" />
+              <input class="${fld} text-right min-w-0" inputmode="decimal" data-f="ptr" value="${esc(r.ptr)}" placeholder="PTR ₹" aria-label="PTR" />
+              <input class="${fld} text-right min-w-0" inputmode="decimal" data-f="mrp" value="${esc(r.mrp)}" placeholder="MRP ₹" aria-label="MRP" />
+              <button type="button" data-remove class="text-red-600 text-lg leading-none" aria-label="Remove this pack" title="Remove">×</button>
+              ${chosenNames().length > 1 ? `<select class="${fld} min-w-0 col-span-3 sm:col-span-4 text-xs" data-f="stockist" aria-label="Distributor for this pack"><option value="">Preferred (${esc(chosenNames()[0])})</option>${chosenNames().slice(1).map((n) => `<option${n === r.stockist ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>` : ''}</div>`; }).join('')}
+          </div>
+          <button type="button" data-addpack class="text-sm text-[#84358c] font-semibold hover:underline">+ Add a pack to this brand</button>
+        </div></details>`;
+    }).join('');
+    $('pr-groups').innerHTML = html || `<p class="text-sm text-[#7b8495] text-center py-6">${rows.length ? 'Nothing matches.' : 'No products yet. Upload a rate list above, or add products one by one.'}</p>`;
+  }
+  // pack fields update in place (no re-render, so typing is never interrupted); brand/category/ingredients apply to the whole brand
+  $('pr-groups').addEventListener('input', (e) => {
+    const line = e.target.closest('[data-i]'); const f = e.target.dataset.f; if (!line || !f) return;
+    rows[+line.dataset.i][f] = e.target.value;
+  });
+  $('pr-groups').addEventListener('change', (e) => {
+    const g = e.target.dataset.g, d = e.target.closest('details'); if (!g || !d) return;
+    const first = rows[+d.dataset.first], key = gkey(first);
+    rows.filter((r) => gkey(r) === key).forEach((r) => { r[g] = e.target.value; });
+    openKeys.add(gkey(first)); renderRows();
+  });
+  $('pr-groups').addEventListener('change', (e) => { if (e.target.dataset.f) renderRows(); }); // re-check warnings once a price is committed
+  $('pr-groups').addEventListener('toggle', (e) => { const d = e.target; if (d.tagName === 'DETAILS') { if (d.open) openKeys.add(d.dataset.key); else openKeys.delete(d.dataset.key); } }, true);
+  $('pr-groups').addEventListener('click', (e) => {
+    const d = e.target.closest('details');
+    if (e.target.hasAttribute('data-remove')) { rows.splice(+e.target.closest('[data-i]').dataset.i, 1); renderRows(); }
+    else if (e.target.hasAttribute('data-addpack') && d) { const f = rows[+d.dataset.first]; openKeys.add(d.dataset.key); rows.push({ category: f.category, brand: f.brand, ingredients: f.ingredients, sku: '', ptr: '', mrp: '', stockist: '' }); renderRows(); const last = $('pr-groups').querySelector(`details[data-key="${CSS.escape(d.dataset.key)}"] [data-i]:last-of-type input`); if (last) last.focus(); }
+  });
+  $('pr-search').addEventListener('input', (e) => { query = e.target.value; renderRows(); });
+  $('pr-only-check').addEventListener('click', () => { onlyCheck = !onlyCheck; renderRows(); });
+  $('pr-toggle-all').addEventListener('click', () => { allOpen = !allOpen; if (!allOpen) openKeys.clear(); renderRows(); });
+  $('pr-add-row').addEventListener('click', () => { rows.push({ category: '', brand: '', ingredients: '', sku: '', ptr: '', mrp: '', stockist: '' }); query = ''; onlyCheck = false; renderRows(); const d = $('pr-groups').querySelector('details:last-of-type'); if (d) { d.scrollIntoView({ block: 'center' }); const i = d.querySelector('[data-g=brand]'); if (i) i.focus(); } });
+
+  function collect() {
+    return {
+      phone: verifiedPhone, otpToken, website: val('pr-website'),
+      salutation: val('pr-salutation'), firstName: val('pr-first'), lastName: val('pr-last'), company: val('pr-company'), division: val('pr-division'), designation: val('pr-designation'), email: val('pr-email'),
+      offerType: val('pr-offer'), buyQty: val('pr-buy'), freeQty: val('pr-free'), marginPercent: val('pr-marginpct'),
+      moq: val('pr-moq'), cashDiscountPercent: val('pr-cash'), deliveryDays: val('pr-delivery'), paymentTerms: val('pr-terms'), medvolApp: val('pr-medvol'),
+      stockists: chosenNames(), prefStockist: chosenNames()[0] || '', secStockist1: chosenNames()[1] || '', secStockist2: chosenNames()[2] || '', otherDivisions: otherDivs.filter((d) => String(d.name).trim()),
+      uploadIds, priceList: rows.filter((r) => String(r.sku).trim()),
+    };
+  }
+  function problem(v) {
+    if (!verifiedPhone) return 'Please verify your WhatsApp number first.';
+    if (!v.firstName) return 'Please enter your name.';
+    if (!v.company) return 'Please enter your company.';
+    if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email)) return 'Please enter a valid email address.';
+    if (v.offerType === 'Scheme' && (!v.buyQty || !v.freeQty)) return 'For a scheme, enter both the buy and the free quantity.';
+    return '';
+  }
+  $('pr-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const v = collect();
+    const msg = problem(v);
+    $('pr-error').textContent = msg;
+    if (msg) return;
+    const btn = $('pr-submit');
+    btn.disabled = true; btn.textContent = 'Submitting...';
+    try {
+      await postJson('/.netlify/functions/public-partner-registration', v);
+      $('pr-form-container').classList.add('hidden');
+      $('pr-success').classList.remove('hidden');
+      $('pr-success').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      if (err.expired) { resetVerification(); setPhoneStatus('Please verify your number again.', 'error'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+      $('pr-error').textContent = err.message;
+    } finally { btn.disabled = false; btn.textContent = 'Submit registration'; }
+  });
+</script>
