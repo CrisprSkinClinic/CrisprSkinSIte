@@ -10,6 +10,7 @@
 // leaves the server.
 
 const core = require("./lib/booking-core");
+const marketingSource = require("./lib/marketing-source");
 
 const BOOKING_FOR_NOTES = { family: "Booked by family member", friend: "Booked by friend" };
 
@@ -198,13 +199,14 @@ exports.handler = async (event) => {
 
     // Both rows of a New consultation commit together, or neither does; the database re-checks
     // every rule under its booking lock, so two people choosing the same time cannot both succeed.
-    const { data: bookedRows, error: bookError } = await supabase.rpc("service_public_book_appointment", {
+    const { data: bookedRows, error: bookError } = await supabase.rpc("service_marketing_public_book_v1", {
       p_patient_id: patientId,
       p_candidates: candidates,
       p_slot_date: slotDate,
       p_slot_time: slotTime,
       p_is_new: !isReview,
       p_notes: notesParts.join(" | "),
+      p_source: marketingSource.source(payload.marketing),
     });
     if (bookError) {
       if (/capacity|available|booked|full|procedure|leave|blocked|past/i.test(bookError.message)) {
@@ -228,3 +230,4 @@ exports.handler = async (event) => {
     return core.json(500, { error: error.message || "Something went wrong." });
   }
 };
+

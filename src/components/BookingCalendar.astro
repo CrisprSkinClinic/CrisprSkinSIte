@@ -138,6 +138,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
     let selectedSlotDoctorIds = null; // set when booking without a doctor preference
 
     const root = document.getElementById('bookingCalendarRoot');
+    root?.addEventListener('focusin', () => window.CrisprMarketing?.event('booking_started'), { once: true });
     const dateInput = document.getElementById('date');
     const slotsContainer = document.getElementById('slotsContainer');
     const confirmBtn = document.getElementById('confirmBtn');
@@ -537,6 +538,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
         const result = await response.json().catch(() => ({}));
         if (!response.ok || !result.success || !result.token) throw new Error(result.error || 'Could not verify the code.');
         otpToken = result.token;
+        window.CrisprMarketing?.event('booking_verified');
         verifiedPhone = otpSentTo;
         if (resendTimer) clearInterval(resendTimer);
         resendTimer = null;
@@ -560,7 +562,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
       const response = await fetch('/.netlify/functions/public-book-appointment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ ...body, marketing: window.CrisprMarketing?.source() }),
       });
       const result = await response.json().catch(() => ({}));
       return { response, result };
@@ -574,7 +576,7 @@ const { defaultService, defaultDoctorId } = Astro.props;
       try {
         const { response, result } = await submitBooking({ ...lastBookingBody, reschedule: true });
         if (!response.ok || !result.success) throw new Error(result.error || 'Could not move your appointment. Please call the clinic.');
-        window.gtag?.('event', 'booking_rescheduled', { event_category: 'engagement', event_label: lastBookingBody.service });
+        window.CrisprMarketing?.event('booking_rescheduled');
         hideReschedule();
         if (successMessage) successMessage.textContent = `Your appointment has been moved from ${result.from} to ${result.to}. We have sent the new time on WhatsApp.`;
         successMessage?.classList.remove('hidden');
@@ -674,20 +676,11 @@ const { defaultService, defaultDoctorId } = Astro.props;
           }
 
           if (!response.ok || !result.success) {
-            window.gtag?.('event', 'booking_failed', {
-              event_category: 'engagement',
-              event_label: service,
-              error_message: result.error || 'unknown_error',
-            });
+            window.CrisprMarketing?.event('booking_failed');
             throw new Error(result.error || "Could not complete your booking. Please try again or call us directly.");
           }
 
-          window.gtag?.('event', 'booking_completed', {
-            event_category: 'conversion',
-            event_label: service,
-            doctor_preference: isNoPreference ? 'no_preference' : 'specific_doctor',
-            doctor_id: isNoPreference ? undefined : doctorId,
-          });
+          window.CrisprMarketing?.event('booking_completed');
 
           successMessage?.classList.remove('hidden');
           confirmBtn.style.display = 'none';
@@ -703,3 +696,4 @@ const { defaultService, defaultDoctorId } = Astro.props;
     }
   });
 </script>
+

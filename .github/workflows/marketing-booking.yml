@@ -1,0 +1,30 @@
+name: Marketing booking checks
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/marketing-booking.yml'
+      - 'public/marketing-attribution.js'
+      - 'netlify/functions/**'
+      - 'src/**'
+      - 'tests/marketing-*.test.cjs'
+      - 'package.json'
+permissions:
+  contents: read
+concurrency:
+  group: marketing-booking-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  website:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Booking source and event tests
+        run: npm run test:marketing
+      - name: Install existing website dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build website
+        run: npm run build
