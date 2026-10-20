@@ -42,12 +42,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(image, Astro.site || siteConfig.url)} />
 
+    <script is:inline src="/marketing-attribution.js"></script>
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-6JTEB0S8T0"></script>
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-6JTEB0S8T0');
+      gtag('config', 'G-6JTEB0S8T0', { allow_google_signals: false, allow_ad_personalization_signals: false });
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -181,3 +182,4 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
 
   </body>
 </html>
+
