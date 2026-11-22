@@ -258,7 +258,14 @@ exports.handler = async (event) => {
 
     // Best-effort: a failed WhatsApp confirmation never fails the booking.
     await core.sendConfirmation(supabase, { serviceRoleKey, canonicalPhone, name, doctorId, slotDate, slotTime, appointmentId: appointment.id });
-    return core.json(200, { success: true, appointment_id: appointment.id });
+    // doctor_name / appointment_type let the confirmation screen show who the visit is with (needed for
+    // "no preference" bookings) and whether it was booked as a new consultation or a follow-up.
+    return core.json(200, {
+      success: true,
+      appointment_id: appointment.id,
+      doctor_name: bookedDoctor?.name || null,
+      appointment_type: isReview ? "review" : "new",
+    });
   } catch (error) {
     console.error("public-book-appointment error:", error);
     return core.json(500, { error: error.message || "Something went wrong." });

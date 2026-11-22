@@ -5,7 +5,7 @@ heroEyebrow: "Minor Dermatosurgery"
 heroHeadline: "Ear Lobe Repair"
 heroSubheadline: "A short procedure under local anaesthetic to repair a split, torn, or stretched earlobe and restore a natural-looking lobe."
 category: "cosmetic"
-defaultService: "Ear Lobe Repair"
+defaultService: "General Consultation"
 
 twoPaths:
   screeningTitle: "Torn or split earlobe from an earring?"
@@ -67,6 +67,10 @@ People who form keloids or thick scars, which is more common in some skin types,
 ## Prevention
 
 Lighter earrings, avoiding pulling on earrings, removing them for sports, and not wearing heavy earrings for extended periods all help. See [preventing torn and stretched earlobes](/blog/preventing-torn-and-stretched-earlobes).
+
+## Booking
+
+Online booking is for a consultation. The repair is planned and scheduled with the doctor after your examination.
 
 ## Realistic Expectations
 

@@ -50,7 +50,7 @@ There is no single best option. As a general guide, excision is preferred for la
 
 ## Booking
 
-When you book, you can select the method you want to discuss: TCA touch, excision, or RFA. If you are unsure, choose a general consultation and we will advise after examining you.
+Online booking is for a consultation. The method, whether a TCA touch, excision, or RFA, is chosen with the doctor after your examination, and the procedure is scheduled afterwards.
 
 ## Questions to Ask Before Treatment
 

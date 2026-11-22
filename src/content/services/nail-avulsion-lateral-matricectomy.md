@@ -5,7 +5,7 @@ heroEyebrow: "Minor Dermatosurgery"
 heroHeadline: "Ingrown Toenail Surgery"
 heroSubheadline: "Partial nail avulsion with lateral chemical matricectomy: a short procedure that removes the problem edge and treats the growth point behind it, so it is less likely to return."
 category: "skin"
-defaultService: "Ingrown Toenail Surgery"
+defaultService: "Nail Disorders"
 
 twoPaths:
   screeningTitle: "Painful ingrown toenail that keeps returning?"
@@ -66,6 +66,10 @@ Expect some drainage and tenderness over the following weeks as the toe heals, w
 ## Alternatives
 
 Alternatives include continued conservative care, partial avulsion without the chemical step, or, in rare cases, more extensive surgery. We explain the benefits and drawbacks of each, including how likely the problem is to return, so you can choose what suits you.
+
+## Booking
+
+Online booking is for a consultation. The procedure is planned and scheduled with the doctor after your examination.
 
 ## Realistic Expectations
 

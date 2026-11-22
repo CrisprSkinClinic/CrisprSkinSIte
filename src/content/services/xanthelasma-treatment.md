@@ -71,7 +71,7 @@ We examine the patches, ask about your family history and general health, and ar
 
 ## Booking
 
-When you book online, you can choose the method you would like to discuss: TCA touch, excision, or RFA. If you are unsure, choose a general consultation and we will advise after examining you.
+Online booking is for a consultation. The procedure itself, whether a TCA touch, excision, or RFA, is chosen and scheduled with the doctor after your examination and any blood tests.
 
 ## Realistic Expectations
 
