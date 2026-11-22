@@ -1,0 +1,18 @@
+---
+import { Image } from 'astro:assets';
+const { post, image, minutes } = Astro.props;
+---
+<a href={`/blog/${post.slug}`} class="ui-card group flex h-full flex-col overflow-hidden">
+  <div class="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-brand-100 via-brand-50 to-champagne-100">
+    {image && <Image src={image} alt="" width={480} height={270} widths={[320, 480]} sizes="(max-width: 768px) 100vw, 33vw" formats={['webp']} quality={72} loading="lazy" class="h-full w-full object-cover transition duration-700 group-hover:scale-105" />}
+    {post.data.tags && post.data.tags.length > 0 && (
+      <span class="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-brand-700 shadow-sm backdrop-blur">{post.data.tags[0]}</span>
+    )}
+  </div>
+  <div class="flex flex-1 flex-col p-6">
+    <p class="mb-2 text-xs font-semibold text-slate-500">{new Date(post.data.pubDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {minutes} min read</p>
+    <h3 class="line-clamp-2 font-sans text-lg font-bold leading-snug text-slate-900 transition-colors group-hover:text-brand-700">{post.data.title}</h3>
+    <p class="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600">{post.data.description}</p>
+    <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-brand-700">Read article <span aria-hidden="true">→</span></span>
+  </div>
+</a>

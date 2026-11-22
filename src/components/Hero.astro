@@ -1,5 +1,6 @@
 ---
 import { siteConfig } from '../config/site.js';
+import LiveStatus from './home/LiveStatus.astro';
 const { title, subtitle, eyebrow, credentials, ctaText, whatsappText } = Astro.props;
 ---
 
@@ -22,6 +23,8 @@ const { title, subtitle, eyebrow, credentials, ctaText, whatsappText } = Astro.p
           {whatsappText}
         </a>
       </div>
+
+      <LiveStatus />
     </div>
 
     <div data-settle style="--d:2" class="order-2 relative mx-auto w-full max-w-lg lg:max-w-2xl">

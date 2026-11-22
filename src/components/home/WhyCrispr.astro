@@ -1,0 +1,33 @@
+---
+const pillars = [
+  { title: 'AIIMS-trained consultants', body: 'Three dermatologists with training at AIIMS and in dermatosurgery, hair restoration and paediatric skin care.', icon: '<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/>' },
+  { title: 'No unnecessary procedures', body: 'We explain your options, including doing nothing yet. Treatment is advised only when it is indicated.', icon: '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>' },
+  { title: 'Booking that respects your time', body: 'Real slots, WhatsApp confirmation, and a page to change or cancel. Reception is one message away.', icon: '<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>' },
+  { title: 'Care for the whole family', body: 'Adults and children, hair and skin, medical and cosmetic, under one roof in KK Nagar.', icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>' },
+];
+---
+<section class="px-5 py-6 md:px-6 md:py-10">
+  <div class="relative mx-auto max-w-7xl overflow-hidden rounded-[36px] bg-[#1a1020] px-6 py-16 text-white md:px-12 md:py-20">
+    <div class="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-brand-600/30 blur-3xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-accent-500/20 blur-3xl" aria-hidden="true"></div>
+    <div class="relative grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+      <div>
+        <p class="mb-4 text-[11px] font-bold uppercase tracking-[0.22em] text-brand-300">Why patients choose us</p>
+        <h2 class="text-4xl leading-tight md:text-5xl">A clear diagnosis comes before any treatment.</h2>
+        <p class="mt-5 max-w-lg text-lg leading-relaxed text-slate-300">Early assessment often means simpler treatment, better control and fewer products or procedures you did not need.</p>
+        <a href="/book/" data-track="booking-click" class="mt-8 inline-flex min-h-[52px] items-center gap-3 rounded-2xl bg-white px-7 font-bold text-slate-950 transition hover:bg-slate-100 active:scale-[0.98]">Book a consultation <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {pillars.map((p) => (
+          <div class="reveal rounded-3xl border border-white/10 bg-white/[0.06] p-6 backdrop-blur-sm transition hover:bg-white/[0.09]">
+            <span class="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-white/10 text-brand-200" aria-hidden="true">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={p.icon}></svg>
+            </span>
+            <h3 class="mb-1.5 font-sans text-base font-bold">{p.title}</h3>
+            <p class="text-sm leading-relaxed text-slate-300">{p.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
