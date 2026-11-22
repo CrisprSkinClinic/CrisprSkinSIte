@@ -6,8 +6,8 @@
 // NOT directly into the real patients table -- every submission
 // requires staff approval before becoming a real patient record.
 //
-// Three short steps (About you / Where you live / One last thing), a compact review, then a banking-style
-// WhatsApp OTP pop-up after "Confirm & Submit" (send-booking-otp / verify-booking-otp). The server consumes
+// Three short steps (About you / Where you live / One last thing); the last step's Submit opens a banking-style
+// WhatsApp OTP pop-up (send-booking-otp / verify-booking-otp). The server consumes
 // the one-time token, so a registration can only carry a number its owner holds. Under-18s must give a
 // guardian's name, and a friend/family or doctor referral asks for the referrer's name.
 import MainLayout from '../layouts/MainLayout.astro';
@@ -198,22 +198,10 @@ const referralOptions = [
           <p id="reg-error-3" class={errorLine} role="alert"></p>
           <div class="flex gap-3">
             <button type="button" data-back="2" class={secondary}>Back</button>
-            <button type="submit" id="reg-review-btn" class={primary}>Review</button>
+            <button type="submit" id="reg-submit-btn" class={primary}>Submit</button>
           </div>
         </div>
       </form>
-    </div>
-
-    <!-- Compact review, shown before anything is submitted -->
-    <div id="reg-review-container" class="hidden bg-white rounded-2xl shadow-sm border border-[#e5e2e8] p-5 sm:p-8">
-      <h2 class="text-xl font-bold text-[#17233d] mb-4">Check your details</h2>
-      <dl id="reg-review-list" class="divide-y divide-[#e5e2e8] border-y border-[#e5e2e8] mb-6"></dl>
-
-      <div class="flex gap-3">
-        <button type="button" id="reg-back-btn" class={secondary}>Back</button>
-        <button type="button" id="reg-confirm-btn" class={primary}>Confirm &amp; Submit</button>
-      </div>
-      <p id="reg-submit-error" class={`${errorLine} text-center mt-3`} role="alert"></p>
     </div>
 
     <!-- Shown after successful submission -->
@@ -230,7 +218,7 @@ const referralOptions = [
     </div>
   </div>
 
-  <!-- OTP pop-up, shown only after Confirm & Submit (like a banking OTP) -->
+  <!-- OTP pop-up, shown only when Submit is pressed on the last step (like a banking OTP) -->
   <div id="reg-otp-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 p-4" role="dialog" aria-modal="true" aria-labelledby="reg-otp-title">
     <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
       <div class="flex items-start justify-between gap-3">
@@ -283,7 +271,6 @@ const referralOptions = [
     $('reg-step-title').textContent = STEP_TITLES[n - 1];
     $('reg-step-count').textContent = `Step ${n} of 3`;
     $('reg-form-container').classList.remove('hidden');
-    $('reg-review-container').classList.add('hidden');
     if (scroll) $('reg-form-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (focus) {
       const first = { 1: 'reg-salutation', 2: 'reg-pincode', 3: null }[n];
@@ -585,45 +572,6 @@ const referralOptions = [
   }));
   document.querySelectorAll('[data-back]').forEach((btn) => btn.addEventListener('click', () => goStep(Number(btn.dataset.back))));
 
-  // ------------------------------------------------------------------ review
-  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  function reviewRow(label, value, step) {
-    return `<div class="py-3 grid grid-cols-[1fr_auto] sm:grid-cols-[10rem_1fr_auto] gap-x-4 gap-y-1">
-      <dt class="text-sm font-semibold text-[#7b8495] col-span-2 sm:col-span-1">${label}</dt>
-      <dd class="text-[#17233d] min-w-0">${escapeHtml(value)}</dd>
-      <button type="button" data-goto="${step}" class="text-sm font-semibold text-[#84358c] underline underline-offset-2 self-start">Edit</button>
-    </div>`;
-  }
-  function renderReview(v) {
-    const age = validAge(parseDOB(v.dob));
-    const detail = v.referralOtherDetails ? `${v.referralSource} (${v.referralOtherDetails})` : v.referralSource;
-    $('reg-review-list').innerHTML = [
-      reviewRow('Name', `${v.salutation} ${v.firstName} ${v.lastName}`, 1),
-      reviewRow('Gender and age', `${GENDER_LABELS[v.gender] || v.gender}, ${age} years`, 1),
-      v.guardianName ? reviewRow('Parent / guardian', v.guardianName, 1) : '',
-      reviewRow('WhatsApp number', `+91 ${v.phone}`, 1),
-      reviewRow('Address', `${v.address}, ${v.area}, ${v.city}, ${v.state} - ${v.pincode}`, 2),
-      reviewRow('Heard about us', detail, 3),
-      v.email ? reviewRow('Email', v.email, 3) : '',
-      v.occupation ? reviewRow('Occupation', v.occupation, 3) : '',
-    ].join('');
-  }
-  $('reg-review-list').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-goto]');
-    if (b) goStep(Number(b.dataset.goto));
-  });
-
-  $('reg-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const failure = validateFrom(1);
-    if (failure) { showStepError(failure.step, failure.problem); return; }
-    renderReview(collectFormValues());
-    $('reg-form-container').classList.add('hidden');
-    $('reg-review-container').classList.remove('hidden');
-    $('reg-review-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-  $('reg-back-btn').addEventListener('click', () => goStep(3, { focus: false }));
-
   // ------------------------------------------------------------------ OTP pop-up + submit
   let otpToken = '';
   let verifiedPhone = '';
@@ -667,10 +615,10 @@ const referralOptions = [
   }
 
   async function sendOtp(phone) {
-    const btn = $('reg-confirm-btn');
+    const btn = $('reg-submit-btn');
     btn.disabled = true;
     btn.textContent = 'Sending OTP…';
-    $('reg-submit-error').textContent = '';
+    $('reg-error-3').textContent = '';
     try {
       await postJson('/.netlify/functions/send-booking-otp', { phone });
       otpSentTo = phone;
@@ -684,21 +632,21 @@ const referralOptions = [
       startResendTimer();
       return true;
     } catch (err) {
-      $('reg-submit-error').textContent = err.message;
+      $('reg-error-3').textContent = err.message;
       return false;
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Confirm & Submit';
+      btn.textContent = 'Submit';
     }
   }
 
   async function submitRegistration(values) {
     if (submitting) return;
     submitting = true;
-    const btn = $('reg-confirm-btn');
+    const btn = $('reg-submit-btn');
     btn.disabled = true;
     btn.textContent = 'Submitting…';
-    $('reg-submit-error').textContent = '';
+    $('reg-error-3').textContent = '';
     try {
       const response = await fetch('/.netlify/functions/public-patient-registration', {
         method: 'POST',
@@ -708,28 +656,28 @@ const referralOptions = [
       const result = await response.json().catch(() => ({}));
       if (result.verificationExpired) {
         otpToken = ''; verifiedPhone = ''; otpSentTo = '';
-        $('reg-submit-error').textContent = 'Your verification expired. Tap Confirm & Submit to get a new OTP.';
+        $('reg-error-3').textContent = 'Your verification expired. Tap Submit to get a new OTP.';
         return;
       }
       if (!response.ok || !result.success) {
         otpToken = ''; verifiedPhone = ''; // the server may have used the token up
         throw new Error(result.error || 'Something went wrong. Please try again.');
       }
-      $('reg-review-container').classList.add('hidden');
+      $('reg-form-container').classList.add('hidden');
       $('reg-success-container').classList.remove('hidden');
       $('reg-success-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
       $('reg-success-title').focus({ preventScroll: true });
     } catch (err) {
-      $('reg-submit-error').textContent = err.message;
+      $('reg-error-3').textContent = err.message;
     } finally {
       submitting = false;
       btn.disabled = false;
-      btn.textContent = 'Confirm & Submit';
+      btn.textContent = 'Submit';
     }
   }
 
-  $('reg-confirm-btn').addEventListener('click', async () => {
-    $('reg-submit-error').textContent = '';
+  async function onSubmit() {
+    $('reg-error-3').textContent = '';
     const failure = validateFrom(1);
     if (failure) { showStepError(failure.step, failure.problem); return; }
     const values = collectFormValues();
@@ -737,7 +685,8 @@ const referralOptions = [
     // An OTP went to this number a moment ago: reopen the pop-up instead of sending another.
     if (otpSentTo === values.phone && Date.now() - otpSentAt < 4.5 * 60000) { openOtp(); otpInput.focus(); return; }
     await sendOtp(values.phone);
-  });
+  }
+  $('reg-form').addEventListener('submit', (e) => { e.preventDefault(); if (currentStep === 3) onSubmit(); });
 
   async function verifyOtp() {
     if (verifyBusy) return;
@@ -776,7 +725,7 @@ const referralOptions = [
     goStep(1, { focus: false });
     $('reg-phone').focus({ preventScroll: true });
   });
-  function cancelOtp() { closeOtp(); $('reg-confirm-btn').focus(); }
+  function cancelOtp() { closeOtp(); $('reg-submit-btn').focus(); }
   $('reg-otp-close').addEventListener('click', cancelOtp);
   modal.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { cancelOtp(); return; }
