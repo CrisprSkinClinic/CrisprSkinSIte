@@ -1,5 +1,5 @@
 ---
-title: "Ingrown Toenail Surgery: Nail Avulsion With Lateral Chemical Matricectomy"
+title: "Ingrown Toenail Surgery (Lateral Matricectomy)"
 metaDescription: "Ingrown toenail surgery in KK Nagar, Chennai -- partial nail avulsion with lateral chemical matricectomy to lower the chance of the ingrown edge returning."
 heroEyebrow: "Minor Dermatosurgery"
 heroHeadline: "Ingrown Toenail Surgery"

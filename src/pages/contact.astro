@@ -3,7 +3,7 @@ import MainLayout from '../layouts/MainLayout.astro';
 import { siteConfig } from '../config/site.js';
 ---
 
-<MainLayout title={`Contact & Location | ${siteConfig.name}`}>
+<MainLayout title="Contact & Location" description={`Visit ${siteConfig.name} at ${siteConfig.contact.address.street}, KK Nagar, Chennai. Clinic hours, phone, WhatsApp and directions.`}>
   <div class="max-w-6xl mx-auto py-16 px-6">
     <h1 class="text-4xl font-extrabold text-brand-900 mb-8 text-center">Visit {siteConfig.name}</h1>
     

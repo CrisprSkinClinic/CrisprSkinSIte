@@ -13,8 +13,8 @@ export async function getStaticPaths() {
 
 const { doctor } = Astro.props;
 
-const pageTitle = `${doctor.name} - ${doctor.designation}`;
-const pageDescription = `${doctor.name}, ${doctor.qualificationsShort}, is a ${doctor.designation} at ${siteConfig.name}, KK Nagar, Chennai. Call ${siteConfig.contact.phone} to book.`;
+const pageTitle = `${doctor.name}: Dermatologist, KK Nagar`;
+const pageDescription = `${doctor.name}, ${doctor.qualificationsShort}, is a ${doctor.designation} at ${siteConfig.name}, KK Nagar, Chennai.`;
 
 // Map expertise labels → service/condition URLs
 const expertiseLinks = {

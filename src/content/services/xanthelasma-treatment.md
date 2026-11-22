@@ -1,6 +1,6 @@
 ---
 title: "Xanthelasma Treatment in Chennai | KK Nagar"
-metaDescription: "Xanthelasma (yellow cholesterol patches around the eyelids) treatment in KK Nagar, Chennai -- lipid check, TCA touch, surgical excision, and radiofrequency ablation (RFA)."
+metaDescription: "Xanthelasma (yellow patches on the eyelids) treatment in KK Nagar, Chennai: lipid check, TCA touch, surgical excision and radiofrequency ablation (RFA)."
 heroEyebrow: "Clinical Dermatology & Dermatosurgery"
 heroHeadline: "Xanthelasma Treatment"
 heroSubheadline: "Soft yellow patches on the eyelids are harmless to the eye but worth a cholesterol check. We offer three established methods: TCA touch, excision, and RFA."

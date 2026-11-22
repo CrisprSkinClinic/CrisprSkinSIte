@@ -78,7 +78,7 @@ const conditionSchema = {
 };
 ---
 
-<MainLayout title={data.title} description={data.metaDescription}>
+<MainLayout title={`${data.title}: Symptoms & Treatment`.length <= 48 ? `${data.title}: Symptoms & Treatment` : data.title} description={data.metaDescription}>
   <script type="application/ld+json" set:html={JSON.stringify(conditionSchema)} />
   {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
