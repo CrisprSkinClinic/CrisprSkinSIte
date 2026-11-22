@@ -57,3 +57,7 @@ Between flares, a consistent moisturizing routine using an appropriate emollient
 ## Setting Realistic Expectations
 
 Eczema, particularly atopic dermatitis, is often a long-term pattern with periods of flare and calm rather than a condition that's cured once and never returns. Our goal is to help you understand your own triggers well enough to reduce flare frequency and severity over time, alongside effective treatment for the flares that do occur.
+
+## Using Topical Treatment Well
+
+The form and the amount both matter. See [creams, ointments, gels and lotions explained](/blog/creams-ointments-gels-lotions-topical-formulations-explained) and [how much to apply](/blog/how-much-topical-medicine-to-apply-fingertip-unit-guide).
