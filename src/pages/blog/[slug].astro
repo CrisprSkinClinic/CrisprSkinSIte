@@ -66,7 +66,7 @@ const articleSchema = {
 <MainLayout title={entry.data.title} description={entry.data.description} image={shareImage} type="article">
   <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
   <Breadcrumbs items={[{ name: "Blog", url: "/blog" }, { name: entry.data.title, url: `/blog/${entry.slug}` }]} />
-  <article class="max-w-3xl mx-auto py-12 px-6">
+  <article class="mx-auto max-w-[46rem] px-6 py-12">
     <div class="mb-8">
       <h1 class="text-4xl font-extrabold text-brand-900 mb-4">{entry.data.title}</h1>
       <p class="text-slate-500 font-medium">
@@ -75,7 +75,7 @@ const articleSchema = {
       </p>
     </div>
     
-    <div class="prose prose-slate prose-brand max-w-none">
+    <div class="prose prose-slate prose-brand max-w-none md:text-lg">
       <Content />
     </div>
 
