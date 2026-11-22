@@ -22,14 +22,35 @@ symptoms:
   - "Course varies -- some patients have stable, limited patches; others experience progression"
 
 treatmentOverview:
-  - name: "Topical Therapy"
-    description: "Most effective for limited, stable disease, particularly on the face."
-  - name: "Phototherapy"
-    description: "Often more effective for more extensive vitiligo, considered based on extent of involvement."
-  - name: "Cosmetic Camouflage"
-    description: "Available for patients who want it, as a complement to medical treatment."
+  - name: "Topical Corticosteroids"
+    description: "Short, supervised courses for limited patches, used carefully on the face and folds."
+  - name: "Topical Calcineurin Inhibitors"
+    description: "Tacrolimus-type creams preferred for the face, neck, and folds, and for longer-term use."
+  - name: "Newer Topical Agents"
+    description: "Topical JAK inhibitors where approved and available."
+  - name: "Narrowband UVB Phototherapy"
+    description: "Established first-line light treatment for more extensive vitiligo."
+  - name: "Targeted Excimer Light"
+    description: "Focused treatment for limited or localised patches."
+  - name: "Oral Therapy for Active Disease"
+    description: "A short, supervised course to halt rapid spread in selected patients."
+  - name: "Surgical Repigmentation"
+    description: "Grafting and cell-transfer techniques for stable, resistant patches."
+  - name: "Camouflage and Micropigmentation"
+    description: "Cosmetic options and selected medical tattooing, as a complement to medical treatment."
+  - name: "Depigmentation"
+    description: "For very extensive disease only, after other options and careful discussion."
 
-relatedConditions: []
+relatedConditions:
+  - "stable-vs-active-vitiligo"
+  - "segmental-vitiligo"
+  - "vitiligo-surgical-treatment"
+
+faqIds:
+  - "vitiligo-treatment-options"
+  - "vitiligo-stable-meaning"
+  - "vitiligo-nbuvb-how-it-works"
+  - "vitiligo-topical-steroids-vs-tacrolimus"
 
 ctaTitle: "Book a Vitiligo Evaluation"
 ---

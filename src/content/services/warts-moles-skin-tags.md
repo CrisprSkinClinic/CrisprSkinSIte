@@ -31,7 +31,6 @@ treatments:
 
 faqIds:
   - "moles-when-to-worry"
-  - "moles-ai-apps-reliability"
   - "skin-cancer-self-check-frequency"
   - "skin-tags-cause"
   - "warts-are-they-contagious"
