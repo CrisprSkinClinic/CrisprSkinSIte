@@ -1,6 +1,5 @@
 ---
 // src/components/StatsBar.astro
-import Icon from './ui/Icon.astro';
 import ClinicIcon from './ui/ClinicIcon.astro';
 const googleReviewsUrl = 'https://share.google/UGVT60Semdn8hnpuv';
 
@@ -12,11 +11,11 @@ const stats = [
     decimals: 0,
     suffix: '',
     label: 'AIIMS-trained dermatologists',
+    sub: 'Skin and hair care',
   },
   {
     id: 'rating',
     icon: 'rating',
-    stars: true,
     end: 4.9,
     decimals: 1,
     suffix: '',
@@ -31,6 +30,7 @@ const stats = [
     decimals: 0,
     suffix: '+',
     label: 'Satisfied patients',
+    sub: 'Adults and children',
   },
   {
     id: 'experience',
@@ -39,6 +39,7 @@ const stats = [
     decimals: 0,
     suffix: '+',
     label: 'Years combined experience',
+    sub: 'Across three doctors',
   },
 ];
 ---
@@ -64,7 +65,7 @@ const stats = [
                 <ClinicIcon name={stat.icon} class="h-9 w-9 md:h-10 md:w-10" stroke={2} />
               </span>
               <p
-                class="bg-gradient-to-b from-white to-brand-200 bg-clip-text font-display text-[2.9rem] leading-[0.95] tracking-tight text-transparent tabular-nums md:text-[4.6rem]"
+                class="bg-gradient-to-b from-white to-brand-200 bg-clip-text font-display text-[2.6rem] leading-[0.95] tracking-tight text-transparent tabular-nums md:text-[4.6rem]"
                 data-stat-value
                 data-end={stat.end}
                 data-decimals={stat.decimals}
@@ -72,18 +73,8 @@ const stats = [
               >
                 0{stat.suffix}
               </p>
-              {stat.stars && (
-                <span class="mt-3 flex gap-1 text-amber-300 drop-shadow-[0_0_8px_rgba(252,211,77,0.55)]" aria-hidden="true">
-                  {[0, 1, 2, 3, 4].map(() => <Icon name="star" class="h-4 w-4 md:h-[1.1rem] md:w-[1.1rem]" fill="currentColor" stroke={0} />)}
-                </span>
-              )}
-              <p class="mt-3 text-[11px] font-bold uppercase leading-snug tracking-[0.14em] text-white/85 md:text-[13px]">{stat.label}</p>
-              {stat.sub && <p class="mt-1 text-xs text-white/60">{stat.sub}</p>}
-              {stat.href && (
-                <span class="mt-3 inline-flex items-center gap-1 text-xs font-bold text-accent-300 transition group-hover:gap-1.5">
-                  Read reviews <Icon name="arrow-right" class="h-3.5 w-3.5" stroke={2.4} />
-                </span>
-              )}
+              <p class="mt-3 min-h-[2.75em] text-[11px] font-bold uppercase leading-snug tracking-[0.14em] text-white/85 md:text-[13px]">{stat.label}</p>
+              <p class="mt-1.5 text-xs text-white/60 md:text-sm">{stat.sub}</p>
             </>
           );
           return stat.href ? (
