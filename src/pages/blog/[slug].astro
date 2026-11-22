@@ -1,7 +1,9 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
 import MainLayout from '../../layouts/MainLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { siteConfig } from '../../config/site.js';
+import { getServiceImage } from '../../utils/serviceImages';
 
 // 1. Generate a new path for every collection entry
 export async function getStaticPaths() {
@@ -33,10 +35,38 @@ const moreArticles = (await getCollection('blog'))
   )
   .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
   .slice(0, 4);
+
+const pageUrl = new URL(`/blog/${entry.slug}/`, siteConfig.url).toString();
+const shareImage = getServiceImage(relatedService?.data.heroImage)?.src;
+const imageAbs = new URL(shareImage || '/images/og-default.jpg', siteConfig.url).toString();
+// The article is written by one of the clinic's doctors when named, otherwise by the clinic team.
+const authorDoctor = siteConfig.doctors.find((d) => entry.data.author && entry.data.author.includes(d.name));
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "@id": `${pageUrl}#article`,
+  "headline": entry.data.title,
+  "description": entry.data.description,
+  "datePublished": new Date(entry.data.pubDate).toISOString(),
+  "dateModified": new Date(entry.data.pubDate).toISOString(),
+  "mainEntityOfPage": pageUrl,
+  "url": pageUrl,
+  "image": imageAbs,
+  "inLanguage": "en-IN",
+  "author": authorDoctor
+    ? { "@type": "Person", "name": authorDoctor.name, "url": new URL(`/our-doctors/${authorDoctor.slug}/`, siteConfig.url).toString() }
+    : { "@type": "Organization", "name": siteConfig.name, "url": siteConfig.url },
+  "publisher": { "@type": "MedicalClinic", "name": siteConfig.name, "url": siteConfig.url,
+    "logo": { "@type": "ImageObject", "url": new URL('/images/crispr-logo.png', siteConfig.url).toString() } },
+  ...(entry.data.tags?.length ? { "keywords": entry.data.tags.join(', ') } : {}),
+  ...(relatedCondition ? { "about": { "@type": "MedicalCondition", "name": relatedCondition.data.title, "url": new URL(`/conditions/${relatedCondition.slug}/`, siteConfig.url).toString() } } : {}),
+};
 ---
 
-<MainLayout title={entry.data.title} description={entry.data.description}>
-  <article class="max-w-3xl mx-auto py-16 px-6">
+<MainLayout title={entry.data.title} description={entry.data.description} image={shareImage} type="article">
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <Breadcrumbs items={[{ name: "Blog", url: "/blog" }, { name: entry.data.title, url: `/blog/${entry.slug}` }]} />
+  <article class="max-w-3xl mx-auto py-12 px-6">
     <div class="mb-8">
       <h1 class="text-4xl font-extrabold text-brand-900 mb-4">{entry.data.title}</h1>
       <p class="text-slate-500 font-medium">

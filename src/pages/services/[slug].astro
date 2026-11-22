@@ -59,20 +59,6 @@ const pageUrl = new URL(`/services/${entry.slug}`, siteConfig.url).toString();
 const heroImageAbs = optimizedHero
   ? new URL(optimizedHero.src, siteConfig.url).toString()
   : new URL('/images/hero-doctor.jpg', siteConfig.url).toString();
-
-const faqSchema = faqEntries.length > 0 ? {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqEntries.map((f) => ({
-    "@type": "Question",
-    "name": f.question,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": f.answer,
-    },
-  })),
-} : null;
-
 const medicalWebPageSchema = {
   "@context": "https://schema.org",
   "@type": "MedicalWebPage",
@@ -130,10 +116,9 @@ const medicalServiceSchema = {
 };
 ---
 
-<MainLayout title={data.title} description={data.metaDescription}>
+<MainLayout title={data.title} description={data.metaDescription} image={optimizedHero?.src}>
   <script type="application/ld+json" set:html={JSON.stringify(medicalWebPageSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(medicalServiceSchema)} />
-  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
   <Breadcrumbs items={[
     { name: "Services", url: "/services" },

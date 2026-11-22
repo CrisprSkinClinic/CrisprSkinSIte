@@ -5,6 +5,7 @@ import CTA from '../../components/CTA.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import FAQAccordion from '../../components/FAQAccordion.astro';
 import { siteConfig } from '../../config/site.js';
+import { getServiceImage } from '../../utils/serviceImages';
 
 export async function getStaticPaths() {
   const conditions = await getCollection('conditions');
@@ -19,6 +20,8 @@ const { Content } = await entry.render();
 const data = entry.data;
 
 const parentService = await getEntry('services', data.parentService);
+// Link-sharing image: the parent service's photo, when it has one.
+const shareImage = getServiceImage(parentService?.data.heroImage)?.src;
 const relatedConditionEntries = data.relatedConditions
   ? (await Promise.all(
       data.relatedConditions.map((slug) => getEntry('conditions', slug))
@@ -42,20 +45,6 @@ if (data.faqIds && data.faqIds.length > 0) {
 }
 
 const pageUrl = new URL(`/conditions/${entry.slug}`, siteConfig.url).toString();
-
-const faqSchema = faqEntries.length > 0 ? {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqEntries.map((f) => ({
-    "@type": "Question",
-    "name": f.question,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": f.answer,
-    },
-  })),
-} : null;
-
 const conditionSchema = {
   "@context": "https://schema.org",
   "@type": "MedicalCondition",
@@ -78,9 +67,8 @@ const conditionSchema = {
 };
 ---
 
-<MainLayout title={`${data.title}: Symptoms & Treatment`.length <= 48 ? `${data.title}: Symptoms & Treatment` : data.title} description={data.metaDescription}>
+<MainLayout title={`${data.title}: Symptoms & Treatment`.length <= 48 ? `${data.title}: Symptoms & Treatment` : data.title} description={data.metaDescription} image={shareImage}>
   <script type="application/ld+json" set:html={JSON.stringify(conditionSchema)} />
-  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
   <Breadcrumbs items={[
     { name: "Services", url: "/services" },
