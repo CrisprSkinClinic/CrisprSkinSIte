@@ -39,6 +39,9 @@ faqIds:
   - "hair-loss-normal-shedding"
   - "hair-loss-reversible"
   - "hair-loss-when-to-see-doctor"
+  - "hair-meds-finasteride-how-well-works"
+  - "hair-meds-how-long-results"
+  - "hair-meds-stop-what-happens"
 
 ctaTitle: "Book a Hair Loss Evaluation"
 ---
@@ -62,3 +65,7 @@ Where initial medical therapy isn't providing enough improvement, treatment is r
 ## Setting Realistic Expectations
 
 Hair loss treatment, in almost every form, works to slow progression and support existing hair rather than instantly reversing years of loss. We are upfront about what a given treatment can and cannot achieve for your specific pattern and stage of hair loss, and we build a plan around realistic, honest expectations rather than promises no treatment can actually keep.
+
+## Medicines: What They Can and Cannot Do
+
+For pattern hair loss, finasteride and minoxidil have the strongest evidence. See our page on [medical treatment for hair loss](/services/hair-loss-medical-treatment), our guides to [oral finasteride](/blog/oral-finasteride-for-hair-loss-benefits-and-side-effects) and [oral minoxidil](/blog/oral-minoxidil-for-hair-loss-what-to-know), and an honest look at [how effective medical treatment is](/blog/how-effective-is-medical-treatment-for-hair-loss). Nutrition also matters: [iron, vitamin D, protein and crash diets](/blog/nutrition-and-hair-loss-iron-vitamin-d-protein).

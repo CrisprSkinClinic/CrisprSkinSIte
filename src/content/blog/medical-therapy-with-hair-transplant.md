@@ -49,3 +49,7 @@ Ask which medical treatments make sense for you, when to start them, how long yo
 ## The Bottom Line
 
 A transplant is a powerful tool, but it works best as one part of a broader plan. If you are considering surgery, or have had a transplant elsewhere and are wondering how to protect your result, an evaluation can help us decide on the right combination for you.
+
+## More on the Medicines
+
+Read our guides to [oral finasteride](/blog/oral-finasteride-for-hair-loss-benefits-and-side-effects), [oral minoxidil](/blog/oral-minoxidil-for-hair-loss-what-to-know) and [how effective medical treatment is](/blog/how-effective-is-medical-treatment-for-hair-loss).

@@ -21,6 +21,8 @@ export function getServiceImage(slug?: string | null): ImageMetadata | undefined
 }
 
 export const serviceImageAlts: Record<string, string> = {
+  'hair-loss-medical-treatment': 'Hair loss medical treatment consultation with a dermatologist',
+  'diet-and-skin-disease': 'Evidence-based guidance on food and skin conditions',
   'vaccination': 'Dermatologists at CRISPR Skin and Hair Clinic who provide shingles and HPV vaccination',
   'winter-skin-care': 'Moisturising dry, sensitive skin in cooler weather',
   'hormonal-skin-conditions': 'Dermatology consultation for hormonal acne, excess hair and dark skin patches',

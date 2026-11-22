@@ -35,6 +35,10 @@ faqIds:
   - "fungal-infection-contagious"
   - "fungal-infection-why-keeps-coming-back"
   - "fungal-infection-treatment-duration"
+  - "tinea-how-long-treatment"
+  - "tinea-stop-when-itch-gone"
+  - "tinea-steroid-cream-danger"
+  - "tinea-family-screening"
 
 ctaTitle: "Book a Fungal Infection Evaluation"
 ---
@@ -56,3 +60,7 @@ For infections involving the nails or scalp, or widespread or resistant infectio
 ## Preventing Recurrence
 
 Beyond medication, we spend real time on practical prevention: keeping affected areas dry, treating or replacing contaminated footwear, not sharing towels or clothing during an active infection, and addressing household factors if a family member has a similar infection at the same time. This part of the conversation is often what actually breaks a cycle of repeated "reinfection" that looks like treatment isn't working.
+
+## Completing Treatment
+
+The most important factor is finishing the course. Read [why tinea treatment fails and the compliance that makes it work](/blog/tinea-treatment-why-it-fails-and-compliance), [how long to continue](/blog/tinea-how-long-to-continue-treatment), [why steroid creams make it worse](/blog/steroid-creams-and-tinea-why-they-make-it-worse), and [how to prevent it coming back](/blog/tinea-recurrence-prevention-household-and-hygiene).

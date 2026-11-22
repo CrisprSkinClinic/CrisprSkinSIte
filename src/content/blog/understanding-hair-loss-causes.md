@@ -43,3 +43,7 @@ For pattern hair loss, treatment aims to slow or stop progression and, in many p
 ## Keeping Realistic
 
 No treatment grows back hair that has no living follicle left. That is why early assessment matters, and why we look at your family history and pattern before suggesting a plan. Our guide to [pattern hair loss in men](/conditions/norwood-scale-male-pattern-baldness) explains the stages.
+
+## Related
+
+If the cause is pattern hair loss, see [medical treatment for hair loss](/services/hair-loss-medical-treatment). If shedding follows a diet or illness, see [nutrition and hair loss](/blog/nutrition-and-hair-loss-iron-vitamin-d-protein).

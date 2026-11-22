@@ -97,3 +97,7 @@ Early stages are often well suited to medical therapy, which helps slow loss and
 ## The Bottom Line
 
 Your stage is a starting point for a conversation, not a verdict. If you are noticing hair loss, an evaluation gives you an accurate picture of where you are, where you are likely to go, and what options are open to you.
+
+## Medicines Before Surgery
+
+Most men with early to moderate loss do well to start with medicines, because they slow progression and protect what is left. See [medical treatment for hair loss](/services/hair-loss-medical-treatment) and [how effective it really is](/blog/how-effective-is-medical-treatment-for-hair-loss).
