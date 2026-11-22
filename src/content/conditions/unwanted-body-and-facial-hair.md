@@ -33,6 +33,7 @@ treatmentOverview:
     description: "Where a hormonal driver is found, treating it alongside cosmetic approaches."
 
 relatedConditions:
+  - "hirsutism"
   - "female-pattern-hair-loss"
   - "hormonal-acne"
 
@@ -49,7 +50,7 @@ Body and facial hair vary widely between people, and much of that variation is n
 
 ## When It May Mean Something Else
 
-In women, hair that becomes noticeably thicker or darker in a male-like pattern, such as on the face, chest, or abdomen, can sometimes reflect a hormonal condition, most commonly polycystic ovary syndrome. Clues include irregular periods, acne, and thinning of scalp hair. If hair growth is new, rapidly increasing, or comes with other changes, it deserves a medical evaluation, and treating the cause may matter more than removing the hair. See also [hormonal acne](/conditions/hormonal-acne) and [female pattern hair loss](/conditions/female-pattern-hair-loss), which can coexist.
+In women, hair that becomes noticeably thicker or darker in a male-like pattern, such as on the face, chest, or abdomen, can sometimes reflect a hormonal condition, most commonly polycystic ovary syndrome. Clues include irregular periods, acne, and thinning of scalp hair. If hair growth is new, rapidly increasing, or comes with other changes, it deserves a medical evaluation, and treating the cause may matter more than removing the hair. This is called [hirsutism](/conditions/hirsutism), and the [hormonal skin service](/services/hormonal-skin-conditions) covers it. See also [hormonal acne](/conditions/hormonal-acne) and [female pattern hair loss](/conditions/female-pattern-hair-loss), which can coexist.
 
 ## Laser Hair Reduction
 

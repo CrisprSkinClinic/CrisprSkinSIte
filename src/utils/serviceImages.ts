@@ -23,6 +23,7 @@ export function getServiceImage(slug?: string | null): ImageMetadata | undefined
 export const serviceImageAlts: Record<string, string> = {
   'vaccination': 'Dermatologists at CRISPR Skin and Hair Clinic who provide shingles and HPV vaccination',
   'winter-skin-care': 'Moisturising dry, sensitive skin in cooler weather',
+  'hormonal-skin-conditions': 'Dermatology consultation for hormonal acne, excess hair and dark skin patches',
   'hair-transplant-fue': 'FUE hair transplant procedure by dermatologist in KK Nagar, Chennai',
   'hair-loss': 'Hair loss evaluation and treatment consultation',
   'female-hair-loss': 'Female pattern hair loss assessment by dermatologist',
