@@ -21,6 +21,7 @@ export function getServiceImage(slug?: string | null): ImageMetadata | undefined
 }
 
 export const serviceImageAlts: Record<string, string> = {
+  'hormonal-skin-conditions': 'Dermatology consultation for hormonal acne, excess hair and dark skin patches',
   'hair-transplant-fue': 'FUE hair transplant procedure by dermatologist in KK Nagar, Chennai',
   'hair-loss': 'Hair loss evaluation and treatment consultation',
   'female-hair-loss': 'Female pattern hair loss assessment by dermatologist',
