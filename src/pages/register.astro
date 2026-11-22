@@ -16,7 +16,7 @@ import { siteConfig } from '../config/site.js';
 const field = "w-full min-h-[52px] bg-white px-4 py-3 text-base text-[#17233d] placeholder:text-[#a9a3b3] border border-[#d9d3df] rounded-xl focus:border-[#9b4fa2] focus:ring-4 focus:ring-[#9b4fa2]/15 outline-none transition";
 const label = "text-sm font-semibold text-[#17233d] mb-1.5 block";
 const errorLine = "text-red-600 text-sm min-h-[1.25rem]";
-const chip = "reg-chip min-h-[48px] rounded-xl border border-[#d9d3df] bg-white px-3 py-2.5 text-sm font-semibold text-[#17233d] transition hover:bg-[#f6edf8]";
+const chip = "reg-chip inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-[#d9d3df] bg-white px-4 py-2 text-sm font-semibold text-[#17233d] transition hover:border-[#9b4fa2] hover:bg-[#faf5fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9b4fa2] active:scale-[0.97]";
 const primary = "flex-1 bg-[#9b4fa2] hover:bg-[#84358c] text-white font-bold min-h-[54px] px-6 text-base rounded-xl shadow-md transition active:scale-[0.98] disabled:opacity-60";
 const secondary = "min-h-[54px] px-5 text-base rounded-xl font-semibold border border-[#d9d3df] text-[#46536b] bg-white hover:bg-[#f6edf8] transition";
 const referralOptions = [
@@ -80,7 +80,7 @@ const referralOptions = [
 
           <div>
             <span class={label} id="reg-gender-label">Gender</span>
-            <div id="reg-gender-chips" class="grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby="reg-gender-label">
+            <div id="reg-gender-chips" class="flex flex-wrap gap-2 [&>button]:flex-1" role="radiogroup" aria-labelledby="reg-gender-label">
               <button type="button" role="radio" aria-checked="false" data-value="male" class={chip}>Male</button>
               <button type="button" role="radio" aria-checked="false" data-value="female" class={chip}>Female</button>
               <button type="button" role="radio" aria-checked="false" data-value="other" class={chip}>Other</button>
@@ -172,7 +172,7 @@ const referralOptions = [
         <div data-step-panel="3" class="hidden rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-5 md:p-7 space-y-5">
           <div>
             <span class={label} id="reg-referral-label">How did you hear about us?</span>
-            <div id="reg-referral-chips" class="grid grid-cols-2 sm:grid-cols-3 gap-2" role="radiogroup" aria-labelledby="reg-referral-label">
+            <div id="reg-referral-chips" class="flex flex-wrap gap-2" role="radiogroup" aria-labelledby="reg-referral-label">
               {referralOptions.map(([value, text]) => (
                 <button type="button" role="radio" aria-checked="false" data-value={value} class={chip}>{text}</button>
               ))}
@@ -245,8 +245,10 @@ const referralOptions = [
 <style is:global>
   /* CRISPR palette (matches the reception app) */
   body { background: #faf9fb; }
-  .reg-chip[aria-checked="true"] { background: #9b4fa2; border-color: #9b4fa2; color: #fff; }
-  .reg-chip[aria-checked="true"]:hover { background: #84358c; }
+  #reg-form .reg-chip[aria-checked="true"] { background: #9b4fa2; border-color: #9b4fa2; color: #fff; box-shadow: 0 4px 12px rgba(155, 79, 162, .3); }
+  #reg-form .reg-chip[aria-checked="true"]:hover { background: #84358c; border-color: #84358c; }
+  #reg-form .reg-chip[aria-checked="true"]::before { content: ""; width: .9rem; height: .9rem; flex: none; background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E"); }
+  @media (prefers-reduced-motion: reduce) { .reg-chip { transition: none; } }
   .reg-seg[data-state="done"], .reg-seg[data-state="current"] { background: #9b4fa2; }
   .reg-seg[data-state="current"] { opacity: .55; }
 </style>
