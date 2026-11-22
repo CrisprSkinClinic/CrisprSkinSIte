@@ -36,6 +36,6 @@ relatedConditions:
 ctaTitle: "Book a Pigmentation Evaluation"
 ---
 
-Post-inflammatory hyperpigmentation refers to dark marks that develop at the site of a healed pimple, injury, or other skin inflammation, as the skin produces extra pigment in response to the healing process. It's especially common and visible in darker skin types, and while it often fades on its own over several months, treatment can meaningfully speed this process along for marks that are slow to resolve.
+Post-inflammatory hyperpigmentation refers to dark marks that develop at the site of a healed pimple, injury, or other skin inflammation, as the skin produces extra pigment in response to the healing process. It's especially common and visible in darker skin types, and while it often fades on its own over several months, [treatment](/services/pigmentation) can meaningfully speed this process along for marks that are slow to resolve.
 
-The most effective preventive step is treating active acne or skin inflammation promptly, since the marks develop as a direct response to inflammation -- reducing how much inflammation occurs in the first place reduces how much post-inflammatory pigmentation follows.
+The most effective preventive step is [treating active acne](/conditions/acne-vulgaris) or skin inflammation promptly, since the marks develop as a direct response to inflammation -- reducing how much inflammation occurs in the first place reduces how much post-inflammatory pigmentation follows. Melasma behaves differently; see [pigmentation vs. melasma](/blog/pigmentation-vs-melasma).

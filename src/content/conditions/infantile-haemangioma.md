@@ -36,4 +36,4 @@ ctaTitle: "Book a Birthmark Evaluation"
 
 Infantile haemangiomas are common vascular birthmarks, sometimes called "strawberry marks," that typically appear within the first few weeks of life as a raised, red, rubbery growth. Most follow a predictable course: growing for several months, then gradually shrinking and fading over the following few years, often resolving largely on their own by early childhood.
 
-For most infants, monitoring through this natural course is the appropriate approach. Haemangiomas that grow especially rapidly, are unusually large, or are located near sensitive structures like the eyes or airway warrant closer evaluation, since these specific situations may benefit from treatment to prevent complications.
+For most infants, [monitoring through this natural course](/blog/birthmarks-for-parents) is the appropriate approach. Haemangiomas that grow especially rapidly, are unusually large, or are located near sensitive structures like the eyes or airway warrant [closer evaluation](/services/birthmarks), since these specific situations may benefit from treatment to prevent complications.

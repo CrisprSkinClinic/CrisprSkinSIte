@@ -49,6 +49,6 @@ ctaTitle: "Book a Skin Evaluation"
 
 Hidradenitis suppurativa is a long-term inflammatory condition affecting the hair follicles in skin folds, most often the armpits, groin, and buttocks. It causes painful lumps that may burst and drain, and over time can lead to scarring and tunnels under the skin.
 
-It is not caused by poor hygiene and it is not contagious, though many patients are told or assume otherwise. It is frequently mistaken for recurring boils, so diagnosis is often delayed by years.
+It is not caused by poor hygiene and it is not contagious, though many patients are told or assume otherwise. It involves the same hair follicles as [acne](/conditions/acne-vulgaris) but is a distinct condition. It is frequently mistaken for [recurring boils](/blog/hidradenitis-more-than-recurring-boils), so diagnosis is often delayed by years.
 
 Earlier treatment generally leads to better control and less scarring. A plan usually combines medicines, lifestyle measures, and, where needed, procedures, with [more advanced options](/services/biologics) for severe disease.

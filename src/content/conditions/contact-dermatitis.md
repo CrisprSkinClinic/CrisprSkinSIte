@@ -38,4 +38,4 @@ ctaTitle: "Book a Skin Allergy Evaluation"
 
 Contact dermatitis occurs when the skin reacts to direct contact with a specific substance -- either through an allergic reaction (allergic contact dermatitis) or direct irritation (irritant contact dermatitis) -- ranging from cosmetics and jewellery to plants, fragrances, and certain fabrics. The pattern and location of the reaction often provide a useful clue toward the likely category of trigger.
 
-Resolving contact dermatitis long-term depends far more on identifying and avoiding the specific trigger than on ongoing treatment. Where the trigger isn't obvious from history and examination alone, patch testing offers a more systematic way of confirming exactly what's responsible.
+Resolving contact dermatitis long-term depends far more on identifying and avoiding the specific trigger than on ongoing treatment. Where the trigger isn't obvious from history and examination alone, [patch testing](/blog/patch-testing-explained) offers a more systematic way of confirming exactly what's responsible. When the hands are mainly affected, see [hand eczema](/conditions/hand-eczema).

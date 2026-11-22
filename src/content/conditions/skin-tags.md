@@ -39,4 +39,4 @@ ctaTitle: "Book a Skin Growth Evaluation"
 
 Skin tags (acrochordons) are harmless, extremely common growths that tend to appear in areas of friction. They are not contagious and do not turn cancerous, so removal is a matter of comfort or appearance.
 
-Because other growths can resemble skin tags, we examine anything unusual before treating. Removal is quick, and new tags can form elsewhere over time, particularly where underlying factors like friction or weight persist.
+Because other growths, such as [moles](/conditions/melanocytic-naevi-moles) or [warts](/conditions/viral-warts), can resemble skin tags, we examine anything unusual before treating. [Removal](/services/warts-moles-skin-tags) is quick, and new tags can form elsewhere over time, particularly where underlying factors like friction or weight persist.

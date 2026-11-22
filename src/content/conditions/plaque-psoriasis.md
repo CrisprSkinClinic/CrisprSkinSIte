@@ -37,6 +37,6 @@ relatedConditions:
 ctaTitle: "Book a Psoriasis Evaluation"
 ---
 
-Plaque psoriasis is the most common form of psoriasis, a chronic autoimmune condition that causes skin cells to build up rapidly, forming thick, red, scaly patches most often seen on the elbows, knees, and lower back. It is not contagious, a persistent and unfortunate misconception that can affect how patients are treated socially.
+Plaque psoriasis is the most common form of psoriasis, a chronic autoimmune condition that causes skin cells to build up rapidly, forming thick, red, scaly patches most often seen on the elbows, knees, and lower back. It is [not contagious](/blog/psoriasis-not-contagious), a persistent and unfortunate misconception that can affect how patients are treated socially.
 
-As a chronic, relapsing-remitting condition, plaque psoriasis is managed with a long-term, sustained treatment plan rather than positioned around a single permanent cure, with topical therapy, phototherapy, or systemic treatment considered based on extent and severity.
+As a chronic, relapsing-remitting condition, plaque psoriasis is managed with a long-term, sustained treatment plan rather than positioned around a single permanent cure, with topical therapy, phototherapy, or [systemic treatment](/blog/psoriasis-treatment-ladder) considered based on extent and severity. Where disease is extensive, see [moderate-to-severe psoriasis](/conditions/moderate-to-severe-psoriasis).

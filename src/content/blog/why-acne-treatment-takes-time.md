@@ -5,6 +5,7 @@ description: "If you've started acne treatment and don't see results in a week, 
 author: "Dr. Karthik L"
 tags: ["Acne"]
 service: "acne"
+condition: "acne-vulgaris"
 ---
 
 One of the most common reasons acne treatment doesn't work isn't that the treatment itself was wrong -- it's that it was abandoned before it had a real chance to work.

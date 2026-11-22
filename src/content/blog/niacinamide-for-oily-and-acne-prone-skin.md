@@ -5,6 +5,7 @@ description: "Niacinamide is well tolerated by many skin types. What it helps wi
 author: "Dr. Karthik L"
 tags: ["Skincare Ingredients"]
 service: "acne"
+condition: "acne-vulgaris"
 ---
 
 Niacinamide, a form of vitamin B3, has become a staple in skincare. It earns its popularity, with some caveats.

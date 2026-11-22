@@ -32,6 +32,6 @@ relatedConditions:
 ctaTitle: "Book an Evaluation"
 ---
 
-Alopecia totalis and alopecia universalis are more extensive forms of alopecia areata -- totalis involving complete loss of scalp hair, and universalis involving complete loss of body hair, including eyebrows and eyelashes. These represent a more significant, and generally more treatment-resistant, end of the alopecia areata spectrum.
+Alopecia totalis and alopecia universalis are more extensive forms of [alopecia areata](/conditions/alopecia-areata) -- totalis involving complete loss of scalp hair, and universalis involving complete loss of body hair, including eyebrows and eyelashes. These represent a more significant, and generally more treatment-resistant, end of the alopecia areata spectrum.
 
-Given the greater extent of involvement, more advanced systemic treatment options are typically considered, discussed openly in terms of their potential benefits and the monitoring they require. We also recognize the significant emotional impact this level of hair loss can have, and support patients through a condition that is as challenging emotionally as it is medically.
+Given the greater extent of involvement, [more advanced systemic treatment options](/blog/jak-inhibitors-safety-and-monitoring) are typically considered, discussed openly in terms of their potential benefits and the monitoring they require. We also recognize the significant emotional impact this level of hair loss can have, and support patients through a condition that is as challenging emotionally as it is medically.

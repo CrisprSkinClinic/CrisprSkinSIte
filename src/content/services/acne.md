@@ -20,6 +20,7 @@ diagnostics:
   - "Assessment for hormonal or other contributing factors where indicated"
 
 conditionsManaged:
+  - "acne-vulgaris"
   - "hormonal-acne"
   - "acne-scar-types"
 

@@ -42,6 +42,6 @@ faqIds:
 ctaTitle: "Book an Eczema Evaluation"
 ---
 
-Atopic eczema in adults is often a continuation of a childhood pattern, though it can also first appear later in life. It tends to follow a cycle of flares and calmer periods, with the skin's weakened barrier making it prone to dryness, itching, and irritation.
+Atopic eczema in adults is often a continuation of a [childhood pattern](/conditions/childhood-atopic-dermatitis), though it can also first appear later in life. It tends to follow a cycle of flares and calmer periods, with the skin's [weakened barrier](/conditions/damaged-skin-barrier) making it prone to dryness, itching, and irritation.
 
-Treatment combines flare control with long-term barrier care. Because adult eczema can overlap with contact dermatitis and other conditions, an accurate diagnosis is the first step toward a plan that holds up over time.
+Treatment combines flare control with long-term barrier care. Because adult eczema can overlap with [contact dermatitis](/conditions/contact-dermatitis) and other conditions, an accurate diagnosis is the first step toward a plan that holds up over time.

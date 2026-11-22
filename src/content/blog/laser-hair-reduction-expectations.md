@@ -5,6 +5,7 @@ description: "This one word choice matters -- here's what laser hair reduction c
 author: "Dr. Karthik L"
 tags: ["Laser Hair Reduction"]
 service: "laser-hair-reduction"
+condition: "unwanted-body-and-facial-hair"
 ---
 
 We deliberately use the term "reduction" rather than "removal" when talking about [laser hair treatment](/services/laser-hair-reduction), and it's worth explaining why that distinction matters for setting the right expectations from the start.

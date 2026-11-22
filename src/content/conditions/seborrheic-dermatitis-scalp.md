@@ -34,6 +34,6 @@ relatedConditions:
 ctaTitle: "Book a Scalp Evaluation"
 ---
 
-Seborrheic dermatitis is an inflammatory skin condition affecting oil-producing areas of the body, with the scalp being one of the most commonly affected sites. It's driven partly by an overgrowth of Malassezia yeast, naturally present on the skin, and presents with redness, greasy yellowish scale, and itching -- distinct from the drier, finer flaking of simple dandruff or dry scalp.
+Seborrheic dermatitis is an inflammatory skin condition affecting oil-producing areas of the body, with the scalp being one of the most commonly affected sites. It's driven partly by an overgrowth of Malassezia yeast, naturally present on the skin, and presents with redness, greasy yellowish scale, and itching -- distinct from the drier, finer flaking of [simple dandruff](/blog/dandruff-myths) or dry scalp.
 
-Because standard anti-dandruff shampoo alone often isn't enough to control seborrheic dermatitis, treatment typically combines a medicated shampoo, used at the correct frequency and contact time, with a targeted topical anti-inflammatory treatment to address the underlying inflammation directly.
+Because standard anti-dandruff shampoo alone often isn't enough to control seborrheic dermatitis, treatment typically combines [a medicated shampoo](/services/dandruff), used at the correct frequency and contact time, with a targeted topical anti-inflammatory treatment to address the underlying inflammation directly. Thick, adherent scale may instead be [scalp psoriasis](/conditions/scalp-psoriasis).

@@ -5,6 +5,7 @@ description: "These two treatments get confused constantly, but they solve diffe
 author: "Dr. Karthik L"
 tags: ["Fillers"]
 service: "fillers"
+condition: "facial-volume-loss"
 ---
 
 Botox and dermal fillers are often mentioned in the same breath, but they work in fundamentally different ways and address different concerns. Knowing the distinction helps you have a more useful conversation at your consultation.

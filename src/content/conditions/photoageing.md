@@ -44,6 +44,6 @@ faqIds:
 ctaTitle: "Book an Anti-ageing Consultation"
 ---
 
-Photoageing refers to skin changes driven mainly by years of sun exposure, rather than by the passage of time alone. It shows up as fine lines, uneven tone, sun spots, and rougher texture, and in deeper skin tones often appears as patchy pigmentation more than as wrinkles.
+Photoageing refers to skin changes driven mainly by years of sun exposure, rather than by the passage of time alone. It shows up as fine lines, uneven tone, sun spots, and rougher texture, and in deeper skin tones often appears as [patchy pigmentation](/conditions/post-inflammatory-hyperpigmentation) more than as wrinkles.
 
-Because so much of it is sun-related, prevention is both the simplest and most effective measure. Established changes can be improved with a combination of topical treatment and in-clinic options, planned to suit your skin type and the time you can set aside for recovery.
+Because so much of it is [sun-related](/blog/sunscreen-and-visible-light-indian-skin), prevention is both the simplest and most effective measure. Established changes can be improved with a combination of [topical treatment](/blog/retinol-vs-retinoids-how-to-start) and [in-clinic options](/services/anti-ageing), planned to suit your skin type and the time you can set aside for recovery.

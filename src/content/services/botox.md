@@ -19,7 +19,9 @@ diagnostics:
   - "Discussion of treatment goals and areas of concern"
   - "Medical history review to confirm suitability for treatment"
 
-conditionsManaged: []
+conditionsManaged:
+  - "expression-lines"
+  - "photoageing"
 
 treatments:
   - name: "Upper Face Treatment"

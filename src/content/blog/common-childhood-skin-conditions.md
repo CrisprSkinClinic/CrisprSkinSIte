@@ -5,6 +5,7 @@ description: "A guide for parents on the childhood skin conditions we see most o
 author: "Dr. Narayanan A"
 tags: ["Pediatric Dermatology"]
 service: "pediatric-dermatology"
+condition: "childhood-atopic-dermatitis"
 ---
 
 Parents bring children in for a wide range of skin concerns, but a handful of conditions make up the large majority of what we see. Here's a quick guide to the most common ones, and roughly what to expect.

@@ -41,6 +41,6 @@ faqIds:
 ctaTitle: "Book a Fungal Infection Evaluation"
 ---
 
-Pityriasis versicolor is caused by overgrowth of a yeast that normally lives on the skin. It produces fine-scaled patches whose colour differs from the surrounding skin, which is why it is often confused with vitiligo or other pigmentation problems.
+Pityriasis versicolor is caused by overgrowth of a yeast that normally lives on the skin. It produces fine-scaled patches whose colour differs from the surrounding skin, which is why it is often confused with [vitiligo](/conditions/vitiligo) or other pigmentation problems.
 
-Treatment clears the infection quickly, but the pigment difference can take weeks to even out after the yeast is gone. That delay is normal and not a sign that treatment failed.
+[Treatment](/services/fungal-infections) clears the infection quickly, but the pigment difference can take weeks to even out after the yeast is gone. That delay is normal and not a sign that treatment failed. Recurrence is common; see [why fungal infections keep coming back](/blog/fungal-infection-recurrence).

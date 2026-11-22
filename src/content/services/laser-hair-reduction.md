@@ -19,7 +19,8 @@ diagnostics:
   - "Treatment area discussion and realistic session planning"
   - "Medical history review, including any medications that affect suitability"
 
-conditionsManaged: []
+conditionsManaged:
+  - "unwanted-body-and-facial-hair"
 
 treatments:
   - name: "Laser Hair Reduction Sessions"

@@ -19,7 +19,9 @@ diagnostics:
   - "Discussion of treatment goals and areas of concern"
   - "Medical history review to confirm suitability for treatment"
 
-conditionsManaged: []
+conditionsManaged:
+  - "facial-volume-loss"
+  - "expression-lines"
 
 treatments:
   - name: "Cheek & Midface Volumizing"

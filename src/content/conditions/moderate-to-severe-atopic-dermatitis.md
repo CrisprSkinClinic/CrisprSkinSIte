@@ -44,6 +44,6 @@ faqIds:
 ctaTitle: "Book an Eczema Evaluation"
 ---
 
-Atopic dermatitis is considered moderate-to-severe when it covers large areas, remains active despite good basic care, or significantly affects sleep and daily life. Before moving to advanced options, we first check the basics: whether creams are used correctly and consistently, whether a trigger or infection is driving flares, and whether another diagnosis such as contact dermatitis is at play.
+Atopic dermatitis is considered moderate-to-severe when it covers large areas, remains active despite good basic care, or significantly affects sleep and daily life. Before moving to advanced options, we first check the basics: whether creams are used correctly and consistently, whether a trigger or infection is driving flares, and whether another diagnosis such as [contact dermatitis](/conditions/contact-dermatitis) is at play.
 
-When disease remains uncontrolled, [newer targeted medicines](/blog/newer-treatments-for-stubborn-eczema) have changed what is possible for many patients. These need careful selection, screening, and monitoring, and the decision rests on your age, health, and goals.
+When disease remains uncontrolled, [newer targeted medicines](/blog/newer-treatments-for-stubborn-eczema) have changed what is possible for many patients. These need careful selection, [screening, and monitoring](/services/biologics), and the decision rests on your age, health, and goals.

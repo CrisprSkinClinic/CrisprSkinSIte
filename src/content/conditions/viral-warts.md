@@ -35,6 +35,6 @@ relatedConditions:
 ctaTitle: "Book a Wart Evaluation"
 ---
 
-Viral warts are caused by a viral infection of the skin and are contagious, spreading through direct contact or shared surfaces. They can appear anywhere on the body but are especially common on the hands and feet, sometimes clustering together over time if untreated.
+Viral warts are caused by a [viral infection](/blog/viral-skin-infections-school) of the skin and are contagious, spreading through direct contact or shared surfaces. They can appear anywhere on the body but are especially common on the hands and feet, sometimes clustering together over time if untreated.
 
-Cryotherapy -- freezing the wart with liquid nitrogen -- is the standard first-line treatment, typically requiring a few sessions spaced a few weeks apart depending on size and location. Warts that don't respond adequately to cryotherapy can be managed with alternative removal approaches discussed at your evaluation.
+[Cryotherapy](/services/warts-moles-skin-tags) -- freezing the wart with liquid nitrogen -- is the standard first-line treatment, typically requiring a few sessions spaced a few weeks apart depending on size and location. Warts that don't respond adequately to cryotherapy can be managed with alternative removal approaches discussed at your evaluation. Another common viral skin infection with a similar course is [molluscum contagiosum](/conditions/molluscum-contagiosum).

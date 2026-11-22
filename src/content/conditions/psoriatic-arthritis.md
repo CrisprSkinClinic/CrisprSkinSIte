@@ -43,6 +43,6 @@ faqIds:
 ctaTitle: "Book a Psoriasis Evaluation"
 ---
 
-A proportion of people with psoriasis develop inflammation in their joints, known as psoriatic arthritis. It can appear years after the skin disease, and occasionally before it. Untreated, it can cause lasting joint damage, so early recognition matters.
+A proportion of people with [psoriasis](/conditions/plaque-psoriasis) develop inflammation in their joints, known as psoriatic arthritis. It can appear years after the skin disease, and occasionally before it. Untreated, it can cause lasting joint damage, so early recognition matters.
 
-Treating the skin and joints together is often the most effective approach, and [some medicines address both](/blog/biologics-in-dermatology-explained). If you have psoriasis and persistent joint symptoms, mention them at your visit so they can be assessed properly.
+Treating the skin and joints together is often the most effective approach, and [some medicines address both](/blog/biologics-in-dermatology-explained). If you have psoriasis and persistent joint symptoms, [mention them at your visit](/services/psoriasis) so they can be assessed properly. Nail changes can also be an early clue; see [nail psoriasis](/conditions/nail-psoriasis).

@@ -5,6 +5,7 @@ description: "The frozen, overdone look people worry about with Botox is almost 
 author: "Dr. Karthik L"
 tags: ["Botox"]
 service: "botox"
+condition: "expression-lines"
 ---
 
 The most common concern we hear before a first Botox treatment isn't about safety -- it's "will I look frozen." It's a reasonable worry, and understanding where that look actually comes from helps explain why it isn't an inevitable outcome.

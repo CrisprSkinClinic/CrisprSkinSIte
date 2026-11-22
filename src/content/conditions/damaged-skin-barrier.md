@@ -45,6 +45,6 @@ faqIds:
 ctaTitle: "Book a Skin Evaluation"
 ---
 
-The outer layer of the skin works as a barrier, keeping moisture in and irritants out. Harsh products, over-exfoliation, and piling on strong active ingredients can break it down, leaving skin that stings, flakes, and reacts unpredictably.
+The outer layer of the skin works as a barrier, keeping moisture in and irritants out. Harsh products, over-exfoliation, and [piling on strong active ingredients](/blog/skincare-routine-order-and-active-clashes) can break it down, leaving skin that stings, flakes, and reacts unpredictably.
 
-Most mild cases recover when the routine is stripped back to basics for a few weeks. Skin that does not improve, or that keeps flaring, deserves an examination to check for an underlying condition, because eczema or an allergic reaction to a product can mimic a simple barrier problem.
+Most mild cases recover when the routine is stripped back to basics for a few weeks. Skin that does not improve, or that keeps flaring, deserves an examination to check for an underlying condition, because [eczema](/services/eczema) or an [allergic reaction to a product](/conditions/contact-dermatitis) can mimic a simple barrier problem.

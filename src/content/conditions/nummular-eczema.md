@@ -41,6 +41,6 @@ faqIds:
 ctaTitle: "Book an Eczema Evaluation"
 ---
 
-Nummular eczema -- from the Latin for coin -- causes well-defined, round patches of inflamed, itchy skin. It is easily mistaken for a fungal infection such as ringworm, which is why an examination, and sometimes a simple skin scraping, is worth doing before starting treatment.
+Nummular eczema -- from the Latin for coin -- causes well-defined, round patches of inflamed, itchy skin. It is easily mistaken for a fungal infection such as [ringworm](/conditions/tinea-infections), which is why an examination, and sometimes a simple skin scraping, is worth doing before starting treatment.
 
-The patches can be stubborn and tend to recur in the same places. Consistent moisturizing and appropriate topical treatment control most cases well.
+The patches can be stubborn and tend to recur in the same places. Consistent moisturizing and [appropriate topical treatment](/services/eczema) control most cases well. It is one of several patterns of [adult eczema](/conditions/atopic-eczema-adults).

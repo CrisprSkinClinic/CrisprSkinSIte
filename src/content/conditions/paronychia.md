@@ -41,6 +41,6 @@ faqIds:
 ctaTitle: "Book a Nail Evaluation"
 ---
 
-Paronychia is inflammation of the skin fold around the nail. The acute form appears suddenly and is usually bacterial; the chronic form develops over weeks to months and is typically a barrier problem aggravated by moisture and irritation, sometimes with yeast involved.
+Paronychia is inflammation of the skin fold around the [nail](/services/nail-disorders). The acute form appears suddenly and is usually bacterial; the chronic form develops over weeks to months and is typically a barrier problem aggravated by moisture and irritation, sometimes with yeast involved.
 
-Chronic cases heal only when the nail fold is protected from repeated wetting and injury, so habit changes are as important as medication.
+Chronic cases heal only when the nail fold is protected from repeated wetting and injury, so habit changes are as important as medication. See also [nail fungus](/conditions/onychomycosis) and [ingrown toenails](/conditions/ingrown-toenail), which can look similar.

@@ -35,6 +35,6 @@ relatedConditions:
 ctaTitle: "Book a Consultation for Your Child"
 ---
 
-Diaper dermatitis is a common irritation caused by prolonged contact with moisture and friction in the diaper area, generally responding well to basic measures like frequent diaper changes, gentle cleansing, and a protective barrier cream. Most cases improve within a few days with consistent care.
+Diaper dermatitis is a common [irritation](/conditions/contact-dermatitis) caused by prolonged contact with moisture and friction in the diaper area, generally responding well to basic measures like frequent diaper changes, gentle cleansing, and a protective barrier cream. Most cases improve within a few days with consistent care.
 
-Rash that's more severe, spreading, or not improving with basic measures can involve a secondary fungal or bacterial infection, which needs a different, targeted treatment alongside continued barrier care -- an evaluation helps distinguish straightforward diaper rash from these less common but treatable complications.
+Rash that's more severe, spreading, or not improving with basic measures can involve a secondary fungal or bacterial infection, which needs a different, targeted treatment alongside continued barrier care -- [an evaluation](/services/pediatric-dermatology) helps distinguish straightforward diaper rash from these less common but treatable complications. For other common rashes in children, see [common childhood skin conditions](/blog/common-childhood-skin-conditions).

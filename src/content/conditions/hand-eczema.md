@@ -41,6 +41,6 @@ faqIds:
 ctaTitle: "Book a Skin Allergy Evaluation"
 ---
 
-Hand eczema is among the most common skin complaints in people who wash their hands often or work with water, cleaning products, or chemicals. It may be irritant-driven, allergic, atopic, or a mix -- and distinguishing these shapes the plan.
+Hand eczema is among the most common skin complaints in people who wash their hands often or work with water, cleaning products, or chemicals. It may be irritant-driven, [allergic](/conditions/contact-dermatitis), [atopic](/conditions/atopic-eczema-adults), or a mix -- and distinguishing these shapes the plan.
 
-Treatment pairs medicated creams with protection and moisturizing habits, since without those the hands are quickly re-injured and the problem returns.
+Treatment pairs medicated creams with protection and [moisturizing habits](/services/eczema), since without those the hands are quickly re-injured and the problem returns. Persistent cases may need [patch testing](/blog/patch-testing-explained) to look for an allergen.

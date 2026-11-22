@@ -41,6 +41,6 @@ faqIds:
 ctaTitle: "Book a Hives Evaluation"
 ---
 
-Most people with chronic hives respond to antihistamines, sometimes at higher doses than standard under medical supervision. A smaller group continues to have symptoms despite this, and this is not a sign they have done anything wrong.
+Most people with [chronic hives](/conditions/urticaria-acute-chronic) respond to antihistamines, sometimes at higher doses than standard under medical supervision. A smaller group continues to have symptoms despite this, and this is not a sign they have done anything wrong.
 
 For these patients, [add-on options exist](/blog/hives-not-responding-to-antihistamines), including injectable treatment that targets a specific part of the allergic pathway. Treatment is chosen after assessment, and disease often settles over time, so the plan is reviewed regularly.

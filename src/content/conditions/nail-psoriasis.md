@@ -40,6 +40,6 @@ faqIds:
 ctaTitle: "Book a Nail Evaluation"
 ---
 
-Up to half of people with psoriasis develop nail changes at some point, and in some cases the nails are affected before any skin rash appears. Pitting, thickening, and separation of the nail look similar to a fungal infection, but the treatments are different, so confirming the diagnosis matters.
+Up to half of people with [psoriasis](/conditions/plaque-psoriasis) develop nail changes at some point, and in some cases the nails are affected before any skin rash appears. Pitting, thickening, and separation of the nail look similar to a [fungal infection](/conditions/onychomycosis), but the treatments are different, so confirming the diagnosis matters.
 
-Nails grow slowly, so improvement takes months. Treatment aims to improve appearance and comfort, and nail changes also prompt a check for joint symptoms.
+Nails grow slowly, so improvement takes months. Treatment aims to improve appearance and comfort, and nail changes also prompt a check for [joint symptoms](/conditions/psoriatic-arthritis). See also [when nail changes are more than cosmetic](/blog/nail-changes-when-to-see-a-doctor).
