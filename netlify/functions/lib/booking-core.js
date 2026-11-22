@@ -229,7 +229,7 @@ async function lastConsultation(supabase, canonicalPhone, name) {
   if (!patient) return null;
   const { data: visit, error } = await supabase
     .from("appointments")
-    .select("slot_date, doctor_id, doctors(name)")
+    .select("slot_date, doctor_id, doctors!appointments_doctor_id_fkey(name)")
     .eq("patient_id", patient.id)
     .in("doctor_id", CLINIC_DOCTOR_IDS)
     .lte("slot_date", clinicNow().date)
@@ -248,7 +248,7 @@ async function lastConsultation(supabase, canonicalPhone, name) {
 async function appointmentOnDay(supabase, patientId, slotDate, ignoreAppointmentId = null) {
   let q = supabase
     .from("appointments")
-    .select("id, slot_time, status, linked_group_id, doctor_id, notes, doctors(name)")
+    .select("id, slot_time, status, linked_group_id, doctor_id, notes, doctors!appointments_doctor_id_fkey(name)")
     .eq("patient_id", patientId)
     .in("doctor_id", CLINIC_DOCTOR_IDS)
     .eq("slot_date", slotDate)
