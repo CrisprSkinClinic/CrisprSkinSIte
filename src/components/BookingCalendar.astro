@@ -131,10 +131,10 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         <div class="space-y-5">
           <div>
             <p id="bookingForLabel" class="mb-2 text-sm font-semibold text-slate-700">Who is this appointment for?</p>
-            <div id="bookingFor" class="grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby="bookingForLabel">
-              <button type="button" role="radio" aria-checked="true" data-for="self" class="booking-for min-h-[44px] rounded-xl border px-2 py-2.5 text-sm font-semibold transition border-brand-600 bg-brand-600 text-white">Myself</button>
-              <button type="button" role="radio" aria-checked="false" data-for="family" class="booking-for min-h-[44px] rounded-xl border px-2 py-2.5 text-sm font-semibold transition border-slate-300 bg-white text-brand-900 hover:bg-brand-50">Family member</button>
-              <button type="button" role="radio" aria-checked="false" data-for="friend" class="booking-for min-h-[44px] rounded-xl border px-2 py-2.5 text-sm font-semibold transition border-slate-300 bg-white text-brand-900 hover:bg-brand-50">Friend</button>
+            <div id="bookingFor" class="flex flex-wrap gap-2 [&>button]:flex-1" role="radiogroup" aria-labelledby="bookingForLabel">
+              <button type="button" role="radio" aria-checked="true" data-for="self" class="booking-for bk-chip inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-brand-900 transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 active:scale-[0.97]">Myself</button>
+              <button type="button" role="radio" aria-checked="false" data-for="family" class="booking-for bk-chip inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-brand-900 transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 active:scale-[0.97]">Family member</button>
+              <button type="button" role="radio" aria-checked="false" data-for="friend" class="booking-for bk-chip inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-brand-900 transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 active:scale-[0.97]">Friend</button>
             </div>
           </div>
 
@@ -276,6 +276,10 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
 </div>
 
 <style is:global>
+  #bookingCalendarRoot .bk-chip[aria-checked="true"] { background: #7E4D8B; border-color: #7E4D8B; color: #fff; box-shadow: 0 4px 12px rgba(126, 77, 139, .3); }
+  #bookingCalendarRoot .bk-chip[aria-checked="true"]:hover { background: #6a3f76; border-color: #6a3f76; }
+  #bookingCalendarRoot .bk-chip[aria-checked="true"]::before { content: ""; width: .9rem; height: .9rem; flex: none; background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E"); }
+  @media (prefers-reduced-motion: reduce) { #bookingCalendarRoot .bk-chip { transition: none; } }
   #bookingProgress .step { border-color: rgb(226 232 240); background: #fff; color: rgb(100 116 139); transition: all .2s ease; }
   #bookingProgress .step .step-dot { background: rgb(226 232 240); color: rgb(71 85 105); }
   #bookingProgress .step[data-state="current"] { border-color: #7E4D8B; color: rgb(15 23 42); background: #FBF8FC; }
@@ -481,9 +485,6 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         document.querySelectorAll('#bookingFor .booking-for').forEach((b) => {
           const on = b === btn;
           b.setAttribute('aria-checked', String(on));
-          b.classList.toggle('bg-brand-600', on); b.classList.toggle('border-brand-600', on); b.classList.toggle('text-white', on);
-          b.classList.toggle('bg-white', !on); b.classList.toggle('border-slate-300', !on); b.classList.toggle('text-brand-900', !on);
-          b.classList.toggle('hover:bg-brand-50', !on);
         });
         $('firstName').placeholder = bookingFor === 'self' ? 'First name' : "Patient's first name";
         $('lastName').placeholder = bookingFor === 'self' ? 'Last name' : "Patient's last name";
@@ -521,14 +522,16 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         chip.type = 'button';
         chip.textContent = p.name;
         const on = p.name.toLowerCase() === current;
-        chip.className = `min-h-[40px] px-3.5 py-2 rounded-full border text-sm font-medium transition ${on ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-brand-200 text-brand-900 hover:bg-brand-50'}`;
+        chip.className = 'bk-chip inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-brand-900 transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 active:scale-[0.97]';
+        chip.setAttribute('role', 'radio');
+        chip.setAttribute('aria-checked', String(on));
         chip.addEventListener('click', () => { fillName(p.name); checkReturningPatient(); });
         familyChips.appendChild(chip);
       });
       const someoneNew = document.createElement('button');
       someoneNew.type = 'button';
       someoneNew.textContent = '+ Someone new';
-      someoneNew.className = 'min-h-[40px] px-3.5 py-2 rounded-full border border-dashed border-slate-300 text-sm font-medium text-slate-600 hover:bg-slate-50';
+      someoneNew.className = 'inline-flex min-h-[44px] items-center rounded-full border border-dashed border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50';
       someoneNew.addEventListener('click', () => {
         $('firstName').value = '';
         $('lastName').value = '';
