@@ -154,14 +154,6 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
 
   <body class="bg-warmwhite text-charcoal antialiased selection:bg-brand-200 selection:text-brand-900 flex flex-col min-h-screen pb-20 md:pb-0">
     
-    <div class="hidden sm:flex bg-slate-900 text-white/90 text-xs py-2 px-6 flex-row justify-between items-center gap-3 relative z-50 tracking-wide">
-      <span class="uppercase whitespace-nowrap">Chennai · Dermatologist-led</span>
-      <div class="flex flex-col sm:flex-row sm:space-x-4 items-center">
-        <span class="whitespace-nowrap">{siteConfig.contact.phone}</span>
-        <a href={`mailto:${siteConfig.contact.email}`} class="hover:underline hidden sm:inline">{siteConfig.contact.email}</a>
-      </div>
-    </div>
-    
     {!bare && <Navbar />}
     
     <main class="flex-grow overflow-hidden">

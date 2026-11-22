@@ -5,6 +5,11 @@ import MainLayout from '../../layouts/MainLayout.astro';
 import BookingSection from '../../components/LandingPageSections/BookingSection.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import FAQAccordion from '../../components/FAQAccordion.astro';
+import StepCards from '../../components/ui/StepCards.astro';
+import OptionCards from '../../components/ui/OptionCards.astro';
+import LinkCards from '../../components/ui/LinkCards.astro';
+import TocChips from '../../components/ui/TocChips.astro';
+import SideBookCard from '../../components/ui/SideBookCard.astro';
 import { siteConfig } from '../../config/site.js';
 import { getServiceImage, getServiceImageAlt } from '../../utils/serviceImages';
 
@@ -17,7 +22,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content, headings } = await entry.render();
 const data = entry.data;
 
 const optimizedHero = getServiceImage(data.heroImage);
@@ -125,26 +130,30 @@ const medicalServiceSchema = {
     { name: data.title, url: `/services/${entry.slug}` }
   ]} />
 
-  <section class="bg-[#fdfcfc] py-12 md:py-20 px-5 md:px-6 border-b border-slate-200/70">
-    <div class="max-w-7xl mx-auto grid md:grid-cols-[.9fr_1.1fr] items-center gap-10 md:gap-14">
+  <section class="bg-gradient-to-b from-brand-50/70 to-transparent px-5 pb-12 pt-3 md:px-6 md:pb-20">
+    <div class="mx-auto grid max-w-7xl items-center gap-10 md:grid-cols-[1.02fr_.98fr] md:gap-14">
       <div>
         {data.heroEyebrow && (
-          <span class="text-brand-600 font-bold tracking-[0.18em] uppercase text-xs mb-5 block">{data.heroEyebrow}</span>
+          <span class="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-100 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-brand-700 shadow-sm"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>{data.heroEyebrow}</span>
         )}
-        <h1 class="text-4xl md:text-6xl text-slate-950 mb-6 leading-[1.05]">{data.heroHeadline}</h1>
-        <p class="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
-          {data.heroSubheadline}
-        </p>
-        <a href="#book" class="bg-brand-700 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-brand-900/15 hover:bg-brand-800 transition inline-flex items-center gap-3">
-          {data.ctaTitle || `Book a ${data.title} Evaluation`}
-          <span aria-hidden="true">→</span>
-        </a>
-        <p class="mt-5 text-xs font-semibold text-slate-500">Consultation first · Treatment only when indicated</p>
+        <h1 class="mb-5 text-4xl leading-[1.05] text-slate-950 md:text-6xl">{data.heroHeadline}</h1>
+        <p class="mb-8 max-w-xl text-lg leading-relaxed text-slate-600 md:text-xl">{data.heroSubheadline}</p>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <a href="#book" data-track="booking-click" class="inline-flex min-h-[52px] items-center justify-center gap-3 rounded-2xl bg-brand-800 px-7 font-bold text-white shadow-lg shadow-brand-900/20 transition hover:bg-brand-700 active:scale-[0.98]">
+            {data.ctaTitle || `Book a ${data.title} Evaluation`} <span aria-hidden="true">→</span>
+          </a>
+          <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-[52px] items-center justify-center rounded-2xl border border-emerald-200 bg-white/80 px-6 font-bold text-emerald-800 transition hover:bg-emerald-50">Chat on WhatsApp</a>
+        </div>
+        <ul class="mt-6 flex flex-wrap gap-2 text-xs font-semibold text-slate-600">
+          <li class="rounded-full border border-slate-200 bg-white px-3 py-1.5">AIIMS-trained dermatologists</li>
+          <li class="rounded-full border border-slate-200 bg-white px-3 py-1.5">Consultation first</li>
+          <li class="rounded-full border border-slate-200 bg-white px-3 py-1.5">KK Nagar, Chennai</li>
+        </ul>
       </div>
 
       {optimizedHero ? (
-        <div class="w-full">
-          <div class="rounded-2xl shadow-xl shadow-slate-900/10 border border-slate-200 bg-white overflow-hidden aspect-[4/3] p-1.5">
+        <div class="relative">
+          <div class="aspect-[4/3] overflow-hidden rounded-[32px] border border-white bg-white p-1.5 shadow-2xl shadow-brand-900/15">
             <Image
               src={optimizedHero}
               alt={heroAlt}
@@ -155,8 +164,12 @@ const medicalServiceSchema = {
               formats={['avif', 'webp']}
               quality={80}
               loading="eager"
-              class="w-full h-full object-cover rounded-xl"
+              class="h-full w-full rounded-[26px] object-cover"
             />
+          </div>
+          <div class="glass absolute -bottom-4 left-4 flex items-center gap-3 rounded-2xl px-4 py-3 md:left-6">
+            <span class="grid h-9 w-9 place-items-center rounded-full bg-emerald-100 text-emerald-700" aria-hidden="true"><svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <div><p class="text-sm font-bold leading-tight text-slate-900">Evidence-based care</p><p class="text-xs text-slate-600">No unnecessary procedures</p></div>
           </div>
         </div>
       ) : null}
@@ -164,105 +177,68 @@ const medicalServiceSchema = {
   </section>
 
   {data.twoPaths && (
-    <section class="py-16 px-6 max-w-5xl mx-auto">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-brand-50 border border-brand-100 p-8 rounded-xl">
-          <h2 class="text-xl font-bold text-brand-900 mb-3">{data.twoPaths.screeningTitle}</h2>
-          <p class="text-slate-700 leading-relaxed">{data.twoPaths.screeningBody}</p>
+    <section class="px-5 md:px-6">
+      <div class="mx-auto grid max-w-6xl gap-5 pb-10 md:grid-cols-2">
+        <div class="ui-card bg-gradient-to-br from-brand-50 to-white p-7">
+          <span class="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-brand-100 text-brand-700" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <h2 class="mb-2 font-sans text-lg font-bold text-brand-900">{data.twoPaths.screeningTitle}</h2>
+          <p class="leading-relaxed text-slate-700">{data.twoPaths.screeningBody}</p>
         </div>
-        <div class="bg-red-50 border border-red-200 p-8 rounded-xl">
-          <h2 class="text-xl font-bold text-red-900 mb-3">{data.twoPaths.symptomsTitle}</h2>
-          <p class="text-red-800 leading-relaxed">{data.twoPaths.symptomsBody}</p>
+        <div class="ui-card border-rose-100 bg-gradient-to-br from-rose-50 to-white p-7">
+          <span class="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-rose-100 text-rose-700" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+          <h2 class="mb-2 font-sans text-lg font-bold text-rose-900">{data.twoPaths.symptomsTitle}</h2>
+          <p class="leading-relaxed text-rose-900/80">{data.twoPaths.symptomsBody}</p>
         </div>
       </div>
     </section>
   )}
 
-  <section class="py-8 px-6 max-w-4xl mx-auto">
-    <div class="prose prose-lg prose-blue max-w-none text-slate-700">
-      <Content />
+  <div class="mx-auto max-w-6xl px-5 py-6 md:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-12">
+    <div class="min-w-0 space-y-14 pb-10">
+      <section>
+        <TocChips headings={headings} />
+        <div class="prose prose-slate max-w-none md:prose-lg prose-headings:text-brand-900 prose-h2:scroll-mt-28 prose-a:text-brand-700 prose-p:leading-7 md:prose-p:leading-8">
+          <Content />
+        </div>
+      </section>
+
+      <StepCards title="How We Evaluate" items={data.diagnostics || []} />
+
+      <OptionCards title="Treatment Options" items={data.treatments || []} />
+
+      <LinkCards title="Conditions We Manage" items={conditionEntries.map((c) => ({ href: `/conditions/${c.slug}`, kicker: 'Condition', title: c.data.title }))} />
+
+      <LinkCards title="Related Articles" items={relatedArticles.map((post) => ({ href: `/blog/${post.slug}`, kicker: 'Article', title: post.data.title }))} />
+
+      {relatedDoctor && (
+        <section>
+          <h2 class="mb-6 text-2xl text-brand-900 md:text-3xl">Performed by</h2>
+          <a href={`/our-doctors/${relatedDoctor.slug}`} class="ui-card group flex items-center gap-5 p-5">
+            <img
+              src={`/images/doctors/${relatedDoctor.slug}.jpg`}
+              alt={`${relatedDoctor.name}, ${relatedDoctor.designation}`}
+              width="80"
+              height="80"
+              loading="lazy"
+              decoding="async"
+              class="h-20 w-20 rounded-full border-2 border-white object-cover object-top shadow"
+              onerror={`this.src='https://placehold.co/80x80/223154/FAF8F5?text=${encodeURIComponent(relatedDoctor.name.split(' ').pop())}'`}
+            />
+            <div class="min-w-0">
+              <p class="font-bold text-slate-900 transition-colors group-hover:text-brand-700">{relatedDoctor.name}</p>
+              <p class="text-sm font-semibold text-brand-600">{relatedDoctor.designation}</p>
+              <p class="mt-1 text-xs text-slate-500">{relatedDoctor.qualificationsShort}</p>
+            </div>
+            <span class="ml-auto hidden text-sm font-semibold text-brand-600 sm:inline">View profile →</span>
+          </a>
+        </section>
+      )}
     </div>
-  </section>
 
-  {data.diagnostics && data.diagnostics.length > 0 && (
-    <section class="py-8 px-6 max-w-4xl mx-auto">
-      <h2 class="text-3xl font-bold text-brand-900 mb-6">How We Evaluate</h2>
-      <ul class="list-disc pl-6 space-y-2 text-slate-700">
-        {data.diagnostics.map((item) => <li>{item}</li>)}
-      </ul>
-    </section>
-  )}
-
-  {data.treatments && data.treatments.length > 0 && (
-    <section class="py-8 px-6 max-w-4xl mx-auto">
-      <div class="bg-brand-50 p-8 rounded-xl border border-brand-100">
-        <h2 class="text-2xl font-bold text-brand-900 mb-4">Treatment Options</h2>
-        <ul class="space-y-3">
-          {data.treatments.map((t) => (
-            <li>
-              <strong class="text-brand-900">{t.name}:</strong>{' '}
-              <span class="text-slate-700">{t.description}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )}
-
-  {conditionEntries.length > 0 && (
-    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
-      <h2 class="text-2xl font-bold text-brand-900 mb-6">Conditions We Manage</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {conditionEntries.map((c) => (
-          <a href={`/conditions/${c.slug}`} class="block p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 transition-colors">
-            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Condition</p>
-            <p class="font-semibold text-slate-900">{c.data.title}</p>
-          </a>
-        ))}
-      </div>
-    </section>
-  )}
-
-  {relatedArticles.length > 0 && (
-    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
-      <h2 class="text-2xl font-bold text-brand-900 mb-6">Related Articles</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {relatedArticles.map((post) => (
-          <a href={`/blog/${post.slug}`} class="block p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 transition-colors">
-            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Article</p>
-            <p class="font-semibold text-slate-900">{post.data.title}</p>
-          </a>
-        ))}
-      </div>
-    </section>
-  )}
-
-  {relatedDoctor && (
-    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
-      <h2 class="text-2xl font-bold text-brand-900 mb-6">Performed by</h2>
-      <a
-        href={`/our-doctors/${relatedDoctor.slug}`}
-        class="flex items-center gap-5 p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 border border-champagne-200 transition-colors group"
-      >
-        <img
-          src={`/images/doctors/${relatedDoctor.slug}.jpg`}
-          alt={`${relatedDoctor.name}, ${relatedDoctor.designation}`}
-          width="80"
-          height="80"
-          loading="lazy"
-          decoding="async"
-          class="w-20 h-20 rounded-full object-cover border-2 border-white shadow"
-          onerror={`this.src='https://placehold.co/80x80/223154/FAF8F5?text=${encodeURIComponent(relatedDoctor.name.split(' ').pop())}'`}
-        />
-        <div>
-          <p class="font-bold text-slate-900 group-hover:text-brand-700 transition-colors">{relatedDoctor.name}</p>
-          <p class="text-sm text-brand-600 font-semibold">{relatedDoctor.designation}</p>
-          <p class="text-xs text-slate-500 mt-1">{relatedDoctor.qualificationsShort}</p>
-        </div>
-        <span class="ml-auto text-brand-600 font-semibold text-sm hidden sm:inline">View profile →</span>
-      </a>
-    </section>
-  )}
+    <aside class="hidden lg:block" aria-label="Book a consultation">
+      <div class="sticky top-28"><SideBookCard /></div>
+    </aside>
+  </div>
 
   <FAQAccordion entries={faqEntries} />
 
