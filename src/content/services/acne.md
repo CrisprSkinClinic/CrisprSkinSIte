@@ -21,6 +21,7 @@ diagnostics:
 
 conditionsManaged:
   - "acne-scars"
+  - "hidradenitis-suppurativa"
 
 treatments:
   - name: "Topical Therapy"
