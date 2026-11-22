@@ -33,6 +33,7 @@ faqIds:
   - "urticaria-cause"
   - "urticaria-acute-vs-chronic"
   - "urticaria-food-allergy-connection"
+  - "biologics-what-are-they"
 
 ctaTitle: "Book a Hives Evaluation"
 ---

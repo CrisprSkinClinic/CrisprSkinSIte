@@ -33,6 +33,8 @@ faqIds:
   - "eczema-vs-dry-skin"
   - "eczema-triggers"
   - "eczema-moisturizer-routine"
+  - "jak-inhibitors-what-are-they"
+  - "biologics-what-are-they"
 
 ctaTitle: "Book an Eczema Evaluation"
 ---
