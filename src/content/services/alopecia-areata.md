@@ -32,6 +32,7 @@ treatments:
 
 faqIds:
   - "alopecia-areata-cause"
+  - "alopecia-areata-newer-treatments"
   - "alopecia-areata-will-it-grow-back"
   - "alopecia-areata-recurrence"
   - "alopecia-areata-children"

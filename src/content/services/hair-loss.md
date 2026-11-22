@@ -34,6 +34,7 @@ treatments:
 
 faqIds:
   - "hair-loss-causes"
+  - "hair-shedding-after-weight-loss"
   - "hair-loss-normal-shedding"
   - "hair-loss-reversible"
   - "hair-loss-when-to-see-doctor"

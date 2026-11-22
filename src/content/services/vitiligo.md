@@ -32,6 +32,7 @@ treatments:
 
 faqIds:
   - "vitiligo-cause"
+  - "vitiligo-new-topical-treatments"
   - "vitiligo-will-it-spread"
   - "vitiligo-can-it-be-cured"
   - "vitiligo-treatment-options"
