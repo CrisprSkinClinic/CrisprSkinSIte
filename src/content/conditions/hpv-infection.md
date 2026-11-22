@@ -53,3 +53,27 @@ See our guide to [what the HPV vaccine prevents and what it does not](/blog/hpv-
 ## Who Should Consider the Vaccine
 
 Girls and boys from 9 years, young adults, and some older adults after a discussion. People about to start immunosuppressants are encouraged to complete the course first where possible. See our [vaccination service](/services/vaccination).
+
+## How HPV Spreads and Why It Matters
+
+HPV is spread through skin-to-skin and mucosal contact, most often during sexual activity. Most sexually active people will acquire HPV at some point, and most clear it within one to two years. Persistent infection with high-risk types is what leads to precancerous changes, so prevention and screening are important.
+
+## Genital Warts in Detail
+
+Genital warts appear as soft, skin-coloured, pink or brown bumps that may be flat, raised or cauliflower-like. They may itch or bleed, but often cause no symptoms. They can recur even after successful treatment, because the virus may persist in nearby skin. Treatment options include topical medicines and procedures such as cryotherapy, electrosurgery or laser, chosen by size and site. Partners may need evaluation. Warts are not a sign of cancer, but any growth that changes, bleeds or looks unusual should be examined.
+
+## Cancer Prevention and Screening
+
+For women, cervical screening (Pap smear or HPV testing) detects precancer early, and treating it prevents cancer. For men and others, there is no routine HPV screening, but anal screening may be advised in certain high-risk groups. Vaccination lowers the risk of these cancers and of genital warts.
+
+## The Vaccine at a Glance
+
+Protection is greatest when given before exposure. It is safe, and side effects are generally mild. It can also benefit those who are already sexually active, though less than for those who have not been exposed. Two doses for those starting at 9 to 14 years, three for others. See [what the HPV vaccine prevents and what it does not](/blog/hpv-vaccine-what-it-prevents-and-what-it-does-not).
+
+## People With Weakened Immunity
+
+Those on biologics, steroids, methotrexate, or with HIV or after transplant are at higher risk of persistent HPV and its complications, including warts, and need closer follow-up, three-dose vaccination, and screening. See our [vaccination service](/services/vaccination).
+
+## Talking About It
+
+HPV is common and no reason for shame. A private, non-judgemental discussion with your doctor is the best way to get the right advice.

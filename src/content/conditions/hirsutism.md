@@ -60,3 +60,29 @@ Laser removes the hair that is present. Medicines treat why it keeps coming. Doi
 ## Pregnancy
 
 Several treatments for hirsutism are not safe in pregnancy, so reliable contraception is part of the plan, or the treatment is chosen accordingly.
+
+## Assessing Severity
+
+The modified Ferriman-Gallwey score is the common tool, with higher scores indicating more hair. A dermatologist also asks about how long the hair has been present, how quickly it is changing, periods, weight, medicines and family history. Photographs help track change.
+
+## Differences From Other Hair Problems
+
+Hirsutism involves coarse, dark hair in androgen-sensitive areas. It differs from general increased fine body hair (hypertrichosis), and from hair on arms and legs, which varies with background. If hair thinning, acne or irregular periods are also present, an androgen cause is more likely. See [female pattern hair loss](/conditions/female-pattern-hair-loss).
+
+## Treatment Pathway
+
+1. **Evaluate** for causes, with tests chosen by your doctor.
+2. **Treat the driver:** lifestyle and weight loss if appropriate, and medicines for androgen effect or insulin resistance.
+3. **Reduce visible hair:** laser or other hair removal, and eflornithine cream.
+4. **Review** every three months, and continue treatment for at least six to twelve months before judging results.
+5. **Maintain** with ongoing medicine and occasional laser top-ups.
+
+## Emotional Aspects
+
+Hirsutism can affect self-esteem, relationships and mental health. Many women have kept it secret for years. Talking about it openly with a doctor you trust is an important step, and support should include attention to emotional wellbeing.
+
+## When It Is Urgent
+
+Rapid onset over weeks to months, a deepening voice, increased muscle bulk, breast shrinkage or loss of periods may signal a hormone-producing tumour, and need prompt assessment.
+
+See [hormone tests and treatment for hirsutism](/blog/hirsutism-hormone-tests-and-treatment).

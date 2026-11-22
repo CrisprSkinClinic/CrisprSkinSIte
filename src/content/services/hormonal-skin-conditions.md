@@ -70,3 +70,35 @@ We examine, order only the tests that are needed, explain the likely cause, and 
 ## A Measured Approach
 
 Hormonal treatments need follow-up, and results take months, because hair and skin renew slowly. We give you realistic timelines and review progress regularly.
+
+## Conditions Covered
+
+**[Hormonal acne](/conditions/hormonal-acne):** deep, cyclical breakouts, mainly of the lower face.
+
+**[Hirsutism](/conditions/hirsutism):** excess coarse hair in women.
+
+**[Acanthosis nigricans](/conditions/acanthosis-nigricans):** dark, velvety patches linked to insulin resistance.
+
+**[PCOS skin and hair signs](/conditions/pcos-skin-and-hair-signs):** the pattern that ties these together.
+
+**[Female pattern hair loss](/conditions/female-pattern-hair-loss):** thinning at the parting, often with hormonal causes.
+
+## What to Expect at Your First Visit
+
+We take a detailed history, including periods, weight changes, family history of diabetes or PCOS, medicines, and your goals. We examine your skin, hair and, if appropriate, weight and blood pressure. We discuss which tests, if any, would help, and agree a plan that treats your skin and hair while the work-up proceeds. Teenagers are seen with sensitivity, and with a parent or guardian as appropriate.
+
+## Medicines We May Discuss
+
+Topical treatments, antibiotics for short periods, hormone-targeting medicines such as combined oral contraceptives and anti-androgens, metformin (usually with your physician), and isotretinoin for severe acne. Each comes with benefits, risks and monitoring needs, and some cannot be taken in pregnancy. We prescribe after assessment, never over the phone for new problems.
+
+## Procedures
+
+Laser hair reduction, chemical peels, scar treatments and removal of skin tags may be part of your plan. See [laser hair reduction](/services/laser-hair-reduction), [chemical peels](/services/chemical-peels) and [acne scars](/services/acne-scars).
+
+## Working With Your Other Doctors
+
+If you are seeing a gynaecologist, endocrinologist or physician, we aim to coordinate. Tell us what you have been prescribed, and bring reports. If we find a problem that needs their expertise, such as irregular cycles, prediabetes or fertility concerns, we will advise referral.
+
+## Expected Timelines
+
+Most skin and hair treatments need three to six months to show results, and some up to a year. We set milestones and review regularly, so that you know what to expect.

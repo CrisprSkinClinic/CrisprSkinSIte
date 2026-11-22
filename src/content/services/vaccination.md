@@ -69,3 +69,33 @@ We review your vaccination record, past illnesses, medicines and any allergies, 
 ## A Measured Approach
 
 Vaccination is advised only where it is indicated for you. We will tell you plainly when a vaccine is not needed, when it should wait, and when it is better given elsewhere.
+
+## Our Vaccination Approach in Practice
+
+**Before the visit:** please bring any vaccination certificates, a list of medicines and recent reports.
+
+**At the visit:** we review your history, check for reasons to postpone or avoid a vaccine, explain what to expect, and obtain your consent.
+
+**After the injection:** you are observed for a short time, and given information on common reactions and when to call.
+
+**Follow-up:** we schedule the next dose, and keep a record.
+
+## Who We Often See
+
+- Adults over 50 who want protection from shingles.
+- Younger adults with weakened immunity, from 18 years, for the shingles vaccine.
+- Teenagers, young adults and parents asking about HPV vaccination.
+- Patients about to start biologics, JAK inhibitors, methotrexate or steroids.
+- People with psoriasis, eczema, hidradenitis or other conditions who want to review their vaccine status.
+
+## Safety
+
+Vaccines are given in a clinic setting, with emergency medicines and trained staff available. We ask about allergies and previous reactions, and we do not vaccinate people who are acutely unwell. Reactions are usually mild. See [rash or swelling after a vaccine: what is normal](/blog/vaccine-rash-injection-site-reactions-what-is-normal).
+
+## Vaccines We Don't Give
+
+We do not provide routine childhood vaccination schedules or travel vaccines. We will advise you on what you may need and where to get it.
+
+## Frequently Asked Questions
+
+Please see the questions below, and ask us anything else. Vaccines are a personal medical decision, and we are happy to talk it through.

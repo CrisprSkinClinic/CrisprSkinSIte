@@ -49,3 +49,33 @@ They come in the same forms, and the same logic applies. See [a winter dry skin 
 ## Next: How Much to Apply
 
 Using the right amount matters as much as the right form. See [how much topical medicine to apply](/blog/how-much-topical-medicine-to-apply-fingertip-unit-guide).
+
+## How Absorption Differs
+
+The vehicle affects how much medicine enters the skin. Ointments hydrate the outer skin and let more medicine pass. Creams are in between. Lotions and gels deliver less, but spread over large areas. Skin thickness matters too: the face, eyelids, groin and armpits absorb far more than the palms and soles. This is why a steroid may be safe on the leg, but not on the face, and why doctors choose strengths and forms carefully.
+
+## Matching Form to Common Conditions
+
+- **Eczema on the hands and feet:** ointment or thick cream.
+- **Weepy eczema or rashes in skin folds:** lotion or a cream, as ointments trap heat.
+- **Scalp psoriasis or dandruff:** shampoo, lotion, solution or foam.
+- **Acne:** gels or lightweight creams.
+- **Fungal infection in folds:** cream or powder.
+- **Cracked heels and thick plaques:** ointment, often with urea or salicylic acid.
+- **Sunscreen:** gel or fluid for oily skin, cream for dry skin.
+
+## Reading Labels
+
+The label may list the active ingredient, its strength as a percentage, and the base. Ingredients that are listed first are present in largest amounts. A product labelled "fragrance-free" is not the same as "unscented", since masking agents may be present. If you have a known allergy, take the product to your doctor.
+
+## Storage and Expiry
+
+Keep tubes closed, in a cool place, away from sunlight and bathroom steam. Do not dip fingers into jars, since contamination spoils the product. Medicated creams have shorter life after opening, so check dates. Discard old and unlabelled tubes.
+
+## Mixing Products
+
+Do not mix prescribed medicines with moisturisers or other creams unless your doctor tells you to, since dilution may change strength and stability. If you use more than one product, apply the prescribed medicine first, wait a few minutes, then the moisturiser, unless told otherwise.
+
+## Allergy and Irritation
+
+Ingredients such as preservatives, fragrances and certain antibiotics sometimes cause allergy. If skin becomes more red, itchy or blistered after a product, stop it and see your doctor. See [contact dermatitis](/conditions/contact-dermatitis).

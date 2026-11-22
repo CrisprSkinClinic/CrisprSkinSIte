@@ -48,3 +48,37 @@ Most people need no medicine. Minoxidil may be considered in selected cases if r
 - It occurs with fatigue, weight change or irregular periods.
 
 These can point to other causes, such as thyroid disease, [alopecia areata](/services/alopecia-areata) or pattern loss. A scalp examination tells them apart. See [why am I losing hair](/blog/understanding-hair-loss-causes) and our [hair loss service](/services/hair-loss).
+
+## Which Illnesses and Events Can Trigger It?
+
+- High or prolonged fever, including dengue, typhoid, malaria, influenza and COVID-19.
+- Major surgery or anaesthesia, severe accident or blood loss.
+- Rapid weight loss, very low calorie intake, or protein deficiency.
+- Childbirth (see [hair fall after pregnancy](/blog/hair-fall-after-pregnancy-timeline-nutrition-and-when-to-treat)).
+- Starting or stopping certain medicines, including hormonal contraceptives.
+- Severe emotional stress, bereavement or trauma.
+
+## Why Dengue and COVID Are Often Blamed
+
+Both cause high fever, loss of appetite, and a significant stress response, and both were widespread in India. Shedding two to three months afterwards is common, and many people report heavy shedding. In one view, loss after COVID-19 was seen in a notable minority of recovered patients. It is temporary in most.
+
+## Acute and Chronic Telogen Effluvium
+
+**Acute:** lasts up to six months, with a clear trigger, and usually fully recovers.
+
+**Chronic:** lasts longer than six months, often in women in their thirties to fifties, with fluctuating shedding. Causes can include ongoing deficiencies, thyroid disease, stress, or coexisting pattern loss.
+
+## Counting Hairs
+
+Losing 50 to 100 hairs a day is normal. In telogen effluvium, daily loss may be 200 to 300 or more, for a few months. A simple pull test in clinic, or a gentle wash test at home over several days, can help us assess shedding. Do not count obsessively.
+
+## Self-Care During Recovery
+
+- Eat regular meals including protein, iron-rich foods, fruit and vegetables.
+- Rest, and let the body recover from illness.
+- Keep gentle hair habits. Avoid harsh treatments.
+- Be patient, and do not change treatments every few weeks.
+
+## When Other Conditions Are at Play
+
+Sometimes telogen effluvium unmasks an underlying tendency to [pattern hair loss](/conditions/androgenetic-alopecia), or coexists with deficiencies. If hair does not return to baseline by a year, ask for an evaluation. See our [hair loss service](/services/hair-loss) and [medical treatment for hair loss](/services/hair-loss-medical-treatment).

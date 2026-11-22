@@ -52,3 +52,31 @@ Check with your doctor before taking supplements while breastfeeding. Biotin is 
 ## Read More
 
 Our earlier guide, [postpartum hair shedding: what's normal](/blog/postpartum-hair-shedding), covers the basics. For other causes of shedding, see [why am I losing hair](/blog/understanding-hair-loss-causes), and our [female hair loss service](/services/female-hair-loss).
+
+## Questions Mothers Ask
+
+**Does breastfeeding cause more hair fall?** Breastfeeding itself does not cause hair loss, but the demands on your body, and low iron or protein intake, can slow recovery. Eat well, and ask for tests if you feel very tired.
+
+**Will my hair grow back thicker or the same?** In most women, density returns to its pre-pregnancy level. A minority, especially those with a tendency to pattern hair loss, may notice that thinning persists, because pregnancy can uncover an existing tendency.
+
+**Can I colour or style my hair?** Gentle colouring is generally fine, though harsh treatments, tight ponytails and heat styling can break hair that is already fragile.
+
+**Does a second pregnancy cause the same?** Many women experience shedding again after each delivery, to varying degrees.
+
+**Is it related to stress?** Sleep deprivation and stress after delivery can add to shedding, so rest and support matter.
+
+## Thyroid Problems After Delivery
+
+Postpartum thyroiditis affects some women in the first year, with an overactive phase followed by an underactive one. It can cause shedding, fatigue, palpitations, weight change and mood symptoms. A simple blood test (TSH) identifies it. If your symptoms go beyond hair, ask for testing.
+
+## Practical Hair Care
+
+- Use a wide-toothed comb, and detangle gently from the ends.
+- Avoid tight buns and braids that pull on the hairline.
+- Choose a gentle shampoo, and do not wash too often with hot water.
+- Short haircuts can make regrowth look fuller while it recovers.
+- Volumising products can help the hair look thicker without affecting growth.
+
+## What to Expect From a Visit
+
+We examine the scalp, look at the pattern, may do a pull test, and check for signs of scalp disease or pattern loss. We review your diet, iron, thyroid and vitamin D, and tailor advice to breastfeeding. We tell you honestly if reassurance is all that is needed, which it often is. See [postpartum hair loss](/conditions/postpartum-hair-loss).

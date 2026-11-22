@@ -59,3 +59,35 @@ A rash on the forehead, around the eye or on the tip of the nose can threaten vi
 ## Vaccination
 
 We provide the recombinant, non-live shingles vaccine. People starting [biologics or other immunosuppressants](/services/biologics) are often best vaccinated before treatment begins; see our [vaccination service](/services/vaccination).
+
+## How Shingles Is Diagnosed
+
+Usually by examination alone: a painful, one-sided band of blisters on a dermatome (the strip of skin served by a single nerve). When the picture is unclear, for example in people with weakened immunity or without blisters (zoster sine herpete), a swab or blood test can confirm. We also look for complications and for factors that may explain why the virus reactivated.
+
+## Complications to Know
+
+**Post-herpetic neuralgia:** nerve pain lasting longer than three months. Risk rises with age and severity.
+
+**Eye involvement (herpes zoster ophthalmicus):** can cause inflammation, scarring and vision loss. A rash on the nose tip is a warning sign.
+
+**Ramsay Hunt syndrome:** facial weakness with ear pain and a rash in or around the ear, sometimes with hearing loss or vertigo.
+
+**Secondary bacterial infection and scarring.**
+
+**Disseminated zoster:** widespread blisters in people with weakened immunity.
+
+## Treatment Details
+
+Antiviral tablets are taken for about a week, ideally started within 72 hours of the rash, though they may still help later in some groups. Pain control uses simple painkillers, and nerve-pain medicines or other measures for severe or persistent pain. Cool compresses and loose dressings soothe blisters. People with eye involvement need an ophthalmologist.
+
+## Preventing Spread
+
+Shingles cannot spread to someone who has already had chickenpox, but the fluid in blisters can pass chickenpox to a person without immunity. Cover the rash and avoid contact with pregnant women, newborns and immunosuppressed people until crusted.
+
+## Living With Pain
+
+Pain may interfere with sleep and mood. Do not ignore it. Treatment of neuralgia is more effective when started early, and pain specialists can help. Gentle activity, warmth and distraction can ease symptoms.
+
+## Vaccination After Shingles
+
+Wait until the rash has resolved, then discuss vaccination with your doctor to reduce the chance of recurrence. See [who should take the shingles vaccine](/blog/shingles-vaccine-who-should-get-it).
