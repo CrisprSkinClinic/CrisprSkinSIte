@@ -23,6 +23,7 @@ diagnostics:
 conditionsManaged:
   - "atopic-dermatitis"
   - "birthmarks"
+  - "diaper-dermatitis"
 
 treatments:
   - name: "Age-Appropriate Medical Therapy"

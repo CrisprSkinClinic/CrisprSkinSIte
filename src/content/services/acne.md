@@ -35,6 +35,7 @@ faqIds:
   - "acne-diet-connection"
   - "acne-adult-onset"
   - "ingredients-niacinamide-strength"
+  - "ingredients-niacinamide-purging"
   - "ingredients-retinoid-starting-routine"
   - "acne-picking-scarring"
 

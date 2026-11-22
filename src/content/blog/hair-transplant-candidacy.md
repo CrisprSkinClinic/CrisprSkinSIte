@@ -5,6 +5,7 @@ description: "Not everyone with hair loss benefits from a hair transplant right 
 author: "Dr. Karthik L"
 tags: ["Hair Transplant"]
 service: "hair-transplant-fue"
+condition: "norwood-scale-male-pattern-baldness"
 ---
 
 One of the most common questions we hear isn't "how much does a hair transplant cost" -- it's "am I actually a good candidate for one." That's the right question to lead with, and the honest answer is: it depends on a few specific factors, not just how much hair you've lost. A good evaluation weighs all of them together, and sometimes the right answer is "not yet."

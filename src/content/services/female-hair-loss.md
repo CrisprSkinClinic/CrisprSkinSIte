@@ -22,6 +22,8 @@ diagnostics:
 conditionsManaged:
   - "hair-loss"
   - "alopecia-areata"
+  - "female-pattern-hair-loss"
+  - "postpartum-hair-loss"
 
 treatments:
   - name: "Topical & Oral Medical Therapy"

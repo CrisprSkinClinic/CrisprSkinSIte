@@ -35,6 +35,7 @@ faqIds:
   - "anti-ageing-skincare-vs-procedures"
   - "anti-ageing-realistic-results"
   - "ingredients-retinol-vs-retinoid"
+  - "ingredients-retinoid-pregnancy"
   - "ingredients-collagen-supplements"
   - "ingredients-vitamin-c-how-to-use"
 

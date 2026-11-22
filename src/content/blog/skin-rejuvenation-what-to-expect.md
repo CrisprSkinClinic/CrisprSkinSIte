@@ -5,6 +5,7 @@ description: "Rejuvenation is a plan, not a single procedure. What to consider b
 author: "Dr. Karthik L"
 tags: ["Skin Rejuvenation"]
 service: "skin-rejuvenation"
+condition: "photoageing"
 
 ---
 

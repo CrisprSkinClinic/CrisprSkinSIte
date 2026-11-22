@@ -21,6 +21,7 @@ diagnostics:
 
 conditionsManaged:
   - "dandruff"
+  - "seborrheic-dermatitis-scalp"
 
 treatments:
   - name: "Medicated Shampoo Protocols"

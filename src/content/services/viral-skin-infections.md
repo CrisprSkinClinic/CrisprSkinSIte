@@ -20,7 +20,9 @@ diagnostics:
   - "Assessment of extent and any spread to other body areas or other children (school, siblings)"
   - "Discussion of watchful waiting vs. active treatment based on type, extent, and impact on your child"
 
-conditionsManaged: []
+conditionsManaged:
+  - "hand-foot-mouth-disease"
+  - "molluscum-contagiosum"
 
 treatments:
   - name: "Watchful Waiting"

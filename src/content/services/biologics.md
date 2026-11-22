@@ -46,6 +46,7 @@ faqIds:
   - "jak-inhibitors-what-are-they"
   - "biologics-pregnancy"
   - "biologics-cost-and-access"
+  - "new-treatment-should-i-ask"
 
 ctaTitle: "Book an Advanced Therapy Consultation"
 ---

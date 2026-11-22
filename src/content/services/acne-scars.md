@@ -21,6 +21,7 @@ diagnostics:
 
 conditionsManaged:
   - "acne-scars"
+  - "acne-scar-types"
 
 treatments:
   - name: "Chemical Peels"

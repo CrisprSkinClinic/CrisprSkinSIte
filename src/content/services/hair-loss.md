@@ -23,6 +23,9 @@ conditionsManaged:
   - "hair-loss"
   - "alopecia-areata"
   - "dandruff"
+  - "androgenetic-alopecia"
+  - "telogen-effluvium"
+  - "scarring-alopecia"
 
 treatments:
   - name: "Topical & Oral Medical Therapy"

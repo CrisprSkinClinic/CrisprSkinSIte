@@ -19,7 +19,10 @@ diagnostics:
   - "Assessment of any concerning features in pigmented lesions (asymmetry, border, color, diameter, evolution)"
   - "Biopsy where a lesion's nature isn't clear on examination alone"
 
-conditionsManaged: []
+conditionsManaged:
+  - "viral-warts"
+  - "melanocytic-naevi-moles"
+  - "skin-tags"
 
 treatments:
   - name: "Cryotherapy"

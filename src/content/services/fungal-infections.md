@@ -19,7 +19,9 @@ diagnostics:
   - "Skin scraping/KOH examination where diagnosis needs confirmation"
   - "Assessment of contributing factors: sweating, tight clothing, shared items, recurrence pattern"
 
-conditionsManaged: []
+conditionsManaged:
+  - "tinea-infections"
+  - "pityriasis-versicolor"
 
 treatments:
   - name: "Topical Antifungal Therapy"
