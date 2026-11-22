@@ -29,3 +29,19 @@ Adequate protein, iron, vitamin D, and overall calories support hair, and slower
 ## Do Not Stop Medicines on Your Own
 
 If you are taking a prescribed medicine, speak to your doctor before changing it.
+
+## Timing and What to Expect
+
+Shedding typically begins two to four months after a major change such as rapid weight loss, so it can seem unconnected to the cause. Hair may come out in noticeable amounts in the shower or on the pillow, but you do not usually go bald, because the hairs that shed are only a fraction of the total. Regrowth usually follows over three to six months once the body has settled.
+
+## Nutrition Checks
+
+If you are eating much less, make sure you are getting enough protein, iron, zinc, vitamin D and B12. We may suggest blood tests to check for deficiency before you add supplements, since taking extra iron or vitamins you do not need can cause problems of its own. Eating regular, balanced meals and aiming for steady, not crash, weight loss helps hair.
+
+## Pre-Existing Hair Loss
+
+If you already have [pattern hair loss](/conditions/androgenetic-alopecia), shedding from weight loss can unmask or speed up thinning. In that case, treating the underlying pattern is separate from waiting for shedding to settle, and an assessment tells the two apart.
+
+## When to Seek Help
+
+If shedding is heavy, patchy or has lasted more than six months, [book an assessment](/services/hair-loss). Our guides to [understanding hair loss causes](/blog/understanding-hair-loss-causes) and [postpartum shedding](/blog/postpartum-hair-shedding) describe similar temporary patterns.

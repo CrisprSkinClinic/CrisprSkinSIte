@@ -27,3 +27,19 @@ Of the five, a mole that's genuinely changing tends to be the most reliable prom
 ## Most Moles Don't Need Removal
 
 To be clear: this isn't a case for removing every mole you have. Most moles are stable, harmless, and simply part of your skin. The goal is knowing which specific features are actually worth a closer look, so you can act on the ones that matter and stop worrying about the ones that don't. For the wider picture, see [sun safety and skin cancer awareness](/blog/sun-safety-and-skin-cancer-awareness).
+
+## The "Ugly Duckling" Sign
+
+Alongside ABCDE, a useful clue is the "ugly duckling": a mole that looks different from your other moles. Most of a person's moles tend to look similar to each other, so one that stands out in colour, size or shape deserves a second look, even if it ticks none of the ABCDE boxes.
+
+## Moles in Skin of Colour
+
+In darker skin, melanoma often arises on the palms, soles, under the nails and in mucous membranes, rather than on sun-exposed skin. A new dark streak under a nail, or a changing dark patch on the sole, should be checked promptly. Read how to examine your skin in [sun safety and skin cancer awareness](/blog/sun-safety-and-skin-cancer-awareness) and the note on [nail changes](/blog/nail-changes-when-to-see-a-doctor).
+
+## Taking Photos and Self-Checks
+
+Taking clear photographs of moles you want to track, with a coin or ruler beside them, makes changes easier to see. Check your skin every month or two, and ask someone to look at areas you cannot see. Bring your photos if you come in.
+
+## Removal and Cosmetic Concerns
+
+Some moles are removed for comfort, catching on clothing or appearance rather than because they are dangerous. Any mole that is removed because of concern should be sent for examination under the microscope. For options, see our page on [skin tags, warts and moles](/services/warts-moles-skin-tags).

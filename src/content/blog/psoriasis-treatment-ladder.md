@@ -29,3 +29,19 @@ For [moderate-to-severe disease](/conditions/moderate-to-severe-psoriasis), or d
 ## How We Decide
 
 We look at how much skin is involved, which sites are affected, how much it affects your life, other health conditions, and what you have already tried. Moving up a step is a shared decision, and the aim is the simplest plan that keeps you well.
+
+## Getting the Most From Topical Treatment
+
+Many people are told their cream "did not work" when the real issue was how it was used. Apply it to the plaques only, in the amount and for the duration advised, and keep to the schedule. Thick scale blocks absorption, so a gentle softening step first helps. Scalp, nails, folds and genitals each need different strengths, which is why one tube rarely suits every site.
+
+## Living With Psoriasis Day to Day
+
+Stress, infections, certain medicines, heavy alcohol use and skin injury can trigger flares, and smoking and excess weight can make the disease harder to control. Looking after these does not replace treatment, but it helps the treatment work. Moisturizing daily and avoiding picking at scale also reduce new patches forming at injured sites.
+
+## Watching for Joint Symptoms
+
+Morning stiffness, swollen fingers or toes, or heel and back pain in someone with psoriasis may point to [psoriatic arthritis](/conditions/psoriatic-arthritis). Mention these early, since earlier treatment protects the joints.
+
+## Reviewing the Plan
+
+Psoriasis changes over time, so the plan is reviewed rather than set in stone. We step up if control is poor, and sometimes step down when disease has been quiet. Our pages on [psoriasis](/services/psoriasis), [scalp psoriasis](/conditions/scalp-psoriasis) and [nail psoriasis](/conditions/nail-psoriasis) cover each site in more detail, and you can read about [psoriasis not being contagious](/blog/psoriasis-not-contagious) if friends or family have concerns.

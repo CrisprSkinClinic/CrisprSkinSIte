@@ -25,3 +25,19 @@ Rapid growth, ulceration, bleeding, or a birthmark located near a sensitive stru
 ## Bringing Your Child In
 
 [An evaluation](/services/birthmarks) early on accomplishes two things: it confirms exactly what type of birthmark your child has, and it gives you a clear picture of what to expect going forward, including specific signs that would warrant bringing your child back sooner than a routine follow-up. For most parents, that clarity resolves the majority of the worry that brought them in.
+
+## Questions Parents Often Ask
+
+Parents often ask whether they caused the birthmark, and the answer is almost always no. Most birthmarks arise by chance during development and are not linked to anything done during pregnancy. Another common question is whether birthmarks are painful or harmful, and the answer is that most are not. Some parents also ask about laser or surgery, which are reserved for specific situations and discussed after the birthmark has been assessed.
+
+## Photographs and Follow-Up
+
+Taking a photograph every month or two on the same device and in similar light helps you notice growth or change, and lets us judge how a birthmark is behaving. Bring the pictures to your visit. For a haemangioma, early review matters because the period of fastest growth is in the first few months.
+
+## When Treatment Is Considered
+
+Treatment may be offered for a birthmark that is growing quickly, ulcerating, affecting vision, feeding or breathing, or likely to leave a significant mark, and the choice depends on the type and the child's age. Some pigmented birthmarks, such as [larger congenital moles](/conditions/congenital-melanocytic-naevus), are followed over time because the size influences the plan.
+
+## Looking After Your Child's Skin
+
+Be gentle when washing and drying the area, avoid picking at any crusts, and use sun protection as your child gets older. Visit our page on [paediatric dermatology](/services/pediatric-dermatology) for the range of conditions we see in children.

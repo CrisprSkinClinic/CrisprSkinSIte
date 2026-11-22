@@ -25,3 +25,19 @@ Most patients see a substantial, lasting reduction in hair growth after a full c
 ## Setting Up Realistic Expectations From the Start
 
 At your consultation, we assess your specific skin and hair type and lay out a realistic session count and expected outcome based on that assessment -- not a generic number quoted before we've actually looked at what we're working with.
+
+## Preparing for a Session
+
+Shave the area the day before, but do not wax, thread or pluck for several weeks beforehand, since the laser needs the hair root present. Avoid sun exposure and tanning in the weeks before treatment, because tanned skin raises the risk of burns and pigmentation. Tell us about any medicines, particularly ones that increase sun sensitivity, and any skin conditions in the area.
+
+## What the Treatment Feels Like
+
+Most people describe a quick snap, like a small rubber band, and the discomfort varies by area. The skin may look slightly red and the hair follicles may be raised for a few hours. Hairs may seem to continue growing for a week or two, but these are being shed rather than regrown.
+
+## Aftercare and Safety
+
+Avoid the sun, saunas and heavy exercise for the period we recommend, use sunscreen, and do not pick at any crusts. Possible side effects include temporary redness, swelling and, less often, blisters or pigmentation changes. A test patch and careful settings reduce the risk, especially on deeper skin tones.
+
+## Hormones and Hair Growth
+
+If you have a lot of coarse hair in unusual areas, such as the face and chest in women, hormonal conditions like PCOS can be the cause. In that case, treating the underlying problem is part of the plan. See [unwanted body and facial hair](/conditions/unwanted-body-and-facial-hair) and the page on [laser hair reduction](/services/laser-hair-reduction).

@@ -31,3 +31,19 @@ For most healthy people, supplements appear to be reasonably safe, though qualit
 ## A Reasonable Position
 
 If you want to try a supplement, treat it as an optional extra with modest expectations, and do not let it replace the basics.
+
+## How to Read a Product Claim
+
+Look for what the study actually measured, how long it ran and how many people took part. Phrases like "clinically proven" mean little unless the study was independent, reasonably large and published. Before-and-after photos can be misleading, since lighting, makeup and angle change the look of skin. Beware products that promise dramatic results for fine lines, scars or sagging.
+
+## Cost, Dose and Quality
+
+Supplements vary in dose, source and added ingredients such as sugar or flavourings. Higher price does not guarantee a better product, and supplements are less strictly regulated than medicines. If you choose to try one, pick a reputable brand with clear labelling, avoid it if you have a relevant allergy, and judge results after a few months.
+
+## Other Nutrients and Skin
+
+A balanced diet with enough protein, fruit and vegetables supports skin health more reliably than a single powder. Vitamin C is needed by the body to make collagen, and a diet short of it can affect skin and healing. If you are concerned about deficiency, a blood test is more useful than guessing.
+
+## What to Do If You Want Visible Change
+
+Treatments with better evidence include [retinoids](/blog/retinol-vs-retinoids-how-to-start) and procedures planned by a dermatologist. Read about [anti-ageing treatment](/services/anti-ageing) and the guide to [individualized anti-ageing care](/blog/anti-ageing-individualized-approach) to see how a plan is built around your skin.

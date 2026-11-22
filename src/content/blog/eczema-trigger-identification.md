@@ -29,3 +29,19 @@ Between flares, a consistent [moisturizing routine](/services/eczema) using the 
 ## The Combined Approach
 
 Active flares still need appropriate topical anti-inflammatory treatment -- that part hasn't changed. But pairing that with genuine trigger identification and a sustainable moisturizing routine is what actually reduces how often you're dealing with flares in the first place. For eczema that stays severe despite this, see [newer treatments for stubborn eczema](/blog/newer-treatments-for-stubborn-eczema).
+
+## Keeping a Simple Diary
+
+For two to four weeks, note each day how itchy your skin was, what you used on it, anything new you ate or wore, the weather, sleep and stress levels. Patterns often emerge that are hard to spot from memory, for example flares after a particular soap, a change of detergent or a stressful week. Bring the diary to your visit, since it gives us something concrete to work from.
+
+## When Allergy Testing Helps
+
+If your eczema affects the hands, face or one particular area and you suspect something you touch, [patch testing](/blog/patch-testing-explained) can identify contact allergens. Allergy tests for foods or pollen are not routinely needed for eczema, and a positive result does not always mean that item is causing flares, so we use tests selectively and interpret them alongside your history.
+
+## Reducing Irritants at Home
+
+Choose mild, fragrance-free soaps and detergents, rinse clothes well, and avoid fabric softeners if they seem to bother you. Wear soft cotton against the skin, keep nails short to limit scratching damage, and avoid very hot showers. For hand eczema, gloves for wet work make a large difference. Read about [hand eczema](/conditions/hand-eczema) and [adult eczema](/conditions/atopic-eczema-adults) for site-specific advice.
+
+## Keeping Control in the Long Run
+
+Triggers can change over time, so a plan that works now may need adjusting. If flares keep returning despite careful routines, we review the diagnosis and treatment again.

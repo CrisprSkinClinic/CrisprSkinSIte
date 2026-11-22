@@ -23,3 +23,15 @@ Microneedling, which stimulates the skin's own collagen production, tends to wor
 ## Setting Honest Expectations
 
 We're upfront that acne scar treatments improve the appearance and texture of scarring, often meaningfully, but complete removal isn't a realistic promise for established scarring. Treating [acne early](/blog/why-acne-treatment-takes-time) is the best way to limit scarring in the first place. What's achievable depends on your specific scar type and depth, which is exactly why classifying your scarring correctly at the start of treatment matters so much.
+
+## How Scars Differ From Dark Marks
+
+Many people use "scar" for any mark left after acne, but flat dark or red marks are not true scars. They are pigment or blood-vessel changes that often fade over months, while true scars involve a change in the skin's texture. The distinction matters because dark marks respond to simple treatment and sun protection, whereas textural scars need procedures. You can read more about [post-inflammatory hyperpigmentation](/conditions/post-inflammatory-hyperpigmentation) for the flat marks.
+
+## What an Assessment Involves
+
+We look at your skin in good light, stretch it gently to see which scars flatten (a sign of rolling scars) and note their depth, number and distribution. We also ask about your skin tone, healing history and whether you form raised scars, since these affect which treatments are safe. Photographs help us compare progress over time.
+
+## Planning a Course
+
+Scar treatment is usually a series of sessions spaced several weeks apart, since the skin needs time to remodel between them. Different methods may be combined, such as treating the deeper pits separately from the overall texture. Improvement builds gradually over months, and active acne should be under control first so that new scars do not form while old ones are being treated.

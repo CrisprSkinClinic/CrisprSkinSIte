@@ -29,3 +29,19 @@ A well-structured skincare routine using evidence-backed [active ingredients](/b
 ## Setting Honest Expectations
 
 Anti-ageing treatment manages and slows visible signs of ageing -- it doesn't stop or reverse the process itself. We build plans around meaningful, realistic improvement in what actually matters to you, rather than promising a complete transformation no treatment can deliver.
+
+## What a First Visit Looks Like
+
+We begin by asking what you notice when you look in the mirror and what you hope to change. We examine your skin in good light and may photograph it for comparison. We also ask about sun exposure, smoking, medicines, past treatments and any tendency to scar or pigment. From this we draw up a short plan with priorities, rather than offering everything at once.
+
+## Treatments Fall Into a Few Groups
+
+Some treatments improve skin quality, such as peels, resurfacing and carefully chosen medical-grade skincare. Others relax the muscles that deepen lines, and others restore lost volume. Each group has its place, and the order matters, since for example improving skin texture first can make the benefit of later treatments clearer. Our pages on [skin rejuvenation](/services/skin-rejuvenation) and [chemical peels](/services/chemical-peels) describe some of these options.
+
+## Starting Early Versus Starting Late
+
+There is no single "right age" to begin. Sun protection and a sensible routine help at any age, and most in-clinic treatments are more useful when matched to visible concerns than to a birthday. Fewer, well-chosen treatments often look better than many unnecessary ones.
+
+## Reviewing Your Plan
+
+Skin changes with time, so we review how you are doing and adjust. Some people drop treatments they no longer need, and others add new ones as their concerns change.

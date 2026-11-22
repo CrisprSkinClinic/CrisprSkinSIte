@@ -25,3 +25,19 @@ Three explanations account for most cases we see: an incorrect underlying diagno
 ## What Actually Works
 
 Once the correct diagnosis is confirmed, most dandruff responds well to medicated shampoo used at the right frequency and left on the scalp for the recommended contact time -- consistency in how it's used matters as much as which product is chosen. If you've been diligent with an anti-dandruff shampoo for several weeks with no real improvement, that's a sign worth [getting evaluated](/services/dandruff) rather than switching to yet another brand.
+
+## What Is Normal and What Is Not
+
+A little flaking now and then, especially in dry weather, is common. Persistent flaking with itching, redness, greasy scale on the scalp, eyebrows or sides of the nose, or hair that seems to fall more may suggest a condition such as seborrheic dermatitis. Thick, silvery plaques that extend beyond the hairline suggest psoriasis. A scalp that is painful, with pus or hair breaking in patches, needs prompt review, since an infection can be present.
+
+## Using a Medicated Shampoo Properly
+
+Wet the hair, apply the shampoo directly to the scalp, massage gently, and leave it on for the time stated on the pack, usually a few minutes, before rinsing. Use it as often as advised, often two or three times a week at first, then less often for maintenance. Rotating between two different active ingredients can help if one loses effect.
+
+## Hair Care Habits That Matter
+
+Avoid heavy oils left on the scalp for long periods, since they can feed the yeast that drives dandruff. Rinse out styling products, wash pillowcases and combs regularly, and do not scratch with your nails. Some people notice flares with stress, lack of sleep or cold, dry weather, and managing those can help.
+
+## When to Get Help
+
+If dandruff keeps returning, causes hair thinning or makes your scalp sore, read our page on [dandruff](/services/dandruff) and consider an evaluation. Persistent scalp problems can also overlap with [hair loss](/services/hair-loss).
