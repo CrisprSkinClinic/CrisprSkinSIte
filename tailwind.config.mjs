@@ -32,12 +32,9 @@ export default {
         warmwhite: '#FFFCFD',
         // Charcoal -- body text
         charcoal: '#2F2F2F',
-        // Gold role retired -- CTAs/highlights now use `brand` shades
-        // directly (e.g. brand-500/600 for buttons that were gold-500/600).
-        // Kept as an alias pointing at navy so any missed gold-* class in
-        // a file we haven't touched yet still resolves to navy instead of
-        // silently rendering unstyled.
-        gold: {
+        // Accent: the logo's pink, for small highlights only (eyebrows, icons). Formerly named `gold`; the
+        // role was retired and the shades re-pointed at the pink, so it is named for what it is now.
+        accent: {
           50: '#FFF8FB',
           100: '#FCECF3',
           300: '#E9B7CF',
