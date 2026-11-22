@@ -28,7 +28,8 @@ treatmentOverview:
   - name: "Medicated Shampoo Protocols"
     description: "Correct use -- frequency and contact time -- of medicated shampoo as part of a combined regimen."
 
-relatedConditions: []
+relatedConditions:
+  - "scalp-psoriasis"
 
 ctaTitle: "Book a Scalp Evaluation"
 ---

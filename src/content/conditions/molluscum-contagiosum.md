@@ -28,7 +28,9 @@ treatmentOverview:
   - name: "In-Clinic Removal"
     description: "For lesions bothering the child, spreading significantly, or where a parent prefers active treatment, gentle removal appropriate for a child's age."
 
-relatedConditions: []
+relatedConditions:
+  - "viral-warts"
+  - "hand-foot-mouth-disease"
 
 ctaTitle: "Book a Consultation for Your Child"
 ---

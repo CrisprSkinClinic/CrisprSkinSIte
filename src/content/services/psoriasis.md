@@ -20,7 +20,9 @@ diagnostics:
   - "Assessment of common trigger factors: stress, infection, certain medications"
 
 conditionsManaged:
-  - "psoriasis"
+  - "plaque-psoriasis"
+  - "scalp-psoriasis"
+  - "nail-psoriasis"
   - "moderate-to-severe-psoriasis"
   - "psoriatic-arthritis"
 

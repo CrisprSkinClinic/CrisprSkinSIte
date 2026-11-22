@@ -28,7 +28,10 @@ treatmentOverview:
   - name: "Oral Antifungal Therapy"
     description: "Considered for more established infection, given as a course over several months."
 
-relatedConditions: []
+relatedConditions:
+  - "nail-psoriasis"
+  - "paronychia"
+  - "tinea-infections"
 
 ctaTitle: "Book a Nail Evaluation"
 ---

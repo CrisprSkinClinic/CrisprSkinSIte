@@ -20,7 +20,8 @@ diagnostics:
   - "Assessment for hormonal or other contributing factors where indicated"
 
 conditionsManaged:
-  - "acne-scars"
+  - "hormonal-acne"
+  - "acne-scar-types"
 
 treatments:
   - name: "Topical Therapy"

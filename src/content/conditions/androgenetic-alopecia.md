@@ -30,6 +30,9 @@ treatmentOverview:
 
 relatedConditions:
   - "telogen-effluvium"
+  - "norwood-scale-male-pattern-baldness"
+  - "donor-area-depletion"
+  - "scarring-alopecia"
 
 ctaTitle: "Book a Hair Loss Evaluation"
 ---

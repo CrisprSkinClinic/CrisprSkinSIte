@@ -5,17 +5,18 @@ description: "Hair loss has several distinct causes, and treating the wrong one 
 author: "Dr. Karthik L"
 tags: ["Hair Loss"]
 service: "hair-loss"
+condition: "androgenetic-alopecia"
 ---
 
 "Why am I losing hair?" is a question with several genuinely different answers, and the treatment that works for one cause often does nothing for another. Before reaching for a generic hair-fall shampoo, it's worth understanding the main categories.
 
 ## Genetic Pattern Hair Loss
 
-The most common cause in both men and women, driven by genetic sensitivity to hormonal factors that gradually shrink hair follicles over time. It follows a recognizable pattern -- receding hairline and crown thinning in men, diffuse thinning or a widening part in women -- and progresses gradually rather than suddenly.
+[The most common cause](/conditions/androgenetic-alopecia) in both men and women, driven by genetic sensitivity to hormonal factors that gradually shrink hair follicles over time. It follows a recognizable pattern -- receding hairline and crown thinning in men, [diffuse thinning or a widening part in women](/conditions/female-pattern-hair-loss) -- and progresses gradually rather than suddenly.
 
 ## Temporary Shedding From Stress or Illness
 
-A significant physical or emotional stressor -- illness, surgery, high fever, major life stress -- can push a larger-than-usual portion of hair into its resting phase simultaneously, causing noticeable shedding two to three months later. This is usually self-limiting and resolves within six to twelve months once the trigger has passed.
+A significant physical or emotional stressor -- illness, surgery, high fever, major life stress -- can push a larger-than-usual portion of hair into its resting phase simultaneously, causing [noticeable shedding](/conditions/telogen-effluvium) two to three months later. This is usually self-limiting and resolves within six to twelve months once the trigger has passed.
 
 ## Nutritional and Hormonal Factors
 
@@ -25,4 +26,4 @@ Iron deficiency, thyroid dysfunction, and hormonal conditions like PCOS can all 
 
 Treating genetic pattern hair loss and treating deficiency-related shedding call for entirely different approaches. Using the wrong one for months doesn't just waste time -- for progressive genetic hair loss specifically, early treatment has more existing hair to work with, so delay while trying the wrong approach has a real cost.
 
-If you're noticing increased shedding or thinning, an evaluation that identifies which of these categories applies to you is the most useful first step, well before choosing a specific product or treatment.
+If you're noticing increased shedding or thinning, [an evaluation](/services/hair-loss) that identifies which of these categories applies to you is the most useful first step, well before choosing a specific product or treatment.

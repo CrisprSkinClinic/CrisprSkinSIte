@@ -28,7 +28,9 @@ treatmentOverview:
   - name: "Standard Topical Therapy"
     description: "Often used alongside hormonally-targeted treatment for a more complete approach."
 
-relatedConditions: []
+relatedConditions:
+  - "acne-scar-types"
+  - "post-inflammatory-hyperpigmentation"
 
 ctaTitle: "Book an Acne Evaluation"
 ---

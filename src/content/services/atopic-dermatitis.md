@@ -21,7 +21,7 @@ diagnostics:
   - "Assessment for secondary infection during active flares"
 
 conditionsManaged:
-  - "atopic-dermatitis"
+  - "childhood-atopic-dermatitis"
 
 treatments:
   - name: "Topical Anti-Inflammatory Therapy"

@@ -28,7 +28,10 @@ treatmentOverview:
   - name: "Chemical Peels"
     description: "Used as an adjunct to topical therapy for more stubborn or extensive pigmentation."
 
-relatedConditions: []
+relatedConditions:
+  - "melasma"
+  - "hormonal-acne"
+  - "photoageing"
 
 ctaTitle: "Book a Pigmentation Evaluation"
 ---

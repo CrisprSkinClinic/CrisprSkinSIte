@@ -28,7 +28,10 @@ treatmentOverview:
   - name: "Barrier Repair Routine"
     description: "A consistent, practical moisturizing routine that parents can realistically maintain daily."
 
-relatedConditions: []
+relatedConditions:
+  - "atopic-eczema-adults"
+  - "moderate-to-severe-atopic-dermatitis"
+  - "hand-eczema"
 
 ctaTitle: "Book a Consultation for Your Child's Eczema"
 ---

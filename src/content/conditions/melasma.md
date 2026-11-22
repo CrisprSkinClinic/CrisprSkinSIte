@@ -32,6 +32,7 @@ treatmentOverview:
 
 relatedConditions:
   - "post-inflammatory-hyperpigmentation"
+  - "photoageing"
 
 ctaTitle: "Book a Melasma Consultation"
 ---

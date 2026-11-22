@@ -30,6 +30,9 @@ treatmentOverview:
 
 relatedConditions:
   - "scalp-psoriasis"
+  - "moderate-to-severe-psoriasis"
+  - "psoriatic-arthritis"
+  - "nail-psoriasis"
 
 ctaTitle: "Book a Psoriasis Evaluation"
 ---

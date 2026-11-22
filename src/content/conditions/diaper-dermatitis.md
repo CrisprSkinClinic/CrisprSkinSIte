@@ -28,7 +28,9 @@ treatmentOverview:
   - name: "Targeted Treatment for Secondary Infection"
     description: "Where a secondary fungal or bacterial infection is identified, targeted treatment alongside basic barrier care."
 
-relatedConditions: []
+relatedConditions:
+  - "contact-dermatitis"
+  - "childhood-atopic-dermatitis"
 
 ctaTitle: "Book a Consultation for Your Child"
 ---

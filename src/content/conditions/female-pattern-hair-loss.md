@@ -29,7 +29,10 @@ treatmentOverview:
   - name: "Addressing Underlying Contributing Factors"
     description: "Correcting an identified hormonal, thyroid, or nutritional factor alongside topical treatment for a more complete approach."
 
-relatedConditions: []
+relatedConditions:
+  - "androgenetic-alopecia"
+  - "telogen-effluvium"
+  - "postpartum-hair-loss"
 
 ctaTitle: "Book a Female Hair Loss Consultation"
 ---

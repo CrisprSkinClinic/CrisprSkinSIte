@@ -31,7 +31,10 @@ treatmentOverview:
   - name: "Surgical Removal"
     description: "For moles removed for cosmetic reasons or based on clinical concern, in-clinic removal under local anaesthesia."
 
-relatedConditions: []
+relatedConditions:
+  - "congenital-melanocytic-naevus"
+  - "skin-tags"
+  - "viral-warts"
 
 ctaTitle: "Book a Mole Evaluation"
 ---

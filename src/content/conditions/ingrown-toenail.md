@@ -28,7 +28,9 @@ treatmentOverview:
   - name: "In-Clinic Procedure"
     description: "For recurrent or more severe cases, a minor procedure to address the underlying nail edge and reduce recurrence."
 
-relatedConditions: []
+relatedConditions:
+  - "paronychia"
+  - "onychomycosis"
 
 ctaTitle: "Book a Nail Evaluation"
 ---

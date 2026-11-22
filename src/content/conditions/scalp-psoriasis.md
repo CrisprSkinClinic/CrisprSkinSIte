@@ -29,6 +29,7 @@ treatmentOverview:
 
 relatedConditions:
   - "plaque-psoriasis"
+  - "seborrheic-dermatitis-scalp"
 
 ctaTitle: "Book a Scalp Evaluation"
 ---

@@ -28,7 +28,8 @@ treatmentOverview:
   - name: "Escalated Therapy for Chronic Cases"
     description: "For chronic urticaria not controlled with antihistamines alone, additional treatment options considered based on severity."
 
-relatedConditions: []
+relatedConditions:
+  - "antihistamine-resistant-urticaria"
 
 ctaTitle: "Book a Hives Evaluation"
 ---

@@ -30,6 +30,7 @@ treatmentOverview:
 
 relatedConditions:
   - "telogen-effluvium"
+  - "female-pattern-hair-loss"
 
 ctaTitle: "Book a Consultation"
 ---

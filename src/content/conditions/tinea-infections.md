@@ -28,7 +28,10 @@ treatmentOverview:
   - name: "Oral Antifungal Therapy"
     description: "Considered for widespread or resistant infections not responding adequately to topical treatment."
 
-relatedConditions: []
+relatedConditions:
+  - "onychomycosis"
+  - "pityriasis-versicolor"
+  - "nummular-eczema"
 
 ctaTitle: "Book a Fungal Infection Evaluation"
 ---

@@ -20,9 +20,7 @@ diagnostics:
   - "Relevant blood investigations where an underlying cause is suspected"
 
 conditionsManaged:
-  - "hair-loss"
   - "alopecia-areata"
-  - "dandruff"
   - "androgenetic-alopecia"
   - "telogen-effluvium"
   - "scarring-alopecia"

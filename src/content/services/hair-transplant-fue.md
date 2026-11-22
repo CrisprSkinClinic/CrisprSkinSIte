@@ -21,7 +21,7 @@ diagnostics:
   - "Graft requirement estimation"
 
 conditionsManaged:
-  - "hair-loss"
+  - "androgenetic-alopecia"
   - "alopecia-areata"
   - "norwood-scale-male-pattern-baldness"
   - "donor-area-depletion"

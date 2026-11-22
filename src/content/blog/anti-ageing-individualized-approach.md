@@ -5,13 +5,14 @@ description: "Skin ageing involves several distinct processes at once -- which i
 author: "Dr. Karthik L"
 tags: ["Anti-ageing"]
 service: "anti-ageing"
+condition: "photoageing"
 ---
 
 When someone says they want to "look less tired" or "do something about ageing," the honest first step is figuring out which specific changes are actually bothering them -- because ageing skin involves several distinct, simultaneous processes, and no single product addresses all of them.
 
 ## The Different Components of Skin Ageing
 
-Volume loss, changes in texture and pigmentation, deepening expression lines, and gradual loss of skin firmness are all part of "ageing," but they're distinct processes with distinct treatments. Two people who both say they want to look more refreshed might need completely different approaches depending on which of these is most prominent for them.
+[Volume loss](/blog/fillers-vs-botox), changes in texture and [pigmentation](/services/pigmentation), deepening [expression lines](/blog/botox-natural-results), and gradual loss of skin firmness are all part of "ageing," but they're distinct processes with distinct treatments. Two people who both say they want to look more refreshed might need completely different approaches depending on which of these is most prominent for them.
 
 ## Why We Ask What Actually Bothers You
 
@@ -19,11 +20,11 @@ Not every visible change needs treatment, and some patients want to address one 
 
 ## Skincare as the Foundation
 
-A well-structured skincare routine using evidence-backed active ingredients tends to be the foundation most other treatment builds on, and it's often more consequential long-term than any single in-clinic procedure. We prioritize getting this right before or alongside anything else.
+A well-structured skincare routine using evidence-backed [active ingredients](/blog/retinol-vs-retinoids-how-to-start) tends to be the foundation most other treatment builds on, and it's often more consequential long-term than any single in-clinic procedure. We prioritize getting this right before or alongside anything else.
 
 ## Sun Protection Isn't Optional Here
 
-UV exposure is the single most significant modifiable driver of premature skin ageing. Any anti-ageing plan that doesn't treat sun protection as a genuinely core component is missing the highest-leverage piece of the puzzle.
+[UV exposure](/conditions/photoageing) is the single most significant modifiable driver of premature skin ageing. Any anti-ageing plan that doesn't treat sun protection as a genuinely core component is missing the highest-leverage piece of the puzzle.
 
 ## Setting Honest Expectations
 

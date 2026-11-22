@@ -32,6 +32,7 @@ treatmentOverview:
 
 relatedConditions:
   - "androgenetic-alopecia"
+  - "postpartum-hair-loss"
 
 ctaTitle: "Book a Hair Loss Evaluation"
 ---

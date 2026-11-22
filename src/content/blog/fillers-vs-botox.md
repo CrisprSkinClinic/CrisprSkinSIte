@@ -11,9 +11,9 @@ Botox and dermal fillers are often mentioned in the same breath, but they work i
 
 ## Botox Relaxes; Fillers Add Volume
 
-Botox works by temporarily relaxing the muscles responsible for expression lines -- frown lines, forehead lines, crow's feet. It doesn't add anything to the skin; it reduces the muscle movement that creates certain wrinkles over time.
+[Botox](/services/botox) works by temporarily relaxing the muscles responsible for expression lines -- frown lines, forehead lines, crow's feet. It doesn't add anything to the skin; it reduces the muscle movement that creates certain wrinkles over time.
 
-Fillers work the opposite way -- they add volume directly to areas that have lost it, such as the cheeks or under-eyes, or to enhance contour, as with lip enhancement. They don't affect muscle movement at all.
+[Fillers](/services/fillers) work the opposite way -- they add volume directly to areas that have lost it, such as the cheeks or under-eyes, or to enhance contour, as with lip enhancement. They don't affect muscle movement at all.
 
 ## Matching Treatment to Concern
 
@@ -25,4 +25,4 @@ Using the wrong treatment for a given concern doesn't just waste money -- it can
 
 ## A Conservative Approach to Both
 
-For both treatments, especially in areas like the lips and under-eyes where overcorrection is most visible, we favor a conservative starting approach and build gradually based on how the initial treatment looks, rather than aiming for a dramatic change in a single visit.
+For both treatments, especially in areas like the lips and under-eyes where overcorrection is most visible, we favor a [conservative starting approach](/blog/botox-natural-results) and build gradually based on how the initial treatment looks, rather than aiming for a dramatic change in a single visit.

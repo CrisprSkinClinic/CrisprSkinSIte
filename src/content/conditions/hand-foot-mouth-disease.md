@@ -28,7 +28,9 @@ treatmentOverview:
   - name: "Monitoring for Complications"
     description: "Watching for signs of dehydration from reduced fluid intake due to mouth discomfort, and following up if symptoms don't follow the expected course."
 
-relatedConditions: []
+relatedConditions:
+  - "molluscum-contagiosum"
+  - "viral-warts"
 
 ctaTitle: "Book a Consultation for Your Child"
 ---

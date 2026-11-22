@@ -7,7 +7,7 @@ tags: ["Laser Hair Reduction"]
 service: "laser-hair-reduction"
 ---
 
-We deliberately use the term "reduction" rather than "removal" when talking about laser hair treatment, and it's worth explaining why that distinction matters for setting the right expectations from the start.
+We deliberately use the term "reduction" rather than "removal" when talking about [laser hair treatment](/services/laser-hair-reduction), and it's worth explaining why that distinction matters for setting the right expectations from the start.
 
 ## Why a Single Session Isn't Enough
 

@@ -29,6 +29,7 @@ treatmentOverview:
 
 relatedConditions:
   - "infantile-haemangioma"
+  - "melanocytic-naevi-moles"
 
 ctaTitle: "Book a Birthmark Evaluation"
 ---

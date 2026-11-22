@@ -28,7 +28,10 @@ treatmentOverview:
   - name: "Patch Testing"
     description: "A systematic test applying small amounts of common allergens to identify the exact trigger where it isn't obvious from history alone."
 
-relatedConditions: []
+relatedConditions:
+  - "hand-eczema"
+  - "damaged-skin-barrier"
+  - "atopic-eczema-adults"
 
 ctaTitle: "Book a Skin Allergy Evaluation"
 ---

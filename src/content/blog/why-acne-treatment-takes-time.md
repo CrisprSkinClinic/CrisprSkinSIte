@@ -15,7 +15,7 @@ Most acne treatments, whether topical or oral, need six to eight weeks of consis
 
 ## Why Switching Products Constantly Backfires
 
-We often see patients who've tried five different products in two months, each for a week or two, because none of them seemed to be "doing anything." In most cases, none of them had been given enough time to actually work, and constantly switching also increases the risk of irritation, which can look like a new problem layered on top of the original acne.
+We often see patients who've tried five different products in two months, each for a week or two, because none of them seemed to be "doing anything." In most cases, none of them had been given enough time to actually work, and constantly switching also increases the risk of [irritation](/conditions/damaged-skin-barrier), which can look like a new problem layered on top of the original acne.
 
 ## Acne Type Matters for Treatment Choice
 
@@ -23,4 +23,6 @@ Acne isn't one uniform condition -- comedonal acne (blackheads and whiteheads), 
 
 ## The Case for an Evaluation
 
-An evaluation identifies your specific acne type and severity, which shapes what's actually likely to work and sets a realistic timeline from the outset -- so you know what to expect and aren't tempted to abandon an effective treatment plan too early.
+(Related: [niacinamide and other ingredients for oily, acne-prone skin](/blog/niacinamide-for-oily-and-acne-prone-skin).)
+
+[An evaluation](/services/acne) identifies your specific acne type and severity, which shapes what's actually likely to work and sets a realistic timeline from the outset -- so you know what to expect and aren't tempted to abandon an effective treatment plan too early.

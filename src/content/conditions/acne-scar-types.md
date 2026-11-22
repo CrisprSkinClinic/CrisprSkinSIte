@@ -28,7 +28,9 @@ treatmentOverview:
   - name: "Microneedling"
     description: "Particularly useful for rolling and boxcar scars, stimulating the skin's own collagen response."
 
-relatedConditions: []
+relatedConditions:
+  - "hormonal-acne"
+  - "post-inflammatory-hyperpigmentation"
 
 ctaTitle: "Book an Acne Scar Evaluation"
 ---

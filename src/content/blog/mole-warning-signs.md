@@ -8,7 +8,7 @@ service: "warts-moles-skin-tags"
 condition: "melanocytic-naevi-moles"
 ---
 
-Most people have moles, and the overwhelming majority are entirely harmless. Rather than trying to keep track of every mole you have, it's more useful to know the specific, recognized warning signs that mean a particular mole is worth a prompt evaluation.
+Most people have [moles](/conditions/melanocytic-naevi-moles), and the overwhelming majority are entirely harmless. Rather than trying to keep track of every mole you have, it's more useful to know the specific, recognized warning signs that mean a particular mole is worth a prompt evaluation.
 
 ## The ABCDE Warning Signs
 
@@ -22,8 +22,8 @@ Of the five, a mole that's genuinely changing tends to be the most reliable prom
 
 ## What an Evaluation Actually Involves
 
-We examine the mole closely, often using dermoscopy -- a handheld magnification tool -- to get a clearer look at its structure. Where the appearance doesn't provide a confident answer on its own, a biopsy provides a definitive one. This is a small, low-risk step that resolves uncertainty far better than continuing to watch and wonder.
+[We examine the mole closely](/services/warts-moles-skin-tags), often using dermoscopy -- a handheld magnification tool -- to get a clearer look at its structure. Where the appearance doesn't provide a confident answer on its own, a biopsy provides a definitive one. This is a small, low-risk step that resolves uncertainty far better than continuing to watch and wonder.
 
 ## Most Moles Don't Need Removal
 
-To be clear: this isn't a case for removing every mole you have. Most moles are stable, harmless, and simply part of your skin. The goal is knowing which specific features are actually worth a closer look, so you can act on the ones that matter and stop worrying about the ones that don't.
+To be clear: this isn't a case for removing every mole you have. Most moles are stable, harmless, and simply part of your skin. The goal is knowing which specific features are actually worth a closer look, so you can act on the ones that matter and stop worrying about the ones that don't. For the wider picture, see [sun safety and skin cancer awareness](/blog/sun-safety-and-skin-cancer-awareness).

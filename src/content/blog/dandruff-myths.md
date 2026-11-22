@@ -5,6 +5,7 @@ description: "Persistent dandruff despite trying every shampoo on the shelf usua
 author: "Dr. Narayanan B"
 tags: ["Dandruff"]
 service: "dandruff"
+condition: "seborrheic-dermatitis-scalp"
 ---
 
 If you've tried three or four anti-dandruff shampoos and none of them have made a lasting difference, the problem probably isn't that you haven't found the right brand yet. It's usually one of a few specific, identifiable issues.
@@ -15,12 +16,12 @@ This is one of the most persistent misconceptions we hear, and it's simply not a
 
 ## The Real Reason Shampoo "Isn't Working"
 
-Three explanations account for most cases we see: an incorrect underlying diagnosis (seborrheic dermatitis or scalp psoriasis can look like dandruff but need different treatment), incorrect usage (not leaving the shampoo on the scalp for the recommended contact time, or not using it frequently enough), or a coexisting condition that needs separate attention alongside standard dandruff treatment.
+Three explanations account for most cases we see: an incorrect underlying diagnosis (seborrheic dermatitis or [scalp psoriasis](/conditions/scalp-psoriasis) can look like dandruff but need different treatment), incorrect usage (not leaving the shampoo on the scalp for the recommended contact time, or not using it frequently enough), or a coexisting condition that needs separate attention alongside standard dandruff treatment.
 
 ## Seborrheic Dermatitis Looks Like Dandruff, But Isn't Quite
 
-Seborrheic dermatitis causes redness and greasy, yellowish scale, and while it overlaps with typical dandruff, it usually needs a targeted anti-inflammatory treatment in addition to a medicated shampoo to bring it under control.
+[Seborrheic dermatitis](/conditions/seborrheic-dermatitis-scalp) causes redness and greasy, yellowish scale, and while it overlaps with typical dandruff, it usually needs a targeted anti-inflammatory treatment in addition to a medicated shampoo to bring it under control.
 
 ## What Actually Works
 
-Once the correct diagnosis is confirmed, most dandruff responds well to medicated shampoo used at the right frequency and left on the scalp for the recommended contact time -- consistency in how it's used matters as much as which product is chosen. If you've been diligent with an anti-dandruff shampoo for several weeks with no real improvement, that's a sign worth getting evaluated rather than switching to yet another brand.
+Once the correct diagnosis is confirmed, most dandruff responds well to medicated shampoo used at the right frequency and left on the scalp for the recommended contact time -- consistency in how it's used matters as much as which product is chosen. If you've been diligent with an anti-dandruff shampoo for several weeks with no real improvement, that's a sign worth [getting evaluated](/services/dandruff) rather than switching to yet another brand.

@@ -28,7 +28,9 @@ treatmentOverview:
   - name: "Alternative Removal Methods"
     description: "For warts not responding to cryotherapy, alternative in-clinic removal options considered."
 
-relatedConditions: []
+relatedConditions:
+  - "molluscum-contagiosum"
+  - "skin-tags"
 
 ctaTitle: "Book a Wart Evaluation"
 ---

@@ -8,7 +8,7 @@ service: "viral-skin-infections"
 condition: "molluscum-contagiosum"
 ---
 
-Molluscum contagiosum and viral warts are two of the most common reasons children come in for a dermatology visit, and one of the first questions parents ask is whether their child needs to stay home from school. In most cases, the answer is no.
+[Molluscum contagiosum](/conditions/molluscum-contagiosum) and [viral warts](/conditions/viral-warts) are two of the most common reasons children come in for a dermatology visit, and one of the first questions parents ask is whether their child needs to stay home from school. In most cases, the answer is no.
 
 ## What These Infections Actually Are
 
@@ -20,7 +20,7 @@ Many of these infections resolve on their own over months to about a year withou
 
 ## When Active Treatment Makes Sense
 
-If the lesions are bothering your child, spreading significantly, or you'd simply prefer not to wait, gentle in-clinic removal methods appropriate for children are available. This is a reasonable choice too -- it's a matter of preference once you understand the trade-offs, not a medical necessity in most cases.
+If the lesions are bothering your child, spreading significantly, or you'd simply prefer not to wait, [gentle in-clinic removal methods](/services/viral-skin-infections) appropriate for children are available. This is a reasonable choice too -- it's a matter of preference once you understand the trade-offs, not a medical necessity in most cases.
 
 ## Practical School and Daily Life Guidance
 

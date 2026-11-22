@@ -5,6 +5,7 @@ description: "Treating an eczema flare is only half the picture -- reducing how 
 author: "Dr. Narayanan B"
 tags: ["Eczema"]
 service: "eczema"
+condition: "atopic-eczema-adults"
 ---
 
 Eczema treatment is often framed entirely around finding the right cream, but for most patients dealing with recurring flares, the more valuable long-term work is identifying and reducing exposure to specific triggers.
@@ -15,7 +16,7 @@ Eczema, more precisely called dermatitis, tends to flare and settle repeatedly r
 
 ## Common Trigger Categories
 
-Triggers vary by individual but commonly include specific allergens, irritants in soaps or detergents, weather changes, and stress. Some patients have an obvious single trigger; many have a combination of several smaller factors that compound each other.
+Triggers vary by individual but commonly include specific allergens, [irritants in soaps or detergents](/conditions/contact-dermatitis), weather changes, and stress. Some patients have an obvious single trigger; many have a combination of several smaller factors that compound each other.
 
 ## Why This Takes Real Conversation, Not a Quick Checklist
 
@@ -23,8 +24,8 @@ Identifying your specific triggers usually takes a detailed history -- recent ch
 
 ## The Moisturizing Routine Is the Unsung Hero
 
-Between flares, a consistent moisturizing routine using the right type of emollient does much of the preventive work in reducing flare frequency, often more than people expect. We spend real time helping patients build a routine that's realistic to maintain daily, since a technically ideal routine that's too complicated to sustain doesn't actually help.
+Between flares, a consistent [moisturizing routine](/services/eczema) using the right type of emollient does much of the preventive work in reducing flare frequency, often more than people expect. We spend real time helping patients build a routine that's realistic to maintain daily, since a technically ideal routine that's too complicated to sustain doesn't actually help.
 
 ## The Combined Approach
 
-Active flares still need appropriate topical anti-inflammatory treatment -- that part hasn't changed. But pairing that with genuine trigger identification and a sustainable moisturizing routine is what actually reduces how often you're dealing with flares in the first place.
+Active flares still need appropriate topical anti-inflammatory treatment -- that part hasn't changed. But pairing that with genuine trigger identification and a sustainable moisturizing routine is what actually reduces how often you're dealing with flares in the first place. For eczema that stays severe despite this, see [newer treatments for stubborn eczema](/blog/newer-treatments-for-stubborn-eczema).

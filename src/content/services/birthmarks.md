@@ -21,7 +21,8 @@ diagnostics:
   - "Discussion of expected natural course for the specific type identified"
 
 conditionsManaged:
-  - "birthmarks"
+  - "infantile-haemangioma"
+  - "congenital-melanocytic-naevus"
 
 treatments:
   - name: "Monitoring & Reassurance"
