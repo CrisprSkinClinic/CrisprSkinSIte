@@ -29,8 +29,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
 >
   <div id="bookingForm" class="pb-36 md:pb-0">
 
-    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-      <p class="text-sm text-slate-600">Takes about a minute. We confirm on WhatsApp.</p>
+    <div class="mb-5 flex flex-wrap items-center justify-end gap-3">
       <a href="/manage-appointment" class="text-sm font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Already booked? Manage my appointment</a>
     </div>
 
@@ -53,39 +52,39 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
               <button type="button" role="radio" aria-checked="false" data-for="family" class="booking-for min-h-[44px] rounded-xl border px-2 py-2.5 text-sm font-semibold transition border-slate-300 bg-white text-brand-900 hover:bg-brand-50">Family member</button>
               <button type="button" role="radio" aria-checked="false" data-for="friend" class="booking-for min-h-[44px] rounded-xl border px-2 py-2.5 text-sm font-semibold transition border-slate-300 bg-white text-brand-900 hover:bg-brand-50">Friend</button>
             </div>
-            <p id="bookingForHint" class="mt-2 hidden text-sm text-slate-600">Enter the patient's name below and your own WhatsApp number. The code and confirmation come to you.</p>
           </div>
 
           <div>
             <span class={label} id="nameLabel">Patient name</span>
-            <div class="flex gap-3" role="group" aria-labelledby="nameLabel">
-              <div class="w-[92px] shrink-0">
-                <label for="prefix" class="sr-only">Title</label>
-                <select id="prefix" class={field}>
+            <div class="grid grid-cols-[76px_minmax(0,1fr)_minmax(0,1fr)] gap-2 sm:grid-cols-[88px_minmax(0,1fr)_minmax(0,1fr)] sm:gap-3" role="group" aria-labelledby="nameLabel">
+              <div>
+                <label for="prefix" class="sr-only">Salutation</label>
+                <select id="prefix" class={`${field} px-2.5`}>
                   <option value="Mr.">Mr.</option>
                   <option value="Ms.">Ms.</option>
                   <option value="Mrs.">Mrs.</option>
                   <option value="Dr.">Dr.</option>
                 </select>
               </div>
-              <div class="min-w-0 flex-1">
+              <div>
                 <label for="firstName" class="sr-only">First name</label>
-                <input type="text" id="firstName" placeholder="First name" autocomplete="given-name" required aria-describedby="err-firstName" class={field} />
+                <input type="text" id="firstName" placeholder="First name" autocomplete="given-name" required aria-describedby="err-firstName" class={`${field} px-3`} />
+              </div>
+              <div>
+                <label for="lastName" class="sr-only">Last name</label>
+                <input type="text" id="lastName" placeholder="Last name" autocomplete="family-name" required class={`${field} px-3`} />
               </div>
             </div>
             <p id="err-firstName" class={fieldError} role="alert"></p>
-            <label for="lastName" class="sr-only">Last name</label>
-            <input type="text" id="lastName" placeholder="Last name" autocomplete="family-name" required class={`${field} mt-3`} />
           </div>
 
           <div>
             <label for="phone" class={label}>WhatsApp mobile number</label>
             <div class="flex items-stretch rounded-xl border border-slate-300 bg-white transition focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/30" id="phoneGroup">
               <span class="inline-flex items-center rounded-l-xl border-r border-slate-200 bg-slate-50 px-3 text-slate-600" aria-hidden="true">+91</span>
-              <input type="tel" id="phone" placeholder="10-digit number" autocomplete="tel-national" inputmode="numeric" maxlength="14" required aria-describedby="phoneHelp err-phone" class="min-h-[48px] min-w-0 flex-1 rounded-r-xl bg-transparent px-3.5 py-3 text-slate-900 outline-none placeholder:text-slate-400" />
+              <input type="tel" id="phone" placeholder="10-digit number" autocomplete="tel-national" inputmode="numeric" maxlength="14" required aria-describedby="err-phone" class="min-h-[48px] min-w-0 flex-1 rounded-r-xl bg-transparent px-3.5 py-3 text-slate-900 outline-none placeholder:text-slate-400" />
               <span id="phoneTick" class="hidden items-center pr-3 text-green-600" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
             </div>
-            <p id="phoneHelp" class="mt-1.5 text-sm text-slate-500">We send a one-time code on WhatsApp when you confirm.</p>
             <p id="phoneVerified" class="mt-1.5 hidden text-sm font-semibold text-green-700" role="status"></p>
             <p id="err-phone" class={fieldError} role="alert"></p>
           </div>
@@ -154,10 +153,6 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
               <p id="err-service" class={fieldError} role="alert"></p>
             </div>
           </div>
-          <p class="flex items-start gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">
-            <svg class="mt-0.5 h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            <span>Online booking is for a consultation. Any procedure is planned with the doctor after your examination.</span>
-          </p>
         </div>
       </section>
 
@@ -166,7 +161,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
 
         <div id="earliestWrap" class="mb-5 hidden flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3.5">
           <p id="earliestText" class="text-sm text-brand-900"></p>
-          <button type="button" id="earliestBtn" class="min-h-[40px] rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Use this time</button>
+          <button type="button" id="earliestBtn" class="min-h-[40px] rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Use this slot</button>
         </div>
 
         <p id="datesLabel" class="mb-2 text-sm font-semibold text-slate-700">Next 7 days</p>
@@ -182,7 +177,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         <p id="err-date" class={fieldError} role="alert"></p>
 
         <div class="mb-3 mt-6 flex items-baseline justify-between gap-2">
-          <h4 class="text-sm font-semibold text-slate-700" id="slotsLabel">Available times</h4>
+          <h4 class="text-sm font-semibold text-slate-700" id="slotsLabel">Available slots</h4>
           <p id="slotsDateLabel" class="text-sm text-slate-500"></p>
         </div>
         <div id="slotsContainer" class="grid grid-cols-3 gap-2.5 sm:grid-cols-4" role="radiogroup" aria-labelledby="slotsLabel">
@@ -192,36 +187,14 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         </div>
         <p id="err-slot" class={fieldError} role="alert"></p>
 
-        <div id="selectionBox" class="mt-5 flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600" role="status" aria-live="polite">
+        <div id="selectionBox" class="mt-5 hidden items-center gap-3 rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800" role="status" aria-live="polite">
           <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span id="selectionSummary">Choose a time to continue.</span>
+          <span id="selectionSummary"></span>
         </div>
 
         <button id="confirmBtn" type="button" class="mt-5 min-h-[52px] w-full rounded-xl bg-brand-900 py-4 font-bold text-white shadow-lg transition hover:bg-brand-800 disabled:opacity-60">
           Confirm Appointment
         </button>
-        <p class="mt-2 text-center text-xs text-slate-500">You will get a WhatsApp code to confirm it is you. No account needed.</p>
-
-        <div id="verifyPanel" class="mt-5 hidden space-y-3 rounded-xl border border-green-200 bg-green-50 p-4" role="group" aria-labelledby="verifyTitle">
-          <div class="flex items-start gap-3">
-            <span class="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-600 text-white" aria-hidden="true">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.5zM12 22a10 10 0 0 1-5.1-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A10 10 0 1 1 12 22zm5.5-7.5c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3 1.8.8 2.5.8 3.4.7.5-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4z"/></svg>
-            </span>
-            <div>
-              <p id="verifyTitle" class="font-semibold text-green-900">Enter the code we sent on WhatsApp</p>
-              <p id="verifyTo" class="text-sm text-green-800"></p>
-            </div>
-          </div>
-          <div>
-            <label for="otp" class="sr-only">6-digit WhatsApp code</label>
-            <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" class="min-h-[56px] w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-2xl font-semibold tracking-[0.5em] text-slate-900 outline-none transition placeholder:text-slate-300 focus:border-green-600 focus:ring-2 focus:ring-green-600/30" />
-          </div>
-          <p id="otpStatus" class="text-sm text-slate-700" role="status" aria-live="polite"></p>
-          <div class="flex flex-wrap items-center gap-4">
-            <button type="button" id="resendBtn" class="min-h-[36px] text-sm font-semibold text-brand-700 underline underline-offset-2 disabled:text-slate-400 disabled:no-underline" disabled>Resend code</button>
-            <button type="button" id="changeNumberBtn" class="min-h-[36px] text-sm font-semibold text-slate-600 underline underline-offset-2">Use a different number</button>
-          </div>
-        </div>
 
         <div id="errorMessage" class="mt-5 hidden items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-800" role="alert">
           <svg class="mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -237,6 +210,28 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
           </div>
         </div>
       </section>
+    </div>
+  </div>
+
+  <!-- OTP pop-up, shown only after Confirm Appointment is pressed (like a banking OTP). -->
+  <div id="verifyPanel" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 p-4" role="dialog" aria-modal="true" aria-labelledby="verifyTitle">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h3 id="verifyTitle" class="text-xl font-bold text-brand-900">Verify your number</h3>
+          <p id="verifyTo" class="mt-1 text-sm text-slate-600"></p>
+        </div>
+        <button type="button" id="otpClose" class="-m-2 rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800" aria-label="Close">✕</button>
+      </div>
+      <div class="mt-5">
+        <label for="otp" class="sr-only">OTP</label>
+        <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP" class="min-h-[56px] w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-2xl font-semibold tracking-[0.4em] text-slate-900 outline-none transition placeholder:text-base placeholder:font-normal placeholder:tracking-normal placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30" />
+      </div>
+      <p id="otpStatus" class="mt-3 min-h-[1.25rem] text-sm text-slate-700" role="status" aria-live="polite"></p>
+      <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <button type="button" id="resendBtn" class="min-h-[36px] text-sm font-semibold text-brand-700 underline underline-offset-2 disabled:text-slate-400 disabled:no-underline" disabled>Resend OTP</button>
+        <button type="button" id="changeNumberBtn" class="min-h-[36px] text-sm font-semibold text-slate-600 underline underline-offset-2">Change number</button>
+      </div>
     </div>
   </div>
 
@@ -260,12 +255,9 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     </div>
 
     <div class="mx-auto max-w-xl overflow-hidden rounded-xl border border-slate-200">
-      <div class="flex items-center justify-between gap-3 bg-brand-900 px-4 py-3 text-white">
-        <div>
-          <p id="confirmWhen" class="text-lg font-bold"></p>
-          <p id="confirmType" class="text-sm text-white/80"></p>
-        </div>
-        <button type="button" id="copyRefBtn" class="shrink-0 rounded-lg border border-white/30 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/10" title="Copy reference"></button>
+      <div class="bg-brand-900 px-4 py-3 text-white">
+        <p id="confirmWhen" class="text-lg font-bold"></p>
+        <p id="confirmType" class="text-sm text-white/80"></p>
       </div>
       <dl id="confirmDetails" class="divide-y divide-slate-200 bg-white text-sm"></dl>
     </div>
@@ -280,9 +272,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       <div>
         <p class="mb-1.5 font-semibold">What to bring</p>
         <ul class="list-disc space-y-1 pl-5">
-          <li>A photo ID</li>
           <li>Previous prescriptions, reports and photos of your condition</li>
-          <li>The names of creams, tablets and supplements you currently use</li>
         </ul>
       </div>
       <p id="confirmArrival"></p>
@@ -333,7 +323,6 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     const rescheduleActions = $('rescheduleActions');
     const rescheduleBtn = $('rescheduleBtn');
     const keepBtn = $('keepBtn');
-    const bookingForHint = $('bookingForHint');
     const familyPicker = $('familyPicker');
     const familyChips = $('familyChips');
     const prefixSelect = $('prefix');
@@ -359,6 +348,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     let lookupSequence = 0;
     let bookingFor = 'self';
     let otpSentTo = '';
+    let otpSentAt = 0;
     let otpToken = '';
     let verifiedPhone = '';
     let resendTimer = null;
@@ -375,6 +365,19 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     const phoneDigits = (v) => String(v || '').replace(/\D/g, '').slice(-10);
     const validPhone = () => /^[6-9]\d{9}$/.test(phoneDigits(phoneInput?.value));
     const apptType = () => (isReturningPatient ? 'review' : 'new');
+    const otpOpen = () => Boolean(otpPanel && !otpPanel.classList.contains('hidden'));
+    function openOtp() {
+      otpPanel.classList.remove('hidden');
+      otpPanel.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+      updateProgress();
+    }
+    function closeOtp() {
+      otpPanel.classList.add('hidden');
+      otpPanel.classList.remove('flex');
+      document.body.classList.remove('overflow-hidden');
+      updateProgress();
+    }
     const hideReschedule = () => reschedulePrompt?.classList.add('hidden');
 
     // ---------------------------------------------------------------- dates (clinic time, IST)
@@ -406,7 +409,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       const timeDone = Boolean(selectedTime);
       const states = state === 'done'
         ? ['done', 'done', 'done']
-        : [detailsDone ? 'done' : 'current', timeDone ? 'done' : (detailsDone ? 'current' : 'todo'), (otpPanel && !otpPanel.classList.contains('hidden')) || busy ? 'current' : 'todo'];
+        : [detailsDone ? 'done' : 'current', timeDone ? 'done' : (detailsDone ? 'current' : 'todo'), otpOpen() || busy ? 'current' : 'todo'];
       document.querySelectorAll('#bookingProgress .step').forEach((li, i) => { li.dataset.state = states[i]; });
     }
 
@@ -480,7 +483,6 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
           b.classList.toggle('bg-white', !on); b.classList.toggle('border-slate-300', !on); b.classList.toggle('text-brand-900', !on);
           b.classList.toggle('hover:bg-brand-50', !on);
         });
-        bookingForHint?.classList.toggle('hidden', bookingFor === 'self');
         $('firstName').placeholder = bookingFor === 'self' ? 'First name' : "Patient's first name";
         $('lastName').placeholder = bookingFor === 'self' ? 'Last name' : "Patient's last name";
         if (otpToken) checkReturningPatient();
@@ -559,7 +561,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     // ---------------------------------------------------------------- availability
     async function fetchDay(dateStr) {
       const doctorId = doctorSelect?.value;
-      if (!doctorId) return { slots: [], reason: 'Choose a doctor to see available times.' };
+      if (!doctorId) return { slots: [], reason: 'Choose a doctor to see available slots.' };
       const type = apptType();
       const key = `${doctorId}|${type}|${dateStr}`;
       if (dayCache.has(key)) return dayCache.get(key);
@@ -580,10 +582,12 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       const date = dateInput?.value;
       if (selectedTime && date) {
         selectionSummary.textContent = `${fmtDate(date, { weekday: 'long', day: 'numeric', month: 'long' })} at ${selectedTime}`;
-        selectionBox.className = 'mt-5 flex items-center gap-3 rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800';
+        selectionBox.classList.remove('hidden');
+        selectionBox.classList.add('flex');
       } else {
-        selectionSummary.textContent = 'Choose a time to continue.';
-        selectionBox.className = 'mt-5 flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600';
+        selectionSummary.textContent = '';
+        selectionBox.classList.add('hidden');
+        selectionBox.classList.remove('flex');
       }
       updateProgress();
       updateStickyBar();
@@ -676,7 +680,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       $('slotsDateLabel').textContent = fmtDate(dateStr, { weekday: 'long', day: 'numeric', month: 'long' });
       highlightStrip(dateStr);
       if (!doctorSelect?.value) {
-        slotsMessage('Choose a doctor to see available times.');
+        slotsMessage('Choose a doctor to see available slots.');
         return;
       }
       slotsContainer.innerHTML = skeletonSlots();
@@ -687,7 +691,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
           const next = earliestKnown && earliestKnown.date !== dateStr
             ? `<button type="button" id="emptyNext" class="mt-3 inline-flex min-h-[40px] items-center rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-brand-700">Show next available: ${fmtDate(earliestKnown.date, { weekday: 'short', day: 'numeric', month: 'short' })}</button>`
             : '';
-          slotsMessage(`<p class="font-semibold text-slate-800">No times on this date</p><p class="mt-0.5">${reason || 'Everything is booked.'} Try another day or <a class="font-semibold text-brand-700 underline" href="tel:${clinicTel}">call ${clinic.phone}</a>.</p>${next}`);
+          slotsMessage(`<p class="font-semibold text-slate-800">No slots on this date</p><p class="mt-0.5">${reason || 'Everything is booked.'} Try another day or <a class="font-semibold text-brand-700 underline" href="tel:${clinicTel}">call ${clinic.phone}</a>.</p>${next}`);
           $('emptyNext')?.addEventListener('click', () => { userChoseDate = true; pickDate(earliestKnown.date); });
           return;
         }
@@ -705,7 +709,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       loadAvailableSlots(dateStr, preselectTime24);
     }
 
-    // "Next 7 days" strip with the number of times per day, plus the earliest available time.
+    // "Next 7 days" strip with the number of slots per day, plus the earliest available slot.
     async function refreshDatesStrip() {
       if (!datesStrip) return null;
       const seq = ++stripSequence;
@@ -728,7 +732,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         chip.disabled = !count;
         chip.setAttribute('aria-pressed', 'false');
         chip.className = 'shrink-0 min-w-[76px] min-h-[76px] rounded-xl border border-brand-200 bg-white px-3 py-2 text-center text-sm transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400 disabled:hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600';
-        chip.innerHTML = `<span class="block font-semibold">${dayLabel(d)}</span><span class="block">${fmtDate(d, { day: 'numeric', month: 'short' })}</span><span data-count="${count ? 'open' : 'full'}" class="block text-xs ${count ? 'text-green-700' : 'text-slate-500'}">${count ? `${count} time${count === 1 ? '' : 's'}` : 'Full'}</span>`;
+        chip.innerHTML = `<span class="block font-semibold">${dayLabel(d)}</span><span class="block">${fmtDate(d, { day: 'numeric', month: 'short' })}</span><span data-count="${count ? 'open' : 'full'}" class="block text-xs ${count ? 'text-green-700' : 'text-slate-500'}">${count ? `${count} slot${count === 1 ? '' : 's'}` : 'Full'}</span>`;
         chip.addEventListener('click', () => { userChoseDate = true; pickDate(d); });
         datesStrip.appendChild(chip);
       });
@@ -744,7 +748,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         $('earliestBtn').classList.remove('hidden');
         $('earliestBtn').onclick = () => { userChoseDate = true; pickDate(earliest.date, earliest.slot.time24); };
       } else {
-        $('earliestText').innerHTML = `<span class="font-semibold">No times in the next 7 days.</span> Pick a later date below, or call <a class="font-semibold underline" href="tel:${clinicTel}">${clinic.phone}</a>.`;
+        $('earliestText').innerHTML = `<span class="font-semibold">No slots in the next 7 days.</span> Pick a later date below, or call <a class="font-semibold underline" href="tel:${clinicTel}">${clinic.phone}</a>.`;
         $('earliestBtn').classList.add('hidden');
       }
       return earliest;
@@ -799,7 +803,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         if (returningPatientMessage) {
           const who = bookingFor === 'self' ? 'Welcome back. Your' : `Welcome back. ${enteredName()}'s`;
           const note = needsChoice
-            ? (doctorOption ? 'This is a follow-up, so we have selected the same doctor. Please choose your time and confirm.' : 'This will be booked as a follow-up. Please choose a doctor and a time.')
+            ? (doctorOption ? 'This is a follow-up, so we have selected the same doctor. Please choose your slot and confirm.' : 'This will be booked as a follow-up. Please choose a doctor and a slot.')
             : 'This will be booked as a follow-up.';
           returningPatientMessage.textContent = `${who} last consultation was on ${lastDate}${last.doctorName ? ` with Dr. ${last.doctorName}` : ''}. ${note}`;
           returningPatientMessage.classList.remove('hidden');
@@ -824,16 +828,16 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       if (resendTimer) clearInterval(resendTimer);
       let wait = seconds;
       resendBtn.disabled = true;
-      resendBtn.textContent = `Resend code in ${wait}s`;
+      resendBtn.textContent = `Resend OTP in ${wait}s`;
       resendTimer = setInterval(() => {
         wait -= 1;
         if (wait <= 0) {
           clearInterval(resendTimer);
           resendTimer = null;
           resendBtn.disabled = false;
-          resendBtn.textContent = 'Resend code';
+          resendBtn.textContent = 'Resend OTP';
         } else {
-          resendBtn.textContent = `Resend code in ${wait}s`;
+          resendBtn.textContent = `Resend OTP in ${wait}s`;
         }
       }, 1000);
     }
@@ -842,16 +846,17 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       clearReturningPatient();
       familyPicker?.classList.add('hidden');
       otpSentTo = '';
+      otpSentAt = 0;
       otpToken = '';
       verifiedPhone = '';
       pendingBooking = false;
       if (otpInput) otpInput.value = '';
-      otpPanel?.classList.add('hidden');
+      closeOtp();
       phoneVerified?.classList.add('hidden');
       if (resendTimer) clearInterval(resendTimer);
       resendTimer = null;
       resendBtn.disabled = true;
-      resendBtn.textContent = 'Resend code';
+      resendBtn.textContent = 'Resend OTP';
       updateProgress();
     }
 
@@ -878,13 +883,12 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         const result = await response.json().catch(() => ({}));
         if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
         otpSentTo = digits;
-        otpPanel?.classList.remove('hidden');
-        $('verifyTo').textContent = `Sent to +91 ${digits.slice(0, 5)} ${digits.slice(5)}. It expires in 5 minutes.`;
+        otpSentAt = Date.now();
+        $('verifyTo').textContent = `OTP sent to +91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
         setOtpStatus('');
-        if (otpInput) { otpInput.value = ''; otpInput.focus(); }
-        otpPanel?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        openOtp();
+        if (otpInput) { otpInput.value = ''; otpInput.classList.remove('border-red-500'); otpInput.focus(); }
         startResendTimer();
-        updateProgress();
         return true;
       } catch (err) {
         pendingBooking = false;
@@ -914,7 +918,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         verifiedPhone = otpSentTo;
         if (resendTimer) clearInterval(resendTimer);
         resendTimer = null;
-        otpPanel?.classList.add('hidden');
+        closeOtp();
         if (phoneVerified) {
           phoneVerified.textContent = `✓ +91 ${verifiedPhone} verified`;
           phoneVerified.classList.remove('hidden');
@@ -942,6 +946,18 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     });
     resendBtn?.addEventListener('click', () => { pendingBooking = true; requestCode(); });
     $('changeNumberBtn')?.addEventListener('click', () => { resetOtp(); phoneInput?.focus(); });
+    // Closing the pop-up cancels this attempt; tapping Confirm again re-opens it without re-sending.
+    $('otpClose')?.addEventListener('click', () => { pendingBooking = false; closeOtp(); confirmBtn?.focus(); });
+    otpPanel?.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { pendingBooking = false; closeOtp(); confirmBtn?.focus(); return; }
+      if (e.key === 'Tab') { // keep focus inside the pop-up
+        const items = Array.from(otpPanel.querySelectorAll('button:not([disabled]), input')).filter((el) => el.offsetParent !== null);
+        if (!items.length) return;
+        const first = items[0], last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
 
     // ---------------------------------------------------------------- confirmation card
     const plainDoctor = (name) => String(name || '').replace(/^dr\.?\s*/i, '').trim();
@@ -951,12 +967,12 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       return new Date(Date.UTC(y, m - 1, d, h, mi) - 330 * 60000 + addMinutes * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); // IST -> UTC
     };
 
-    function buildIcs({ ref, date, time24, minutes, summary, description, location }) {
+    function buildIcs({ date, time24, minutes, summary, description, location }) {
       const esc = (s) => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
       return [
         'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//CRISPR Skin and Hair Clinic//Booking//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
         'BEGIN:VEVENT',
-        `UID:${ref || utcStamp(date, time24, 0)}@booking`,
+        `UID:${utcStamp(date, time24, 0)}-${phoneDigits(phoneInput?.value || '')}@booking`,
         `DTSTAMP:${utcStamp(date, time24, 0)}`,
         `DTSTART:${utcStamp(date, time24, 0)}`,
         `DTEND:${utcStamp(date, time24, minutes)}`,
@@ -976,7 +992,6 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       const doctorText = result.doctor_name
         ? `Dr. ${plainDoctor(result.doctor_name)}`
         : (doctorSelect?.value && doctorSelect.value !== 'any' ? doctorSelect.selectedOptions[0].text : 'Assigned by the clinic');
-      const ref = result.appointment_id ? `CR-${String(result.appointment_id).slice(0, 8).toUpperCase()}` : '';
       const dateText = fmtDate(date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       const timeText = body.time;
 
@@ -984,26 +999,14 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       $('confirmSubtitle').textContent = `We have sent the details on WhatsApp to +91 ${phoneDigits(body.phone)}.`;
       $('confirmWhen').textContent = `${fmtDate(date, { weekday: 'short', day: 'numeric', month: 'short' })} · ${timeText}`;
       $('confirmType').textContent = `${review ? 'Follow-up' : 'Consultation'} · ${minutes} min`;
-      const copyBtn = $('copyRefBtn');
-      if (ref) {
-        copyBtn.textContent = `${ref} · Copy`;
-        copyBtn.classList.remove('hidden');
-        copyBtn.onclick = async () => {
-          try { await navigator.clipboard.writeText(ref); copyBtn.textContent = 'Copied ✓'; } catch { copyBtn.textContent = ref; }
-          setTimeout(() => { copyBtn.textContent = `${ref} · Copy`; }, 1800);
-        };
-      } else {
-        copyBtn.classList.add('hidden');
-      }
 
       const rows = [
         ['Patient', body.name],
         ['Date', dateText],
-        ['Time', timeText],
+        ['Slot', timeText],
         ['Doctor', doctorText],
         ['Reason', body.service],
         ['Clinic', `${clinic.name}, ${clinic.address}`],
-        ...(ref ? [['Reference', ref]] : []),
       ];
       const details = $('confirmDetails');
       details.innerHTML = '';
@@ -1022,11 +1025,11 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
 
       const location = `${clinic.name}, ${clinic.address}`;
       const summary = `Appointment at ${clinic.name}`;
-      const description = `${review ? 'Follow-up' : 'Consultation'} with ${doctorText}. Reason: ${body.service}.${ref ? ` Reference ${ref}.` : ''} Please arrive 10 minutes early. Questions? Call ${clinic.phone}.`;
+      const description = `${review ? 'Follow-up' : 'Consultation'} with ${doctorText}. Reason: ${body.service}. Please arrive 10 minutes early. Questions? Call ${clinic.phone}.`;
       $('gcalLink').href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(summary)}&dates=${utcStamp(date, time24, 0)}/${utcStamp(date, time24, minutes)}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}`;
       $('mapLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
       $('icsBtn').onclick = () => {
-        const blob = new Blob([buildIcs({ ref, date, time24, minutes, summary, description, location })], { type: 'text/calendar;charset=utf-8' });
+        const blob = new Blob([buildIcs({ date, time24, minutes, summary, description, location })], { type: 'text/calendar;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -1071,7 +1074,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       if (!doctorSelect.value) errors.push(['doctor', 'Choose a doctor, or “No preference”.']);
       if (!serviceSelect.value) errors.push(['service', 'Choose the reason for your visit.']);
       if (!dateInput.value) errors.push(['date', 'Choose a date.']);
-      if (!selectedTime) errors.push(['slot', 'Choose one of the available times.']);
+      if (!selectedTime) errors.push(['slot', 'Choose one of the available slots.']);
       errors.forEach(([key, message]) => setFieldError(key, message));
       if (errors.length) {
         const first = errors[0][0];
@@ -1124,7 +1127,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       // server picks one and re-verifies availability before committing.
       const isNoPreference = doctorId === 'any';
       if (isNoPreference && (!selectedSlotDoctorIds || selectedSlotDoctorIds.length === 0)) {
-        showError('That time slot’s doctor information is missing. Please choose a time again.');
+        showError('That time slot’s doctor information is missing. Please choose a slot again.');
         return;
       }
 
@@ -1179,7 +1182,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
             event_label: service,
             error_message: result.error || 'unknown_error',
           });
-          // The slot may have just been taken: refresh the times so the patient can pick another.
+          // The slot may have just been taken: refresh the slots so the patient can pick another.
           if (/slot|time|available|taken|booked|30 minutes/i.test(result.error || '')) refreshAvailability();
           throw new Error(result.error || 'Could not complete your booking. Please try again or call us directly.');
         }
@@ -1209,8 +1212,13 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       if (!validate()) return;
       if (!otpToken || verifiedPhone !== phoneDigits(phoneInput.value)) {
         // Verification happens now, after the patient has seen their time, not before.
-        if (otpSentTo && !otpPanel.classList.contains('hidden')) { otpInput?.focus(); return; }
         pendingBooking = true;
+        // An OTP was already sent to this number a moment ago: re-open the pop-up instead of sending another.
+        if (otpSentTo === phoneDigits(phoneInput.value) && Date.now() - otpSentAt < 4.5 * 60000) {
+          openOtp();
+          otpInput?.focus();
+          return;
+        }
         await requestCode();
         return;
       }
