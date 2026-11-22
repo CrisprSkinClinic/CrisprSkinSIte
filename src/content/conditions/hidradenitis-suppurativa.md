@@ -4,7 +4,7 @@ metaDescription: "Hidradenitis suppurativa -- recurrent painful lumps and boils 
 heroEyebrow: "Skin Condition"
 heroHeadline: "Hidradenitis Suppurativa"
 heroSubheadline: "Recurrent, painful lumps in the armpits, groin, or other skin folds. It is a chronic inflammatory condition, not a hygiene problem, and it can be treated."
-parentService: "acne"
+parentService: "biologics"
 
 twoPaths:
   screeningTitle: "Recurring boils in the armpits or groin?"
