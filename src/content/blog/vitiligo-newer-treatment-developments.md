@@ -1,5 +1,5 @@
 ---
-title: "Vitiligo: What Is New in Treatment, and What Is Still the Foundation"
+title: "Vitiligo: What Is New in Treatment"
 pubDate: 2026-10-02
 description: "Research into vitiligo has produced new treatment options. A balanced look at what is promising and what remains core care."
 author: "Dr. Narayanan B"

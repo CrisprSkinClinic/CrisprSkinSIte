@@ -1,5 +1,5 @@
 ---
-title: "Xanthelasma: What the Yellow Patches Around Your Eyes Mean, and the Cholesterol Link"
+title: "Xanthelasma: What Yellow Eyelid Patches Mean"
 pubDate: 2026-09-10
 description: "Yellow eyelid patches are harmless to the eye but can signal raised cholesterol. What they are, what causes them, and what to check."
 author: "Dr. Narayanan B"

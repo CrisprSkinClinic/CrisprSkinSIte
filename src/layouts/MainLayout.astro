@@ -165,21 +165,32 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
 
     {!bare && <FloatingContact />}
 
-    <script>
-      // Equal billing for the doctors: any element marked data-shuffle has its
-      // children put in a fresh random order on every page load, so no doctor is
-      // always first. (The pages are static, so this has to happen in the browser.)
-      document.addEventListener('astro:page-load', () => {
-        document.querySelectorAll('[data-shuffle]').forEach((el) => {
-          const kids = Array.from(el.children);
-          for (let i = kids.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [kids[i], kids[j]] = [kids[j], kids[i]];
-          }
-          kids.forEach((k) => el.appendChild(k));
-          el.setAttribute('data-shuffled', '');
+
+    <script is:inline>
+      // Equal billing for the doctors: any element marked data-shuffle gets its children put in a fresh
+      // random order on every page load, so no doctor is always first. The pages are static, so this has to
+      // happen in the browser. It is inline (not bundled) so it runs as soon as the page is parsed, on first
+      // load, on view-transition navigations and on back/forward cache restores.
+      (function () {
+        function shuffleAll() {
+          document.querySelectorAll('[data-shuffle]:not([data-shuffled])').forEach(function (el) {
+            var kids = Array.prototype.slice.call(el.children);
+            for (var i = kids.length - 1; i > 0; i--) {
+              var j = Math.floor(Math.random() * (i + 1));
+              var tmp = kids[i]; kids[i] = kids[j]; kids[j] = tmp;
+            }
+            kids.forEach(function (k) { el.appendChild(k); });
+            el.setAttribute('data-shuffled', '');
+          });
+        }
+        document.addEventListener('DOMContentLoaded', shuffleAll);
+        document.addEventListener('astro:page-load', shuffleAll);
+        document.addEventListener('astro:after-swap', shuffleAll);
+        window.addEventListener('pageshow', function (e) {
+          if (e.persisted) { document.querySelectorAll('[data-shuffled]').forEach(function (el) { el.removeAttribute('data-shuffled'); }); shuffleAll(); }
         });
-      });
+        if (document.readyState !== 'loading') shuffleAll();
+      })();
     </script>
 
     <script>

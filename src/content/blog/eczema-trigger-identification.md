@@ -1,5 +1,5 @@
 ---
-title: "Managing Eczema: Why Identifying Your Triggers Matters More Than Any Cream"
+title: "Managing Eczema: Why Finding Your Triggers Matters"
 pubDate: 2025-12-22
 description: "Treating an eczema flare is only half the picture -- reducing how often flares happen depends on understanding your specific triggers."
 author: "Dr. Narayanan A"

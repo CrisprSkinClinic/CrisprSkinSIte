@@ -1,5 +1,5 @@
 ---
-title: "Beyond Repigmentation: Camouflage, Micropigmentation, and Depigmentation in Vitiligo"
+title: "Vitiligo: Camouflage, Micropigmentation, Depigmentation"
 pubDate: 2026-09-25
 description: "Not every patch repigments. Options for patches that do not respond, and when lightening remaining skin is considered."
 author: "Dr. Narayanan B"

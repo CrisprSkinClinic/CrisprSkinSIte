@@ -1,5 +1,5 @@
 ---
-title: "Sunscreen for Indian Skin: Why Visible Light Matters for Pigmentation"
+title: "Sunscreen for Indian Skin: Why Visible Light Matters"
 pubDate: 2026-07-13
 description: "Deeper skin tones are prone to pigmentation triggered by light. How to choose and use sunscreen if you have melasma or dark marks."
 author: "Dr. Narayanan B"
