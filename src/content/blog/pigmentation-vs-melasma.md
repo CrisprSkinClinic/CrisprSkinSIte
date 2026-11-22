@@ -1,6 +1,6 @@
 ---
 title: "Pigmentation or Melasma? Why the Difference Changes Everything"
-pubDate: 2026-03-05
+pubDate: 2026-06-25
 description: "Not all dark spots are the same -- melasma specifically needs a different, more sustained treatment approach than typical pigmentation."
 author: "Dr. Karthik L"
 tags: ["Pigmentation"]

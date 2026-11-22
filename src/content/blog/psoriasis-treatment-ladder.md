@@ -1,6 +1,6 @@
 ---
 title: "Beyond Creams: The Psoriasis Treatment Ladder"
-pubDate: 2026-11-11
+pubDate: 2026-08-07
 description: "Psoriasis treatment steps up as needed. Here is how the options fit together and how we decide when to move on."
 author: "Dr. Narayanan B"
 tags: ["Psoriasis"]

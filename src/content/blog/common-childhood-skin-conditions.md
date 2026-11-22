@@ -1,6 +1,6 @@
 ---
 title: "The Most Common Skin Conditions We See in Children"
-pubDate: 2026-05-14
+pubDate: 2026-02-25
 description: "A guide for parents on the childhood skin conditions we see most often, and roughly what to expect from each."
 author: "Dr. Narayanan A"
 tags: ["Pediatric Dermatology"]

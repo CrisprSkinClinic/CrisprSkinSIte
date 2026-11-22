@@ -1,6 +1,6 @@
 ---
 title: "Why Your Fungal Skin Infection Keeps Coming Back"
-pubDate: 2026-04-02
+pubDate: 2026-03-13
 description: "Fungal infections are very treatable, but they seem to recur constantly for one common, avoidable reason."
 author: "Dr. Narayanan B"
 tags: ["Fungal Infections"]

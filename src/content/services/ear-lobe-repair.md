@@ -5,7 +5,7 @@ heroEyebrow: "Minor Dermatosurgery"
 heroHeadline: "Ear Lobe Repair"
 heroSubheadline: "A short procedure under local anaesthetic to repair a split, torn, or stretched earlobe and restore a natural-looking lobe."
 category: "cosmetic"
-defaultService: "General Consultation"
+defaultService: "Ear Lobe Repair"
 
 twoPaths:
   screeningTitle: "Torn or split earlobe from an earring?"

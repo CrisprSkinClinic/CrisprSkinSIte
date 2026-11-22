@@ -1,6 +1,6 @@
 ---
 title: "Does Vitamin C Serum Work? What the Evidence Says"
-pubDate: 2026-11-02
+pubDate: 2026-01-07
 description: "Vitamin C is one of the most popular skincare ingredients. What it can and cannot do, and how to choose one."
 author: "Dr. Narayanan B"
 tags: ["Skincare Ingredients"]

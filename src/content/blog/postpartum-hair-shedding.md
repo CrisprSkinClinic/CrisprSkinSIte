@@ -1,6 +1,6 @@
 ---
 title: "Postpartum Hair Shedding: What's Normal and What Isn't"
-pubDate: 2026-01-29
+pubDate: 2026-04-21
 description: "Noticing more hair in the brush a few months after delivery? Here's what's typically happening, and when it's worth a closer look."
 author: "Dr. Karthik L"
 tags: ["Female Hair Loss"]

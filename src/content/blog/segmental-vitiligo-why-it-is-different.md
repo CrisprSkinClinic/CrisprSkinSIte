@@ -1,6 +1,6 @@
 ---
 title: "Segmental Vitiligo: Why It Behaves Differently"
-pubDate: 2026-11-01
+pubDate: 2026-05-18
 description: "Segmental vitiligo is less common, starts earlier, and often stabilises. Why that changes the treatment plan."
 author: "Dr. Karthik L"
 tags: ["Vitiligo"]

@@ -1,6 +1,6 @@
 ---
 title: "Niacinamide: A Gentle Ingredient for Oily and Acne-Prone Skin"
-pubDate: 2026-11-06
+pubDate: 2026-01-29
 description: "Niacinamide is well tolerated by many skin types. What it helps with, what it does not, and how to use it."
 author: "Dr. Karthik L"
 tags: ["Skincare Ingredients"]

@@ -1,6 +1,6 @@
 ---
 title: "After Earlobe Repair: Recovery, Scars, and Wearing Earrings Again"
-pubDate: 2026-11-16
+pubDate: 2025-12-16
 description: "What healing looks like after earlobe repair, how to care for the scar, and when and how to re-pierce."
 author: "Dr. Karthik L"
 tags: ["Ear Lobe Repair"]

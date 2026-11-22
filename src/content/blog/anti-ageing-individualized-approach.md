@@ -1,6 +1,6 @@
 ---
 title: "Why 'Anti-Ageing' Isn't a Single Treatment"
-pubDate: 2026-05-07
+pubDate: 2025-12-05
 description: "Skin ageing involves several distinct processes at once -- which is why an effective plan is rarely one product or procedure."
 author: "Dr. Karthik L"
 tags: ["Anti-ageing"]

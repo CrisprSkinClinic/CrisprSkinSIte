@@ -1,18 +1,28 @@
 ---
-title: "Xanthelasma Treatment Options Compared: Excision, Peel, Laser, and More"
-pubDate: 2026-11-17
-description: "How each xanthelasma treatment works, who it suits, and the trade-offs in scarring, pigment change, and recurrence."
+title: "Xanthelasma Treatment Options Compared: TCA Touch, Excision, and RFA"
+pubDate: 2026-06-19
+description: "How TCA touch, surgical excision, and radiofrequency ablation work for xanthelasma, who each suits, and the trade-offs in scarring, pigment change, and recurrence."
 author: "Dr. Karthik L"
 tags: ["Xanthelasma"]
 service: "xanthelasma-treatment"
 condition: "xanthelasma"
 ---
 
-If you have decided you would like your xanthelasma treated, you will find a confusing range of options online. Each works differently, and the right choice depends on your patches, your skin, and how much downtime you can accept. Here is an honest comparison.
+If you have decided you would like your xanthelasma treated, the choice of method matters. We offer three established options: a TCA touch, surgical excision, and radiofrequency ablation (RFA). Each works differently, and the right choice depends on your patches, your skin, and how much healing time you can accept. Here is an honest comparison.
 
 ## First Things First
 
-Before any treatment, we check your cholesterol and lipids, since [treating the patches does not treat the cause](/blog/xanthelasma-what-it-is-and-the-cholesterol-link). We also confirm the diagnosis, because other eyelid lesions can look similar. Eyelid skin is thin and delicate, and the patches are often near the lash line and tear duct, so technique and caution matter.
+Before any treatment, we check your cholesterol and lipids, since [treating the patches does not treat the cause](/blog/xanthelasma-what-it-is-and-the-cholesterol-link). We also confirm the diagnosis, because other eyelid lesions can look similar. Eyelid skin is thin and delicate, and the patches are often near the lash line and tear duct, so technique and caution matter with every method.
+
+## TCA Touch
+
+**How it works.** A small amount of trichloroacetic acid (TCA) is applied precisely to the surface of the patch using a fine applicator. The treated skin frosts white, then darkens and peels away over several days. Treatment is often repeated at intervals of a few weeks until the patch clears.
+
+**Best for.** Small, flat, superficial patches.
+
+**Advantages.** No cutting, no stitches, a very short procedure, and little downtime. It is useful for several small patches or for people who prefer to avoid surgery.
+
+**Drawbacks.** Deeper or thicker patches may only partly clear, so multiple sessions are common and recurrence is more likely. The strength and depth must be controlled carefully, because applying too much acid on eyelid skin can cause scarring or lasting pigment change. The risk of darker marks is higher in deeper skin tones, so we are conservative and may do a small test area first.
 
 ## Surgical Excision
 
@@ -20,41 +30,27 @@ Before any treatment, we check your cholesterol and lipids, since [treating the 
 
 **Best for.** Larger, deeper, or thicker patches, and those that have returned after other treatments.
 
-**Advantages.** Removes the whole patch, usually with a single procedure, and is often associated with a lower recurrence rate than superficial methods.
+**Advantages.** Removes the whole patch, usually in a single procedure, and is often associated with a lower recurrence rate than superficial methods.
 
-**Drawbacks.** Leaves a fine scar, which typically fades. Larger excisions on the upper or lower lid can pull the lid and need skill, and in some cases a skin flap or graft is needed. Healing takes a couple of weeks.
+**Drawbacks.** Leaves a fine scar, which typically fades. Larger excisions on the upper or lower lid can pull the lid and need skill, and in some cases a skin flap or graft is needed. Healing takes a couple of weeks, with some swelling and bruising.
 
-## Chemical Peel With Trichloroacetic Acid
+## Radiofrequency Ablation (RFA)
 
-**How it works.** A strong acid, trichloroacetic acid, is applied carefully to the patch, causing the affected skin to peel away over days. It may be repeated.
+**How it works.** Controlled radiofrequency energy removes the patch layer by layer under local anaesthetic. The depth can be adjusted as the treatment proceeds, and there is little bleeding.
 
-**Best for.** Small, flat, superficial patches.
+**Best for.** Small to moderate patches, in people who prefer to avoid stitches but want more control than a peel offers.
 
-**Advantages.** No cutting or stitches, relatively simple, and inexpensive.
+**Advantages.** Good depth control in experienced hands, a short procedure, and a bloodless field, with no stitches.
 
-**Drawbacks.** Needs careful technique, because too strong or deep an application can cause scarring or pigment change, and eyelid skin is thin. Multiple sessions may be needed, and deeper patches may only partly clear. Darker skin types carry a higher risk of pigmentation.
-
-## Laser and Radiofrequency Ablation
-
-**How it works.** Energy removes the patch layer by layer, using an ablative laser or a radiofrequency device, with control over depth.
-
-**Best for.** Small to moderate patches, in people who prefer a non-cutting approach.
-
-**Advantages.** Good depth control in experienced hands, with a short procedure.
-
-**Drawbacks.** Temporary redness and crusting, and a risk of lighter or darker marks, again higher in darker skin. Deeper deposits may recur. The eyes must be protected during treatment.
-
-## Cryotherapy and Electrosurgery
-
-**How it works.** Freezing, or an electrical current, destroys the patch.
-
-**Best for.** Small patches, selectively.
-
-**Drawbacks.** These carry a risk of pigment change and scarring on eyelid skin, so we use them cautiously and only where appropriate.
+**Drawbacks.** Temporary redness and crusting while it heals, over about a week or so. There is a risk of lighter or darker marks, again higher in darker skin, and very deep deposits may recur. The eyes must be protected during treatment.
 
 ## Which Is Best?
 
-There is no single best option. A reasonable summary is that excision is generally preferred for larger or deeper patches and for lasting results, while peels and ablative methods suit small, superficial ones, with a higher chance of needing repeat treatment. We choose by size, depth, position, skin type, and your preferences, and we tell you the likely trade-offs.
+There is no single best option. As a general guide, excision is preferred for larger or deeper patches and for lasting results, TCA touch suits small, flat ones, and RFA sits in between, giving controlled removal without stitches. We choose by size, depth, position, skin type, and your preferences, and we tell you the likely trade-offs, including how many sessions you may need.
+
+## Booking
+
+When you book, you can select the method you want to discuss: TCA touch, excision, or RFA. If you are unsure, choose a general consultation and we will advise after examining you.
 
 ## Questions to Ask Before Treatment
 

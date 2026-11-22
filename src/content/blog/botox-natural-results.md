@@ -1,6 +1,6 @@
 ---
 title: "Botox Without Looking 'Done': How Dosing Actually Works"
-pubDate: 2026-04-16
+pubDate: 2026-02-13
 description: "The frozen, overdone look people worry about with Botox is almost always about dosing and technique, not the treatment itself."
 author: "Dr. Karthik L"
 tags: ["Botox"]

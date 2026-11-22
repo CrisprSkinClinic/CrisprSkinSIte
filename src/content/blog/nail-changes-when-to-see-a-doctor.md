@@ -1,6 +1,6 @@
 ---
 title: "Nail Changes: When Is It More Than Cosmetic?"
-pubDate: 2026-06-03
+pubDate: 2026-04-10
 description: "Ridges, spots, and colour changes in nails are usually harmless, but some are worth a closer look."
 author: "Dr. Narayanan A"
 tags: ["Nail Disorders"]

@@ -1,6 +1,6 @@
 ---
 title: "Why Am I Losing Hair? Understanding the Different Causes"
-pubDate: 2026-01-22
+pubDate: 2026-05-01
 description: "Hair loss has several distinct causes, and treating the wrong one wastes months. Here's how to think about identifying yours."
 author: "Dr. Karthik L"
 tags: ["Hair Loss"]

@@ -1,6 +1,6 @@
 ---
 title: "Am I a Good Candidate for a Hair Transplant?"
-pubDate: 2026-01-15
+pubDate: 2025-11-24
 description: "Not everyone with hair loss benefits from a hair transplant right away. Here's what actually determines candidacy."
 author: "Dr. Karthik L"
 tags: ["Hair Transplant"]

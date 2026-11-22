@@ -1,6 +1,6 @@
 ---
 title: "Molluscum, Warts, and School: What Parents Should Know"
-pubDate: 2026-06-04
+pubDate: 2026-05-07
 description: "Viral skin infections in children are common and usually don't require keeping kids home -- here's what actually matters."
 author: "Dr. Narayanan A"
 tags: ["Viral Skin Infections"]

@@ -1,6 +1,6 @@
 ---
 title: "Sun Safety and Skin Cancer: What Everyone Should Know"
-pubDate: 2026-11-22
+pubDate: 2026-09-15
 description: "Skin cancer is more common than many people think, including in darker skin tones. Prevention and early detection explained."
 author: "Dr. Narayanan B"
 tags: ["Dermatology Updates"]

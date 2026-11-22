@@ -1,6 +1,6 @@
 ---
 title: "Retinol or Prescription Retinoid? How to Start Without Irritation"
-pubDate: 2026-11-10
+pubDate: 2026-08-03
 description: "Retinoids are among the best-studied skincare ingredients. A practical guide to choosing and starting one."
 author: "Dr. Karthik L"
 tags: ["Skincare Ingredients"]

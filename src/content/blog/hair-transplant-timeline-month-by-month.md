@@ -1,6 +1,6 @@
 ---
 title: "Hair Transplant Timeline: What Happens Month by Month"
-pubDate: 2026-08-19
+pubDate: 2026-09-21
 description: "Results take about a year. Here is the usual sequence so nothing in the process surprises you."
 author: "Dr. Karthik L"
 tags: ["Hair Transplant"]

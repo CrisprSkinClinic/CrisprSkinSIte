@@ -1,6 +1,6 @@
 ---
 title: "Newer Treatments for Stubborn Eczema: What Has Changed"
-pubDate: 2026-11-18
+pubDate: 2026-06-09
 description: "For eczema that does not settle with creams, there are now more targeted options than there used to be. What to know before asking about them."
 author: "Dr. Karthik L"
 tags: ["Eczema"]

@@ -1,6 +1,6 @@
 ---
 title: "Vitiligo Surgery: Grafting Options Explained"
-pubDate: 2026-10-19
+pubDate: 2026-10-29
 description: "When creams and light have not worked, surgery can restore pigment in stable vitiligo. The main techniques and who they suit."
 author: "Dr. Karthik L"
 tags: ["Vitiligo"]

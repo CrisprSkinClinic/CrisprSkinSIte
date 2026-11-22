@@ -1,6 +1,6 @@
 ---
 title: "Xanthelasma: What the Yellow Patches Around Your Eyes Mean, and the Cholesterol Link"
-pubDate: 2026-11-13
+pubDate: 2026-09-10
 description: "Yellow eyelid patches are harmless to the eye but can signal raised cholesterol. What they are, what causes them, and what to check."
 author: "Dr. Karthik L"
 tags: ["Xanthelasma"]
@@ -48,7 +48,7 @@ Not every eyelid bump is xanthelasma. Cysts, skin tags, warts, and rarely skin c
 
 ## What Happens Next
 
-If you want the patches treated, there are several options, from surgery to chemical peels and laser. See [xanthelasma treatment options compared](/blog/xanthelasma-treatment-options-compared) and our [xanthelasma treatment service](/services/xanthelasma-treatment). Recurrence is common, so also read [recurrence and aftercare](/blog/xanthelasma-recurrence-and-aftercare).
+If you want the patches treated, there are three established options: a TCA touch, surgical excision, and radiofrequency ablation (RFA). See [xanthelasma treatment options compared](/blog/xanthelasma-treatment-options-compared) and our [xanthelasma treatment service](/services/xanthelasma-treatment). Recurrence is common, so also read [recurrence and aftercare](/blog/xanthelasma-recurrence-and-aftercare).
 
 ## The Bottom Line
 

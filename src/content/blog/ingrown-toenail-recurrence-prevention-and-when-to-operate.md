@@ -1,6 +1,6 @@
 ---
 title: "Ingrown Toenails: What You Can Do at Home and When It Needs a Procedure"
-pubDate: 2026-11-18
+pubDate: 2025-12-26
 description: "Self-care that works for early ingrown toenails, what does not, and the signs that point to a definitive procedure."
 author: "Dr. Karthik L"
 tags: ["Nail Disorders"]

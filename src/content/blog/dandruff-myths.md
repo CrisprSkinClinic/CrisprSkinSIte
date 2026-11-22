@@ -1,6 +1,6 @@
 ---
 title: "Dandruff Myths: Why Your Shampoo Might Not Be the Problem"
-pubDate: 2026-02-12
+pubDate: 2026-03-02
 description: "Persistent dandruff despite trying every shampoo on the shelf usually has a specific, identifiable explanation."
 author: "Dr. Narayanan B"
 tags: ["Dandruff"]

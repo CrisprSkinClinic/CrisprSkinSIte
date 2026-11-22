@@ -1,6 +1,6 @@
 ---
 title: "Fillers vs. Botox: Which One Actually Addresses Your Concern?"
-pubDate: 2026-04-23
+pubDate: 2026-03-09
 description: "These two treatments get confused constantly, but they solve different problems -- here's how to tell which one you actually need."
 author: "Dr. Karthik L"
 tags: ["Fillers"]

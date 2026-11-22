@@ -1,6 +1,6 @@
 ---
 title: "Chemical Peel Aftercare: What to Do and What to Avoid"
-pubDate: 2026-05-06
+pubDate: 2026-02-20
 description: "The days after a peel matter as much as the peel itself. A practical guide to healing well and protecting your results."
 author: "Dr. Karthik L"
 tags: ["Chemical Peels"]

@@ -5,7 +5,7 @@ heroEyebrow: "Advanced Dermatology"
 heroHeadline: "Biologics and Advanced Therapy"
 heroSubheadline: "For severe or persistent skin disease that has not been controlled by standard treatment, a careful assessment of targeted options."
 category: "skin"
-defaultService: "General Consultation"
+defaultService: "Biologics / Advanced Therapy"
 
 twoPaths:
   screeningTitle: "Skin disease not controlled despite treatment?"

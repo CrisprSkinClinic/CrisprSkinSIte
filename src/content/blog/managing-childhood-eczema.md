@@ -1,6 +1,6 @@
 ---
 title: "Managing Your Child's Eczema Day to Day"
-pubDate: 2026-05-28
+pubDate: 2026-03-30
 description: "Practical guidance for parents on building a sustainable daily routine for childhood atopic dermatitis."
 author: "Dr. Narayanan A"
 tags: ["Atopic Dermatitis"]

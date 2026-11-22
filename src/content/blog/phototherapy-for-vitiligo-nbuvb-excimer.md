@@ -1,6 +1,6 @@
 ---
 title: "Phototherapy for Vitiligo: Narrowband UVB, Excimer, and PUVA"
-pubDate: 2026-10-12
+pubDate: 2025-11-28
 description: "Light treatment is one of the most effective options for vitiligo. How the different types work and what to expect."
 author: "Dr. Karthik L"
 tags: ["Vitiligo"]

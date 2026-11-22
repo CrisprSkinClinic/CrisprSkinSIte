@@ -1,6 +1,6 @@
 ---
 title: "Preparing for Your Hair Transplant: A Practical Checklist"
-pubDate: 2026-10-28
+pubDate: 2026-10-23
 description: "What to tell us, what to avoid, and what to arrange before the day of your procedure."
 author: "Dr. Karthik L"
 tags: ["Hair Transplant"]

@@ -1,6 +1,6 @@
 ---
 title: "Psoriasis Is Not Contagious -- Here's What It Actually Is"
-pubDate: 2026-03-19
+pubDate: 2026-05-29
 description: "One of the most persistent misconceptions about psoriasis is that it can spread through contact. Here's the medical reality."
 author: "Dr. Narayanan B"
 tags: ["Psoriasis"]

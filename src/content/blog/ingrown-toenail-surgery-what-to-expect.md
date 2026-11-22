@@ -1,6 +1,6 @@
 ---
 title: "Ingrown Toenail Surgery: What to Expect Before, During, and After"
-pubDate: 2026-11-14
+pubDate: 2026-06-15
 description: "A step-by-step guide to the day of nail avulsion with lateral chemical matricectomy, and the weeks of recovery that follow."
 author: "Dr. Karthik L"
 tags: ["Nail Disorders"]

@@ -1,6 +1,6 @@
 ---
 title: "Your Baby Has a Birthmark: What Parents Should Actually Know"
-pubDate: 2026-05-21
+pubDate: 2026-02-09
 description: "Most birthmarks need nothing more than accurate information and a bit of patience. Here's what actually matters."
 author: "Dr. Narayanan A"
 tags: ["Birthmarks"]

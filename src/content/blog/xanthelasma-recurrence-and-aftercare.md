@@ -1,6 +1,6 @@
 ---
 title: "Xanthelasma Aftercare and Recurrence: What to Expect and How to Lower the Risk"
-pubDate: 2026-11-21
+pubDate: 2026-01-01
 description: "Healing after xanthelasma removal, why patches can return, and what helps reduce the chance of recurrence."
 author: "Dr. Karthik L"
 tags: ["Xanthelasma"]
@@ -16,9 +16,9 @@ The details depend on the method used. As a general guide:
 
 **After excision.** Expect swelling and some bruising around the eyes for several days. Stitches are usually removed within about a week. Keep the area clean, use cold compresses if advised, avoid rubbing or pulling the eyelid, and keep your head raised when resting.
 
-**After a chemical peel.** The treated patch darkens, crusts, and peels over days. Do not pick at it. Apply any ointment advised, and protect the area from the sun.
+**After a TCA touch.** The treated patch frosts, then darkens, crusts, and peels over days. Do not pick at it. Apply any ointment advised, and protect the area from the sun.
 
-**After laser or radiofrequency.** The area is red and may crust for a week or so before healing.
+**After RFA (radiofrequency ablation).** The area is red and may crust for a week or so before healing.
 
 **After any method.** Use sunscreen on the area once healed, since new skin is more prone to pigment change, particularly in deeper skin tones. Follow instructions about cleaning, make-up, and when you can return to normal activities.
 

@@ -1,6 +1,6 @@
 ---
 title: "Preventing Torn and Stretched Earlobes: Earring Habits That Protect Your Lobes"
-pubDate: 2026-11-20
+pubDate: 2026-06-03
 description: "Most torn and stretched earlobes are preventable. Practical advice on earring weight, wear time, and first aid if a lobe tears."
 author: "Dr. Karthik L"
 tags: ["Ear Lobe Repair"]

@@ -1,6 +1,6 @@
 ---
 title: "Melasma: Why Sun Protection Matters More Than Any Cream"
-pubDate: 2026-05-20
+pubDate: 2026-01-23
 description: "Melasma is easily triggered and easily worsened by light. Here is what actually helps keep it under control."
 author: "Dr. Narayanan B"
 tags: ["Melasma"]

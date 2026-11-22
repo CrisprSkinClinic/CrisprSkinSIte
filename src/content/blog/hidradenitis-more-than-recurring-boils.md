@@ -1,6 +1,6 @@
 ---
 title: "Hidradenitis Suppurativa: More Than Recurring Boils"
-pubDate: 2026-11-22
+pubDate: 2026-03-19
 description: "Repeated painful lumps in the armpits or groin are often mistaken for ordinary boils. Why the right diagnosis changes treatment."
 author: "Dr. Narayanan B"
 tags: ["Biologics"]

@@ -1,6 +1,6 @@
 ---
 title: "Hives: When to Relax and When to Seek Help"
-pubDate: 2026-07-15
+pubDate: 2026-07-01
 description: "Most hives settle on their own, but some situations need urgent care. How to tell the difference."
 author: "Dr. Narayanan B"
 tags: ["Urticaria"]

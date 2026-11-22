@@ -5,7 +5,7 @@ heroEyebrow: "Minor Dermatosurgery"
 heroHeadline: "Ingrown Toenail Surgery"
 heroSubheadline: "Partial nail avulsion with lateral chemical matricectomy: a short procedure that removes the problem edge and treats the growth point behind it, so it is less likely to return."
 category: "skin"
-defaultService: "Nail Disorders"
+defaultService: "Ingrown Toenail Surgery"
 
 twoPaths:
   screeningTitle: "Painful ingrown toenail that keeps returning?"

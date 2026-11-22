@@ -1,6 +1,6 @@
 ---
 title: "Do You Still Need Medicines After a Hair Transplant?"
-pubDate: 2026-09-16
+pubDate: 2026-10-07
 description: "A transplant relocates hair but does not stop ongoing loss in the hair you already have."
 author: "Dr. Karthik L"
 tags: ["Hair Transplant"]

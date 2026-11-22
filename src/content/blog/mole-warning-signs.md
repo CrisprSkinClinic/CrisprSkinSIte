@@ -1,6 +1,6 @@
 ---
 title: "The ABCDE Rule: When a Mole Is Worth Checking"
-pubDate: 2026-04-09
+pubDate: 2026-04-03
 description: "Most moles are completely harmless. Here are the specific warning signs that mean it's worth getting checked."
 author: "Dr. Narayanan B"
 tags: ["Warts, Moles & Skin Tags"]

@@ -1,6 +1,6 @@
 ---
 title: "Who Should Wait Before Getting a Hair Transplant?"
-pubDate: 2026-10-14
+pubDate: 2026-11-16
 description: "Sometimes the best advice is not yet. Situations in which we recommend a different plan first."
 author: "Dr. Karthik L"
 tags: ["Hair Transplant"]

@@ -1,6 +1,6 @@
 ---
 title: "Alopecia Areata: Newer Treatment Options and What They Mean for You"
-pubDate: 2026-11-03
+pubDate: 2026-08-14
 description: "Treatment for alopecia areata has moved forward in recent years. What has changed, and what has not."
 author: "Dr. Karthik L"
 tags: ["Dermatology Updates"]

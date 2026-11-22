@@ -1,6 +1,6 @@
 ---
 title: "Shock Loss After a Hair Transplant: What Is Normal?"
-pubDate: 2026-09-02
+pubDate: 2026-11-04
 description: "Temporary shedding of existing hair after surgery can be alarming. Here is what it is and when to call us."
 author: "Dr. Karthik L"
 tags: ["Hair Transplant"]

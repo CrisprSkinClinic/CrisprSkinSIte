@@ -1,9 +1,9 @@
 ---
 title: "Xanthelasma"
-metaDescription: "Xanthelasma -- yellow cholesterol deposits on the eyelids: causes, the link with blood lipids, and treatment options. KK Nagar, Chennai."
+metaDescription: "Xanthelasma -- yellow cholesterol deposits on the eyelids: causes, the link with blood lipids, and treatment with TCA touch, excision, or RFA. KK Nagar, Chennai."
 heroEyebrow: "Skin Condition"
 heroHeadline: "Xanthelasma"
-heroSubheadline: "Soft yellow plaques on the eyelids: harmless to the eye, worth a cholesterol check, and removable by several methods."
+heroSubheadline: "Soft yellow plaques on the eyelids: harmless to the eye, worth a cholesterol check, and removable by TCA touch, excision, or RFA."
 parentService: "xanthelasma-treatment"
 
 twoPaths:
@@ -28,12 +28,12 @@ symptoms:
 treatmentOverview:
   - name: "Check Lipids and Risk Factors"
     description: "Blood tests and medical review, with treatment of any underlying lipid disorder."
+  - name: "TCA Touch"
+    description: "Precise spot application of trichloroacetic acid for small, flat patches, usually repeated."
   - name: "Surgical Excision"
     description: "Removal with fine stitches, suited to larger or deeper patches."
-  - name: "Chemical Peel, Laser, or Radiofrequency"
-    description: "Options for small or superficial patches, chosen with care on thin eyelid skin."
-  - name: "Cryotherapy or Electrosurgery"
-    description: "Selected small patches, with attention to the risk of pigment change."
+  - name: "Radiofrequency Ablation (RFA)"
+    description: "Layer-by-layer removal with controlled depth, for small to moderate patches."
 
 relatedConditions:
   - "skin-tags"
@@ -68,7 +68,7 @@ Several things can look similar, including cysts, [skin tags](/conditions/skin-t
 
 ## Treatment Overview
 
-Patches do not usually disappear on their own, and creams do not remove them. Treatment is considered for appearance or when patches are enlarging. The main approaches are surgical excision, chemical peeling with trichloroacetic acid, laser or radiofrequency ablation, and cryotherapy or electrosurgery. Each has advantages and drawbacks, and eyelid skin is thin, so careful technique matters. See [our treatment options compared](/blog/xanthelasma-treatment-options-compared) and the [xanthelasma treatment service](/services/xanthelasma-treatment).
+Patches do not usually disappear on their own, and creams do not remove them. Treatment is considered for appearance or when patches are enlarging. We offer three established methods: a TCA touch for small, flat patches, surgical excision for larger or deeper ones, and radiofrequency ablation (RFA) for small to moderate patches. Each has advantages and drawbacks, and eyelid skin is thin, so careful technique matters. See [our treatment options compared](/blog/xanthelasma-treatment-options-compared) and the [xanthelasma treatment service](/services/xanthelasma-treatment).
 
 ## Recurrence
 

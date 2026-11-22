@@ -1,6 +1,6 @@
 ---
 title: "Skin Rejuvenation: Planning Treatments That Fit Your Skin"
-pubDate: 2026-07-01
+pubDate: 2026-04-27
 description: "Rejuvenation is a plan, not a single procedure. What to consider before you begin."
 author: "Dr. Karthik L"
 tags: ["Skin Rejuvenation"]

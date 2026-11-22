@@ -1,6 +1,6 @@
 ---
 title: "How Many Grafts Do You Need? Understanding a Transplant Quote"
-pubDate: 2026-08-05
+pubDate: 2026-07-23
 description: "A graft number means little without context. What to ask when you are given an estimate."
 author: "Dr. Karthik L"
 tags: ["Hair Transplant"]

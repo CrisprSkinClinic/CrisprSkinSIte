@@ -1,6 +1,6 @@
 ---
 title: "Weight-Loss Medicines and Hair Shedding: What We Know"
-pubDate: 2026-11-12
+pubDate: 2026-10-19
 description: "Hair shedding is a common worry for people losing weight quickly. Why it happens and what helps."
 author: "Dr. Karthik L"
 tags: ["Dermatology Updates"]

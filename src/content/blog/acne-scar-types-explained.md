@@ -1,6 +1,6 @@
 ---
 title: "Not All Acne Scars Are the Same -- Here's Why That Matters"
-pubDate: 2026-02-26
+pubDate: 2026-02-03
 description: "Icepick, boxcar, and rolling scars each need a different treatment approach. Here's how to tell them apart."
 author: "Dr. Karthik L"
 tags: ["Acne Scars"]

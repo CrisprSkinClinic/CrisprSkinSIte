@@ -1,6 +1,6 @@
 ---
 title: "When Hives Do Not Respond to Antihistamines"
-pubDate: 2026-11-21
+pubDate: 2026-01-12
 description: "Chronic hives that persist despite standard treatment are common and treatable. Here is what comes next."
 author: "Dr. Narayanan B"
 tags: ["Urticaria"]
