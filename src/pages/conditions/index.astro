@@ -40,7 +40,7 @@ const conditionsByCategory = categoryOrder.map((cat) => ({
 <MainLayout title={pageTitle} description={pageDescription}>
   <Breadcrumbs items={[{ name: "Conditions", url: "/conditions" }]} />
 
-  <div class="bg-[#fdfcfc] py-14 md:py-20 px-6 text-center border-b border-slate-200/70">
+  <div class="bg-gradient-to-b from-brand-50/70 to-transparent py-12 md:py-16 px-6 text-center">
     <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-600 mb-4">Patient guide</p>
     <h1 class="text-4xl md:text-6xl text-slate-950 mb-4">Conditions We Treat</h1>
     <p class="text-lg text-slate-600 max-w-2xl mx-auto">Learn about the skin, hair, and paediatric dermatology conditions we diagnose and treat at {siteConfig.name}.</p>
@@ -63,7 +63,7 @@ const conditionsByCategory = categoryOrder.map((cat) => ({
                 data-filter-item
                 data-cat={category}
                 data-search={`${condition.data.title} ${condition.data.heroSubheadline || ''} ${serviceTitleBySlug[condition.data.parentService] || ''} ${label}`.toLowerCase()}
-                class="bg-white rounded-xl border border-champagne-200 p-5 hover:shadow-lg hover:border-brand-200 transition-all duration-300 group flex items-center justify-between"
+                class="ui-card p-5 group flex items-center justify-between"
               >
                 <span class="font-semibold text-slate-800 group-hover:text-brand-700 transition-colors">{condition.data.title}</span>
                 <span aria-hidden="true" class="text-brand-500 group-hover:translate-x-0.5 transition-transform">&rarr;</span>

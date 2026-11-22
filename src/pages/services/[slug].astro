@@ -5,6 +5,7 @@ import MainLayout from '../../layouts/MainLayout.astro';
 import BookingSection from '../../components/LandingPageSections/BookingSection.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import FAQAccordion from '../../components/FAQAccordion.astro';
+import ClinicGallery from '../../components/ClinicGallery.astro';
 import StepCards from '../../components/ui/StepCards.astro';
 import OptionCards from '../../components/ui/OptionCards.astro';
 import LinkCards from '../../components/ui/LinkCards.astro';
@@ -239,6 +240,8 @@ const medicalServiceSchema = {
       <div class="sticky top-28"><SideBookCard /></div>
     </aside>
   </div>
+
+  <ClinicGallery />
 
   <FAQAccordion entries={faqEntries} />
 

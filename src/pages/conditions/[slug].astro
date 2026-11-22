@@ -4,6 +4,7 @@ import MainLayout from '../../layouts/MainLayout.astro';
 import CTA from '../../components/CTA.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import FAQAccordion from '../../components/FAQAccordion.astro';
+import ClinicGallery from '../../components/ClinicGallery.astro';
 import OptionCards from '../../components/ui/OptionCards.astro';
 import CheckCards from '../../components/ui/CheckCards.astro';
 import LinkCards from '../../components/ui/LinkCards.astro';
@@ -200,6 +201,8 @@ const conditionSchema = {
       cards.forEach((card) => grid.appendChild(card));
     });
   </script>
+
+  <ClinicGallery />
 
   <FAQAccordion entries={faqEntries} />
 
