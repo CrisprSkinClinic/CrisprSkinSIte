@@ -29,3 +29,19 @@ Stinging with products that used to be fine, tightness, flaking, and sudden redn
 ## What to Do
 
 Stop all actives and exfoliants, and use only a gentle cleanser, plain moisturizer, and sunscreen for a few weeks. If skin does not settle, come in for an evaluation, since [eczema](/services/eczema) or an allergic reaction can look similar.
+
+## Choosing a Cleanser and Moisturizer
+
+A cleanser should leave skin clean but not tight. If your face feels squeaky or stings after washing, the cleanser is too harsh. A moisturizer should suit your skin type: lighter gels or lotions for oily skin, creams or ointments for dry skin. People with oily, acne-prone skin still need a moisturizer, since skipping it can make skin produce more oil.
+
+## Building Around Your Concern
+
+If your main concern is acne, a retinoid or [niacinamide](/blog/niacinamide-for-oily-and-acne-prone-skin) may help. If it is dullness or dark marks, [vitamin C](/blog/does-vitamin-c-serum-work) may be useful in the morning. If it is dryness or sensitivity, focus on barrier repair and leave out exfoliating acids. Each concern leads to a different shortlist, and you rarely need more than two or three actives.
+
+## How Long to Judge a Product
+
+Give a new product about six to twelve weeks unless it irritates, since skin renews slowly. Switching every few weeks means you never learn what works. Keep a note of what you added and when, so that you can trace any reaction.
+
+## When a Routine Is Not Enough
+
+If you have persistent acne, patches that scale or itch, or pigmentation that is not responding, a better routine alone will not fix it. In that case, [acne](/services/acne), [pigmentation](/services/pigmentation) and [eczema](/services/eczema) each need a plan built after examination, and we can fit your routine around it.

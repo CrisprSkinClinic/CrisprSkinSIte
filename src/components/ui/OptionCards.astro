@@ -1,0 +1,21 @@
+---
+// Option cards: each treatment / option as its own card (name + short description).
+const { title, items = [] } = Astro.props; // items: [{ name, description }]
+---
+{items.length > 0 && (
+  <section>
+    <h2 class="mb-6 text-2xl text-brand-900 md:text-3xl">{title}</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      {items.map((t) => (
+        <div class="ui-card p-6">
+          <span class="mb-4 grid h-10 w-10 place-items-center rounded-2xl bg-brand-50 text-brand-600" aria-hidden="true">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+          </span>
+          <h3 class="mb-1.5 font-sans text-base font-bold text-brand-900">{t.name}</h3>
+          <p class="text-[15px] leading-relaxed text-slate-600">{t.description}</p>
+        </div>
+      ))}
+    </div>
+    <slot name="footer" />
+  </section>
+)}

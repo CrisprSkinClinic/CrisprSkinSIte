@@ -27,3 +27,19 @@ Iron deficiency, thyroid dysfunction, and hormonal conditions like PCOS can all 
 Treating genetic pattern hair loss and treating deficiency-related shedding call for entirely different approaches. Using the wrong one for months doesn't just waste time -- for progressive genetic hair loss specifically, early treatment has more existing hair to work with, so delay while trying the wrong approach has a real cost.
 
 If you're noticing increased shedding or thinning, [an evaluation](/services/hair-loss) that identifies which of these categories applies to you is the most useful first step, well before choosing a specific product or treatment.
+
+## Other Causes Worth Knowing About
+
+Patchy hair loss that appears suddenly, in round, smooth patches, may be [alopecia areata](/conditions/alopecia-areata). Hair loss with scalp pain, redness, scarring or pus may point to an inflammatory or infective cause, including types that can leave permanent scars, which is why early review matters. Pulling or tight hairstyles can cause loss along the hairline, and some medicines and treatments can cause shedding as a side effect.
+
+## What the Assessment Involves
+
+We ask about the speed and pattern of loss, family history, diet, stress, recent illness, medicines, and hair care habits. We then examine the scalp, often with a magnifying instrument that shows the size of the hairs and the state of the follicles. Where needed, blood tests look for iron, thyroid or other contributors. This takes time, but it is what separates a guess from a diagnosis.
+
+## What Treatment Can and Cannot Do
+
+For pattern hair loss, treatment aims to slow or stop progression and, in many people, thicken existing hair, and it works best when started early and continued. Shedding from stress or illness generally settles once the trigger resolves. Some people with advanced pattern loss may consider [hair transplantation](/services/hair-transplant-fue) after a proper assessment.
+
+## Keeping Realistic
+
+No treatment grows back hair that has no living follicle left. That is why early assessment matters, and why we look at your family history and pattern before suggesting a plan. Our guide to [pattern hair loss in men](/conditions/norwood-scale-male-pattern-baldness) explains the stages.

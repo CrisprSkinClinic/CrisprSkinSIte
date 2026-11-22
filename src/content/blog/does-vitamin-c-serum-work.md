@@ -29,3 +29,19 @@ Most people use it in the morning, followed by sunscreen. Introduce it gradually
 ## When to See Us
 
 If you have [stubborn pigmentation](/services/pigmentation), dark marks after acne, or [melasma](/conditions/melasma), a prescription-guided plan usually works better than any single serum.
+
+## Forms of Vitamin C on Labels
+
+You will see L-ascorbic acid, which is the most studied form, as well as gentler derivatives such as ascorbyl glucoside or magnesium ascorbyl phosphate. L-ascorbic acid tends to work better but is more likely to sting and oxidise. Derivatives are gentler and more stable, though the effect may be milder. Neither is right for everyone, so sensitivity and budget both play a part.
+
+## Realistic Timeline
+
+Most people need at least eight to twelve weeks of regular use before noticing any change in glow or tone. If you see nothing after three months, the product may not suit you, or your concern may need a different approach, and that is a good moment to ask us.
+
+## Who Should Be Careful
+
+If your skin is very sensitive, if you have eczema or a damaged skin barrier, introduce vitamin C slowly, perhaps every other day, and skip it during flares. Avoid applying it to broken or irritated skin. A patch test on a small area first can save a lot of trouble.
+
+## Fitting It Into a Routine
+
+Use vitamin C in the morning before sunscreen, and keep your routine simple. Our guide to [routine order and active clashes](/blog/skincare-routine-order-and-active-clashes) explains how it fits with other products, and [niacinamide](/blog/niacinamide-for-oily-and-acne-prone-skin) is a gentle partner for many people.

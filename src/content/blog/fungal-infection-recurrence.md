@@ -25,3 +25,19 @@ Using a steroid cream on what's actually a fungal infection -- a common mix-up, 
 ## Breaking the Cycle
 
 If you feel like you're [stuck in a loop](/services/fungal-infections) of treating and "recurring" fungal infections, the fix usually isn't a stronger medication -- it's completing the full prescribed course and addressing the environmental source alongside it. That combination is what actually breaks the cycle for most patients.
+
+## Everyday Habits That Prevent Reinfection
+
+Dry yourself thoroughly after bathing, especially between the toes and in skin folds. Wear breathable cotton and change out of sweaty clothes quickly, and wash towels and clothing in hot water. Do not share towels, combs or footwear. Dust antifungal powder into shoes if advised, and let shoes air out between wearings.
+
+## Different Sites, Different Problems
+
+Ringworm of the groin and body, athlete's foot, scalp infections and nail fungus each behave differently and need their own treatment. Scalp and nail infections, for instance, usually need tablets as well as local treatment, because creams do not reach deep enough. Read more about [nail changes](/blog/nail-changes-when-to-see-a-doctor) and the condition page on [fungal nail infection](/conditions/onychomycosis).
+
+## When Tablets Are Needed
+
+Widespread infections, infections that do not respond to creams, and infections of hair-bearing skin or nails may need antifungal tablets. These medicines need a proper assessment first, and sometimes a blood test, since they can interact with other medicines. Do not use leftover tablets without advice.
+
+## Looking for Underlying Factors
+
+Diabetes, a weakened immune system, obesity and heavy sweating make infections more likely to return. In some people, pets are the source. If infections keep recurring even after full treatment, we look for these factors alongside the skin itself.

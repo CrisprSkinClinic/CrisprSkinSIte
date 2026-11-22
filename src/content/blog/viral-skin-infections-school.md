@@ -29,3 +29,19 @@ Covering visible lesions and encouraging your child not to scratch or pick at th
 ## The Reassurance Parents Usually Need
 
 These infections are common, generally harmless, and self-limiting for most children. An evaluation confirms the diagnosis and gives you a clear, practical plan -- whether that's watching and waiting or opting for active treatment -- so you're not left guessing.
+
+## Hygiene That Helps
+
+Encourage handwashing, keep towels and clothing separate while lesions are present, and avoid sharing baths with other children if that is practical. Cover lesions during swimming and contact sports where possible. Cutting nails short limits scratching, which spreads the virus to new spots on the same child.
+
+## Why Molluscum Can Look Red and Sore
+
+Sometimes molluscum bumps become red, swollen and tender, often a sign that the body is beginning to clear them, but occasionally due to a secondary infection. If your child develops pain, pus or fever, bring them in. A pattern of eczema around molluscum is also common and needs treatment of its own.
+
+## Warts on Hands and Feet
+
+Common warts and verrucas on the feet can be stubborn, and many go away on their own over time. Treatment is aimed at helping the body clear them and is chosen according to the site and age. Verrucas are not a reason to avoid school or swimming, but cover them with a waterproof plaster and wear footwear in changing rooms.
+
+## When to Ask for Help
+
+See us if lesions are numerous, near the eyes, in the genital area, or not improving, or if your child has a condition such as eczema or a weak immune system that makes them harder to clear. Our page on [viral skin infections](/services/viral-skin-infections) and the guide to [common childhood skin conditions](/blog/common-childhood-skin-conditions) offer more.

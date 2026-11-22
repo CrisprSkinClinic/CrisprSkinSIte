@@ -7,6 +7,7 @@
 import { siteConfig } from '../config/site.js';
 const { defaultService, defaultDoctorId } = Astro.props;
 
+const waUrl = siteConfig.contact.otpWhatsapp;
 const a = siteConfig.contact.address;
 const clinicAddress = `${a.street}, ${a.locality}, ${a.city}, ${a.state} ${a.postalCode}`;
 
@@ -184,6 +185,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         <button id="confirmBtn" type="button" class="mt-5 min-h-[52px] w-full rounded-xl bg-brand-900 py-4 font-bold text-white shadow-lg transition hover:bg-brand-800 disabled:opacity-60">
           Confirm Appointment
         </button>
+        <p class="mt-2.5 text-center text-xs text-slate-500">An OTP will be sent to your WhatsApp to confirm.</p>
 
         <div id="errorMessage" class="mt-5 hidden items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-800" role="alert">
           <svg class="mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -212,7 +214,8 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         </div>
         <button type="button" id="otpClose" class="-m-2 rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800" aria-label="Close">✕</button>
       </div>
-      <div class="mt-5">
+      <a href={waUrl} target="_blank" rel="noopener noreferrer" class="mt-5 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-base font-semibold text-white shadow-sm transition hover:bg-green-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 active:scale-[0.98]"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>Open WhatsApp</a>
+      <div class="mt-3">
         <label for="otp" class="sr-only">OTP</label>
         <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP" class="min-h-[56px] w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-2xl font-semibold tracking-[0.4em] text-slate-900 outline-none transition placeholder:text-base placeholder:font-normal placeholder:tracking-normal placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30" />
       </div>
@@ -413,10 +416,13 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       const show = formShown && Boolean(selectedTime) && !confirmVisible;
       stickyBar.classList.toggle('hidden', !show);
       // Sit above the site's own bottom action bar (Call / WhatsApp / Book) when it is showing.
+      // The site's floating action bar slides away on scroll: sit just above it while it shows, at the edge when it does not.
       const siteBar = $('siteBottomBar');
-      stickyBar.style.bottom = siteBar && siteBar.offsetHeight ? `${siteBar.offsetHeight}px` : '0px';
+      const gap = siteBar && siteBar.offsetHeight ? Math.max(0, window.innerHeight - siteBar.getBoundingClientRect().top) : 0;
+      stickyBar.style.bottom = `${Math.round(gap)}px`;
       if (show) $('stickySummary').textContent = `${fmtDate(dateInput.value, { weekday: 'short', day: 'numeric', month: 'short' })} · ${selectedTime}`;
     }
+    document.addEventListener('sitebar:change', updateStickyBar);
     if ('IntersectionObserver' in window && confirmBtn) {
       new IntersectionObserver((entries) => { confirmVisible = entries[0].isIntersecting; updateStickyBar(); }, { threshold: 0.6 }).observe(confirmBtn);
     }
@@ -915,7 +921,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
         otpSentTo = digits;
         otpSentAt = Date.now();
-        $('verifyTo').textContent = `OTP sent to +91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+        $('verifyTo').textContent = `OTP sent on WhatsApp to +91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
         setOtpStatus('');
         openOtp();
         if (otpInput) { otpInput.value = ''; otpInput.classList.remove('border-red-500'); otpInput.focus(); }
@@ -982,7 +988,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     otpPanel?.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { pendingBooking = false; closeOtp(); confirmBtn?.focus(); return; }
       if (e.key === 'Tab') { // keep focus inside the pop-up
-        const items = Array.from(otpPanel.querySelectorAll('button:not([disabled]), input')).filter((el) => el.offsetParent !== null);
+        const items = Array.from(otpPanel.querySelectorAll('button:not([disabled]), input, a[href]')).filter((el) => el.offsetParent !== null);
         if (!items.length) return;
         const first = items[0], last = items[items.length - 1];
         if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }

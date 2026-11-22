@@ -1,7 +1,7 @@
 ---
 title: "Xanthelasma Treatment Options Compared: TCA Touch, Excision, and RFA"
 pubDate: 2026-06-19
-description: "How TCA touch, surgical excision, and radiofrequency ablation work for xanthelasma, who each suits, and the trade-offs in scarring, pigment change, and recurrence."
+description: "How TCA touch, surgical excision and radiofrequency ablation work for xanthelasma, who each suits, and the trade-offs in scarring and recurrence."
 author: "Dr. Karthik L"
 tags: ["Xanthelasma"]
 service: "xanthelasma-treatment"

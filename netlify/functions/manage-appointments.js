@@ -42,7 +42,7 @@ exports.handler = async (event) => {
     // reschedule / cancel act on one appointment that must belong to this phone.
     const { data: appt, error: apptError } = await supabase
       .from("appointments")
-      .select("id, patient_id, doctor_id, slot_date, slot_time, status, linked_group_id, notes, doctors(name)")
+      .select("id, patient_id, doctor_id, slot_date, slot_time, status, linked_group_id, notes, doctors!appointments_doctor_id_fkey(name)")
       .eq("id", String(payload.appointmentId || ""))
       .is("deleted_at", null)
       .maybeSingle();
@@ -128,7 +128,7 @@ async function upcoming(supabase, patients) {
   const nameById = new Map(patients.map((p) => [p.id, p.name]));
   const { data, error } = await supabase
     .from("appointments")
-    .select("id, patient_id, doctor_id, slot_date, slot_time, status, linked_group_id, notes, doctors(name)")
+    .select("id, patient_id, doctor_id, slot_date, slot_time, status, linked_group_id, notes, doctors!appointments_doctor_id_fkey(name)")
     .in("patient_id", patients.map((p) => p.id))
     .in("doctor_id", core.CLINIC_DOCTOR_IDS)
     .gte("slot_date", core.clinicNow().date)

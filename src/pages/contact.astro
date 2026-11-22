@@ -1,56 +1,69 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { siteConfig } from '../config/site.js';
+
+const a = siteConfig.contact.address;
+const fullAddress = `${a.street}, ${a.locality}, ${a.city}, ${a.state} ${a.postalCode}`;
+const tel = siteConfig.contact.phone.replace(/[^0-9+]/g, '');
+const directions = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteConfig.name}, ${fullAddress}`)}`;
+const mapSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.974836067086!2d80.2017997!3d13.0397028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5266cb2eb18fbb%3A0xc6fbef0f8eee3a3f!2s39%2F2%2C%20RK%20Shanmugam%20Salai%2C%20Goutham%20Colony%2C%20K.%20K.%20Nagar%2C%20Chennai%2C%20Tamil%20Nadu%20600078!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin';
 ---
 
-<MainLayout title={`Contact & Location | ${siteConfig.name}`}>
-  <div class="max-w-6xl mx-auto py-16 px-6">
-    <h1 class="text-4xl font-extrabold text-brand-900 mb-8 text-center">Visit {siteConfig.name}</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white rounded-2xl shadow-sm border border-champagne-200 p-8 md:p-12">
-      <div>
-        <h2 class="text-2xl font-bold mb-6">Get in Touch</h2>
-        <div class="space-y-6">
+<MainLayout title="Contact & Location" description={`Visit ${siteConfig.name} at ${a.street}, KK Nagar, Chennai. Clinic hours, phone, WhatsApp and directions.`}>
+  <Breadcrumbs items={[{ name: "Contact", url: "/contact" }]} />
+
+  <section class="bg-gradient-to-b from-brand-50/70 to-transparent px-5 pb-6 pt-6 text-center md:px-6 md:pb-10 md:pt-10">
+    <p data-rise style="--d:0" class="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-600">Contact &amp; location</p>
+    <h1 data-rise style="--d:1" class="mb-4 text-4xl text-slate-950 md:text-6xl">Visit {siteConfig.name}</h1>
+    <p data-rise style="--d:2" class="mx-auto max-w-2xl text-lg text-slate-600 md:text-xl">In KK Nagar, Chennai, easy to reach from Ashok Nagar, Vadapalani, Virugambakkam and Ramapuram.</p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-5 pb-16 md:px-6">
+    <div class="grid gap-6 lg:grid-cols-[.85fr_1.15fr]">
+      <div class="space-y-4">
+        <div class="ui-card flex gap-4 p-6">
+          <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-700" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
           <div>
-            <p class="text-sm text-slate-500 font-semibold uppercase tracking-wider mb-1">Clinic Address</p>
-            <p class="text-lg text-slate-800">{siteConfig.contact.address}</p>
-            <p class="text-slate-600 mt-2">Serving Ashok Nagar, Vadapalani, Virugambakkam & Ramapuram.</p>
+            <p class="mb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Clinic address</p>
+            <p class="font-semibold leading-snug text-slate-900">{fullAddress}</p>
+            <a href={directions} target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-brand-700 hover:underline">Get directions <span aria-hidden="true">→</span></a>
           </div>
+        </div>
+
+        <div class="ui-card flex gap-4 p-6">
+          <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-700" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
           <div>
-            <p class="text-sm text-slate-500 font-semibold uppercase tracking-wider mb-1">Phone & Emergencies</p>
-            <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="text-2xl text-brand-600 font-bold hover:underline">{siteConfig.contact.phone}</a>
+            <p class="mb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Phone &amp; WhatsApp</p>
+            <a href={`tel:${tel}`} class="text-2xl font-bold text-brand-700 hover:underline">{siteConfig.contact.phone}</a>
+            <p class="mt-1 text-sm text-slate-600">{siteConfig.contact.email}</p>
           </div>
+        </div>
+
+        <div class="ui-card flex gap-4 p-6">
+          <span class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-700" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></span>
           <div>
-            <p class="text-sm text-slate-500 font-semibold uppercase tracking-wider mb-1">Working Hours</p>
-            <p class="text-lg text-slate-800">{siteConfig.contact.workingHoursDisplay}</p>
+            <p class="mb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Working hours</p>
+            <p class="font-semibold leading-snug text-slate-900">{siteConfig.contact.workingHoursDisplay}</p>
           </div>
+        </div>
+
+        <div class="grid gap-3 pt-1 sm:grid-cols-2">
+          <a href="/book" data-track="booking-click" class="flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-brand-800 px-5 font-bold text-white shadow-lg shadow-brand-900/20 transition hover:bg-brand-700 active:scale-[0.98]">Book online <span aria-hidden="true">→</span></a>
+          <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="flex min-h-[52px] items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 px-5 font-bold text-emerald-800 transition hover:bg-emerald-100">Chat on WhatsApp</a>
         </div>
       </div>
 
-      <div class="bg-brand-50 p-8 rounded-xl">
-        <h3 class="text-xl font-bold text-brand-900 mb-4">Request a Call Back</h3>
-        <form class="space-y-4" action="#" method="POST" onsubmit="event.preventDefault(); alert('Form submission connected successfully!');">
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
-            <input type="text" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-brand-500 focus:border-brand-500" required />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
-            <input type="tel" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-brand-500 focus:border-brand-500" required />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Service Needed</label>
-            <select class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-brand-500 focus:border-brand-500">
-              <option>General Checkup</option>
-              <option>Cataract Evaluation</option>
-              <option>LASIK Consult</option>
-              <option>Retina Care</option>
-            </select>
-          </div>
-          <button type="submit" class="w-full bg-brand-600 text-white font-bold py-3 rounded-md hover:bg-brand-700 transition">Submit Request</button>
-        </form>
+      <div class="ui-card min-h-[320px] overflow-hidden p-1.5 lg:min-h-full">
+        <iframe
+          title={`Map of ${siteConfig.name}`}
+          src={mapSrc}
+          class="h-full min-h-[320px] w-full rounded-[1.1rem]"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
     </div>
-  </div>
+  </section>
 </MainLayout>
-

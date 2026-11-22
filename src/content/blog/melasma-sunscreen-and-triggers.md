@@ -25,3 +25,23 @@ Hormonal factors such as pregnancy or contraceptive use, heat, and a family tend
 ## Setting Expectations
 
 Improvement is gradual over months, and maintenance is ongoing. Patients who protect their skin consistently see the best and most lasting results.
+
+## Choosing and Using a Sunscreen
+
+For melasma, the practical choice is a broad-spectrum sunscreen with a tint that contains iron oxide, because it helps block visible light as well as UV. Apply it generously, enough to cover the whole face and neck, as the last step of your morning routine, and reapply every few hours if you are outdoors. A hat or umbrella adds protection that no cream can match.
+
+## Heat and Other Everyday Triggers
+
+Heat, such as cooking over a flame or working near furnaces, can worsen melasma in some people even without direct sun. Hormonal changes, including pregnancy and certain contraceptives, are well-known triggers. Irritating products or harsh scrubbing can cause inflammation and darken the skin further, so keep the routine gentle.
+
+## Why Relapse Does Not Mean Failure
+
+Melasma tends to come back when protection slips, particularly in summer or after a holiday. That is part of the condition and not a sign that treatment failed. A maintenance plan, with sun protection and, where we advise it, a mild lightening product, keeps most people comfortable.
+
+## Related Reading
+
+If you are unsure how melasma differs from other dark patches, see [pigmentation versus melasma](/blog/pigmentation-vs-melasma). Our guides to [post-inflammatory hyperpigmentation](/conditions/post-inflammatory-hyperpigmentation) and [pigmentation](/services/pigmentation) explain the other common causes.
+
+## Tips for Staying Consistent
+
+Keep sunscreen where you will see it, such as next to your toothbrush or in your bag, so that applying it becomes automatic. Carry a small tube for reapplication, and use a wide-brimmed hat or umbrella on long outdoor days. Consistency matters more than perfection, and a lapse is not a reason to stop.

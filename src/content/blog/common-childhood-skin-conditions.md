@@ -29,3 +29,15 @@ Most [birthmarks](/blog/birthmarks-for-parents), whether vascular or pigmented, 
 ## When to Bring Your Child In
 
 Any persistent rash, unusual growth, or skin change that isn't improving with basic home care is worth [an evaluation](/services/pediatric-dermatology) -- particularly if it's affecting your child's comfort, sleep, or daily activities. We aim to make these visits as comfortable as possible for children, working at their pace and explaining things in an age-appropriate way.
+
+## Other Conditions Parents Often Ask About
+
+Cradle cap, a greasy yellowish scale on a baby's scalp, is common and usually settles with gentle care. Heat rash appears in warm weather as tiny red bumps in skin folds, and responds to keeping the child cool. Warts and nail changes, along with ringworm of the scalp or body, are also seen frequently. Hand, foot and mouth disease, which causes blisters on the hands and feet and sores in the mouth, is usually mild and passes in about a week. You can read more on the condition page for [hand, foot and mouth disease](/conditions/hand-foot-mouth-disease).
+
+## Everyday Skin Care for Children
+
+Use lukewarm water, keep baths short, and choose a gentle, fragrance-free cleanser. Pat the skin dry and apply a moisturizer while it is still slightly damp. Dress your child in soft, breathable cotton, wash new clothes before use, and protect skin from the sun with hats, shade and a child-friendly sunscreen.
+
+## Signs That Need Prompt Attention
+
+A rash with fever, spreading redness or pain, blisters that are widespread, or any rash in a very young baby who seems unwell should be seen quickly. So should a skin condition that stops your child sleeping or eating. When in doubt, it is safer to ask.

@@ -25,3 +25,19 @@ Keep the back dry during testing and avoid strong sun exposure. Some medicines c
 ## What Comes After
 
 Identifying the trigger lets you avoid it, which is usually more effective than any long-term medication. A positive result is a practical guide rather than a diagnosis of a serious condition.
+
+## What Is on the Panel
+
+A standard series covers common triggers such as fragrances, preservatives, hair dyes, rubber chemicals, metals like nickel, and ingredients in topical medicines. Depending on your story we may add products you use at home or at work, such as your own cosmetics or workplace substances, so bring them in their original packaging.
+
+## What the Visits Involve
+
+The patches are applied on the first visit and stay on for about two days. You then return to have them removed and read, and often again a day or two later because some reactions appear late. Patch testing does not hurt, although patches can itch, and a strong reaction may be uncomfortable for a short while.
+
+## Reading the Results
+
+A positive result is read together with your history. A reaction under a patch does not always explain your rash, and a negative result does not always rule out an allergy, so we match the findings to what you are exposed to. Once a cause is identified, we give you a list of products and ingredients to avoid.
+
+## Limits and Safety
+
+Patch testing is not the test for hives or food allergy, which work differently. Avoid getting the patches wet, avoid heavy sweating and sun on your back, and tell us if a patch becomes severely painful. See our pages on [skin allergy](/services/skin-allergy) and [hand eczema](/conditions/hand-eczema) for related care.

@@ -4,7 +4,8 @@ export const siteConfig = {
   // ✅ Use final domain (IMPORTANT)
   url: "https://crisprdermatology.com",
 
-  description: "Leading skin, hair & aesthetic dermatology clinic in KK Nagar, Chennai. AIIMS-trained dermatologists offering hair transplant, acne, psoriasis, vitiligo, pediatric dermatology and cosmetic treatments with evidence-based care.",
+  description: "AIIMS-trained dermatologists in KK Nagar, Chennai: hair transplant, acne, psoriasis, vitiligo, paediatric and cosmetic dermatology. Evidence-based care.",
+  titleSuffix: "CRISPR Clinic",
 
   // Full clinical team -- all shared components reference this array (or
   // siteConfig.name / a generic "our doctors" framing) rather than any
@@ -93,6 +94,14 @@ export const siteConfig = {
     },
 
     whatsapp: "https://wa.me/919698444888",
+
+    // Public profile URLs (Google Business Profile, Instagram, Facebook, YouTube...). Emitted as schema.org `sameAs`
+    // so search engines connect the website to the clinic's listings. Add the real URLs here.
+    googleMapsUrl: "https://maps.app.goo.gl/bqzmReZ1VLo4JzAF9",
+    sameAs: ["https://maps.app.goo.gl/bqzmReZ1VLo4JzAF9"],
+
+    // WhatsApp Business number that sends the booking / registration OTP. "Open WhatsApp" in the OTP pop-ups opens this chat.
+    otpWhatsapp: "https://wa.me/917806880801",
 
     // Machine-readable, schema.org format -- used ONLY in JSON-LD structured data.
     // Mon-Sat 4-9pm; Sunday 9am-1pm & 4-9pm.

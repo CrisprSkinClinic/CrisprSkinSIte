@@ -4,6 +4,7 @@ metaDescription: "Advanced treatment for moderate-to-severe skin conditions that
 heroEyebrow: "Advanced Dermatology"
 heroHeadline: "Biologics and Advanced Therapy"
 heroSubheadline: "For severe or persistent skin disease that has not been controlled by standard treatment, a careful assessment of targeted options."
+heroImage: "biologics"
 category: "skin"
 defaultService: "Biologics / Advanced Therapy"
 

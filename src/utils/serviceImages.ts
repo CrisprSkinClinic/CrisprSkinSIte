@@ -48,6 +48,10 @@ export const serviceImageAlts: Record<string, string> = {
   'fillers': 'Dermal filler treatment consultation',
   'anti-ageing': 'Anti-ageing dermatology treatment consultation',
   'skin-rejuvenation': 'Skin rejuvenation treatment at dermatology clinic',
+  'biologics': 'Biologic injection therapy for chronic skin disease',
+  'ear-lobe-repair': 'Earlobe examination before split earlobe repair',
+  'nail-avulsion-lateral-matricectomy': 'Toenail examination before ingrown toenail surgery',
+  'xanthelasma-treatment': 'Eyelid examination for xanthelasma treatment',
 };
 
 export function getServiceImageAlt(

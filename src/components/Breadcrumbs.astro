@@ -30,7 +30,7 @@ const schema = {
 
 <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
-<nav aria-label="Breadcrumb" class="bg-[#f8f7f8] border-b border-slate-200/70 px-5 sm:px-6 py-3.5 text-xs sm:text-sm leading-none">
+<nav aria-label="Breadcrumb" class="px-5 sm:px-6 pt-3 pb-1 text-xs sm:text-sm leading-none">
   <ol class="max-w-7xl mx-auto flex items-center flex-nowrap overflow-hidden gap-1 text-slate-500 leading-none">
     {allItems.map((item, index) => (
       <li class={`flex items-center gap-1 leading-none ${index === allItems.length - 1 ? 'min-w-0 flex-1' : 'shrink-0'}`}>

@@ -29,3 +29,19 @@ Look over your skin every month or so, including the scalp, soles, and between t
 ## Early Detection Works
 
 Most skin cancers found early are highly treatable. If you notice something suspicious, [book an examination](/services/warts-moles-skin-tags) rather than waiting to see what happens.
+
+## Common Myths
+
+"I have dark skin, so I cannot get skin cancer" is wrong. Darker skin does have more natural protection, but it is not complete, and skin cancer can be missed because people do not expect it. Another myth is that only sunburn matters. Long-term, cumulative exposure also adds up. A third myth is that a high-SPF sunscreen lets you stay out all day. Sunscreen is one layer of protection, not a licence to ignore shade.
+
+## Children and Sun
+
+Much sun exposure happens in childhood, so protective habits started early help for life. Keep babies out of direct sun, use hats and clothing, and apply sunscreen to older children. Make sunscreen part of the school-day routine.
+
+## Medicines and Sun Sensitivity
+
+Some medicines, including certain antibiotics and some tablets used for other conditions, can make skin more sensitive to light. If you notice unusual sunburn or rash after starting a medicine, let your doctor know.
+
+## What Happens at a Skin Check
+
+We look at your skin from head to toe, including the scalp, nails, palms and soles, and use a magnifying instrument to look closely at any spot of concern. If something looks suspicious, a small sample may be taken to confirm the diagnosis. Most spots turn out to be harmless, which is a relief in itself. Read about [moles](/conditions/melanocytic-naevi-moles) and when [mole changes matter](/blog/mole-warning-signs), or see our page on [skin tags, warts and moles](/services/warts-moles-skin-tags).

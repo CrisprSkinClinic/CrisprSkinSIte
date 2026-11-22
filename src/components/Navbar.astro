@@ -1,18 +1,21 @@
 ---
 import { siteConfig } from '../config/site.js';
 ---
-<header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/80 transition-all duration-300">
-  <div class="max-w-7xl mx-auto px-5 sm:px-6 h-[74px] lg:h-20 flex justify-between items-center">
+<header id="siteHeader" class="site-header pointer-events-none sticky top-0 z-40 w-full px-3 pt-2 sm:px-4 lg:px-6 lg:pt-3">
+  <!-- Disconnected controls, in the style of the ChatGPT app: each piece (logo, menu button, and on desktop the
+       links and Book button) floats on its own frosted-glass surface instead of sharing one bar. On phones the
+       whole header slides away while scrolling down and returns on scroll up. -->
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
 
-    <a href="/" class="hidden lg:flex items-center" aria-label={`${siteConfig.name} home`}>
-      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[180px] object-contain" />
+    <a href="/" class="glass pointer-events-auto hidden h-14 items-center rounded-full px-6 lg:flex" aria-label={`${siteConfig.name} home`}>
+      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[150px] object-contain" />
     </a>
 
-    <a href="/" class="flex min-w-0 items-center lg:hidden" aria-label={`${siteConfig.name} home`}>
-      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[160px] object-contain object-left" />
+    <a href="/" class="glass pointer-events-auto flex h-12 min-w-0 items-center rounded-full px-4 lg:hidden" aria-label={`${siteConfig.name} home`}>
+      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[104px] object-contain object-left" />
     </a>
 
-    <nav class="hidden lg:flex space-x-7 items-center px-2 py-3">
+    <nav class="glass pointer-events-auto hidden h-14 items-center space-x-7 rounded-full px-8 lg:flex">
       <a href="/" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Home</a>
 
       <!-- Services Mega Menu -->
@@ -24,7 +27,7 @@ import { siteConfig } from '../config/site.js';
         <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 hidden group-hover:block">
           <div class="bg-white rounded-xl shadow-xl border border-champagne-200 py-6 px-6 w-[720px] grid grid-cols-4 gap-6">
             <div>
-              <a href="/hair" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Hair</a>
+              <a href="/hair" class="block text-xs font-bold uppercase tracking-widest text-accent-600 hover:text-accent-700 mb-3">Hair</a>
               <div class="flex flex-col gap-2">
                 <a href="/services/hair-transplant-fue" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Hair Transplant (FUE)</a>
                 <a href="/services/hair-loss" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Hair Loss</a>
@@ -34,7 +37,7 @@ import { siteConfig } from '../config/site.js';
               </div>
             </div>
             <div>
-              <a href="/skin" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Skin</a>
+              <a href="/skin" class="block text-xs font-bold uppercase tracking-widest text-accent-600 hover:text-accent-700 mb-3">Skin</a>
               <div class="flex flex-col gap-2">
                 <a href="/services/acne" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Acne</a>
                 <a href="/services/acne-scars" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Acne Scars</a>
@@ -54,7 +57,7 @@ import { siteConfig } from '../config/site.js';
               </div>
             </div>
             <div>
-              <a href="/cosmetic" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Cosmetic</a>
+              <a href="/cosmetic" class="block text-xs font-bold uppercase tracking-widest text-accent-600 hover:text-accent-700 mb-3">Cosmetic</a>
               <div class="flex flex-col gap-2">
                 <a href="/services/chemical-peels" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Chemical Peels</a>
                 <a href="/services/botox" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Botox</a>
@@ -66,7 +69,7 @@ import { siteConfig } from '../config/site.js';
               </div>
             </div>
             <div>
-              <a href="/pediatric" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Pediatric</a>
+              <a href="/pediatric" class="block text-xs font-bold uppercase tracking-widest text-accent-600 hover:text-accent-700 mb-3">Pediatric</a>
               <div class="flex flex-col gap-2">
                 <a href="/services/pediatric-dermatology" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Pediatric Dermatology</a>
                 <a href="/services/birthmarks" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Birthmarks</a>
@@ -87,7 +90,7 @@ import { siteConfig } from '../config/site.js';
         <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 hidden group-hover:block">
           <div class="bg-white rounded-xl shadow-xl border border-champagne-200 py-6 px-6 w-[720px] grid grid-cols-4 gap-6">
             <div>
-              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Hair</a>
+              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-accent-600 hover:text-accent-700 mb-3">Hair</a>
               <div class="flex flex-col gap-2">
                 <a href="/conditions/androgenetic-alopecia" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Androgenetic Alopecia</a>
                 <a href="/conditions/female-pattern-hair-loss" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Female Pattern Hair Loss</a>
@@ -100,7 +103,7 @@ import { siteConfig } from '../config/site.js';
               </div>
             </div>
             <div>
-              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Skin</a>
+              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-accent-600 hover:text-accent-700 mb-3">Skin</a>
               <div class="flex flex-col gap-2">
                 <a href="/conditions/hormonal-acne" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Hormonal Acne</a>
                 <a href="/conditions/acne-scar-types" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Acne Scar Types</a>
@@ -114,7 +117,7 @@ import { siteConfig } from '../config/site.js';
               </div>
             </div>
             <div>
-              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Nails & Growths</a>
+              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-accent-600 hover:text-accent-700 mb-3">Nails & Growths</a>
               <div class="flex flex-col gap-2">
                 <a href="/conditions/onychomycosis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Onychomycosis (Nail Fungus)</a>
                 <a href="/conditions/ingrown-toenail" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Ingrown Toenail</a>
@@ -126,7 +129,7 @@ import { siteConfig } from '../config/site.js';
               </div>
             </div>
             <div>
-              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 hover:text-gold-700 mb-3">Pediatric</a>
+              <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-accent-600 hover:text-accent-700 mb-3">Pediatric</a>
               <div class="flex flex-col gap-2">
                 <a href="/conditions/childhood-atopic-dermatitis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Childhood Atopic Dermatitis</a>
                 <a href="/conditions/diaper-dermatitis" class="text-sm text-slate-600 hover:text-brand-600 transition-colors">Diaper Dermatitis</a>
@@ -146,11 +149,17 @@ import { siteConfig } from '../config/site.js';
       <a href="/contact" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Contact</a>
     </nav>
 
-    <a href="/book" data-track="booking-click" class="hidden lg:inline-flex items-center gap-2 bg-brand-800 text-white text-sm font-bold px-6 py-3 rounded-full shadow-lg shadow-brand-900/15 hover:bg-brand-700 hover:-translate-y-0.5 transition-all">
+    <div class="pointer-events-auto hidden items-center gap-2.5 lg:flex">
+      <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="glass grid h-14 w-14 place-items-center rounded-full text-brand-700 transition hover:text-brand-900 active:scale-95" aria-label={`Call ${siteConfig.contact.phone}`} title={siteConfig.contact.phone}>
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </a>
+    <a href="/book" data-track="booking-click" class="inline-flex h-14 items-center gap-2 rounded-full bg-brand-800 px-7 text-sm font-bold text-white shadow-lg shadow-brand-900/20 transition-all hover:-translate-y-0.5 hover:bg-brand-700">
       Book Appointment <span aria-hidden="true">→</span>
     </a>
 
-    <button id="mobileMenuBtn" class="lg:hidden grid h-9 w-9 shrink-0 place-items-center text-slate-600 hover:text-slate-950 transition-colors" aria-label="Toggle Menu" aria-expanded="false">
+    </div>
+
+    <button id="mobileMenuBtn" class="glass pointer-events-auto grid h-12 w-12 shrink-0 place-items-center rounded-full text-slate-700 transition hover:text-slate-950 active:scale-95 lg:hidden" aria-label="Toggle Menu" aria-expanded="false">
       <svg id="menuIconOpen" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
@@ -161,7 +170,7 @@ import { siteConfig } from '../config/site.js';
   </div>
 
   <!-- Mobile menu panel -->
-  <div id="mobileMenuPanel" class="hidden lg:hidden mx-3 mb-3 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-slate-200/80 bg-white/90 shadow-xl shadow-slate-900/10 backdrop-blur-xl">
+  <div id="mobileMenuPanel" class="glass pointer-events-auto mx-auto mt-2 hidden max-h-[calc(100dvh-5.5rem)] max-w-7xl overflow-y-auto overscroll-contain rounded-3xl lg:hidden">
     <nav class="px-5 py-5 flex flex-col gap-1">
       <a href="/" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Home</a>
 
@@ -173,7 +182,7 @@ import { siteConfig } from '../config/site.js';
       <div id="mobileServicesSubmenu" class="hidden flex-col gap-4 pl-4 border-l border-champagne-200 ml-1">
         <!-- (same Services content as before) -->
         <div>
-          <a href="/hair" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Hair</a>
+          <a href="/hair" class="block text-xs font-bold uppercase tracking-widest text-accent-600 mb-1.5">Hair</a>
           <div class="flex flex-col gap-1">
             <a href="/services/hair-transplant-fue" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Hair Transplant (FUE)</a>
             <a href="/services/hair-loss" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Hair Loss</a>
@@ -183,7 +192,7 @@ import { siteConfig } from '../config/site.js';
           </div>
         </div>
         <div>
-          <a href="/skin" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Skin</a>
+          <a href="/skin" class="block text-xs font-bold uppercase tracking-widest text-accent-600 mb-1.5">Skin</a>
           <div class="flex flex-col gap-1">
             <a href="/services/acne" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Acne</a>
             <a href="/services/acne-scars" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Acne Scars</a>
@@ -203,7 +212,7 @@ import { siteConfig } from '../config/site.js';
           </div>
         </div>
         <div>
-          <a href="/cosmetic" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Cosmetic</a>
+          <a href="/cosmetic" class="block text-xs font-bold uppercase tracking-widest text-accent-600 mb-1.5">Cosmetic</a>
           <div class="flex flex-col gap-1">
             <a href="/services/chemical-peels" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Chemical Peels</a>
             <a href="/services/botox" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Botox</a>
@@ -215,7 +224,7 @@ import { siteConfig } from '../config/site.js';
           </div>
         </div>
         <div>
-          <a href="/pediatric" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Pediatric</a>
+          <a href="/pediatric" class="block text-xs font-bold uppercase tracking-widest text-accent-600 mb-1.5">Pediatric</a>
           <div class="flex flex-col gap-1">
             <a href="/services/pediatric-dermatology" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Pediatric Dermatology</a>
             <a href="/services/birthmarks" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Birthmarks</a>
@@ -232,7 +241,7 @@ import { siteConfig } from '../config/site.js';
       </button>
       <div id="mobileConditionsSubmenu" class="hidden flex-col gap-4 pl-4 border-l border-champagne-200 ml-1">
         <div>
-          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Hair</a>
+          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-accent-600 mb-1.5">Hair</a>
           <div class="flex flex-col gap-1">
             <a href="/conditions/androgenetic-alopecia" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Androgenetic Alopecia</a>
             <a href="/conditions/female-pattern-hair-loss" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Female Pattern Hair Loss</a>
@@ -245,7 +254,7 @@ import { siteConfig } from '../config/site.js';
           </div>
         </div>
         <div>
-          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Skin</a>
+          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-accent-600 mb-1.5">Skin</a>
           <div class="flex flex-col gap-1">
             <a href="/conditions/hormonal-acne" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Hormonal Acne</a>
             <a href="/conditions/acne-scar-types" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Acne Scar Types</a>
@@ -259,7 +268,7 @@ import { siteConfig } from '../config/site.js';
           </div>
         </div>
         <div>
-          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Nails & Growths</a>
+          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-accent-600 mb-1.5">Nails & Growths</a>
           <div class="flex flex-col gap-1">
             <a href="/conditions/onychomycosis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Onychomycosis (Nail Fungus)</a>
             <a href="/conditions/ingrown-toenail" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Ingrown Toenail</a>
@@ -271,7 +280,7 @@ import { siteConfig } from '../config/site.js';
           </div>
         </div>
         <div>
-          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-gold-600 mb-1.5">Pediatric</a>
+          <a href="/conditions" class="block text-xs font-bold uppercase tracking-widest text-accent-600 mb-1.5">Pediatric</a>
           <div class="flex flex-col gap-1">
             <a href="/conditions/childhood-atopic-dermatitis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Childhood Atopic Dermatitis</a>
             <a href="/conditions/diaper-dermatitis" class="py-1 text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Diaper Dermatitis</a>
@@ -287,10 +296,76 @@ import { siteConfig } from '../config/site.js';
       <a href="/faq" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">FAQ</a>
       <a href="/blog" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Blog</a>
       <a href="/contact" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Contact</a>
-      <a href="/book" data-track="booking-click" class="mt-3 bg-gold-500 text-brand-900 text-sm font-bold px-6 py-3 rounded-full text-center shadow-md hover:bg-gold-600 transition-colors">Book Now</a>
+      <a href="/book" data-track="booking-click" class="mt-3 bg-accent-500 text-brand-900 text-sm font-bold px-6 py-3 rounded-full text-center shadow-md hover:bg-accent-600 transition-colors">Book Now</a>
     </nav>
   </div>
 </header>
+
+<style is:global>
+  /* Frosted-glass surface shared by the floating header and the mobile action bar */
+  .glass {
+    background: rgba(255, 255, 255, 0.62);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 10px 36px rgba(31, 20, 48, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass { background: rgba(255, 255, 255, 0.97); }
+  }
+  @media (max-width: 1023px) {
+    .site-header, #siteBottomBar { transition: transform .32s cubic-bezier(.22, .8, .24, 1); will-change: transform; }
+    .site-header[data-hidden="true"] { transform: translateY(-115%); }
+    #siteBottomBar[data-hidden="true"] { transform: translateY(140%); }
+  }
+  @media (prefers-reduced-motion: reduce) { .site-header, #siteBottomBar { transition: none !important; } }
+</style>
+
+<script>
+  // Mobile: hide the header and the bottom action bar while scrolling down, bring them back on any scroll up,
+  // at the very top, at the very bottom, or after the page has been still for a moment. Bound once per page
+  // load of the app (the layout uses view transitions), looking the elements up fresh each time.
+  if (!(window as any).__siteChromeBound) {
+    (window as any).__siteChromeBound = true;
+    let lastY = window.scrollY;
+    let ticking = false;
+    let idleTimer: number | undefined;
+    const phone = () => window.matchMedia('(max-width: 1023px)').matches;
+    const set = (el: HTMLElement | null, hidden: boolean) => { if (el) el.dataset.hidden = String(hidden); };
+    const notify = () => window.setTimeout(() => document.dispatchEvent(new CustomEvent('sitebar:change')), 340);
+
+    const update = () => {
+      ticking = false;
+      const header = document.getElementById('siteHeader');
+      const bar = document.getElementById('siteBottomBar');
+      const y = window.scrollY;
+      const dy = y - lastY;
+      lastY = y;
+      if (!phone()) { set(header, false); set(bar, false); return; }
+      const menuOpen = !document.getElementById('mobileMenuPanel')?.classList.contains('hidden');
+      const atTop = y <= 8;
+      const atBottom = window.innerHeight + y >= document.documentElement.scrollHeight - 8;
+      if (atTop || menuOpen) { set(header, false); set(bar, false); }
+      else if (Math.abs(dy) > 5) {
+        const down = dy > 0;
+        set(header, down && y > 90);
+        set(bar, down && y > 90 && !atBottom);
+      }
+      if (atBottom) set(bar, false);
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => { set(bar, false); notify(); }, 1500);
+      notify();
+    };
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    // Keyboard users: tabbing into the header or the bar must reveal it.
+    document.addEventListener('focusin', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('#siteHeader')) set(document.getElementById('siteHeader'), false);
+      if (t.closest('#siteBottomBar')) set(document.getElementById('siteBottomBar'), false);
+    });
+    document.addEventListener('astro:page-load', () => { lastY = window.scrollY; set(document.getElementById('siteHeader'), false); set(document.getElementById('siteBottomBar'), false); });
+  }
+</script>
 
 <script>
   document.addEventListener('astro:page-load', () => {

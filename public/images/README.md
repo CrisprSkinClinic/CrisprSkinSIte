@@ -14,7 +14,7 @@ site builds and looks reasonable before photography is ready.
 - `public/images/doctors/<doctor-slug>.jpg` — one headshot per doctor,
   matching the `slug` field in `src/config/site.js` → `doctors[]`
   (e.g. `dr-karthik-l.jpg`, `dr-narayanan-a.jpg`, `dr-narayanan-b.jpg`)
-- `public/images/clinic/*.jpg` — clinic interior photos for the gallery
+- `public/images/clinic/*` — clinic interior photos for the gallery
   section on the homepage (see `src/components/ClinicGallery.astro`
   for the exact filenames expected)
 - `public/logo.png` — site logo, if/when a wordmark or icon is added

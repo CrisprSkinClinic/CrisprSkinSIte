@@ -29,3 +29,19 @@ Results build over the days following treatment and typically last a few months 
 ## The Bottom Line
 
 A natural-looking result isn't a matter of luck -- it's a deliberate dosing choice, discussed with you at your consultation rather than applied as a fixed, generic protocol. Wondering how it differs from fillers? See [Botox vs. fillers](/blog/fillers-vs-botox), and our [individualized approach to anti-ageing](/blog/anti-ageing-individualized-approach).
+
+## What We Discuss Before Treatment
+
+We look at how your face moves, which lines bother you and which ones you would rather keep, since some movement gives expression and character. We discuss goals such as softening the frown without lowering the brow, and check your medical history, medicines and any previous treatments. Photographs at rest and in expression help plan and compare.
+
+## Aftercare in the First Day or Two
+
+Avoid pressing or rubbing the treated areas, and avoid lying flat or vigorous exercise for the period we advise. Small bumps at the injection points settle within hours, and mild bruises can occur. Tell us if you notice drooping or asymmetry, which can often be corrected and tends to settle as the effect wears off.
+
+## Who Should Wait
+
+Botox is not advised in pregnancy or breastfeeding, and certain nerve and muscle conditions or medicines mean it may not be suitable. If you have an infection at the treatment site, we also postpone. Honest answers about your health keep treatment safe.
+
+## Touch-Ups and Maintenance
+
+If the first dose is slightly too light, a small top-up after about two weeks is a safer way to reach the right result than starting heavy. Some people then treat every few months, and others space treatments further apart. See our page on [Botox](/services/botox) and the guide to [expression lines](/conditions/expression-lines) for more.

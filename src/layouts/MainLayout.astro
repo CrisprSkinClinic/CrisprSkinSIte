@@ -10,7 +10,7 @@ import '../styles/global.css';
 const { 
   title, 
   description = siteConfig.description,
-  image = '/images/hero-doctor.jpg', // Default fallback image for link sharing
+  image = '/images/og-default.jpg', // Default link-sharing image (1200x630)
   type = 'website',
   // Defaults to indexed (false) -- only internal/non-public pages like
   // Utility pages may pass true here. Ad landing pages use their own
@@ -22,10 +22,38 @@ const {
 
 // Automatically generate the exact canonical URL for the current page
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
+
+// ---- Search-snippet hygiene ----------------------------------------------------------------------
+// Titles: pages pass a plain title; the brand is appended only when the whole thing stays within ~60
+// characters (Google truncates beyond that). A brand suffix already on the title is removed first so it is
+// never doubled.
+const baseTitle = String(title).replace(/\s*[|\u2013-]\s*CRISPR[^|]*$/i, '').trim();
+const withBrand = `${baseTitle} | ${siteConfig.titleSuffix}`;
+const fullTitle = withBrand.length <= 60 ? withBrand : baseTitle;
+// Descriptions: keep within ~155 characters, cutting at a sentence or word boundary.
+const clip = (text, max = 155) => {
+  const t = String(text || '').replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max - 1);
+  const sentence = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf(': '));
+  return sentence > max * 0.6 ? cut.slice(0, sentence + 1) : cut.slice(0, cut.lastIndexOf(' ')).replace(/[,;:\-\u2013]$/, '') + '\u2026';
+};
+const metaDescription = clip(description);
+
+// ---- Structured data -----------------------------------------------------------------------------
+// The clinic entity is described once, on the pages that are about the clinic itself, instead of repeating
+// it (and all three doctors) on all 180 pages. Other pages carry only their own page-specific schema.
+const path = Astro.url.pathname;
+const clinicId = `${siteConfig.url}/#clinic`;
+const showClinic = ['/', '/contact/', '/book/'].includes(path) || path.startsWith('/our-doctors');
+const doctorsToShow = path === '/' || path === '/our-doctors/'
+  ? siteConfig.doctors
+  : siteConfig.doctors.filter((d) => path.startsWith(`/our-doctors/${d.slug}`));
+const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteConfig.name}, ${siteConfig.contact.address.street}, ${siteConfig.contact.address.locality}, ${siteConfig.contact.address.city}`)}`;
 ---
 
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en-IN" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     
@@ -35,21 +63,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     
-    <title>{title} | {siteConfig.name}</title>
-    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+    <meta name="description" content={metaDescription} />
     <link rel="canonical" href={canonicalURL} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {noindex && <meta name="robots" content="noindex, follow" />}
 
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:title" content={`${title} | ${siteConfig.name}`} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:image" content={new URL(image, Astro.site || siteConfig.url)} />
 
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={`${title} | ${siteConfig.name}`} />
-    <meta property="twitter:description" content={description} />
+    <meta property="twitter:title" content={fullTitle} />
+    <meta property="twitter:description" content={metaDescription} />
     <meta property="twitter:image" content={new URL(image, Astro.site || siteConfig.url)} />
 
     <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -62,67 +90,69 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
       gtag('config', 'G-6JTEB0S8T0');
     </script>
 
-    <script type="application/ld+json" set:html={JSON.stringify({ 
-      "@context": "https://schema.org", 
-      "@type": "MedicalBusiness", 
-      "name": siteConfig.name, 
-      "url": siteConfig.url, 
-      "description": siteConfig.description, 
-      "image": new URL('/images/hero-doctor.jpg', siteConfig.url).toString(),
-      "telephone": siteConfig.contact.phone, 
-      "priceRange": "₹₹",
-      "address": { 
-        "@type": "PostalAddress", 
-        "streetAddress": siteConfig.contact.address.street, 
-        "addressLocality": siteConfig.contact.address.locality, 
-        "addressRegion": siteConfig.contact.address.state, 
-        "postalCode": siteConfig.contact.address.postalCode, 
-        "addressCountry": siteConfig.contact.address.country 
-      }, 
-      "geo": { 
-        "@type": "GeoCoordinates", 
-        "latitude": siteConfig.contact.geo?.latitude, 
-        "longitude": siteConfig.contact.geo?.longitude 
-      }, 
-      "openingHours": siteConfig.contact.workingHours, 
-      "areaServed": { "@type": "City", "name": "Chennai" } 
-    })} /> 
+    {showClinic && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": ["MedicalClinic", "Dermatology"],
+        "@id": clinicId,
+        "name": siteConfig.name,
+        "url": siteConfig.url,
+        "description": siteConfig.description,
+        "image": new URL('/images/hero-doctor.jpg', siteConfig.url).toString(),
+        "logo": new URL('/images/crispr-logo.png', siteConfig.url).toString(),
+        "telephone": siteConfig.contact.phone,
+        "email": siteConfig.contact.email,
+        "priceRange": "\u20B9\u20B9",
+        "medicalSpecialty": "Dermatology",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": siteConfig.contact.address.street,
+          "addressLocality": siteConfig.contact.address.locality,
+          "addressRegion": siteConfig.contact.address.state,
+          "postalCode": siteConfig.contact.address.postalCode,
+          "addressCountry": "IN"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": siteConfig.contact.geo?.latitude,
+          "longitude": siteConfig.contact.geo?.longitude
+        },
+        "hasMap": mapUrl,
+        "openingHours": siteConfig.contact.workingHours,
+        "areaServed": { "@type": "City", "name": "Chennai" },
+        ...(siteConfig.contact.sameAs?.length ? { "sameAs": siteConfig.contact.sameAs } : {})
+      })} />
+    )}
 
-    {siteConfig.doctors.map((doc) => (
-      <script type="application/ld+json" set:html={JSON.stringify({ 
-        "@context": "https://schema.org", 
-        "@type": "Physician", 
-        "name": doc.name, 
-        "medicalSpecialty": "Dermatology", 
+    {showClinic && doctorsToShow.map((doc) => (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Physician",
+        "@id": `${siteConfig.url}/our-doctors/${doc.slug}/#physician`,
+        "name": doc.name,
+        "url": new URL(`/our-doctors/${doc.slug}/`, siteConfig.url).toString(),
+        "medicalSpecialty": "Dermatology",
+        "jobTitle": doc.designation,
         "image": new URL(`/images/doctors/${doc.slug}.jpg`, siteConfig.url).toString(),
         "telephone": siteConfig.contact.phone,
-        "priceRange": "₹₹",
-        "worksFor": { "@type": "MedicalBusiness", "name": siteConfig.name }, 
-        "address": { 
-          "@type": "PostalAddress", 
+        "worksFor": { "@id": clinicId },
+        "address": {
+          "@type": "PostalAddress",
           "streetAddress": siteConfig.contact.address.street,
-          "addressLocality": siteConfig.contact.address.locality, 
-          "addressRegion": siteConfig.contact.address.state, 
+          "addressLocality": siteConfig.contact.address.locality,
+          "addressRegion": siteConfig.contact.address.state,
           "postalCode": siteConfig.contact.address.postalCode,
-          "addressCountry": "India" 
-        } 
+          "addressCountry": "IN"
+        }
       })} />
     ))}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   </head>
 
   <body class="bg-warmwhite text-charcoal antialiased selection:bg-brand-200 selection:text-brand-900 flex flex-col min-h-screen pb-20 md:pb-0">
-    
-    <div class="hidden sm:flex bg-slate-900 text-white/90 text-xs py-2 px-6 flex-row justify-between items-center gap-3 relative z-50 tracking-wide">
-      <span class="uppercase whitespace-nowrap">Chennai · Dermatologist-led</span>
-      <div class="flex flex-col sm:flex-row sm:space-x-4 items-center">
-        <span class="whitespace-nowrap">{siteConfig.contact.phone}</span>
-        <a href={`mailto:${siteConfig.contact.email}`} class="hover:underline hidden sm:inline">{siteConfig.contact.email}</a>
-      </div>
-    </div>
     
     {!bare && <Navbar />}
     

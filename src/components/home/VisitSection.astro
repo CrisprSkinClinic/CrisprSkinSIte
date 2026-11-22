@@ -1,0 +1,44 @@
+---
+import { siteConfig } from '../../config/site.js';
+import Icon from '../ui/Icon.astro';
+const a = siteConfig.contact.address;
+const fullAddress = `${a.street}, ${a.locality}, ${a.city}, ${a.state} ${a.postalCode}`;
+const directions = siteConfig.contact.googleMapsUrl;
+const photos = [
+  { src: '/images/clinic/hallway.jpg', alt: `Clinic interior at ${siteConfig.name}` },
+  { src: '/images/clinic/waiting-area.jpg', alt: `Patient waiting area at ${siteConfig.name}` },
+  { src: '/images/clinic/consultation-room.webp', alt: `Consultation room at ${siteConfig.name}` },
+  { src: '/images/clinic/procedure-room.webp', alt: `Procedure room at ${siteConfig.name}` },
+];
+---
+<section class="mx-auto max-w-7xl px-5 py-16 md:px-6 md:py-24">
+  <div class="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-stretch">
+    <div class="flex flex-col">
+      <p class="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-600">Visit us</p>
+      <h2 class="mb-4 text-4xl text-brand-900 md:text-5xl">In the heart of KK Nagar.</h2>
+      <p class="mb-7 text-lg text-slate-600">Easy to reach from Ashok Nagar, Vadapalani, Virugambakkam and Ramapuram.</p>
+
+      <div class="ui-card mb-6 space-y-5 p-6">
+        <div class="flex gap-4">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-700" aria-hidden="true"><Icon name="map-pin" class="h-5 w-5" /></span>
+          <div><p class="font-semibold leading-snug text-slate-900">{fullAddress}</p><a href={directions} target="_blank" rel="noopener noreferrer" class="mt-1 inline-block text-sm font-bold text-brand-700 hover:underline">Get directions →</a></div>
+        </div>
+        <div class="flex gap-4">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-700" aria-hidden="true"><Icon name="clock" class="h-5 w-5" /></span>
+          <p class="font-semibold leading-snug text-slate-900">{siteConfig.contact.workingHoursDisplay}</p>
+        </div>
+      </div>
+
+      <div class="mt-auto flex flex-col gap-3 sm:flex-row">
+        <a href="/book/" data-track="booking-click" class="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-brand-800 px-6 font-bold text-white shadow-lg shadow-brand-900/20 transition hover:bg-brand-700 active:scale-[0.98]">Book a consultation <span aria-hidden="true">→</span></a>
+        <a href={siteConfig.contact.whatsapp} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-[52px] items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 px-6 font-bold text-emerald-800 transition hover:bg-emerald-100">Chat on WhatsApp</a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 grid-rows-[1.15fr_1fr] gap-3">
+      <img src={photos[0].src} alt={photos[0].alt} width="720" height="480" loading="lazy" decoding="async" class="col-span-2 h-full w-full rounded-3xl object-cover shadow-md" />
+      <img src={photos[1].src} alt={photos[1].alt} width="480" height="320" loading="lazy" decoding="async" class="h-full w-full rounded-3xl object-cover shadow-md" />
+      <img src={photos[2].src} alt={photos[2].alt} width="480" height="320" loading="lazy" decoding="async" class="h-full w-full rounded-3xl object-cover shadow-md" />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,18 @@
+---
+// Numbered step cards: turns a plain list (e.g. "How we evaluate") into a short, scannable sequence.
+const { title, intro, items = [] } = Astro.props;
+---
+{items.length > 0 && (
+  <section>
+    <h2 class="mb-2 text-2xl text-brand-900 md:text-3xl">{title}</h2>
+    {intro && <p class="mb-6 max-w-2xl text-slate-600">{intro}</p>}
+    <ol class={`${intro ? '' : 'mt-6'} grid gap-4 sm:grid-cols-2 lg:grid-cols-3`}>
+      {items.map((item, i) => (
+        <li class="ui-card relative flex gap-4 p-5">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-sm font-bold text-white shadow-md shadow-brand-900/20">{i + 1}</span>
+          <p class="text-[15px] leading-relaxed text-slate-700">{item}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+)}

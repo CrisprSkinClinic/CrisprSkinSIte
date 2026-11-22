@@ -31,3 +31,19 @@ Beyond the medical routine, we provide practical guidance for managing eczema in
 (More on childhood skin in general: [common childhood skin conditions](/blog/common-childhood-skin-conditions).)
 
 Many children see their atopic dermatitis improve substantially as they get older, though the timeline varies considerably. In the meantime, our goal is genuinely sustainable, practical control of flares and comfort -- built around a routine your family can actually keep up with.
+
+## Bath Time and Moisturizing in Practice
+
+Keep baths short and lukewarm, use a gentle cleanser only where needed, pat the skin dry, and apply moisturizer within a few minutes while the skin is still slightly damp. Apply it generously and often, at least twice a day, and more during dry weather. Ointments are greasier but more protective, while creams and lotions are easier to spread, so choose what your child will tolerate and you can keep up.
+
+## Using Prescribed Creams Safely
+
+Topical steroids, when used as advised, are safe and effective for flares. Apply a thin layer to the affected patches only, for the number of days we recommend, then step back to moisturizer. Many parents worry about side effects, so please ask us if you are unsure. Using too little or stopping too early is a common reason flares drag on.
+
+## Sleep, Scratching and Mood
+
+Itch at night disrupts sleep for children and parents. Keep nails short, dress your child in soft cotton, keep the bedroom cool, and apply moisturizer at bedtime. If sleep, school or mood suffer, tell us, because it means the plan needs adjusting.
+
+## Signs of Infection
+
+Weeping, crusting, yellow scabs or sudden worsening may indicate infection and should be seen promptly. For adult eczema, see [eczema triggers](/blog/eczema-trigger-identification), and for more on this condition in young children, our guide to [childhood atopic dermatitis](/conditions/childhood-atopic-dermatitis) explains the stages.

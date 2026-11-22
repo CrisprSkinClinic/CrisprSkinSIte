@@ -1,6 +1,6 @@
 ---
 title: "Segmental Vitiligo"
-metaDescription: "Segmental vitiligo -- depigmentation confined to one area of the body, usually starting young. Why it behaves differently and how it is treated. KK Nagar, Chennai."
+metaDescription: "Segmental vitiligo: depigmentation limited to one area, usually starting young. Why it behaves differently and how it is treated. KK Nagar, Chennai."
 heroEyebrow: "Skin Condition"
 heroHeadline: "Segmental Vitiligo"
 heroSubheadline: "A form of vitiligo limited to one segment of the body that usually spreads for a short period and then settles."

@@ -27,3 +27,19 @@ Because psoriasis is autoimmune and chronic, our approach centers on long-term m
 [Psoriatic arthritis](/conditions/psoriatic-arthritis) can accompany skin psoriasis in some patients, causing joint pain, stiffness, or swelling. This is worth mentioning at your evaluation specifically, since it needs to be identified and managed as its own component of care.
 
 If you or someone you know has psoriasis, the most helpful thing you can do is treat it exactly like any other chronic medical condition -- because that's precisely what it is.
+
+## Everyday Life With Psoriasis
+
+Psoriasis does not stop you from swimming, going to work, sharing meals or being close to family. People with psoriasis may feel self-conscious, and friends and colleagues can help most by treating the condition as an ordinary part of life. If someone asks, you can say simply that it is an immune condition of the skin and cannot be passed on.
+
+## Triggers and Flare Management
+
+Stress, infections such as a sore throat, skin injury, certain medicines, smoking and heavy alcohol can trigger flares. Keeping skin moisturized, treating injuries promptly and managing stress all help. Weight and general health matter too, since psoriasis is linked with conditions such as heart disease and diabetes in some people, which we may screen for.
+
+## Emotional Wellbeing
+
+Living with a visible, long-term skin condition can affect confidence, sleep and mood. If you feel low or avoid social situations, let us know. This is a real part of the condition and treatment includes support, not only creams. Treatment also often improves how people feel about their skin.
+
+## Where to Learn More
+
+Our page on [psoriasis](/services/psoriasis) outlines how we assess and treat it, and the guide to [scalp psoriasis](/conditions/scalp-psoriasis) covers one of the most troublesome sites. If your psoriasis is not controlled with simple measures, read about [moderate-to-severe psoriasis](/conditions/moderate-to-severe-psoriasis).

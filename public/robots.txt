@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /
-Allow: /
-Disallow: /lp/
 
 Sitemap: https://crisprdermatology.com/sitemap-index.xml

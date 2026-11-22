@@ -25,3 +25,19 @@ Hold off on [retinoids](/blog/retinol-vs-retinoids-how-to-start), exfoliating ac
 ## When to Call Us
 
 Contact the clinic if you notice increasing pain, blistering, crusting, or signs of infection. Most peels heal uneventfully, and following aftercare closely is the best way to keep it that way.
+
+## A Simple Day-by-Day Guide
+
+On the first day, keep the skin clean and moisturized and avoid washing too hard. Over the next few days, expect tightness, then flaking. Allow the skin to come away by itself and keep applying a bland moisturizer. By the end of the first week, most superficial peels have settled, while deeper peels take longer. Follow the schedule we give you, since it depends on the type of peel.
+
+## Makeup, Shaving and Exercise
+
+Wait until the skin has stopped flaking before applying makeup, unless we say otherwise, and use clean brushes. Avoid shaving over peeling areas and avoid waxing, threading or laser until the skin has healed. Vigorous exercise, saunas and swimming pools can irritate healing skin, so hold off for the period we advise.
+
+## Dark Skin and Peels
+
+In deeper skin tones, inflammation can leave dark marks, which is why we choose peel strength cautiously and why sunscreen and gentle care afterwards matter so much. If you notice darkening, call us early instead of trying a lightening product by yourself. Read more about [dark marks after inflammation](/conditions/post-inflammatory-hyperpigmentation).
+
+## Planning the Next Session
+
+Peels are usually done as a series, spaced weeks apart, with the skin allowed to recover fully in between. Our page on [chemical peels](/services/chemical-peels) explains the types, and the guide to [skin rejuvenation planning](/blog/skin-rejuvenation-what-to-expect) shows how peels fit into a wider plan.

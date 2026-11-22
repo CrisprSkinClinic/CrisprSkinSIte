@@ -1,0 +1,22 @@
+---
+// Cards that link to related pages (conditions, articles, related conditions).
+const { title, items = [], cols = 2 } = Astro.props; // items: [{ href, kicker, title, image? }]
+---
+{items.length > 0 && (
+  <section>
+    <h2 class="mb-6 text-2xl text-brand-900 md:text-3xl">{title}</h2>
+    <div class={`grid gap-4 sm:grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : ''}`}>
+      {items.map((it) => (
+        <a href={it.href} class="ui-card group flex items-center justify-between gap-4 p-5">
+          <div class="min-w-0">
+            <p class="mb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-600">{it.kicker}</p>
+            <p class="font-semibold leading-snug text-slate-900 transition-colors group-hover:text-brand-700">{it.title}</p>
+          </div>
+          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600 transition group-hover:translate-x-0.5 group-hover:bg-brand-600 group-hover:text-white" aria-hidden="true">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

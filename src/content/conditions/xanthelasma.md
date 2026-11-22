@@ -1,6 +1,6 @@
 ---
 title: "Xanthelasma"
-metaDescription: "Xanthelasma -- yellow cholesterol deposits on the eyelids: causes, the link with blood lipids, and treatment with TCA touch, excision, or RFA. KK Nagar, Chennai."
+metaDescription: "Xanthelasma: yellow cholesterol deposits on the eyelids, the link with blood lipids, and treatment with TCA touch, excision or RFA. KK Nagar, Chennai."
 heroEyebrow: "Skin Condition"
 heroHeadline: "Xanthelasma"
 heroSubheadline: "Soft yellow plaques on the eyelids: harmless to the eye, worth a cholesterol check, and removable by TCA touch, excision, or RFA."

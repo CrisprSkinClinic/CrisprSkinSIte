@@ -1,6 +1,6 @@
 ---
 title: "Hair Loss Treatment"
-metaDescription: "Comprehensive evaluation and treatment for hair loss in men in KK Nagar, Chennai. Medical management and hair transplant options from AIIMS-trained dermatologists."
+metaDescription: "Evaluation and treatment for hair loss in men in KK Nagar, Chennai. Medical management and hair transplant options from AIIMS-trained dermatologists."
 heroEyebrow: "Hair Loss Management"
 heroHeadline: "Hair Loss Diagnosis & Treatment"
 heroSubheadline: "A thorough evaluation of why you're losing hair, followed by a treatment plan matched to your stage and cause -- not a one-size-fits-all prescription."

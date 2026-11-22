@@ -31,3 +31,19 @@ As with any cream, correct amount, correct site, and consistency matter. Some ca
 ## What to Do
 
 If you rely on steroid creams, use them often, or worry about long-term use, [a review of your plan](/services/psoriasis) may identify better options. We can discuss what suits your skin and condition.
+
+## Steroid Creams Are Not the Enemy
+
+Fear of steroid creams stops many people from using them correctly. Used in the right strength, for the right length of time and on the right site, they are safe and effective. Problems arise from using strong steroids on thin skin, such as the face, for months without supervision. A non-steroidal cream gives us another way to protect those sensitive areas while still controlling inflammation.
+
+## Choosing Between Options
+
+We consider where the problem is, how long it has lasted, your age, and whether you need a short course or long-term maintenance. A cream that suits a child with eczema on the cheeks may not be the right choice for scalp psoriasis. Some are better for dry, scaly plaques, others for red, itchy patches, so matching the product to the condition matters more than choosing the newest one.
+
+## Practical Tips
+
+Apply the cream to clean, slightly damp skin if advised, and follow it with a plain moisturizer. Stinging or burning in the first few days is common with some creams and often settles, so do not stop at the first sting without asking us. Keep using the cream for as long as prescribed, because stopping early is a common reason for flares coming back.
+
+## Where to Read More
+
+Our guide to [scalp psoriasis](/conditions/scalp-psoriasis) explains treatment for a difficult site, and the page on [eczema](/services/eczema) covers day-to-day care. The article on [stubborn eczema](/blog/newer-treatments-for-stubborn-eczema) explains what comes next if creams are not enough.

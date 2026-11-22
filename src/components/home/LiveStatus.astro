@@ -1,0 +1,69 @@
+---
+// Two small live chips for the hero: the next bookable slot (from the real availability API) and whether the clinic is
+// open right now (from the clinic hours). Both are enhancements: if anything fails the chips simply stay hidden.
+import { siteConfig } from '../../config/site.js';
+---
+<div id="liveStatus" data-hours={siteConfig.contact.workingHours} class="mt-6 flex flex-wrap items-center justify-center gap-2.5 lg:justify-start" aria-live="polite">
+  <a id="liveNext" href="/book/" class="hidden items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/90 px-3.5 py-2 text-[13px] font-semibold text-emerald-900 shadow-sm transition hover:bg-emerald-100">
+    <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60 motion-reduce:animate-none"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span></span>
+    <span>Next available: <strong id="liveNextText" class="font-bold"></strong></span>
+    <span aria-hidden="true">→</span>
+  </a>
+  <span id="liveOpen" class="hidden items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3.5 py-2 text-[13px] font-semibold text-slate-700 shadow-sm">
+    <span id="liveOpenDot" class="h-2 w-2 rounded-full bg-slate-400"></span><span id="liveOpenText"></span>
+  </span>
+</div>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const root = document.getElementById('liveStatus');
+    if (!root) return;
+    const IST = 'Asia/Kolkata';
+    const parts = (d = new Date()) => Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: IST, weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(d).map((p) => [p.type, p.value]));
+    const show = (el) => { el.classList.remove('hidden'); el.classList.add('inline-flex'); };
+
+    // ---- open now, from the schedule string, e.g. "Mo-Sa 16:00-21:00, Su 09:00-13:00,16:00-21:00"
+    try {
+      const days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+      const schedule = {}; // day index -> [[startMin, endMin], ...]
+      for (const [, range, times] of (root.dataset.hours || '').matchAll(/([A-Z][a-z](?:-[A-Z][a-z])?)\s+([0-9:,\-]+)/g)) {
+        const [a, b = a] = range.split('-');
+        const slots = times.split(',').map((t) => t.split('-').map((x) => { const [h, m] = x.split(':').map(Number); return h * 60 + m; }));
+        let i = days.indexOf(a); const end = days.indexOf(b);
+        while (i !== -1 && end !== -1) { (schedule[i] ||= []).push(...slots); if (i === end) break; i = (i + 1) % 7; }
+      }
+      const p = parts();
+      const dayIdx = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(p.weekday);
+      const now = Number(p.hour) * 60 + Number(p.minute);
+      const fmt = (m) => { const h = Math.floor(m / 60); const mm = String(m % 60).padStart(2, '0'); return `${((h + 11) % 12) + 1}${mm === '00' ? '' : ':' + mm} ${h >= 12 ? 'PM' : 'AM'}`; };
+      const today = schedule[dayIdx] || [];
+      const current = today.find(([s, e]) => now >= s && now < e);
+      const next = today.find(([s]) => now < s);
+      const open = document.getElementById('liveOpen');
+      if (current) { document.getElementById('liveOpenDot').className = 'h-2 w-2 rounded-full bg-emerald-500'; document.getElementById('liveOpenText').textContent = `Open now · until ${fmt(current[1])}`; show(open); }
+      else if (next) { document.getElementById('liveOpenText').textContent = `Closed · opens at ${fmt(next[0])}`; show(open); }
+      else { document.getElementById('liveOpenText').textContent = 'Closed for today'; show(open); }
+    } catch { /* leave the chip hidden */ }
+
+    // ---- next bookable slot: first day in the next week with an open slot
+    (async () => {
+      try {
+        const base = new Date();
+        for (let d = 0; d < 7; d++) {
+          const day = new Date(base.getTime() + d * 86400000);
+          const p = parts(day);
+          const iso = `${p.year}-${p.month}-${p.day}`;
+          const res = await fetch(`/.netlify/functions/public-available-slots?date=${iso}&appointmentType=new`);
+          if (!res.ok) return;
+          const data = await res.json();
+          const slot = (data.slots || [])[0];
+          if (!slot) continue;
+          const label = d === 0 ? 'Today' : d === 1 ? 'Tomorrow' : new Intl.DateTimeFormat('en-IN', { timeZone: IST, weekday: 'short', day: 'numeric', month: 'short' }).format(day);
+          document.getElementById('liveNextText').textContent = `${label}, ${String(slot.display).replace(/^0/, '')}`;
+          show(document.getElementById('liveNext'));
+          return;
+        }
+      } catch { /* availability is an enhancement only */ }
+    })();
+  });
+</script>

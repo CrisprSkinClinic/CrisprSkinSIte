@@ -1,6 +1,6 @@
 ---
 title: "Urticaria (Hives) Treatment"
-metaDescription: "Urticaria (hives) diagnosis and treatment in KK Nagar, Chennai. Identifying acute vs. chronic patterns and appropriate management from AIIMS-trained dermatologists."
+metaDescription: "Urticaria (hives) diagnosis and treatment in KK Nagar, Chennai. Acute vs chronic patterns and appropriate management by AIIMS-trained dermatologists."
 heroEyebrow: "Clinical Dermatology"
 heroHeadline: "Urticaria (Hives) Treatment"
 heroSubheadline: "Distinguishing a short-lived reaction from a chronic pattern shapes everything about how urticaria is managed."

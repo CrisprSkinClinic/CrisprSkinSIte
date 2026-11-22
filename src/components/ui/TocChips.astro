@@ -1,0 +1,15 @@
+---
+// "On this page" chips built from the article's level-2 headings.
+const { headings = [] } = Astro.props;
+const items = headings.filter((h) => h.depth === 2).slice(0, 8);
+---
+{items.length > 2 && (
+  <nav aria-label="On this page" class="mb-8">
+    <p class="mb-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">On this page</p>
+    <div class="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
+      {items.map((h) => (
+        <a href={`#${h.slug}`} class="shrink-0 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-800">{h.text}</a>
+      ))}
+    </div>
+  </nav>
+)}

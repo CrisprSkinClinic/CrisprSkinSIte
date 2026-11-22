@@ -1,6 +1,6 @@
 ---
 title: "Female Hair Loss Treatment"
-metaDescription: "Specialized evaluation and treatment for female pattern hair loss in KK Nagar, Chennai. Hormonal, nutritional, and medical causes assessed by AIIMS-trained dermatologists."
+metaDescription: "Female pattern hair loss evaluation and treatment in KK Nagar, Chennai. Hormonal and nutritional causes assessed by AIIMS-trained dermatologists."
 heroEyebrow: "Women's Hair Health"
 heroHeadline: "Female Hair Loss: Diagnosis & Treatment"
 heroSubheadline: "Hair loss in women often has different underlying causes than in men -- a thorough, hormone-aware evaluation is the starting point for effective treatment."

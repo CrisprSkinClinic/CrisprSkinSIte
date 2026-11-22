@@ -1,6 +1,6 @@
 ---
 title: "Moderate-to-Severe Psoriasis"
-metaDescription: "Moderate-to-severe psoriasis -- when topical treatment is not enough and advanced options such as phototherapy, oral medicines, or biologics are considered. KK Nagar, Chennai."
+metaDescription: "Moderate-to-severe psoriasis: when creams are not enough and phototherapy, oral medicines or biologics are considered. KK Nagar, Chennai."
 heroEyebrow: "Skin Condition"
 heroHeadline: "Moderate-to-Severe Psoriasis"
 heroSubheadline: "When psoriasis covers more skin or keeps returning despite creams, a step up in treatment can make a real difference."

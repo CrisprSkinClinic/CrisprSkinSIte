@@ -1,0 +1,197 @@
+---
+// src/components/ListingFilter.astro
+//
+// Search + filter bar for the Services, Conditions, Blog and FAQ listing pages. It is progressive
+// enhancement: every item is in the HTML (so search engines and no-JS visitors see the full list) and the
+// script only hides items that do not match.
+//
+// The page marks up its own content:
+//   [data-filter-root]     wraps the bar's target area (this component renders the bar, the page the list)
+//   [data-filter-item]     one searchable item; data-search = lowercase text, data-cat = category value,
+//                          data-topics = "|"-separated topic values (optional)
+//   [data-filter-section]  a group (e.g. "Hair") that is hidden when none of its items match
+//   data-open-on-match     on <details> items: opened while a search is active
+//
+// Props:
+//   noun         "services" / "conditions" / "articles" / "questions": used in the count and empty state
+//   placeholder  search box placeholder
+//   categories   [{ value, label }] filter chips (an "All" chip is added)
+//   topics       optional [{ value, label }] shown as a "Topic" select
+const { noun, placeholder, categories = [], topics = [], total } = Astro.props;
+---
+
+<div id="listingFilter" data-noun={noun} data-total={total} class="mx-auto max-w-7xl px-4 pt-8 sm:px-6 sm:pt-10" role="search">
+  <!-- One slim bar: search, category and (blog) topic on a single line -->
+  <div class="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white p-1.5 shadow-[0_2px_14px_rgba(15,23,42,0.06)] transition focus-within:border-brand-400 focus-within:shadow-[0_4px_20px_rgba(126,77,139,0.16)]">
+    <div class="relative min-w-0 flex-1">
+      <label for="lfSearch" class="sr-only">Search {noun}</label>
+      <svg class="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="lfSearch" type="search" autocomplete="off" enterkeyhint="search" placeholder={placeholder}
+             class="h-11 w-full min-w-0 rounded-full bg-transparent pl-10 pr-9 text-base text-slate-900 placeholder:text-slate-400 outline-none [&::-webkit-search-cancel-button]:hidden" />
+      <button id="lfClear" type="button" class="absolute right-1.5 top-1/2 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Clear search">
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    {categories.length > 0 && (
+      <>
+        <span class="hidden h-6 w-px bg-slate-200 lg:block" aria-hidden="true"></span>
+        <!-- Wide screens: segmented chips -->
+        <div id="lfChips" class="hidden shrink-0 items-center gap-1 rounded-full bg-slate-100 p-1 lg:flex" role="group" aria-label="Filter by category">
+          <button type="button" data-cat="" aria-pressed="true" class="lf-chip">All</button>
+          {categories.map((c) => (
+            <button type="button" data-cat={c.value} aria-pressed="false" class="lf-chip">{c.label}</button>
+          ))}
+        </div>
+        <!-- Narrower screens: the same filter as a compact select, still on the same line -->
+        <div class="relative shrink-0 lg:hidden">
+          <label for="lfCatSelect" class="sr-only">Category</label>
+          <select id="lfCatSelect" class="lf-select">
+            <option value="">All</option>
+            {categories.map((c) => <option value={c.value}>{c.label}</option>)}
+          </select>
+        </div>
+      </>
+    )}
+
+    {topics.length > 0 && (
+      <div class="relative shrink-0">
+        <label for="lfTopic" class="sr-only">Topic</label>
+        <select id="lfTopic" class="lf-select">
+          <option value="">Topic</option>
+          {topics.map((t) => <option value={t.value}>{t.label}</option>)}
+        </select>
+      </div>
+    )}
+  </div>
+
+  <div class="mt-3 flex min-h-[1.25rem] items-center gap-3 px-2 text-sm text-slate-500">
+    <p id="lfCount" role="status" aria-live="polite"></p>
+    <button id="lfReset" type="button" class="hidden font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Clear filters</button>
+  </div>
+
+  <div id="lfEmpty" class="mt-6 hidden rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center">
+    <p class="text-lg font-semibold text-slate-900">No {noun} match <span id="lfEmptyQuery" class="break-words"></span></p>
+    <p class="mt-2 text-slate-600">Try a different word, or clear the filters to see everything.</p>
+    <div class="mt-5 flex flex-wrap justify-center gap-3">
+      <button id="lfEmptyReset" type="button" class="min-h-[44px] rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-white hover:bg-brand-700">Clear filters</button>
+      <a href="/contact" class="inline-flex min-h-[44px] items-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-800 hover:bg-slate-50">Ask our team</a>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .lf-chip { min-height: 36px; padding: 0 0.95rem; border-radius: 9999px; border: 0; background: transparent; color: rgb(71 85 105); font-size: 0.875rem; font-weight: 600; white-space: nowrap; transition: background-color .15s, color .15s, box-shadow .15s; }
+  .lf-chip:hover { color: rgb(15 23 42); }
+  .lf-chip:focus-visible { outline: 2px solid #7E4D8B; outline-offset: 1px; }
+  .lf-chip[aria-pressed="true"] { background: #7E4D8B; color: #fff; box-shadow: 0 2px 8px rgba(126, 77, 139, .32); }
+  .lf-select { height: 44px; max-width: 8.5rem; appearance: none; -webkit-appearance: none; border: 0; border-radius: 9999px; background-color: rgb(241 245 249); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 11px; padding: 0 1.9rem 0 0.9rem; font-size: 0.875rem; font-weight: 600; color: rgb(30 41 59); text-overflow: ellipsis; outline: none; cursor: pointer; }
+  .lf-select:focus-visible { box-shadow: 0 0 0 2px #7E4D8B; }
+  @media (max-width: 479px) { .lf-select { max-width: 5.6rem; padding: 0 1.5rem 0 0.7rem; font-size: 0.8125rem; background-position: right 8px center; } }
+  @media (prefers-reduced-motion: reduce) { .lf-chip { transition: none; } }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const bar = document.getElementById('listingFilter');
+    if (!bar) return;
+    const items = Array.from(document.querySelectorAll('[data-filter-item]'));
+    const sections = Array.from(document.querySelectorAll('[data-filter-section]'));
+    if (!items.length) return;
+
+    const input = document.getElementById('lfSearch');
+    const clearBtn = document.getElementById('lfClear');
+    const chips = Array.from(bar.querySelectorAll('.lf-chip'));
+    const topicSel = document.getElementById('lfTopic');
+    const catSel = document.getElementById('lfCatSelect');
+    const countEl = document.getElementById('lfCount');
+    const resetBtn = document.getElementById('lfReset');
+    const empty = document.getElementById('lfEmpty');
+    const noun = bar.dataset.noun || 'items';
+    const total = items.length;
+
+    // Lower-case, strip accents and punctuation so "Café", "acne-scars" and "acne scars" all match.
+    const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    const haystacks = items.map((el) => norm(el.dataset.search || el.textContent));
+
+    const state = { q: '', cat: '', topic: '' };
+    let opened = new Set();
+
+    const matches = (i) => {
+      const el = items[i];
+      if (state.cat && el.dataset.cat !== state.cat) return false;
+      if (state.topic && !(el.dataset.topics || '').split('|').includes(state.topic)) return false;
+      if (!state.q) return true;
+      // Every word must appear; a trailing "s" is ignored so "scars" finds "scar" and vice versa.
+      const hay = haystacks[i];
+      return norm(state.q).split(' ').every((w) => hay.includes(w) || (w.length > 3 && w.endsWith('s') && hay.includes(w.slice(0, -1))));
+    };
+
+    function apply({ updateUrl = true } = {}) {
+      let shown = 0;
+      items.forEach((el, i) => {
+        const ok = matches(i);
+        el.classList.toggle('hidden', !ok);
+        if (ok) shown += 1;
+        // FAQ answers: open the matches while searching, then put them back as they were.
+        if (el.tagName === 'DETAILS' && el.hasAttribute('data-open-on-match')) {
+          if (ok && state.q && shown <= 8) { if (!el.open) { el.open = true; opened.add(el); } }
+          else if (opened.has(el)) { el.open = false; opened.delete(el); }
+        }
+      });
+      sections.forEach((sec) => {
+        const any = Array.from(sec.querySelectorAll('[data-filter-item]')).some((el) => !el.classList.contains('hidden'));
+        sec.classList.toggle('hidden', !any);
+      });
+
+      const filtering = Boolean(state.q || state.cat || state.topic);
+      countEl.textContent = filtering ? `Showing ${shown} of ${total} ${noun}` : `${total} ${noun}`;
+      resetBtn.classList.toggle('hidden', !filtering);
+      clearBtn.classList.toggle('hidden', !state.q);
+      clearBtn.classList.toggle('flex', Boolean(state.q));
+      empty.classList.toggle('hidden', shown !== 0);
+      document.getElementById('lfEmptyQuery').textContent = state.q ? `“${state.q}”` : 'these filters';
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.cat === state.cat)));
+      if (catSel) catSel.value = state.cat;
+      if (topicSel) topicSel.value = state.topic;
+
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        ['q', 'cat', 'topic'].forEach((k) => (state[k] ? url.searchParams.set(k, state[k]) : url.searchParams.delete(k)));
+        history.replaceState(history.state, '', url);
+      }
+    }
+
+    let timer = null;
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { state.q = input.value.trim(); apply(); }, 120);
+    });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Escape' && input.value) { e.preventDefault(); resetQuery(); } });
+    const resetQuery = () => { input.value = ''; state.q = ''; apply(); input.focus(); };
+    clearBtn.addEventListener('click', resetQuery);
+    chips.forEach((chip) => chip.addEventListener('click', () => { state.cat = chip.dataset.cat || ''; apply(); }));
+    catSel?.addEventListener('change', () => { state.cat = catSel.value; apply(); });
+    topicSel?.addEventListener('change', () => { state.topic = topicSel.value; apply(); });
+    const resetAll = () => { input.value = ''; Object.assign(state, { q: '', cat: '', topic: '' }); apply(); input.focus(); };
+    resetBtn.addEventListener('click', resetAll);
+    document.getElementById('lfEmptyReset')?.addEventListener('click', resetAll);
+
+    // "/" jumps to the search box (as on most documentation sites) unless the visitor is already typing.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target;
+      if (t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      e.preventDefault();
+      input.focus();
+    });
+
+    // Restore from a shared link such as /faq/?q=acne&cat=skin.
+    const params = new URLSearchParams(window.location.search);
+    state.q = (params.get('q') || '').trim();
+    state.cat = chips.some((c) => c.dataset.cat === params.get('cat')) ? params.get('cat') : '';  // chips and the select share the same values
+    state.topic = topicSel && Array.from(topicSel.options).some((o) => o.value === params.get('topic')) ? params.get('topic') : '';
+    input.value = state.q;
+    apply({ updateUrl: false });
+  });
+</script>
