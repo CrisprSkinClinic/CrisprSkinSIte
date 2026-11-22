@@ -2,7 +2,7 @@
 title: "Newer Non-Steroidal Creams for Psoriasis and Eczema"
 pubDate: 2026-08-31
 description: "Topical treatments beyond steroids have expanded. What they are for and where they fit."
-author: "Dr. Narayanan B"
+author: "Dr. Narayanan A"
 tags: ["Dermatology Updates"]
 service: "psoriasis"
 condition: "plaque-psoriasis"

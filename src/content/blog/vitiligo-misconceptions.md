@@ -2,7 +2,7 @@
 title: "Vitiligo: Separating Fact From Common Misconceptions"
 pubDate: 2026-10-13
 description: "Vitiligo carries a lot of misinformation and stigma. Here's what's actually true, medically, about this autoimmune condition."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan B"
 tags: ["Vitiligo"]
 service: "vitiligo"
 condition: "vitiligo"

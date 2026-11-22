@@ -2,7 +2,7 @@
 title: "Lateral Chemical Matricectomy: How It Stops an Ingrown Toenail Coming Back"
 pubDate: 2026-09-04
 description: "A plain-language explanation of partial nail avulsion with lateral chemical matricectomy, why the chemical step matters, and who it suits."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan B"
 tags: ["Nail Disorders"]
 service: "nail-avulsion-lateral-matricectomy"
 condition: "recurrent-ingrown-toenail"

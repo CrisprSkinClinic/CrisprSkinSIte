@@ -2,7 +2,7 @@
 title: "Patch Testing Explained: Finding What Your Skin Reacts To"
 pubDate: 2026-04-15
 description: "When a rash keeps returning, patch testing can reveal the allergen behind it. Here is how it works."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan A"
 tags: ["Skin Allergy"]
 service: "skin-allergy"
 condition: "contact-dermatitis"

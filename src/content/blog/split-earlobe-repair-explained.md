@@ -2,7 +2,7 @@
 title: "Split Earlobe Repair Explained: Techniques, Healing, and Results"
 pubDate: 2026-08-19
 description: "How a torn or stretched earlobe is repaired, the different techniques, and what to expect from healing."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan B"
 tags: ["Ear Lobe Repair"]
 service: "ear-lobe-repair"
 condition: "split-earlobe"
