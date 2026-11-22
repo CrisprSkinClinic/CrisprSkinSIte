@@ -4,16 +4,17 @@
 // around. Reuses ServiceCard (now plain <img>-based with placeholder
 // fallback, since dermatology service photography doesn't exist yet).
 import ServiceCard from './ServiceCard.astro';
+import { getServiceImage } from '../utils/serviceImages';
 
 const overviewServices = [
-  { image: '/images/services/hair-transplant-fue.jpg', alt: 'Hair transplant procedure', title: 'Hair Transplant (FUE)', description: 'Natural, permanent hair restoration through advanced Follicular Unit Extraction.', link: '/services/hair-transplant-fue' },
-  { image: '/images/services/hair-loss.jpg', alt: 'Hair loss consultation', title: 'Hair Loss Treatment', description: 'Diagnosis and management of hair thinning and hair loss in men and women.', link: '/services/hair-loss' },
-  { image: '/images/services/acne.jpg', alt: 'Acne treatment', title: 'Acne & Acne Scars', description: 'Evidence-based treatment for active acne and post-acne scarring.', link: '/services/acne' },
-  { image: '/images/services/pigmentation.jpg', alt: 'Pigmentation treatment', title: 'Pigmentation & Melasma', description: 'Targeted care for stubborn pigmentation and melasma.', link: '/services/pigmentation' },
-  { image: '/images/services/vitiligo.jpg', alt: 'Vitiligo treatment', title: 'Vitiligo', description: 'Comprehensive, honest management of vitiligo for all skin types.', link: '/services/vitiligo' },
-  { image: '/images/services/psoriasis.jpg', alt: 'Psoriasis and eczema treatment', title: 'Psoriasis & Eczema', description: 'Long-term management of chronic inflammatory skin conditions.', link: '/services/psoriasis' },
-  { image: '/images/services/botox.jpg', alt: 'Cosmetic dermatology', title: 'Botox & Fillers', description: 'Natural-looking anti-ageing treatments from trained dermatologists.', link: '/services/botox' },
-  { image: '/images/services/pediatric-dermatology.jpg', alt: 'Pediatric dermatology', title: 'Pediatric Dermatology', description: "Child-friendly care for eczema, birthmarks, and children's skin conditions.", link: '/services/pediatric-dermatology' },
+  { image: getServiceImage('hair-transplant-fue'), alt: 'Hair transplant procedure', title: 'Hair Transplant (FUE)', description: 'Natural, permanent hair restoration through advanced Follicular Unit Extraction.', link: '/services/hair-transplant-fue' },
+  { image: getServiceImage('hair-loss'), alt: 'Hair loss consultation', title: 'Hair Loss Treatment', description: 'Diagnosis and management of hair thinning and hair loss in men and women.', link: '/services/hair-loss' },
+  { image: getServiceImage('acne'), alt: 'Acne treatment', title: 'Acne & Acne Scars', description: 'Evidence-based treatment for active acne and post-acne scarring.', link: '/services/acne' },
+  { image: getServiceImage('pigmentation'), alt: 'Pigmentation treatment', title: 'Pigmentation & Melasma', description: 'Targeted care for stubborn pigmentation and melasma.', link: '/services/pigmentation' },
+  { image: getServiceImage('vitiligo'), alt: 'Vitiligo treatment', title: 'Vitiligo', description: 'Comprehensive, honest management of vitiligo for all skin types.', link: '/services/vitiligo' },
+  { image: getServiceImage('psoriasis'), alt: 'Psoriasis and eczema treatment', title: 'Psoriasis & Eczema', description: 'Long-term management of chronic inflammatory skin conditions.', link: '/services/psoriasis' },
+  { image: getServiceImage('botox'), alt: 'Cosmetic dermatology', title: 'Botox & Fillers', description: 'Natural-looking anti-ageing treatments from trained dermatologists.', link: '/services/botox' },
+  { image: getServiceImage('pediatric-dermatology'), alt: 'Pediatric dermatology', title: 'Pediatric Dermatology', description: "Child-friendly care for eczema, birthmarks, and children's skin conditions.", link: '/services/pediatric-dermatology' },
 ];
 ---
 

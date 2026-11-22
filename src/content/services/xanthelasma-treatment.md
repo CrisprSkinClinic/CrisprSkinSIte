@@ -4,6 +4,7 @@ metaDescription: "Xanthelasma (yellow cholesterol patches around the eyelids) tr
 heroEyebrow: "Clinical Dermatology & Dermatosurgery"
 heroHeadline: "Xanthelasma Treatment"
 heroSubheadline: "Soft yellow patches on the eyelids are harmless to the eye but worth a cholesterol check. We offer three established methods: TCA touch, excision, and RFA."
+heroImage: "xanthelasma-treatment"
 category: "skin"
 defaultService: "General Consultation"
 

@@ -55,7 +55,7 @@ const servicesByCategory = categoryOrder.map((cat) => ({
             {services.map((service) => (
               <div class="h-full" data-filter-item data-cat={category} data-search={`${service.data.title} ${service.data.heroSubheadline || ''} ${service.data.metaDescription || ''} ${label} ${(service.data.conditionsManaged || []).join(' ')}`.toLowerCase()}>
               <ServiceCard
-                image={getServiceImage(service.data.heroImage) ?? (service.data.heroImage ? `/images/services/${service.data.heroImage}.jpg` : undefined)}
+                image={getServiceImage(service.data.heroImage)}
                 alt={getServiceImageAlt(service.data.heroImage, service.data.title)}
                 title={service.data.title}
                 description={service.data.heroSubheadline || service.data.metaDescription || ''}

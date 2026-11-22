@@ -22,9 +22,6 @@ const data = entry.data;
 
 const optimizedHero = getServiceImage(data.heroImage);
 const heroAlt = getServiceImageAlt(data.heroImage, data.heroHeadline);
-const heroImageSrc = data.heroImage
-  ? `/images/services/${data.heroImage}.jpg`
-  : null;
 
 const conditionEntries = data.conditionsManaged
   ? (await Promise.all(
@@ -59,8 +56,8 @@ const relatedDoctor = data.defaultDoctorId
   : null;
 
 const pageUrl = new URL(`/services/${entry.slug}`, siteConfig.url).toString();
-const heroImageAbs = data.heroImage
-  ? new URL(`/images/services/${data.heroImage}.jpg`, siteConfig.url).toString()
+const heroImageAbs = optimizedHero
+  ? new URL(optimizedHero.src, siteConfig.url).toString()
   : new URL('/images/hero-doctor.jpg', siteConfig.url).toString();
 
 const faqSchema = faqEntries.length > 0 ? {
@@ -177,22 +174,7 @@ const medicalServiceSchema = {
             />
           </div>
         </div>
-      ) : heroImageSrc && (
-        <div class="w-full">
-          <div class="rounded-2xl shadow-xl shadow-slate-900/10 border border-slate-200 bg-white overflow-hidden aspect-[4/3] p-1.5">
-            <img
-              src={heroImageSrc}
-              alt={heroAlt}
-              width="700"
-              height="700"
-              loading="eager"
-              decoding="async"
-              class="w-full h-full object-cover rounded-xl"
-              onerror={`this.onerror=null;this.src='https://placehold.co/700x700/0f172a/ffffff?text=${encodeURIComponent(data.title)}'`}
-            />
-          </div>
-        </div>
-      )}
+      ) : null}
     </div>
   </section>
 

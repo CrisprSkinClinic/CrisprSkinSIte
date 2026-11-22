@@ -4,6 +4,7 @@ metaDescription: "Earlobe repair in KK Nagar, Chennai -- surgical repair of spli
 heroEyebrow: "Minor Dermatosurgery"
 heroHeadline: "Ear Lobe Repair"
 heroSubheadline: "A short procedure under local anaesthetic to repair a split, torn, or stretched earlobe and restore a natural-looking lobe."
+heroImage: "ear-lobe-repair"
 category: "cosmetic"
 defaultService: "General Consultation"
 
