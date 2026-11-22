@@ -38,16 +38,62 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       <section class={`${card} min-w-0`} aria-labelledby="timeTitle">
         <h3 id="timeTitle" class="mb-5 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>1</span>Choose a slot</h3>
 
-        <div class="mb-5">
-          <label for="doctor" class={label}>Doctor</label>
-          <select id="doctor" aria-describedby="err-doctor" class={field}>
-            <option value="" disabled>Select doctor...</option>
-            <option value="any" selected>No preference</option>
-            {siteConfig.doctors.map((doc) => (
-              <option value={doc.dbId}>{doc.name}</option>
-            ))}
-          </select>
-          <p id="err-doctor" class={fieldError} role="alert"></p>
+        <div class="mb-5 grid grid-cols-2 gap-3">
+          <div class="min-w-0">
+            <label for="doctor" class={label}>Doctor</label>
+            <select id="doctor" aria-describedby="err-doctor" class={`${field} !px-2.5 !text-sm sm:!px-3.5 sm:!text-base`}>
+              <option value="" disabled>Select doctor...</option>
+              <option value="any" selected>No preference</option>
+              {siteConfig.doctors.map((doc) => (
+                <option value={doc.dbId}>{doc.name}</option>
+              ))}
+            </select>
+            <p id="err-doctor" class={fieldError} role="alert"></p>
+          </div>
+          <div class="min-w-0">
+            <label for="service" class={label}>Reason for visit</label>
+            <select id="service" aria-describedby="err-service" class={`${field} !px-2.5 !text-sm sm:!px-3.5 sm:!text-base`}>
+              <option value="" disabled>Select...</option>
+              <option value="General Consultation" selected>Consultation</option>
+              <optgroup label="Hair">
+                <option value="Hair Transplant (FUE)">Hair Transplant (FUE)</option>
+                <option value="Hair Loss">Hair Loss</option>
+                <option value="Female Hair Loss">Female Hair Loss</option>
+                <option value="Alopecia Areata">Alopecia Areata</option>
+                <option value="Dandruff">Dandruff</option>
+              </optgroup>
+              <optgroup label="Skin">
+                <option value="Acne">Acne</option>
+                <option value="Acne Scars">Acne Scars</option>
+                <option value="Pigmentation">Pigmentation</option>
+                <option value="Melasma">Melasma</option>
+                <option value="Vitiligo">Vitiligo</option>
+                <option value="Psoriasis">Psoriasis</option>
+                <option value="Eczema">Eczema</option>
+                <option value="Urticaria">Urticaria</option>
+                <option value="Skin Allergy">Skin Allergy</option>
+                <option value="Fungal Infections">Fungal Infections</option>
+                <option value="Warts, Moles & Skin Tags">Warts, Moles & Skin Tags</option>
+                <option value="Nail Disorders">Nail Disorders</option>
+                <option value="Biologics / Advanced Therapy">Biologics / Advanced Therapy</option>
+              </optgroup>
+              <optgroup label="Cosmetic">
+                <option value="Chemical Peels">Chemical Peels</option>
+                <option value="Botox">Botox</option>
+                <option value="Fillers">Fillers</option>
+                <option value="Laser Hair Reduction">Laser Hair Reduction</option>
+                <option value="Anti-ageing">Anti-ageing</option>
+                <option value="Skin Rejuvenation">Skin Rejuvenation</option>
+              </optgroup>
+              <optgroup label="Pediatric">
+                <option value="Pediatric Dermatology">Pediatric Dermatology</option>
+                <option value="Birthmarks">Birthmarks</option>
+                <option value="Atopic Dermatitis">Atopic Dermatitis</option>
+                <option value="Viral Skin Infections">Viral Skin Infections</option>
+              </optgroup>
+            </select>
+            <p id="err-service" class={fieldError} role="alert"></p>
+          </div>
         </div>
 
         <div id="earliestWrap" class="mb-5 hidden flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3.5">
@@ -133,52 +179,6 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
           </div>
           <div id="returningPatientMessage" class="hidden rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900" role="status" aria-live="polite"></div>
 
-          <div class="grid gap-5">
-            <div>
-              <label for="service" class={label}>Reason for visit</label>
-              <select id="service" aria-describedby="err-service" class={field}>
-                <option value="" disabled>Select...</option>
-                <option value="General Consultation" selected>General consultation</option>
-                <optgroup label="Hair">
-                  <option value="Hair Transplant (FUE)">Hair Transplant (FUE)</option>
-                  <option value="Hair Loss">Hair Loss</option>
-                  <option value="Female Hair Loss">Female Hair Loss</option>
-                  <option value="Alopecia Areata">Alopecia Areata</option>
-                  <option value="Dandruff">Dandruff</option>
-                </optgroup>
-                <optgroup label="Skin">
-                  <option value="Acne">Acne</option>
-                  <option value="Acne Scars">Acne Scars</option>
-                  <option value="Pigmentation">Pigmentation</option>
-                  <option value="Melasma">Melasma</option>
-                  <option value="Vitiligo">Vitiligo</option>
-                  <option value="Psoriasis">Psoriasis</option>
-                  <option value="Eczema">Eczema</option>
-                  <option value="Urticaria">Urticaria</option>
-                  <option value="Skin Allergy">Skin Allergy</option>
-                  <option value="Fungal Infections">Fungal Infections</option>
-                  <option value="Warts, Moles & Skin Tags">Warts, Moles & Skin Tags</option>
-                  <option value="Nail Disorders">Nail Disorders</option>
-                  <option value="Biologics / Advanced Therapy">Biologics / Advanced Therapy</option>
-                </optgroup>
-                <optgroup label="Cosmetic">
-                  <option value="Chemical Peels">Chemical Peels</option>
-                  <option value="Botox">Botox</option>
-                  <option value="Fillers">Fillers</option>
-                  <option value="Laser Hair Reduction">Laser Hair Reduction</option>
-                  <option value="Anti-ageing">Anti-ageing</option>
-                  <option value="Skin Rejuvenation">Skin Rejuvenation</option>
-                </optgroup>
-                <optgroup label="Pediatric">
-                  <option value="Pediatric Dermatology">Pediatric Dermatology</option>
-                  <option value="Birthmarks">Birthmarks</option>
-                  <option value="Atopic Dermatitis">Atopic Dermatitis</option>
-                  <option value="Viral Skin Infections">Viral Skin Infections</option>
-                </optgroup>
-              </select>
-              <p id="err-service" class={fieldError} role="alert"></p>
-            </div>
-          </div>
         </div>
 
         <button id="confirmBtn" type="button" class="mt-5 min-h-[52px] w-full rounded-xl bg-brand-900 py-4 font-bold text-white shadow-lg transition hover:bg-brand-800 disabled:opacity-60">
@@ -386,7 +386,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     const dayLabel = (iso) => {
       const today = clinicToday();
       if (iso === today) return 'Today';
-      if (iso === addDays(today, 1)) return 'Tomorrow';
+      if (iso === addDays(today, 1)) return 'Tom';
       return fmtDate(iso, { weekday: 'short' });
     };
 
