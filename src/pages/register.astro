@@ -54,10 +54,10 @@ const referralOptions = [
         <div data-step-panel="1" class="rounded-2xl bg-white border border-[#e5e2e8] shadow-sm p-5 md:p-7 space-y-5">
           <div>
             <span class={label} id="reg-name-label">Name</span>
-            <div class="grid grid-cols-[88px_minmax(0,1fr)_minmax(0,1fr)] gap-2" role="group" aria-labelledby="reg-name-label">
+            <div class="grid grid-cols-[80px_minmax(0,1fr)_minmax(0,1fr)] gap-2" role="group" aria-labelledby="reg-name-label">
               <div>
                 <label for="reg-salutation" class="sr-only">Salutation</label>
-                <select id="reg-salutation" required class={`${field} !px-2.5`}>
+                <select id="reg-salutation" required class={`${field} sal-select`}>
                   <option value="">Title</option>
                   <option value="Mr.">Mr.</option>
                   <option value="Ms.">Ms.</option>
@@ -69,11 +69,11 @@ const referralOptions = [
               </div>
               <div>
                 <label for="reg-first-name" class="sr-only">First name</label>
-                <input type="text" id="reg-first-name" required placeholder="First name" autocomplete="given-name" enterkeyhint="next" class={`${field} !px-3`} />
+                <input type="text" id="reg-first-name" required placeholder="First name" autocomplete="given-name" enterkeyhint="next" class={`${field} name-input`} />
               </div>
               <div>
                 <label for="reg-last-name" class="sr-only">Last name</label>
-                <input type="text" id="reg-last-name" required placeholder="Last name" autocomplete="family-name" enterkeyhint="next" class={`${field} !px-3`} />
+                <input type="text" id="reg-last-name" required placeholder="Last name" autocomplete="family-name" enterkeyhint="next" class={`${field} name-input`} />
               </div>
             </div>
           </div>
@@ -243,6 +243,9 @@ const referralOptions = [
 </MainLayout>
 
 <style is:global>
+  .sal-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; background-size: 10px; padding-left: 10px !important; padding-right: 20px !important; }
+  .name-input { padding-left: 10px !important; padding-right: 10px !important; font-size: 15px; }
+  @media (min-width: 480px) { .name-input { font-size: 1rem; padding-left: 14px !important; padding-right: 14px !important; } }
   /* CRISPR palette (matches the reception app) */
   body { background: #faf9fb; }
   #reg-form .reg-chip[aria-checked="true"] { background: #9b4fa2; border-color: #9b4fa2; color: #fff; box-shadow: 0 4px 12px rgba(155, 79, 162, .3); }

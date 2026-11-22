@@ -140,10 +140,10 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
 
           <div>
             <span class={label} id="nameLabel">Patient name</span>
-            <div class="grid grid-cols-[76px_minmax(0,1fr)_minmax(0,1fr)] gap-2 sm:grid-cols-[88px_minmax(0,1fr)_minmax(0,1fr)] sm:gap-3" role="group" aria-labelledby="nameLabel">
+            <div class="grid grid-cols-[58px_minmax(0,1fr)_minmax(0,1fr)] gap-2 sm:grid-cols-[72px_minmax(0,1fr)_minmax(0,1fr)] sm:gap-3" role="group" aria-labelledby="nameLabel">
               <div>
                 <label for="prefix" class="sr-only">Salutation</label>
-                <select id="prefix" class={`${field} px-2.5`}>
+                <select id="prefix" class={`${field} sal-select`}>
                   <option value="Mr.">Mr.</option>
                   <option value="Ms.">Ms.</option>
                   <option value="Mrs.">Mrs.</option>
@@ -152,11 +152,11 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
               </div>
               <div>
                 <label for="firstName" class="sr-only">First name</label>
-                <input type="text" id="firstName" placeholder="First name" autocomplete="given-name" required aria-describedby="err-firstName" class={`${field} px-3`} />
+                <input type="text" id="firstName" placeholder="First name" autocomplete="given-name" required aria-describedby="err-firstName" class={`${field} name-input`} />
               </div>
               <div>
                 <label for="lastName" class="sr-only">Last name</label>
-                <input type="text" id="lastName" placeholder="Last name" autocomplete="family-name" required class={`${field} px-3`} />
+                <input type="text" id="lastName" placeholder="Last name" autocomplete="family-name" required class={`${field} name-input`} />
               </div>
             </div>
             <p id="err-firstName" class={fieldError} role="alert"></p>
@@ -276,6 +276,9 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
 </div>
 
 <style is:global>
+  .sal-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; background-size: 10px; padding-left: 10px !important; padding-right: 20px !important; }
+  .name-input { padding-left: 10px !important; padding-right: 10px !important; font-size: 15px; }
+  @media (min-width: 480px) { .name-input { font-size: 1rem; padding-left: 14px !important; padding-right: 14px !important; } }
   #bookingCalendarRoot .bk-chip[aria-checked="true"] { background: #7E4D8B; border-color: #7E4D8B; color: #fff; box-shadow: 0 4px 12px rgba(126, 77, 139, .3); }
   #bookingCalendarRoot .bk-chip[aria-checked="true"]:hover { background: #6a3f76; border-color: #6a3f76; }
   #bookingCalendarRoot .bk-chip[aria-checked="true"]::before { content: ""; width: .9rem; height: .9rem; flex: none; background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E"); }
