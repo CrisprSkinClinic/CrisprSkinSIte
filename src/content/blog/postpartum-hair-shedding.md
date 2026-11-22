@@ -41,3 +41,7 @@ If you notice a widening parting, thinning at the crown or hairline recession th
 ## Looking After Yourself
 
 New parenthood is demanding, and poor sleep and stress can add to shedding. It is fine to ask for support, and to ask us for reassurance. For more on this pattern, see [postpartum hair loss](/conditions/postpartum-hair-loss).
+
+## More Detail
+
+For a month-by-month timeline and what to eat, see [hair fall after pregnancy](/blog/hair-fall-after-pregnancy-timeline-nutrition-and-when-to-treat).

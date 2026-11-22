@@ -1,5 +1,5 @@
 ---
-title: "PCOS: Skin and Hair Signs"
+title: "PCOS Skin and Hair Signs"
 metaDescription: "How polycystic ovary syndrome shows on the skin and scalp: acne, excess hair, hair thinning and dark velvety patches. KK Nagar, Chennai."
 heroEyebrow: "Skin Condition"
 heroHeadline: "PCOS: Skin and Hair Signs"
@@ -52,3 +52,30 @@ ctaTitle: "Book a Consultation"
 PCOS is a common hormonal and metabolic condition. Doctors diagnose it when at least two of three features are present: irregular ovulation (shown by irregular periods), signs or blood tests of raised androgens, and polycystic-appearing ovaries on ultrasound. The skin often tells the story before anything else does.
 
 Our [PCOS skin and hair checklist](/blog/pcos-skin-and-hair-signs-checklist) explains how to read these signs. Female hair thinning is covered under [female pattern hair loss](/conditions/female-pattern-hair-loss). The [hormonal skin and hair service](/services/hormonal-skin-conditions) brings it together.
+
+## Beyond the Skin
+
+PCOS is a whole-body condition. Women with PCOS are more likely to have insulin resistance, weight gain, high cholesterol, fatty liver, sleep apnoea, anxiety and depression, and irregular periods leading to fertility challenges. Regular health checks matter as much as treating skin and hair signs.
+
+## How Diagnosis Works
+
+Your doctor reviews your menstrual history, examines for signs of androgen excess, and checks hormone levels, blood sugar and lipids. A pelvic ultrasound may be suggested. Other conditions with similar features, such as thyroid disease, high prolactin and non-classical congenital adrenal hyperplasia, are excluded. In teenagers, diagnosis is cautious.
+
+## Treating Each Sign
+
+- **Acne:** topical treatment, hormonal medicines where suitable, and sometimes isotretinoin. See [hormonal acne](/conditions/hormonal-acne).
+- **Excess hair:** medicines for androgen effect and laser hair reduction. See [hirsutism](/conditions/hirsutism).
+- **Hair thinning:** minoxidil, anti-androgens in selected women, and treating deficiencies. See [female pattern hair loss](/conditions/female-pattern-hair-loss).
+- **Dark neck and folds:** see [acanthosis nigricans](/conditions/acanthosis-nigricans).
+
+## Lifestyle at the Centre
+
+A modest weight loss improves ovulation, androgen levels and insulin sensitivity. Activity, sleep and a balanced diet matter. Programmes that include group support and gradual goals work better than crash diets.
+
+## Planning Pregnancy
+
+Many women with PCOS conceive, naturally or with help. Some skin and hair medicines are unsafe in pregnancy, so tell your doctors about your plans. Your gynaecologist will guide fertility treatment, and we will adjust skin and hair treatment accordingly.
+
+## Long-Term Follow-Up
+
+Annual checks of blood pressure, weight, glucose and lipids are advised. See our [PCOS skin and hair checklist](/blog/pcos-skin-and-hair-signs-checklist).

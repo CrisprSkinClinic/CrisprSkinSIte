@@ -1,5 +1,5 @@
 ---
-title: "Why Tinea Treatment Fails, and the Compliance That Makes It Work"
+title: "Why Tinea Treatment Fails: Compliance That Works"
 pubDate: 2026-11-02
 description: "The commonest reasons ringworm does not clear or keeps returning, and the habits that make treatment succeed."
 author: "Dr. Narayanan B"
@@ -32,3 +32,50 @@ Tinea, or ringworm, is one of the most common skin infections in India. It is al
 ## Why Follow-Up Matters
 
 A review confirms the infection has cleared, and allows us to change treatment if it has not. See [fungal infections](/services/fungal-infections) and [tinea infections](/conditions/tinea-infections).
+
+## The Indian Context
+
+In recent years, dermatologists across India have seen a sharp rise in widespread, stubborn and recurrent ringworm. Contributing factors include humid weather, tight and synthetic clothing, shared items in households, and above all the common use of over-the-counter creams that contain steroids with antifungal and antibacterial agents. Some strains also respond less well to the usual medicines, so a longer course or a change of medicine may be needed.
+
+## A Typical Treatment Plan
+
+Plans vary, but commonly include:
+
+- An antifungal tablet for several weeks, chosen by the doctor, often alongside an antifungal cream.
+- A medicated soap or wash and, where needed, an anti-itch measure for a short time.
+- Instructions for clothes, towels and hygiene.
+- A review visit at two to four weeks.
+
+The exact medicine, dose and duration depend on the site, how widespread the infection is, your health, other medicines, and whether you have had treatment before.
+
+## Common Compliance Gaps
+
+**"I used the cream only at night."** Cream needs to be applied as prescribed, usually once or twice daily.
+
+**"I stopped when it stopped itching."** See [how long to continue](/blog/tinea-how-long-to-continue-treatment).
+
+**"I switched creams every week."** Rotation resets progress and encourages irritation.
+
+**"I washed clothes normally."** Spores survive normal washing. Hot water and ironing or sun-drying help.
+
+**"I did not treat my feet or nails."** Foot infection reinfects the groin and body.
+
+**"My family has similar rashes, but I did not tell the doctor."** Household spread keeps the cycle going.
+
+## What You Can Do to Make It Easier
+
+- Set alarms for tablets, and keep a tick chart.
+- Keep a spare tube so you do not run out.
+- Take photos weekly to see real progress.
+- Write down questions for your review visit.
+- Ask whether you should avoid any foods, alcohol or medicines while on tablets.
+
+## Safety Monitoring
+
+Antifungal tablets are well tolerated by most, but can affect the liver and interact with other medicines such as some cholesterol, heart and epilepsy medicines. Tell your doctor about everything you take, and about liver disease or heavy alcohol use. Blood tests may be advised for longer courses.
+
+## When to Return Sooner
+
+Return if the rash spreads, new areas appear, you develop severe itching, burning or swelling, or you have yellow crusting. Do not wait for the scheduled review.
+
+See [fungal infections](/services/fungal-infections) and [tinea infections](/conditions/tinea-infections).

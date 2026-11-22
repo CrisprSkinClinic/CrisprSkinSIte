@@ -1,5 +1,5 @@
 ---
-title: "Winter Skin Care"
+title: "Winter Dry Skin Treatment in Chennai"
 metaDescription: "Dry, itchy, cracked skin and winter flares of eczema, psoriasis and scalp problems, assessed by dermatologists in KK Nagar, Chennai."
 heroEyebrow: "Seasonal Skin Care"
 heroHeadline: "Winter Skin Care"
@@ -61,3 +61,39 @@ Young skin loses water faster and flares easily. See our guide to [baby and chil
 ## When to Book a Visit
 
 Book if itching disturbs sleep, skin is cracking or oozing, a rash spreads, or a moisturiser routine has not helped within two weeks.
+
+## Winter Skin Problems We See Most
+
+**Generalised dryness and itch (xerosis):** see [winter dry skin](/conditions/winter-xerosis).
+
+**Eczema flares:** see [why eczema flares in winter](/blog/eczema-flares-in-winter).
+
+**Psoriasis:** see [psoriasis in winter](/blog/psoriasis-in-winter-why-flares).
+
+**Cracked heels, hands and lips:** see [cracked heels and chapped lips](/blog/cracked-heels-and-chapped-lips-in-winter).
+
+**Scalp flaking and hair shedding:** see [winter hair fall and dry scalp](/blog/winter-hair-fall-and-dry-scalp).
+
+**Children's skin:** see [baby and child skin in winter](/blog/baby-and-child-skin-in-winter).
+
+**Sun protection:** see [sunscreen in winter](/blog/sunscreen-in-winter-still-needed).
+
+## What Happens at Your Visit
+
+We ask about your skin, bathing habits, products, work and home environment, travel, medicines and any previous skin conditions. We examine the skin, scalp, hands and feet, and, when needed, take a scraping to rule out fungus, or advise tests for thyroid or iron problems. You leave with a plan in plain language, including which products to use, how often and how much, and when to return.
+
+## Who Benefits Most From a Visit
+
+- People with eczema, psoriasis or other long-term skin conditions.
+- Older adults with itchy, dry skin.
+- Parents of babies and children with recurring dryness or rashes.
+- People with diabetes, thyroid disease or poor circulation.
+- Anyone whose skin has not improved with a basic routine.
+
+## Frequently Asked Questions
+
+Our answers to common questions are listed below. If yours is not there, ask us at your visit or by WhatsApp.
+
+## Our Approach
+
+We keep routines simple and affordable, choose products on evidence, not marketing, and explain why each step matters, so you can keep it up. Seasonal care is best planned before the dry months start, and we are happy to see you early.

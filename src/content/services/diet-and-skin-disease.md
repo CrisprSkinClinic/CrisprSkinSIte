@@ -75,3 +75,33 @@ Read [diet and skin: what the evidence actually shows](/blog/diet-and-skin-what-
 ## A Measured Approach
 
 We recommend changes that research supports, test before restricting, and keep diets balanced. If you suspect a food, keep a short diary and bring it to your visit.
+
+## How We Approach Diet in Clinic
+
+We do not hand out one-size-fits-all diet sheets. Instead, we ask what you eat, what you have already cut out, and why. We separate three situations: a true food allergy, which needs proper testing and sometimes avoidance; a food that seems to trigger your skin, which can be tested with a short, structured trial; and a belief that has no evidence, in which case we explain and remove unnecessary restrictions.
+
+## Tests We Use, and Those We Avoid
+
+We use allergy tests and supervised challenges when history suggests allergy. We check blood tests for iron, vitamin D, B12, thyroid and glucose when they relate to your problem. We do not recommend food intolerance panels based on IgG antibodies, since they are not validated and often lead to needless restrictions.
+
+## Special Groups
+
+**Children:** growth and nutrition come first. Do not restrict foods without advice. See [food allergy and eczema](/blog/food-allergy-and-eczema-when-to-test-and-when-not-to).
+
+**Vegetarians and vegans:** watch iron, B12, protein and vitamin D, which affect hair and skin.
+
+**People on isotretinoin or methotrexate:** diet and alcohol advice is specific. Ask us.
+
+**People with PCOS or insulin resistance:** diet is a core part of treatment. See [acanthosis nigricans](/conditions/acanthosis-nigricans) and [PCOS and your skin](/blog/pcos-skin-and-hair-signs-checklist).
+
+## Common Beliefs, Checked
+
+For a plain look at what the research says about acne, eczema, psoriasis, vitiligo, hives, hair and supplements, see [diet and skin: what the evidence actually shows](/blog/diet-and-skin-what-evidence-actually-shows).
+
+## Working With a Dietitian
+
+For weight management, deficiencies or complex needs, we may suggest a dietitian. Together, we aim for realistic changes you can keep.
+
+## Our Principle
+
+Do no harm. We would rather you eat a normal, balanced diet and treat your skin with medicines that work than follow a strict plan that is hard to keep and has little evidence.

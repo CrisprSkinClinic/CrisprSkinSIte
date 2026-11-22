@@ -38,3 +38,5 @@ ctaTitle: "Book a Consultation"
 Postpartum hair loss is a specific and very common form of [telogen effluvium](/conditions/telogen-effluvium), triggered by the sharp drop in hormone levels after childbirth. During pregnancy, elevated hormone levels keep a larger proportion of hair in its growth phase, which is why hair often feels thicker during pregnancy; after delivery, this hair shifts into its resting phase and sheds over the following months, which can feel alarming even though it's a [normal, expected process](/blog/postpartum-hair-shedding).
 
 Most postpartum shedding peaks around three to four months after delivery and improves gradually over the following months, generally normalizing within a year. [An evaluation](/services/female-hair-loss) can help confirm this is the expected pattern and check for any additional contributing factors, like iron deficiency, that are common in the postpartum period and can be addressed alongside reassurance.
+
+For a month-by-month timeline, what to eat and when to test, read [hair fall after pregnancy](/blog/hair-fall-after-pregnancy-timeline-nutrition-and-when-to-treat).

@@ -61,3 +61,7 @@ For acne that is cystic, deeply inflamed, or scarring rapidly, in-clinic procedu
 ## Setting Realistic Expectations
 
 Acne treatment takes time -- most regimens need six to eight weeks of consistent use before real improvement is visible, and we set that expectation clearly upfront so you don't abandon an effective treatment too early. We're also direct about the connection between untreated or picked-at acne and scarring: addressing active acne promptly is the best way to reduce the risk of scarring that's considerably more difficult to treat afterward.
+
+## Hormonal Acne and Diet
+
+Acne along the jawline, especially with irregular periods or extra hair, may be hormonal. See our [hormonal skin and hair service](/services/hormonal-skin-conditions) and [hormonal acne medicines explained](/blog/hormonal-acne-medicines-explained). For the food link, read [food and acne: what the evidence says](/blog/food-and-acne-what-the-evidence-says).

@@ -93,3 +93,7 @@ We are candid about each option's benefits, limits, and time frame, so you can d
 ## Setting Realistic Expectations
 
 Response to treatment varies meaningfully by body area (the face generally responds best, hands and feet the least reliably), by how long a patch has been present, and by how active the disease currently is. We discuss this honestly and specifically for your case at your evaluation, rather than offering a generic timeline, so you can make an informed decision about which treatments to pursue.
+
+## Diet Myths
+
+There is no good evidence that milk, fish or citrus affect vitiligo. See [vitiligo and diet](/blog/vitiligo-diet-myths-milk-fish-citrus) and [vaccines and vitiligo](/blog/vaccines-and-psoriasis-vitiligo-alopecia-flares-myths).

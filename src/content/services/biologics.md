@@ -63,3 +63,7 @@ We review your diagnosis and what has been tried so far, because the first step 
 ## A Measured Approach
 
 These treatments are powerful tools used within a longer plan. Our aim is the simplest treatment that keeps you well, with honest discussion of benefits, risks, cost, and alternatives, so that the plan is one you can sustain.
+
+## Vaccines Before Treatment
+
+Vaccines work best, and live vaccines are only safe, when given before you start. See our [vaccination service](/services/vaccination) and the [pre-treatment vaccine checklist](/blog/vaccines-before-immunosuppressants-biologics-checklist).

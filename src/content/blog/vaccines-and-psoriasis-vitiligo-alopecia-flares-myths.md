@@ -28,3 +28,38 @@ Occasionally someone notices a flare after a vaccine. A coincidence, or the infe
 ## What to Do
 
 Keep vaccinations up to date, tell the vaccinator your diagnosis and medicines, and book a review before starting new immune-lowering treatment. See our [vaccination service](/services/vaccination).
+
+## What We Know About Each Condition
+
+**Psoriasis.** Studies of influenza, pneumococcal and other vaccines in people with psoriasis show they are safe and effective. Infections, including strep throat, are better-known triggers than vaccines. Rare reports of flares after vaccination exist, but they are uncommon and generally mild.
+
+**Vitiligo.** Vitiligo is not known to be triggered by routine vaccines. It is more often linked with skin injury, sunburn, stress, and thyroid autoimmunity. Patients are encouraged to have vaccines as usual.
+
+**Alopecia areata.** There is no clear evidence that vaccines cause or worsen it. Illnesses and stress are more commonly reported as triggers.
+
+## Why Some Patients Notice a Flare
+
+Several things coincide: a vaccine day may be stressful, a fever, even a mild one, can aggravate skin disease, and skin diseases naturally wax and wane. People notice what came just before. When a flare follows a vaccine, it is rarely possible to prove cause, and almost never a reason to avoid the vaccines your health needs.
+
+## Vaccines and Your Treatment
+
+**On topical treatment or phototherapy:** no change to vaccine advice.
+
+**On methotrexate:** non-live vaccines are fine. Response may be reduced, and sometimes the timing is adjusted.
+
+**On biologics or JAK inhibitors:** avoid live vaccines, and ideally complete non-live vaccines beforehand. See our [pre-treatment vaccine checklist](/blog/vaccines-before-immunosuppressants-biologics-checklist).
+
+**On steroid tablets:** the dose and duration decide whether live vaccines are suitable.
+
+## Recommended Vaccines in Autoimmune Skin Disease
+
+People with psoriasis, particularly those with joint involvement or on immune-lowering medicines, should discuss influenza, pneumococcal, shingles, hepatitis B, HPV and COVID-19 vaccines. Staying up to date reduces infections, which are themselves a trigger for flares.
+
+## Practical Advice
+
+- Tell your vaccinator your diagnosis and medicines.
+- Avoid vaccination during a very active flare with fever, and reschedule if needed.
+- Photograph any new patches and note dates, so patterns become clear.
+- If a flare follows a vaccine, tell your dermatologist. Most can be managed without stopping vaccination.
+
+See our [vaccination service](/services/vaccination), [psoriasis service](/services/psoriasis) and guide to [vitiligo misconceptions](/blog/vitiligo-misconceptions).

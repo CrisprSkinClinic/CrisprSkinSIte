@@ -1,5 +1,5 @@
 ---
-title: "Choosing a Hair Transplant Clinic: What to Check Beyond the Price"
+title: "Choosing a Hair Transplant Clinic: What to Check"
 pubDate: 2026-05-13
 description: "Low-cost offers and package deals can hide important gaps. Questions that help you compare safely."
 author: "Dr. Karthik L"

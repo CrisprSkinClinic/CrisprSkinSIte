@@ -61,3 +61,27 @@ Patches that appear suddenly, spread quickly, involve the lips, palms or mouth, 
 ## Related
 
 AN often coexists with [PCOS](/conditions/pcos-skin-and-hair-signs) and with [hormonal acne](/conditions/hormonal-acne). See our [hormonal skin and hair service](/services/hormonal-skin-conditions).
+
+## Grading and Sites
+
+Doctors may grade AN by the extent of the neck involvement and number of sites. Mild disease is a slight darkening at the back of the neck. Moderate disease involves the neck sides and armpits. Severe disease involves many areas, with markedly thick, rough skin. Severity often tracks with the degree of insulin resistance.
+
+## Symptoms Beyond the Skin
+
+Many people with AN have no other symptoms. Some notice increased thirst, tiredness, frequent urination, or increased hunger, which may signal diabetes. Women may have irregular periods, acne and extra hair, pointing to PCOS.
+
+## Why Early Detection Matters
+
+AN may be the first visible sign of prediabetes. Detecting it early gives you years to change course through diet, exercise and weight management, preventing or delaying type 2 diabetes. For young patients, it is an opportunity to intervene before complications develop.
+
+## How We Treat
+
+We combine three approaches: improve the underlying cause with lifestyle and, where needed, medicines through your physician; treat the skin with softening and lightening creams; and use procedures such as peels or laser in selected patients. Results depend on how well the cause is controlled.
+
+## Who Should Be Checked
+
+Anyone with new dark, velvety patches should have blood sugar tested. This is especially important in people with excess weight, a family history of diabetes, PCOS, children entering puberty, and people of South Asian origin, who develop insulin resistance at lower body weights.
+
+## Related Reading
+
+See [what dark, velvety patches mean](/blog/acanthosis-nigricans-what-dark-velvety-patches-mean), [tests and insulin resistance](/blog/acanthosis-nigricans-insulin-resistance-and-tests) and [treatment of a darkened neck](/blog/acanthosis-nigricans-treatment-and-neck-darkening).

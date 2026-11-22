@@ -60,3 +60,7 @@ Treatment response is reviewed at follow-up, and the regimen adjusted if progres
 ## Postpartum and Stress-Related Shedding
 
 A significant amount of hair shedding after childbirth (postpartum telogen effluvium) or following major physical or emotional stress is a normal, self-limiting process that typically improves within several months without specific treatment, though it can feel alarming while it's happening. Part of the evaluation is distinguishing this temporary, self-resolving shedding from a progressive pattern that benefits from active treatment -- so you're neither left untreated when you need care, nor treated unnecessarily for something that will resolve on its own.
+
+## After Pregnancy or Illness
+
+Shedding after delivery or a fever is common and temporary. See [hair fall after pregnancy](/blog/hair-fall-after-pregnancy-timeline-nutrition-and-when-to-treat) and [hair fall after fever](/blog/hair-fall-after-fever-dengue-typhoid-covid-recovery). For hormonal causes such as PCOS, see our [hormonal skin and hair service](/services/hormonal-skin-conditions) and [medical treatment for female pattern hair loss](/blog/medical-treatment-for-female-pattern-hair-loss).

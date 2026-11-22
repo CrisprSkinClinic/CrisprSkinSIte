@@ -1,5 +1,5 @@
 ---
-title: "A Vitiligo Treatment Roadmap: What to Expect From First Visit to Long-Term Care"
+title: "Vitiligo Treatment Roadmap: What to Expect"
 pubDate: 2026-11-20
 description: "A step-by-step view of how vitiligo is evaluated and treated, and how the options fit together over time."
 author: "Dr. Narayanan B"

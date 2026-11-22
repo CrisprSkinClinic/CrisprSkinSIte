@@ -1,5 +1,5 @@
 ---
-title: "Laser Hair Reduction: Why It's Called 'Reduction,' Not 'Removal'"
+title: "Laser Hair Reduction: Why It Is Not 'Removal'"
 pubDate: 2026-03-24
 description: "This one word choice matters -- here's what laser hair reduction can realistically achieve, and why a full course of sessions is essential."
 author: "Dr. Karthik L"
