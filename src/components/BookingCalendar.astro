@@ -416,10 +416,13 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       const show = formShown && Boolean(selectedTime) && !confirmVisible;
       stickyBar.classList.toggle('hidden', !show);
       // Sit above the site's own bottom action bar (Call / WhatsApp / Book) when it is showing.
+      // The site's floating action bar slides away on scroll: sit just above it while it shows, at the edge when it does not.
       const siteBar = $('siteBottomBar');
-      stickyBar.style.bottom = siteBar && siteBar.offsetHeight ? `${siteBar.offsetHeight}px` : '0px';
+      const gap = siteBar && siteBar.offsetHeight ? Math.max(0, window.innerHeight - siteBar.getBoundingClientRect().top) : 0;
+      stickyBar.style.bottom = `${Math.round(gap)}px`;
       if (show) $('stickySummary').textContent = `${fmtDate(dateInput.value, { weekday: 'short', day: 'numeric', month: 'short' })} · ${selectedTime}`;
     }
+    document.addEventListener('sitebar:change', updateStickyBar);
     if ('IntersectionObserver' in window && confirmBtn) {
       new IntersectionObserver((entries) => { confirmVisible = entries[0].isIntersecting; updateStickyBar(); }, { threshold: 0.6 }).observe(confirmBtn);
     }

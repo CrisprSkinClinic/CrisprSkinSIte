@@ -1,15 +1,18 @@
 ---
 import { siteConfig } from '../config/site.js';
 ---
-<header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/80 transition-all duration-300">
-  <div class="max-w-7xl mx-auto px-5 sm:px-6 h-[74px] lg:h-20 flex justify-between items-center">
+<header id="siteHeader" class="site-header pointer-events-none sticky top-0 z-40 w-full px-3 pt-2 sm:px-4 lg:px-6 lg:pt-3">
+  <!-- Floating, detached glass bar (frosted translucent surface with a soft shadow). On phones it slides away while
+       scrolling down and returns on scroll up. -->
+  <div class="glass pointer-events-auto mx-auto max-w-7xl rounded-[28px] lg:rounded-full">
+  <div class="flex h-16 items-center justify-between px-4 sm:px-5 lg:h-[76px] lg:px-8">
 
     <a href="/" class="hidden lg:flex items-center" aria-label={`${siteConfig.name} home`}>
-      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[180px] object-contain" />
+      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[150px] object-contain" />
     </a>
 
     <a href="/" class="flex min-w-0 items-center lg:hidden" aria-label={`${siteConfig.name} home`}>
-      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[160px] object-contain object-left" />
+      <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[124px] object-contain object-left" />
     </a>
 
     <nav class="hidden lg:flex space-x-7 items-center px-2 py-3">
@@ -161,7 +164,7 @@ import { siteConfig } from '../config/site.js';
   </div>
 
   <!-- Mobile menu panel -->
-  <div id="mobileMenuPanel" class="hidden lg:hidden mx-3 mb-3 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-slate-200/80 bg-white/90 shadow-xl shadow-slate-900/10 backdrop-blur-xl">
+  <div id="mobileMenuPanel" class="hidden lg:hidden mx-1.5 mb-1.5 max-h-[calc(100dvh-6.5rem)] overflow-y-auto overscroll-contain rounded-[22px] border-t border-white/60">
     <nav class="px-5 py-5 flex flex-col gap-1">
       <a href="/" class="py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Home</a>
 
@@ -290,7 +293,74 @@ import { siteConfig } from '../config/site.js';
       <a href="/book" data-track="booking-click" class="mt-3 bg-gold-500 text-brand-900 text-sm font-bold px-6 py-3 rounded-full text-center shadow-md hover:bg-gold-600 transition-colors">Book Now</a>
     </nav>
   </div>
+  </div>
 </header>
+
+<style is:global>
+  /* Frosted-glass surface shared by the floating header and the mobile action bar */
+  .glass {
+    background: rgba(255, 255, 255, 0.62);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 10px 36px rgba(31, 20, 48, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass { background: rgba(255, 255, 255, 0.97); }
+  }
+  @media (max-width: 1023px) {
+    .site-header, #siteBottomBar { transition: transform .32s cubic-bezier(.22, .8, .24, 1); will-change: transform; }
+    .site-header[data-hidden="true"] { transform: translateY(-115%); }
+    #siteBottomBar[data-hidden="true"] { transform: translateY(140%); }
+  }
+  @media (prefers-reduced-motion: reduce) { .site-header, #siteBottomBar { transition: none !important; } }
+</style>
+
+<script>
+  // Mobile: hide the header and the bottom action bar while scrolling down, bring them back on any scroll up,
+  // at the very top, at the very bottom, or after the page has been still for a moment. Bound once per page
+  // load of the app (the layout uses view transitions), looking the elements up fresh each time.
+  if (!(window as any).__siteChromeBound) {
+    (window as any).__siteChromeBound = true;
+    let lastY = window.scrollY;
+    let ticking = false;
+    let idleTimer: number | undefined;
+    const phone = () => window.matchMedia('(max-width: 1023px)').matches;
+    const set = (el: HTMLElement | null, hidden: boolean) => { if (el) el.dataset.hidden = String(hidden); };
+    const notify = () => window.setTimeout(() => document.dispatchEvent(new CustomEvent('sitebar:change')), 340);
+
+    const update = () => {
+      ticking = false;
+      const header = document.getElementById('siteHeader');
+      const bar = document.getElementById('siteBottomBar');
+      const y = window.scrollY;
+      const dy = y - lastY;
+      lastY = y;
+      if (!phone()) { set(header, false); set(bar, false); return; }
+      const menuOpen = !document.getElementById('mobileMenuPanel')?.classList.contains('hidden');
+      const atTop = y <= 8;
+      const atBottom = window.innerHeight + y >= document.documentElement.scrollHeight - 8;
+      if (atTop || menuOpen) { set(header, false); set(bar, false); }
+      else if (Math.abs(dy) > 5) {
+        const down = dy > 0;
+        set(header, down && y > 90);
+        set(bar, down && y > 90 && !atBottom);
+      }
+      if (atBottom) set(bar, false);
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => { set(bar, false); notify(); }, 1500);
+      notify();
+    };
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    // Keyboard users: tabbing into the header or the bar must reveal it.
+    document.addEventListener('focusin', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('#siteHeader')) set(document.getElementById('siteHeader'), false);
+      if (t.closest('#siteBottomBar')) set(document.getElementById('siteBottomBar'), false);
+    });
+    document.addEventListener('astro:page-load', () => { lastY = window.scrollY; set(document.getElementById('siteHeader'), false); set(document.getElementById('siteBottomBar'), false); });
+  }
+</script>
 
 <script>
   document.addEventListener('astro:page-load', () => {
