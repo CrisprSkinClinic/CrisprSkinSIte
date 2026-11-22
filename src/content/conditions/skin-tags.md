@@ -29,6 +29,7 @@ treatmentOverview:
     description: "In-clinic removal of larger or stubborn tags under local anaesthetic where needed."
 
 relatedConditions:
+  - "xanthelasma"
   - "viral-warts"
   - "melanocytic-naevi-moles"
 faqIds:

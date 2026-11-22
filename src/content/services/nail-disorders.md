@@ -22,6 +22,7 @@ diagnostics:
 conditionsManaged:
   - "onychomycosis"
   - "ingrown-toenail"
+  - "recurrent-ingrown-toenail"
   - "nail-psoriasis"
   - "paronychia"
 
