@@ -160,7 +160,7 @@ const conditionSchema = {
       {siteConfig.doctors.length > 0 && (
         <section>
           <h2 class="mb-6 text-2xl text-brand-900 md:text-3xl">Our Specialists</h2>
-          <div id="conditionDoctorsGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div id="conditionDoctorsGrid" data-shuffle class="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {siteConfig.doctors.map((doc) => (
               <a href={`/our-doctors/${doc.slug}`} class="ui-card group flex flex-col items-center gap-3 p-5 text-center">
                 <img
@@ -188,19 +188,6 @@ const conditionSchema = {
       <div class="sticky top-28"><SideBookCard /></div>
     </aside>
   </div>
-
-  <script>
-    document.addEventListener('astro:page-load', () => {
-      const grid = document.getElementById('conditionDoctorsGrid');
-      if (!grid) return;
-      const cards = Array.from(grid.children);
-      for (let i = cards.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [cards[i], cards[j]] = [cards[j], cards[i]];
-      }
-      cards.forEach((card) => grid.appendChild(card));
-    });
-  </script>
 
   <ClinicGallery />
 
