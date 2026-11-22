@@ -179,7 +179,13 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
               var j = Math.floor(Math.random() * (i + 1));
               var tmp = kids[i]; kids[i] = kids[j]; kids[j] = tmp;
             }
+            // Scroll-snap carousels (the phone layout) remember which card was snapped and re-snap to it after
+            // the cards move, which carried the carousel to whichever doctor used to be first. Turn snapping
+            // off while reordering, start at the left edge, then turn it back on.
+            el.style.scrollSnapType = 'none';
             kids.forEach(function (k) { el.appendChild(k); });
+            el.scrollLeft = 0;
+            requestAnimationFrame(function () { el.scrollLeft = 0; el.style.scrollSnapType = ''; });
             el.setAttribute('data-shuffled', '');
           });
         }
