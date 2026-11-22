@@ -455,6 +455,21 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       tick?.classList.toggle('hidden', !validPhone());
       tick?.classList.toggle('inline-flex', validPhone());
     });
+    // Auto-advance: salutation -> first name -> last name -> mobile -> Confirm (Enter also moves on).
+    const nextField = { firstName: 'lastName', lastName: 'phone' };
+    $('prefix')?.addEventListener('change', () => $('firstName')?.focus());
+    Object.entries(nextField).forEach(([from, to]) => {
+      $(from)?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); $(to)?.focus(); }
+      });
+    });
+    phoneInput?.addEventListener('input', () => {
+      // Move on as soon as a full 10-digit number is in (typing, autofill or paste).
+      if (phoneDigits(phoneInput.value).length === 10 && validPhone() && document.activeElement === phoneInput) confirmBtn?.focus();
+    });
+    phoneInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && validPhone()) { e.preventDefault(); confirmBtn?.focus(); }
+    });
     phoneInput?.addEventListener('blur', () => {
       if (phoneInput.value.trim() && !validPhone()) setFieldError('phone', 'Enter a valid 10-digit mobile number that uses WhatsApp.');
     });
@@ -572,7 +587,10 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       detailsRevealed = true;
       const stage = $('detailsStage');
       stage.classList.remove('hidden');
-      requestAnimationFrame(() => stage.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+      requestAnimationFrame(() => {
+        stage.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        $('firstName')?.focus({ preventScroll: true }); // go straight to typing
+      });
     }
 
     function updateSelectionUI() {
