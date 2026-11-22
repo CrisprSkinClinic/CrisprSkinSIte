@@ -89,15 +89,63 @@ a.ui-card:hover, .ui-card.is-link:hover {
 /* Headings set in the sans family (card titles) keep a real bold; only the serif display face is single-weight. */
 h1.font-sans, h2.font-sans { font-weight: 700 !important; font-synthesis: auto; letter-spacing: -0.01em; }
 
-/* Quiet scroll reveal: cards and section blocks rise and fade in as they enter the viewport. Progressive: browsers
-   without scroll-driven animations simply show everything. `backwards` fill (not `both`) so hover lifts still work. */
-@keyframes ui-reveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
+/* ------------------------------------------------------------------------------------------------------------
+   Motion system. Quiet, Apple-style choreography built only from transform and opacity (cheap to animate), on one
+   easing curve. Everything is wrapped in no-preference-for-reduced-motion, and the scroll-linked parts are
+   progressive: browsers without scroll-driven animations just show the finished state. */
+:root { --ease-out: cubic-bezier(.22, 1, .36, 1); }
+
+@keyframes rise   { from { opacity: 0; transform: translate3d(0, 22px, 0); } to { opacity: 1; transform: none; } }
+@keyframes settle { from { opacity: 0; transform: scale(1.045); }            to { opacity: 1; transform: none; } }
+@keyframes ui-reveal { from { opacity: 0; transform: translate3d(0, 18px, 0); } to { opacity: 1; transform: none; } }
+@keyframes hero-away { to { transform: translate3d(0, 22px, 0) scale(.968); opacity: .9; } }
+@keyframes glass-firm {
+  from { background: rgba(255, 255, 255, 0.62); box-shadow: 0 10px 36px rgba(31, 20, 48, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.65); }
+  to   { background: rgba(255, 255, 255, 0.84); box-shadow: 0 16px 44px rgba(31, 20, 48, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.7); }
+}
+@keyframes read-progress { to { transform: scaleX(1); } }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in  { from { opacity: 0; transform: translate3d(0, 10px, 0); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 1. Page-load choreography: elements rise in one after another (--d = step of 80ms) */
+  [data-rise]   { animation: rise .85s var(--ease-out) both; animation-delay: calc(var(--d, 0) * 80ms); }
+  [data-settle] { animation: settle 1.1s var(--ease-out) both; animation-delay: calc(var(--d, 0) * 80ms); }
+
+  /* 2. Arrows in buttons and links nudge forward on hover */
+  a > span[aria-hidden="true"]:not([class]), button > span[aria-hidden="true"]:not([class]) { display: inline-block; transition: transform .35s var(--ease-out); }
+  a:hover > span[aria-hidden="true"]:not([class]), button:hover > span[aria-hidden="true"]:not([class]) { transform: translateX(4px); }
+
+  /* 3. FAQ answers open and close smoothly where the browser can animate to auto height */
+  @supports (interpolate-size: allow-keywords) {
+    :root { interpolate-size: allow-keywords; }
+    details.ui-card::details-content { block-size: 0; overflow-y: clip; transition: block-size .4s var(--ease-out), content-visibility .4s allow-discrete; }
+    details.ui-card[open]::details-content { block-size: auto; }
+  }
+
+  /* 4. Page changes: a short fade out and a soft rise in (the site uses view transitions) */
+  ::view-transition-old(root) { animation: vt-out .16s ease both; }
+  ::view-transition-new(root) { animation: vt-in .38s var(--ease-out) both; }
+
+  /* 5. Scroll-linked effects */
+  @supports (animation-timeline: view()) {
     .ui-card, .reveal {
       animation: ui-reveal linear backwards;
       animation-timeline: view();
-      animation-range: entry 0% entry 28%;
+      animation-range: entry calc(var(--i, 0) * 4%) entry calc(26% + var(--i, 0) * 4%);
     }
+    /* cards in a row arrive one after the other */
+    :is(.grid, .space-y-3, .space-y-4) > .ui-card:nth-child(3n + 2) { --i: 1; }
+    :is(.grid, .space-y-3, .space-y-4) > .ui-card:nth-child(3n + 3) { --i: 2; }
+  }
+  @supports (animation-timeline: scroll()) {
+    /* hero photo recedes a little as you scroll away from it */
+    [data-hero-media] { animation: hero-away linear both; animation-timeline: scroll(root); animation-range: 0 520px; transform-origin: 50% 0; }
+    /* the glass header firms up once the page has moved */
+    #siteHeader .glass { animation: glass-firm linear both; animation-timeline: scroll(root); animation-range: 0 120px; }
+    /* thin reading-progress line on articles */
+    .read-progress { animation: read-progress linear both; animation-timeline: scroll(root); }
   }
 }
+.read-progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 60; background: linear-gradient(90deg, #AE89B8, #7E4D8B); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .read-progress { display: none; } }

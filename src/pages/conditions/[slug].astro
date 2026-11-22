@@ -86,15 +86,15 @@ const conditionSchema = {
     <div class="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.2fr_.8fr] md:items-center md:gap-14">
       <div>
         {data.heroEyebrow && (
-          <span class="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-100 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-brand-700 shadow-sm"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>{data.heroEyebrow}</span>
+          <span data-rise style="--d:0" class="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-100 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-brand-700 shadow-sm"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>{data.heroEyebrow}</span>
         )}
-        <h1 class="mb-5 max-w-4xl text-4xl leading-[1.05] text-slate-950 md:text-6xl">{data.heroHeadline}</h1>
-        <p class="mb-8 max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">{data.heroSubheadline}</p>
+        <h1 data-rise style="--d:1" class="mb-5 max-w-4xl text-4xl leading-[1.05] text-slate-950 md:text-6xl">{data.heroHeadline}</h1>
+        <p data-rise style="--d:2" class="mb-8 max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">{data.heroSubheadline}</p>
         <a href="#book" data-track="booking-click" class="inline-flex min-h-[52px] items-center justify-center gap-3 rounded-2xl bg-brand-800 px-7 font-bold text-white shadow-lg shadow-brand-900/20 transition hover:bg-brand-700 active:scale-[0.98]">
           {data.ctaTitle || `Book an Evaluation`} <span aria-hidden="true">→</span>
         </a>
       </div>
-      <aside class="ui-card bg-gradient-to-br from-white to-brand-50/60 p-7 md:p-8">
+      <aside data-settle style="--d:2" class="ui-card bg-gradient-to-br from-white to-brand-50/60 p-7 md:p-8">
         <p class="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-600">Clinical assessment</p>
         <p class="text-lg leading-relaxed text-slate-800">A dermatologist will confirm the diagnosis, assess severity, and discuss treatment options appropriate for your age, history, and goals.</p>
         {parentService && <a href={`/services/${parentService.slug}`} class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-brand-700 hover:underline">Explore {parentService.data.title} <span aria-hidden="true">→</span></a>}

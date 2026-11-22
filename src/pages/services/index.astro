@@ -36,9 +36,9 @@ const servicesByCategory = categoryOrder.map((cat) => ({
   <Breadcrumbs items={[{ name: "Services", url: "/services" }]} />
 
   <div class="bg-gradient-to-b from-brand-50/70 to-transparent py-12 md:py-16 px-6 text-center">
-    <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-600 mb-4">Our expertise</p>
-    <h1 class="text-4xl md:text-6xl text-slate-950 mb-4">Services</h1>
-    <p class="text-lg text-slate-600 max-w-2xl mx-auto">Evidence-based hair, skin, cosmetic, and paediatric dermatology care under one roof in KK Nagar, Chennai.</p>
+    <p data-rise style="--d:0" class="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-600 mb-4">Our expertise</p>
+    <h1 data-rise style="--d:1" class="text-4xl md:text-6xl text-slate-950 mb-4">Services</h1>
+    <p data-rise style="--d:2" class="text-lg text-slate-600 max-w-2xl mx-auto">Evidence-based hair, skin, cosmetic, and paediatric dermatology care under one roof in KK Nagar, Chennai.</p>
   </div>
 
   <ListingFilter noun="services" placeholder="Search" categories={filterCategories} />

@@ -41,9 +41,9 @@ const conditionsByCategory = categoryOrder.map((cat) => ({
   <Breadcrumbs items={[{ name: "Conditions", url: "/conditions" }]} />
 
   <div class="bg-gradient-to-b from-brand-50/70 to-transparent py-12 md:py-16 px-6 text-center">
-    <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-600 mb-4">Patient guide</p>
-    <h1 class="text-4xl md:text-6xl text-slate-950 mb-4">Conditions We Treat</h1>
-    <p class="text-lg text-slate-600 max-w-2xl mx-auto">Learn about the skin, hair, and paediatric dermatology conditions we diagnose and treat at {siteConfig.name}.</p>
+    <p data-rise style="--d:0" class="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-600 mb-4">Patient guide</p>
+    <h1 data-rise style="--d:1" class="text-4xl md:text-6xl text-slate-950 mb-4">Conditions We Treat</h1>
+    <p data-rise style="--d:2" class="text-lg text-slate-600 max-w-2xl mx-auto">Learn about the skin, hair, and paediatric dermatology conditions we diagnose and treat at {siteConfig.name}.</p>
   </div>
 
   <ListingFilter noun="conditions" placeholder="Search" categories={filterCategories} />
