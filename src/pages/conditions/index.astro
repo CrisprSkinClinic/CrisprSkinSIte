@@ -46,7 +46,7 @@ const conditionsByCategory = categoryOrder.map((cat) => ({
     <p class="text-lg text-slate-600 max-w-2xl mx-auto">Learn about the skin, hair, and paediatric dermatology conditions we diagnose and treat at {siteConfig.name}.</p>
   </div>
 
-  <ListingFilter noun="conditions" placeholder="Search conditions" categories={filterCategories} />
+  <ListingFilter noun="conditions" placeholder="Search" categories={filterCategories} />
 
   <div class="max-w-6xl mx-auto py-10 px-6">
     {conditionsByCategory.map(({ category, label, conditions }) => (

@@ -41,7 +41,7 @@ const servicesByCategory = categoryOrder.map((cat) => ({
     <p class="text-lg text-slate-600 max-w-2xl mx-auto">Evidence-based hair, skin, cosmetic, and paediatric dermatology care under one roof in KK Nagar, Chennai.</p>
   </div>
 
-  <ListingFilter noun="services" placeholder="Search services" categories={filterCategories} />
+  <ListingFilter noun="services" placeholder="Search" categories={filterCategories} />
 
   <div class="max-w-7xl mx-auto py-10 px-6">
     {servicesByCategory.map(({ category, label, services }) => (
