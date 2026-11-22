@@ -210,11 +210,8 @@ const referralOptions = [
         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
       </div>
       <h2 id="reg-success-title" tabindex="-1" class="text-xl font-bold text-[#17233d] mb-2 outline-none">Registration submitted</h2>
-      <p class="text-[#46536b] mb-6">Our front desk will review it and be in touch on WhatsApp if anything is needed.</p>
-      <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <a href="/book" class="inline-flex items-center justify-center bg-[#9b4fa2] hover:bg-[#84358c] text-white font-bold min-h-[54px] px-6 rounded-xl shadow-md transition">Book a consultation</a>
-        <a href="/" class="inline-flex items-center justify-center min-h-[54px] px-6 rounded-xl font-semibold border border-[#d9d3df] text-[#46536b] bg-white hover:bg-[#f6edf8] transition">Back to home</a>
-      </div>
+      <p class="text-[#46536b] mb-6">Our front desk will review it and be in touch on WhatsApp if anything is needed. Taking you to the home page…</p>
+      <a href="/" class="inline-flex items-center justify-center bg-[#9b4fa2] hover:bg-[#84358c] text-white font-bold min-h-[54px] px-6 rounded-xl shadow-md transition">Go to home page now</a>
     </div>
   </div>
 
@@ -672,6 +669,7 @@ const referralOptions = [
       $('reg-success-container').classList.remove('hidden');
       $('reg-success-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
       $('reg-success-title').focus({ preventScroll: true });
+      setTimeout(() => { window.location.href = '/'; }, 2500);
     } catch (err) {
       $('reg-error-3').textContent = err.message;
     } finally {
