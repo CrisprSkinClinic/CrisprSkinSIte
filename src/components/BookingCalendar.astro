@@ -10,8 +10,11 @@ const { defaultService, defaultDoctorId } = Astro.props;
 const a = siteConfig.contact.address;
 const clinicAddress = `${a.street}, ${a.locality}, ${a.city}, ${a.state} ${a.postalCode}`;
 
-const field = 'w-full p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none';
-const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
+const field = 'w-full min-h-[48px] px-3.5 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 outline-none transition';
+const label = 'block text-sm font-semibold text-slate-700 mb-1.5';
+const fieldError = 'field-error hidden mt-1.5 flex items-start gap-1.5 text-sm text-red-700';
+const card = 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6';
+const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white';
 ---
 
 <div
@@ -22,199 +25,260 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
   data-clinic-address={clinicAddress}
   data-clinic-phone={siteConfig.contact.phone}
   data-clinic-hours={siteConfig.contact.workingHoursDisplay}
-  class="max-w-5xl mx-auto p-5 md:p-8 bg-white border border-slate-200 rounded-2xl shadow-lg"
+  class="mx-auto max-w-5xl"
 >
-  <div id="bookingForm" class="flex flex-col md:flex-row gap-8">
+  <div id="bookingForm" class="pb-36 md:pb-0">
 
-    <div class="md:w-1/2 space-y-5 pr-0 md:pr-8 border-b md:border-b-0 md:border-r border-slate-200/60 pb-8 md:pb-0">
-      <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
-        <h3 class="text-2xl font-bold text-brand-900">Patient Details</h3>
-        <a href="/manage-appointment" class="text-sm font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Already booked? Manage my appointment</a>
-      </div>
-
-      <div>
-        <p id="bookingForLabel" class="text-sm font-semibold text-slate-700 mb-2">Who is this appointment for?</p>
-        <div id="bookingFor" class="grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby="bookingForLabel">
-          <button type="button" role="radio" aria-checked="true" data-for="self" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-brand-600 border-brand-600 text-white">Myself</button>
-          <button type="button" role="radio" aria-checked="false" data-for="family" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-white border-slate-200 text-brand-900">Family member</button>
-          <button type="button" role="radio" aria-checked="false" data-for="friend" class="booking-for py-2.5 px-2 rounded-xl border text-sm font-semibold transition bg-white border-slate-200 text-brand-900">Friend</button>
-        </div>
-        <p id="bookingForHint" class="hidden mt-2 text-sm text-slate-600">Enter the patient's name below and your own WhatsApp number — the code and confirmation come to you.</p>
-      </div>
-
-      <div>
-        <div class="flex gap-3">
-          <div class="w-1/4">
-            <label for="prefix" class="sr-only">Title</label>
-            <select id="prefix" class={field}>
-              <option value="Mr.">Mr.</option>
-              <option value="Ms.">Ms.</option>
-              <option value="Mrs.">Mrs.</option>
-              <option value="Dr.">Dr.</option>
-            </select>
-          </div>
-          <div class="w-3/4">
-            <label for="firstName" class="sr-only">First name</label>
-            <input type="text" id="firstName" placeholder="First Name" autocomplete="given-name" required aria-describedby="err-firstName" class={field} />
-          </div>
-        </div>
-        <p id="err-firstName" class={fieldError} role="alert"></p>
-      </div>
-
-      <div>
-        <label for="lastName" class="sr-only">Last name</label>
-        <input type="text" id="lastName" placeholder="Last Name" autocomplete="family-name" required class={field} />
-      </div>
-
-      <div>
-        <label for="phone" class="block text-sm font-semibold text-slate-700 mb-1.5">WhatsApp mobile number</label>
-        <input type="tel" id="phone" placeholder="10-digit mobile number" autocomplete="tel-national" inputmode="tel" required aria-describedby="phoneHelp err-phone" class={field} />
-        <p id="phoneHelp" class="mt-1.5 text-sm text-slate-500">We send a one-time code on WhatsApp when you confirm.</p>
-        <p id="phoneVerified" class="hidden mt-1.5 text-sm font-semibold text-green-700" role="status"></p>
-        <p id="err-phone" class={fieldError} role="alert"></p>
-      </div>
-
-      <div id="familyPicker" class="hidden space-y-2">
-        <p class="text-sm font-semibold text-slate-700">Patients on this number — tap to fill in</p>
-        <div id="familyChips" class="flex flex-wrap gap-2"></div>
-      </div>
-      <div id="returningPatientMessage" class="hidden rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900" role="status" aria-live="polite"></div>
-
-      <div>
-        <label for="doctor" class="block text-sm font-semibold text-slate-700 mb-1.5">Doctor</label>
-        <select id="doctor" aria-describedby="err-doctor" class={field}>
-          <option value="" disabled>Select Doctor...</option>
-          <option value="any" selected>No preference (earliest available)</option>
-          {siteConfig.doctors.map((doc) => (
-            <option value={doc.dbId}>{doc.name}</option>
-          ))}
-        </select>
-        <p id="err-doctor" class={fieldError} role="alert"></p>
-      </div>
-
-      <div>
-        <label for="service" class="block text-sm font-semibold text-slate-700 mb-1.5">Reason for visit</label>
-        <select id="service" aria-describedby="serviceHelp err-service" class={field}>
-          <option value="" disabled>Select...</option>
-          <option value="General Consultation" selected>General Dermatology Consultation</option>
-          <optgroup label="Hair">
-            <option value="Hair Transplant (FUE)">Hair Transplant (FUE)</option>
-            <option value="Hair Loss">Hair Loss</option>
-            <option value="Female Hair Loss">Female Hair Loss</option>
-            <option value="Alopecia Areata">Alopecia Areata</option>
-            <option value="Dandruff">Dandruff</option>
-          </optgroup>
-          <optgroup label="Skin">
-            <option value="Acne">Acne</option>
-            <option value="Acne Scars">Acne Scars</option>
-            <option value="Pigmentation">Pigmentation</option>
-            <option value="Melasma">Melasma</option>
-            <option value="Vitiligo">Vitiligo</option>
-            <option value="Psoriasis">Psoriasis</option>
-            <option value="Eczema">Eczema</option>
-            <option value="Urticaria">Urticaria</option>
-            <option value="Skin Allergy">Skin Allergy</option>
-            <option value="Fungal Infections">Fungal Infections</option>
-            <option value="Warts, Moles & Skin Tags">Warts, Moles & Skin Tags</option>
-            <option value="Nail Disorders">Nail Disorders</option>
-            <option value="Biologics / Advanced Therapy">Biologics / Advanced Therapy</option>
-          </optgroup>
-          <optgroup label="Cosmetic">
-            <option value="Chemical Peels">Chemical Peels</option>
-            <option value="Botox">Botox</option>
-            <option value="Fillers">Fillers</option>
-            <option value="Laser Hair Reduction">Laser Hair Reduction</option>
-            <option value="Anti-ageing">Anti-ageing</option>
-            <option value="Skin Rejuvenation">Skin Rejuvenation</option>
-          </optgroup>
-          <optgroup label="Pediatric">
-            <option value="Pediatric Dermatology">Pediatric Dermatology</option>
-            <option value="Birthmarks">Birthmarks</option>
-            <option value="Atopic Dermatitis">Atopic Dermatitis</option>
-            <option value="Viral Skin Infections">Viral Skin Infections</option>
-          </optgroup>
-        </select>
-        <p id="serviceHelp" class="mt-1.5 text-sm text-slate-500">Online booking is for a consultation. Any procedure is planned with the doctor after your examination.</p>
-        <p id="err-service" class={fieldError} role="alert"></p>
-      </div>
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+      <p class="text-sm text-slate-600">Takes about a minute. We confirm on WhatsApp.</p>
+      <a href="/manage-appointment" class="text-sm font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Already booked? Manage my appointment</a>
     </div>
 
-    <div class="md:w-1/2 flex flex-col">
-      <h3 class="text-2xl font-bold text-brand-900 mb-4">Select Slot</h3>
+    <ol id="bookingProgress" class="mb-6 grid grid-cols-3 gap-2 text-xs font-semibold sm:text-sm" aria-label="Booking progress">
+      <li data-step="1" class="step flex items-center gap-2 rounded-full border px-3 py-2"><span class="step-dot inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">1</span><span class="truncate">Your details</span></li>
+      <li data-step="2" class="step flex items-center gap-2 rounded-full border px-3 py-2"><span class="step-dot inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">2</span><span class="truncate">Date &amp; time</span></li>
+      <li data-step="3" class="step flex items-center gap-2 rounded-full border px-3 py-2"><span class="step-dot inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">3</span><span class="truncate">Confirm</span></li>
+    </ol>
 
-      <div id="earliestWrap" class="hidden mb-4 rounded-xl border border-brand-200 bg-brand-50 p-3 flex flex-wrap items-center justify-between gap-2">
-        <p id="earliestText" class="text-sm text-brand-900"></p>
-        <button type="button" id="earliestBtn" class="px-3 py-2 rounded-lg bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 transition">Use this time</button>
-      </div>
+    <div class="grid gap-6 md:grid-cols-2 md:items-start">
 
-      <p id="datesLabel" class="text-sm font-semibold text-slate-700 mb-2">Next 7 days</p>
-      <div id="datesStrip" class="flex gap-2 overflow-x-auto pb-2 mb-3" role="group" aria-labelledby="datesLabel">
-        <p class="text-sm text-slate-400">Checking availability...</p>
-      </div>
+      <section class={`${card} min-w-0`} aria-labelledby="detailsTitle">
+        <h3 id="detailsTitle" class="mb-5 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>1</span>Your details</h3>
 
-      <label for="date" class="block text-sm font-semibold text-slate-700 mb-1.5">Or choose another date</label>
-      <input type="date" id="date" required aria-describedby="err-date" class={`${field} mb-1`} />
-      <p id="err-date" class={fieldError} role="alert"></p>
+        <div class="space-y-5">
+          <div>
+            <p id="bookingForLabel" class="mb-2 text-sm font-semibold text-slate-700">Who is this appointment for?</p>
+            <div id="bookingFor" class="grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby="bookingForLabel">
+              <button type="button" role="radio" aria-checked="true" data-for="self" class="booking-for min-h-[44px] rounded-xl border px-2 py-2.5 text-sm font-semibold transition border-brand-600 bg-brand-600 text-white">Myself</button>
+              <button type="button" role="radio" aria-checked="false" data-for="family" class="booking-for min-h-[44px] rounded-xl border px-2 py-2.5 text-sm font-semibold transition border-slate-300 bg-white text-brand-900 hover:bg-brand-50">Family member</button>
+              <button type="button" role="radio" aria-checked="false" data-for="friend" class="booking-for min-h-[44px] rounded-xl border px-2 py-2.5 text-sm font-semibold transition border-slate-300 bg-white text-brand-900 hover:bg-brand-50">Friend</button>
+            </div>
+            <p id="bookingForHint" class="mt-2 hidden text-sm text-slate-600">Enter the patient's name below and your own WhatsApp number. The code and confirmation come to you.</p>
+          </div>
 
-      <div class="mt-5 mb-2 flex items-baseline justify-between gap-2">
-        <h4 class="text-sm font-semibold text-slate-700" id="slotsLabel">Available times</h4>
-        <p id="slotsDateLabel" class="text-sm text-slate-500"></p>
-      </div>
-      <div id="slotsContainer" class="grid grid-cols-2 gap-3 mb-4" role="radiogroup" aria-labelledby="slotsLabel">
-        <p class="col-span-2 text-slate-400 text-sm">Checking availability...</p>
-      </div>
-      <p id="err-slot" class={fieldError} role="alert"></p>
+          <div>
+            <span class={label} id="nameLabel">Patient name</span>
+            <div class="flex gap-3" role="group" aria-labelledby="nameLabel">
+              <div class="w-[92px] shrink-0">
+                <label for="prefix" class="sr-only">Title</label>
+                <select id="prefix" class={field}>
+                  <option value="Mr.">Mr.</option>
+                  <option value="Ms.">Ms.</option>
+                  <option value="Mrs.">Mrs.</option>
+                  <option value="Dr.">Dr.</option>
+                </select>
+              </div>
+              <div class="min-w-0 flex-1">
+                <label for="firstName" class="sr-only">First name</label>
+                <input type="text" id="firstName" placeholder="First name" autocomplete="given-name" required aria-describedby="err-firstName" class={field} />
+              </div>
+            </div>
+            <p id="err-firstName" class={fieldError} role="alert"></p>
+            <label for="lastName" class="sr-only">Last name</label>
+            <input type="text" id="lastName" placeholder="Last name" autocomplete="family-name" required class={`${field} mt-3`} />
+          </div>
 
-      <p id="selectionSummary" class="mb-3 text-sm font-semibold text-brand-900" role="status" aria-live="polite">Choose a time to continue.</p>
+          <div>
+            <label for="phone" class={label}>WhatsApp mobile number</label>
+            <div class="flex items-stretch rounded-xl border border-slate-300 bg-white transition focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/30" id="phoneGroup">
+              <span class="inline-flex items-center rounded-l-xl border-r border-slate-200 bg-slate-50 px-3 text-slate-600" aria-hidden="true">+91</span>
+              <input type="tel" id="phone" placeholder="10-digit number" autocomplete="tel-national" inputmode="numeric" maxlength="14" required aria-describedby="phoneHelp err-phone" class="min-h-[48px] min-w-0 flex-1 rounded-r-xl bg-transparent px-3.5 py-3 text-slate-900 outline-none placeholder:text-slate-400" />
+              <span id="phoneTick" class="hidden items-center pr-3 text-green-600" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            </div>
+            <p id="phoneHelp" class="mt-1.5 text-sm text-slate-500">We send a one-time code on WhatsApp when you confirm.</p>
+            <p id="phoneVerified" class="mt-1.5 hidden text-sm font-semibold text-green-700" role="status"></p>
+            <p id="err-phone" class={fieldError} role="alert"></p>
+          </div>
 
-      <button id="confirmBtn" type="button" class="mt-auto w-full py-4 bg-brand-900 text-white font-bold rounded-xl shadow-lg hover:bg-brand-800 transition disabled:opacity-50">
-        Confirm Appointment
-      </button>
+          <div id="familyPicker" class="hidden space-y-2">
+            <p class="text-sm font-semibold text-slate-700">Patients on this number. Tap to fill in.</p>
+            <div id="familyChips" class="flex flex-wrap gap-2"></div>
+          </div>
+          <div id="returningPatientMessage" class="hidden rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900" role="status" aria-live="polite"></div>
 
-      <div id="verifyPanel" class="hidden mt-4 rounded-xl border border-brand-200 bg-brand-50 p-4 space-y-3" role="group" aria-labelledby="verifyTitle">
-        <p id="verifyTitle" class="font-semibold text-brand-900">One last step: enter the code we sent on WhatsApp</p>
-        <div>
-          <label for="otp" class="sr-only">6-digit WhatsApp code</label>
-          <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" class={`${field} tracking-widest text-lg`} />
+          <div class="grid gap-5 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+            <div>
+              <label for="doctor" class={label}>Doctor</label>
+              <select id="doctor" aria-describedby="err-doctor" class={field}>
+                <option value="" disabled>Select doctor...</option>
+                <option value="any" selected>No preference</option>
+                {siteConfig.doctors.map((doc) => (
+                  <option value={doc.dbId}>{doc.name}</option>
+                ))}
+              </select>
+              <p id="err-doctor" class={fieldError} role="alert"></p>
+            </div>
+
+            <div>
+              <label for="service" class={label}>Reason for visit</label>
+              <select id="service" aria-describedby="err-service" class={field}>
+                <option value="" disabled>Select...</option>
+                <option value="General Consultation" selected>General consultation</option>
+                <optgroup label="Hair">
+                  <option value="Hair Transplant (FUE)">Hair Transplant (FUE)</option>
+                  <option value="Hair Loss">Hair Loss</option>
+                  <option value="Female Hair Loss">Female Hair Loss</option>
+                  <option value="Alopecia Areata">Alopecia Areata</option>
+                  <option value="Dandruff">Dandruff</option>
+                </optgroup>
+                <optgroup label="Skin">
+                  <option value="Acne">Acne</option>
+                  <option value="Acne Scars">Acne Scars</option>
+                  <option value="Pigmentation">Pigmentation</option>
+                  <option value="Melasma">Melasma</option>
+                  <option value="Vitiligo">Vitiligo</option>
+                  <option value="Psoriasis">Psoriasis</option>
+                  <option value="Eczema">Eczema</option>
+                  <option value="Urticaria">Urticaria</option>
+                  <option value="Skin Allergy">Skin Allergy</option>
+                  <option value="Fungal Infections">Fungal Infections</option>
+                  <option value="Warts, Moles & Skin Tags">Warts, Moles & Skin Tags</option>
+                  <option value="Nail Disorders">Nail Disorders</option>
+                  <option value="Biologics / Advanced Therapy">Biologics / Advanced Therapy</option>
+                </optgroup>
+                <optgroup label="Cosmetic">
+                  <option value="Chemical Peels">Chemical Peels</option>
+                  <option value="Botox">Botox</option>
+                  <option value="Fillers">Fillers</option>
+                  <option value="Laser Hair Reduction">Laser Hair Reduction</option>
+                  <option value="Anti-ageing">Anti-ageing</option>
+                  <option value="Skin Rejuvenation">Skin Rejuvenation</option>
+                </optgroup>
+                <optgroup label="Pediatric">
+                  <option value="Pediatric Dermatology">Pediatric Dermatology</option>
+                  <option value="Birthmarks">Birthmarks</option>
+                  <option value="Atopic Dermatitis">Atopic Dermatitis</option>
+                  <option value="Viral Skin Infections">Viral Skin Infections</option>
+                </optgroup>
+              </select>
+              <p id="err-service" class={fieldError} role="alert"></p>
+            </div>
+          </div>
+          <p class="flex items-start gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">
+            <svg class="mt-0.5 h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>Online booking is for a consultation. Any procedure is planned with the doctor after your examination.</span>
+          </p>
         </div>
-        <p id="otpStatus" class="text-sm text-slate-600" role="status" aria-live="polite"></p>
-        <div class="flex flex-wrap items-center gap-3">
-          <button type="button" id="resendBtn" class="text-sm font-semibold text-brand-700 underline underline-offset-2 disabled:opacity-50 disabled:no-underline" disabled>Resend code</button>
-          <button type="button" id="changeNumberBtn" class="text-sm font-semibold text-slate-600 underline underline-offset-2">Use a different number</button>
-        </div>
-      </div>
+      </section>
 
-      <div id="errorMessage" class="hidden mt-4 text-center p-3 bg-red-100 text-red-800 rounded-lg font-medium" role="alert"></div>
-      <div id="reschedulePrompt" class="hidden mt-4 p-4 rounded-xl border border-brand-200 bg-brand-50 text-brand-900 text-sm leading-relaxed space-y-3" role="status" aria-live="polite">
-        <p id="rescheduleText"></p>
-        <div id="rescheduleActions" class="flex flex-col sm:flex-row gap-3">
-          <button type="button" id="rescheduleBtn" class="flex-1 py-3 px-4 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition disabled:opacity-50">Move it</button>
-          <button type="button" id="keepBtn" class="flex-1 py-3 px-4 rounded-xl border border-brand-200 bg-white text-brand-900 font-semibold hover:bg-brand-100 transition">Keep my existing appointment</button>
+      <section class={`${card} min-w-0`} aria-labelledby="timeTitle">
+        <h3 id="timeTitle" class="mb-5 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>2</span>Date &amp; time</h3>
+
+        <div id="earliestWrap" class="mb-5 hidden flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3.5">
+          <p id="earliestText" class="text-sm text-brand-900"></p>
+          <button type="button" id="earliestBtn" class="min-h-[40px] rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Use this time</button>
         </div>
-      </div>
+
+        <p id="datesLabel" class="mb-2 text-sm font-semibold text-slate-700">Next 7 days</p>
+        <div id="datesStrip" class="-mx-1 mb-4 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-labelledby="datesLabel">
+          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
+        </div>
+
+        <label for="date" class={label}>Or choose another date</label>
+        <input type="date" id="date" required aria-describedby="err-date" class={field} />
+        <p id="err-date" class={fieldError} role="alert"></p>
+
+        <div class="mb-3 mt-6 flex items-baseline justify-between gap-2">
+          <h4 class="text-sm font-semibold text-slate-700" id="slotsLabel">Available times</h4>
+          <p id="slotsDateLabel" class="text-sm text-slate-500"></p>
+        </div>
+        <div id="slotsContainer" class="grid grid-cols-3 gap-2.5 sm:grid-cols-4" role="radiogroup" aria-labelledby="slotsLabel">
+          <div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>
+        </div>
+        <p id="err-slot" class={fieldError} role="alert"></p>
+
+        <div id="selectionBox" class="mt-5 flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600" role="status" aria-live="polite">
+          <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="selectionSummary">Choose a time to continue.</span>
+        </div>
+
+        <button id="confirmBtn" type="button" class="mt-5 min-h-[52px] w-full rounded-xl bg-brand-900 py-4 font-bold text-white shadow-lg transition hover:bg-brand-800 disabled:opacity-60">
+          Confirm Appointment
+        </button>
+        <p class="mt-2 text-center text-xs text-slate-500">You will get a WhatsApp code to confirm it is you. No account needed.</p>
+
+        <div id="verifyPanel" class="mt-5 hidden space-y-3 rounded-xl border border-green-200 bg-green-50 p-4" role="group" aria-labelledby="verifyTitle">
+          <div class="flex items-start gap-3">
+            <span class="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-600 text-white" aria-hidden="true">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6A12 12 0 0 0 12 24c6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.5zM12 22a10 10 0 0 1-5.1-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A10 10 0 1 1 12 22zm5.5-7.5c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3 1.8.8 2.5.8 3.4.7.5-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4z"/></svg>
+            </span>
+            <div>
+              <p id="verifyTitle" class="font-semibold text-green-900">Enter the code we sent on WhatsApp</p>
+              <p id="verifyTo" class="text-sm text-green-800"></p>
+            </div>
+          </div>
+          <div>
+            <label for="otp" class="sr-only">6-digit WhatsApp code</label>
+            <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" class="min-h-[56px] w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-2xl font-semibold tracking-[0.5em] text-slate-900 outline-none transition placeholder:text-slate-300 focus:border-green-600 focus:ring-2 focus:ring-green-600/30" />
+          </div>
+          <p id="otpStatus" class="text-sm text-slate-700" role="status" aria-live="polite"></p>
+          <div class="flex flex-wrap items-center gap-4">
+            <button type="button" id="resendBtn" class="min-h-[36px] text-sm font-semibold text-brand-700 underline underline-offset-2 disabled:text-slate-400 disabled:no-underline" disabled>Resend code</button>
+            <button type="button" id="changeNumberBtn" class="min-h-[36px] text-sm font-semibold text-slate-600 underline underline-offset-2">Use a different number</button>
+          </div>
+        </div>
+
+        <div id="errorMessage" class="mt-5 hidden items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-800" role="alert">
+          <svg class="mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p id="errorText" class="flex-1 font-medium"></p>
+          <button type="button" id="errorClose" class="-m-1 p-1 text-red-700 hover:text-red-900" aria-label="Dismiss">✕</button>
+        </div>
+
+        <div id="reschedulePrompt" class="mt-5 hidden space-y-3 rounded-xl border border-brand-200 bg-brand-50 p-4 text-sm leading-relaxed text-brand-900" role="status" aria-live="polite">
+          <p id="rescheduleText"></p>
+          <div id="rescheduleActions" class="flex flex-col gap-3 sm:flex-row">
+            <button type="button" id="rescheduleBtn" class="min-h-[44px] flex-1 rounded-xl bg-brand-600 px-4 py-3 font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50">Move it</button>
+            <button type="button" id="keepBtn" class="min-h-[44px] flex-1 rounded-xl border border-brand-200 bg-white px-4 py-3 font-semibold text-brand-900 transition hover:bg-brand-100">Keep my existing appointment</button>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
-  <div id="confirmationCard" class="hidden" role="region" aria-labelledby="confirmTitle">
-    <div class="text-center mb-6">
-      <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700" aria-hidden="true">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <div id="stickyBar" class="fixed inset-x-0 bottom-0 z-40 hidden border-t border-slate-200 bg-white/95 px-4 py-3 shadow-[0_-6px_20px_rgba(15,23,42,0.1)] backdrop-blur md:hidden">
+    <div class="mx-auto flex max-w-5xl items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p class="text-xs text-slate-500">Your appointment</p>
+        <p id="stickySummary" class="truncate text-sm font-bold text-brand-900"></p>
       </div>
-      <h3 id="confirmTitle" tabindex="-1" class="text-2xl font-bold text-brand-900 outline-none">You're booked</h3>
-      <p id="confirmSubtitle" class="mt-1 text-slate-600"></p>
+      <button type="button" id="stickyConfirm" class="min-h-[48px] shrink-0 rounded-xl bg-brand-900 px-6 py-3 font-bold text-white shadow-md transition hover:bg-brand-800">Confirm</button>
+    </div>
+  </div>
+
+  <div id="confirmationCard" class="hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8" role="region" aria-labelledby="confirmTitle">
+    <div class="mb-6 text-center">
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-700 ring-8 ring-green-50" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3 id="confirmTitle" tabindex="-1" class="text-2xl font-bold text-brand-900 outline-none md:text-3xl">You're booked</h3>
+      <p id="confirmSubtitle" class="mt-1.5 text-slate-600"></p>
     </div>
 
-    <dl id="confirmDetails" class="mx-auto max-w-xl divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white text-sm"></dl>
+    <div class="mx-auto max-w-xl overflow-hidden rounded-xl border border-slate-200">
+      <div class="flex items-center justify-between gap-3 bg-brand-900 px-4 py-3 text-white">
+        <div>
+          <p id="confirmWhen" class="text-lg font-bold"></p>
+          <p id="confirmType" class="text-sm text-white/80"></p>
+        </div>
+        <button type="button" id="copyRefBtn" class="shrink-0 rounded-lg border border-white/30 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/10" title="Copy reference"></button>
+      </div>
+      <dl id="confirmDetails" class="divide-y divide-slate-200 bg-white text-sm"></dl>
+    </div>
 
-    <div class="mx-auto mt-5 flex max-w-xl flex-col gap-3 sm:flex-row sm:flex-wrap">
-      <a id="gcalLink" target="_blank" rel="noopener" class="flex-1 min-w-[180px] rounded-xl bg-brand-600 px-4 py-3 text-center font-semibold text-white hover:bg-brand-700 transition">Add to Google Calendar</a>
-      <button type="button" id="icsBtn" class="flex-1 min-w-[180px] rounded-xl border border-brand-200 bg-white px-4 py-3 font-semibold text-brand-900 hover:bg-brand-50 transition">Download .ics (Apple / Outlook)</button>
-      <a id="mapLink" target="_blank" rel="noopener" class="flex-1 min-w-[180px] rounded-xl border border-brand-200 bg-white px-4 py-3 text-center font-semibold text-brand-900 hover:bg-brand-50 transition">Get directions</a>
+    <div class="mx-auto mt-5 grid max-w-xl gap-3 sm:grid-cols-3">
+      <a id="gcalLink" target="_blank" rel="noopener" class="flex min-h-[48px] items-center justify-center rounded-xl bg-brand-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-brand-700">Add to Google Calendar</a>
+      <button type="button" id="icsBtn" class="min-h-[48px] rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm font-semibold text-brand-900 transition hover:bg-brand-50">Apple / Outlook (.ics)</button>
+      <a id="mapLink" target="_blank" rel="noopener" class="flex min-h-[48px] items-center justify-center rounded-xl border border-brand-200 bg-white px-4 py-3 text-center text-sm font-semibold text-brand-900 transition hover:bg-brand-50">Get directions</a>
     </div>
 
     <div class="mx-auto mt-6 grid max-w-xl gap-4 rounded-xl bg-brand-50 p-4 text-sm text-brand-900">
       <div>
-        <p class="font-semibold mb-1">What to bring</p>
+        <p class="mb-1.5 font-semibold">What to bring</p>
         <ul class="list-disc space-y-1 pl-5">
           <li>A photo ID</li>
           <li>Previous prescriptions, reports and photos of your condition</li>
@@ -225,12 +289,25 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
     </div>
 
     <div class="mx-auto mt-5 flex max-w-xl flex-wrap items-center justify-between gap-3 text-sm">
-      <a href="/manage-appointment" class="font-semibold text-brand-700 underline underline-offset-2">Change or cancel this appointment</a>
+      <a href="/manage-appointment" class="font-semibold text-brand-700 underline underline-offset-2">Change or cancel</a>
       <a id="callLink" class="font-semibold text-brand-700 underline underline-offset-2"></a>
       <button type="button" id="bookAnotherBtn" class="font-semibold text-slate-600 underline underline-offset-2">Book another appointment</button>
     </div>
   </div>
 </div>
+
+<style is:global>
+  #bookingProgress .step { border-color: rgb(226 232 240); background: #fff; color: rgb(100 116 139); transition: all .2s ease; }
+  #bookingProgress .step .step-dot { background: rgb(226 232 240); color: rgb(71 85 105); }
+  #bookingProgress .step[data-state="current"] { border-color: #7E4D8B; color: rgb(15 23 42); background: #FBF8FC; }
+  #bookingProgress .step[data-state="current"] .step-dot { background: #7E4D8B; color: #fff; }
+  #bookingProgress .step[data-state="done"] { border-color: rgb(187 247 208); color: rgb(21 128 61); background: rgb(240 253 244); }
+  #bookingProgress .step[data-state="done"] .step-dot { background: rgb(22 163 74); color: #fff; font-size: 0; }
+  #bookingProgress .step[data-state="done"] .step-dot::after { content: "✓"; font-size: .8rem; }
+  #bookingCalendarRoot .check-draw { stroke-dasharray: 30; stroke-dashoffset: 30; animation: bk-check .5s .15s ease forwards; }
+  @keyframes bk-check { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { #bookingCalendarRoot .check-draw { animation: none; stroke-dashoffset: 0; } }
+</style>
 
 <script>
   document.addEventListener('astro:page-load', () => {
@@ -262,6 +339,8 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
     const prefixSelect = $('prefix');
     const datesStrip = $('datesStrip');
     const selectionSummary = $('selectionSummary');
+    const selectionBox = $('selectionBox');
+    const stickyBar = $('stickyBar');
 
     const clinic = {
       name: root.dataset.clinicName || 'Clinic',
@@ -269,6 +348,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       phone: root.dataset.clinicPhone || '',
       hours: root.dataset.clinicHours || '',
     };
+    const clinicTel = clinic.phone.replace(/[^0-9+]/g, '');
 
     // ---------------------------------------------------------------- state
     let selectedTime = '';          // display string sent to the server, e.g. "04:30 PM"
@@ -284,12 +364,16 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
     let resendTimer = null;
     let verifyBusy = false;
     let pendingBooking = false;     // the patient tapped Confirm and is waiting on verification
+    let busy = false;
     let slotsSequence = 0;
     let stripSequence = 0;
     let userChoseDate = false;
+    let earliestKnown = null;
+    let confirmVisible = true;
     const dayCache = new Map();     // `${doctor}|${type}|${date}` -> Promise<{ slots, reason }>
 
     const phoneDigits = (v) => String(v || '').replace(/\D/g, '').slice(-10);
+    const validPhone = () => /^[6-9]\d{9}$/.test(phoneDigits(phoneInput?.value));
     const apptType = () => (isReturningPatient ? 'review' : 'new');
     const hideReschedule = () => reschedulePrompt?.classList.add('hidden');
 
@@ -308,31 +392,81 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       if (m[3].toUpperCase() === 'PM') h += 12;
       return `${String(h).padStart(2, '0')}:${m[2]}`;
     };
+    const period = (time24) => { const h = Number(String(time24).slice(0, 2)); return h < 12 ? 'Morning' : h < 16 ? 'Afternoon' : 'Evening'; };
+    const dayLabel = (iso) => {
+      const today = clinicToday();
+      if (iso === today) return 'Today';
+      if (iso === addDays(today, 1)) return 'Tomorrow';
+      return fmtDate(iso, { weekday: 'short' });
+    };
+
+    // ---------------------------------------------------------------- progress + sticky bar
+    function updateProgress(state) {
+      const detailsDone = Boolean($('firstName').value.trim()) && validPhone();
+      const timeDone = Boolean(selectedTime);
+      const states = state === 'done'
+        ? ['done', 'done', 'done']
+        : [detailsDone ? 'done' : 'current', timeDone ? 'done' : (detailsDone ? 'current' : 'todo'), (otpPanel && !otpPanel.classList.contains('hidden')) || busy ? 'current' : 'todo'];
+      document.querySelectorAll('#bookingProgress .step').forEach((li, i) => { li.dataset.state = states[i]; });
+    }
+
+    function updateStickyBar() {
+      if (!stickyBar) return;
+      const formShown = !$('bookingForm').classList.contains('hidden');
+      const show = formShown && Boolean(selectedTime) && !confirmVisible;
+      stickyBar.classList.toggle('hidden', !show);
+      // Sit above the site's own bottom action bar (Call / WhatsApp / Book) when it is showing.
+      const siteBar = $('siteBottomBar');
+      stickyBar.style.bottom = siteBar && siteBar.offsetHeight ? `${siteBar.offsetHeight}px` : '0px';
+      if (show) $('stickySummary').textContent = `${fmtDate(dateInput.value, { weekday: 'short', day: 'numeric', month: 'short' })} · ${selectedTime}`;
+    }
+    if ('IntersectionObserver' in window && confirmBtn) {
+      new IntersectionObserver((entries) => { confirmVisible = entries[0].isIntersecting; updateStickyBar(); }, { threshold: 0.6 }).observe(confirmBtn);
+    }
+    $('stickyConfirm')?.addEventListener('click', () => confirmBtn.click());
 
     // ---------------------------------------------------------------- errors
     function showError(message) {
       if (!errorMessage) return;
-      errorMessage.textContent = message;
+      $('errorText').textContent = message;
       errorMessage.classList.remove('hidden');
-      errorMessage.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      errorMessage.classList.add('flex');
+      errorMessage.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
-    function clearError() { errorMessage?.classList.add('hidden'); }
+    function clearError() { errorMessage?.classList.add('hidden'); errorMessage?.classList.remove('flex'); }
+    $('errorClose')?.addEventListener('click', clearError);
 
     const fieldIds = { firstName: 'firstName', phone: 'phone', doctor: 'doctor', service: 'service', date: 'date', slot: null };
     function setFieldError(key, message) {
       const p = $(`err-${key}`);
       const input = fieldIds[key] ? $(fieldIds[key]) : null;
-      if (p) { p.textContent = message || ''; p.classList.toggle('hidden', !message); }
+      if (p) {
+        p.textContent = message || '';
+        p.classList.toggle('hidden', !message);
+        p.classList.toggle('flex', Boolean(message));
+      }
       if (input) {
         input.setAttribute('aria-invalid', message ? 'true' : 'false');
-        input.classList.toggle('border-red-400', Boolean(message));
+        input.classList.toggle('border-red-500', Boolean(message));
       }
+      if (key === 'phone') $('phoneGroup')?.classList.toggle('border-red-500', Boolean(message));
     }
     function clearFieldErrors() { Object.keys(fieldIds).forEach((k) => setFieldError(k, '')); }
     ['firstName', 'phone', 'doctor', 'service', 'date'].forEach((key) => {
       const el = $(fieldIds[key]);
-      el?.addEventListener('input', () => setFieldError(key, ''));
-      el?.addEventListener('change', () => setFieldError(key, ''));
+      el?.addEventListener('input', () => { setFieldError(key, ''); updateProgress(); });
+      el?.addEventListener('change', () => { setFieldError(key, ''); updateProgress(); });
+    });
+
+    // Phone: digits only, shows a tick once it is a valid number, validates on blur.
+    phoneInput?.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/[^\d+\s-]/g, '');
+      const tick = $('phoneTick');
+      tick?.classList.toggle('hidden', !validPhone());
+      tick?.classList.toggle('inline-flex', validPhone());
+    });
+    phoneInput?.addEventListener('blur', () => {
+      if (phoneInput.value.trim() && !validPhone()) setFieldError('phone', 'Enter a valid 10-digit mobile number that uses WhatsApp.');
     });
 
     // ---------------------------------------------------------------- who is it for
@@ -343,11 +477,12 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
           const on = b === btn;
           b.setAttribute('aria-checked', String(on));
           b.classList.toggle('bg-brand-600', on); b.classList.toggle('border-brand-600', on); b.classList.toggle('text-white', on);
-          b.classList.toggle('bg-white', !on); b.classList.toggle('border-slate-200', !on); b.classList.toggle('text-brand-900', !on);
+          b.classList.toggle('bg-white', !on); b.classList.toggle('border-slate-300', !on); b.classList.toggle('text-brand-900', !on);
+          b.classList.toggle('hover:bg-brand-50', !on);
         });
         bookingForHint?.classList.toggle('hidden', bookingFor === 'self');
-        $('firstName').placeholder = bookingFor === 'self' ? 'First Name' : "Patient's First Name";
-        $('lastName').placeholder = bookingFor === 'self' ? 'Last Name' : "Patient's Last Name";
+        $('firstName').placeholder = bookingFor === 'self' ? 'First name' : "Patient's first name";
+        $('lastName').placeholder = bookingFor === 'self' ? 'Last name' : "Patient's last name";
         if (otpToken) checkReturningPatient();
       });
     });
@@ -369,6 +504,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       }
       $('firstName').value = words.length > 1 ? words.slice(0, -1).join(' ') : (words[0] || '');
       $('lastName').value = words.length > 1 ? words[words.length - 1] : '';
+      updateProgress();
     }
 
     function renderFamilyChips(patients) {
@@ -381,19 +517,20 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
         chip.type = 'button';
         chip.textContent = p.name;
         const on = p.name.toLowerCase() === current;
-        chip.className = `px-3 py-2 rounded-full border text-sm font-medium transition ${on ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-brand-200 text-brand-900 hover:bg-brand-50'}`;
+        chip.className = `min-h-[40px] px-3.5 py-2 rounded-full border text-sm font-medium transition ${on ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-brand-200 text-brand-900 hover:bg-brand-50'}`;
         chip.addEventListener('click', () => { fillName(p.name); checkReturningPatient(); });
         familyChips.appendChild(chip);
       });
       const someoneNew = document.createElement('button');
       someoneNew.type = 'button';
       someoneNew.textContent = '+ Someone new';
-      someoneNew.className = 'px-3 py-2 rounded-full border border-dashed border-slate-300 text-sm font-medium text-slate-600 hover:bg-slate-50';
+      someoneNew.className = 'min-h-[40px] px-3.5 py-2 rounded-full border border-dashed border-slate-300 text-sm font-medium text-slate-600 hover:bg-slate-50';
       someoneNew.addEventListener('click', () => {
         $('firstName').value = '';
         $('lastName').value = '';
         clearReturningPatient();
         renderFamilyChips(patients);
+        updateProgress();
         $('firstName').focus();
       });
       familyChips.appendChild(someoneNew);
@@ -442,12 +579,14 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
     function updateSelectionUI() {
       const date = dateInput?.value;
       if (selectedTime && date) {
-        selectionSummary.textContent = `Selected: ${fmtDate(date, { weekday: 'short', day: 'numeric', month: 'short' })} at ${selectedTime}`;
-        selectionSummary.className = 'mb-3 text-sm font-semibold text-green-700';
+        selectionSummary.textContent = `${fmtDate(date, { weekday: 'long', day: 'numeric', month: 'long' })} at ${selectedTime}`;
+        selectionBox.className = 'mt-5 flex items-center gap-3 rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800';
       } else {
         selectionSummary.textContent = 'Choose a time to continue.';
-        selectionSummary.className = 'mb-3 text-sm font-semibold text-brand-900';
+        selectionBox.className = 'mt-5 flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600';
       }
+      updateProgress();
+      updateStickyBar();
     }
 
     function clearSelection() {
@@ -463,7 +602,9 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
         b.classList.toggle('bg-brand-600', on);
         b.classList.toggle('text-white', on);
         b.classList.toggle('border-brand-600', on);
-        // Drop the idle text colour and hover tint while selected, so the choice stays readable under the cursor.
+        // Drop the idle background, text colour and hover tint while selected: bg-white would otherwise
+        // win over bg-brand-600 and leave white text on a white button.
+        b.classList.toggle('bg-white', !on);
         b.classList.toggle('text-brand-800', !on);
         b.classList.toggle('hover:bg-brand-50', !on);
         b.setAttribute('aria-checked', String(on));
@@ -476,17 +617,27 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       updateSelectionUI();
     }
 
-    // Nothing is pre-selected: the patient makes an explicit choice.
+    // Nothing is pre-selected: the patient makes an explicit choice. Times are grouped by part of day.
     function renderSlots(slots, preselectTime24) {
       hideReschedule();
       clearSelection();
       slotsContainer.innerHTML = '';
+      let lastPeriod = '';
+      const multiple = new Set(slots.map((s) => period(s.time24 || to24(s.display)))).size > 1;
       slots.forEach((slot) => {
+        const p = period(slot.time24 || to24(slot.display));
+        if (multiple && p !== lastPeriod) {
+          const h = document.createElement('p');
+          h.className = 'col-span-full mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 first:mt-0';
+          h.textContent = p;
+          slotsContainer.appendChild(h);
+          lastPeriod = p;
+        }
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.setAttribute('role', 'radio');
         btn.setAttribute('aria-checked', 'false');
-        btn.className = 'time-slot py-3 border border-brand-200 rounded-lg text-brand-800 hover:bg-brand-50 transition font-medium';
+        btn.className = 'time-slot min-h-[48px] rounded-lg border border-brand-200 bg-white py-2.5 font-medium text-brand-800 transition hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600';
         btn.textContent = slot.display;
         btn.dataset.time = slot.display;
         btn.addEventListener('click', () => selectSlot(slot, btn));
@@ -495,8 +646,9 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       });
     }
 
+    const skeletonSlots = () => Array.from({ length: 6 }, () => '<div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>').join('');
     function slotsMessage(html) {
-      slotsContainer.innerHTML = `<p class="col-span-2 text-slate-500 text-sm">${html}</p>`;
+      slotsContainer.innerHTML = `<div class="col-span-full rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">${html}</div>`;
     }
 
     function highlightStrip(dateStr) {
@@ -505,6 +657,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
         b.classList.toggle('bg-brand-600', on);
         b.classList.toggle('text-white', on);
         b.classList.toggle('border-brand-600', on);
+        b.classList.toggle('bg-white', !on);
         b.classList.toggle('hover:bg-brand-50', !on);
         b.setAttribute('aria-pressed', String(on));
         const count = b.querySelector('[data-count]');
@@ -519,27 +672,31 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       if (!dateStr) return;
       const seq = ++slotsSequence;
       clearSelection();
-      errorMessage && clearError();
+      clearError();
       $('slotsDateLabel').textContent = fmtDate(dateStr, { weekday: 'long', day: 'numeric', month: 'long' });
       highlightStrip(dateStr);
       if (!doctorSelect?.value) {
         slotsMessage('Choose a doctor to see available times.');
         return;
       }
-      slotsMessage('Checking availability...');
+      slotsContainer.innerHTML = skeletonSlots();
       try {
         const { slots, reason } = await fetchDay(dateStr);
         if (seq !== slotsSequence) return; // a newer request superseded this one
         if (!slots.length) {
-          slotsMessage(`${reason || 'No times are available on this date.'} Try another day, or call us directly.`);
+          const next = earliestKnown && earliestKnown.date !== dateStr
+            ? `<button type="button" id="emptyNext" class="mt-3 inline-flex min-h-[40px] items-center rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-brand-700">Show next available: ${fmtDate(earliestKnown.date, { weekday: 'short', day: 'numeric', month: 'short' })}</button>`
+            : '';
+          slotsMessage(`<p class="font-semibold text-slate-800">No times on this date</p><p class="mt-0.5">${reason || 'Everything is booked.'} Try another day or <a class="font-semibold text-brand-700 underline" href="tel:${clinicTel}">call ${clinic.phone}</a>.</p>${next}`);
+          $('emptyNext')?.addEventListener('click', () => { userChoseDate = true; pickDate(earliestKnown.date); });
           return;
         }
         renderSlots(slots, preselectTime24);
       } catch (err) {
         if (seq !== slotsSequence) return;
         console.error('Error loading availability:', err);
-        slotsContainer.innerHTML = '<p class="col-span-2 text-red-600 text-sm">Could not load availability. <button type="button" id="retrySlots" class="font-semibold underline">Try again</button></p>';
-        $('retrySlots')?.addEventListener('click', () => loadAvailableSlots(dateStr));
+        slotsMessage('<p class="font-semibold text-red-700">Could not load availability</p><p class="mt-0.5">Check your connection and try again.</p><button type="button" id="retrySlots" class="mt-3 inline-flex min-h-[40px] items-center rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Try again</button>');
+        $('retrySlots')?.addEventListener('click', () => { dayCache.clear(); loadAvailableSlots(dateStr); });
       }
     }
 
@@ -555,7 +712,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       const today = clinicToday();
       const days = Array.from({ length: 7 }, (_, i) => addDays(today, i));
       if (!doctorSelect?.value) return null;
-      datesStrip.innerHTML = '<p class="text-sm text-slate-400">Checking availability...</p>';
+      datesStrip.innerHTML = Array.from({ length: 5 }, () => '<div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>').join('');
       const results = await Promise.all(days.map((d) => fetchDay(d).catch(() => null)));
       if (seq !== stripSequence) return null;
 
@@ -570,21 +727,25 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
         chip.dataset.date = d;
         chip.disabled = !count;
         chip.setAttribute('aria-pressed', 'false');
-        chip.className = 'shrink-0 min-w-[72px] rounded-xl border border-brand-200 px-3 py-2 text-center text-sm transition hover:bg-brand-50 disabled:opacity-40 disabled:hover:bg-transparent';
-        chip.innerHTML = `<span class="block font-semibold">${i === 0 ? 'Today' : fmtDate(d, { weekday: 'short' })}</span><span class="block">${fmtDate(d, { day: 'numeric', month: 'short' })}</span><span data-count="${count ? 'open' : 'full'}" class="block text-xs ${count ? 'text-green-700' : 'text-slate-500'}">${count ? `${count} time${count === 1 ? '' : 's'}` : 'Full'}</span>`;
+        chip.className = 'shrink-0 min-w-[76px] min-h-[76px] rounded-xl border border-brand-200 bg-white px-3 py-2 text-center text-sm transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400 disabled:hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600';
+        chip.innerHTML = `<span class="block font-semibold">${dayLabel(d)}</span><span class="block">${fmtDate(d, { day: 'numeric', month: 'short' })}</span><span data-count="${count ? 'open' : 'full'}" class="block text-xs ${count ? 'text-green-700' : 'text-slate-500'}">${count ? `${count} time${count === 1 ? '' : 's'}` : 'Full'}</span>`;
         chip.addEventListener('click', () => { userChoseDate = true; pickDate(d); });
         datesStrip.appendChild(chip);
       });
       highlightStrip(dateInput?.value);
 
+      earliestKnown = earliest;
       const wrap = $('earliestWrap');
+      wrap?.classList.remove('hidden');
+      wrap?.classList.add('flex');
       if (earliest) {
         const when = `${earliest.date === today ? 'Today' : fmtDate(earliest.date, { weekday: 'long', day: 'numeric', month: 'long' })} at ${earliest.slot.display}`;
         $('earliestText').innerHTML = `<span class="font-semibold">Earliest available:</span> ${when}`;
-        wrap?.classList.remove('hidden');
+        $('earliestBtn').classList.remove('hidden');
         $('earliestBtn').onclick = () => { userChoseDate = true; pickDate(earliest.date, earliest.slot.time24); };
       } else {
-        wrap?.classList.add('hidden');
+        $('earliestText').innerHTML = `<span class="font-semibold">No times in the next 7 days.</span> Pick a later date below, or call <a class="font-semibold underline" href="tel:${clinicTel}">${clinic.phone}</a>.`;
+        $('earliestBtn').classList.add('hidden');
       }
       return earliest;
     }
@@ -656,7 +817,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
     // ---------------------------------------------------------------- WhatsApp verification (at confirm time)
     function setOtpStatus(text, kind) {
       otpStatus.textContent = text;
-      otpStatus.className = `text-sm ${kind === 'error' ? 'text-red-700 font-semibold' : kind === 'ok' ? 'text-green-700 font-semibold' : 'text-slate-600'}`;
+      otpStatus.className = `text-sm ${kind === 'error' ? 'text-red-700 font-semibold' : kind === 'ok' ? 'text-green-800 font-semibold' : 'text-slate-700'}`;
     }
 
     function startResendTimer(seconds = 30) {
@@ -691,6 +852,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       resendTimer = null;
       resendBtn.disabled = true;
       resendBtn.textContent = 'Resend code';
+      updateProgress();
     }
 
     phoneInput?.addEventListener('input', () => {
@@ -717,10 +879,12 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
         if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
         otpSentTo = digits;
         otpPanel?.classList.remove('hidden');
-        setOtpStatus(`Code sent on WhatsApp to +91 ${digits}. It expires in 5 minutes.`);
+        $('verifyTo').textContent = `Sent to +91 ${digits.slice(0, 5)} ${digits.slice(5)}. It expires in 5 minutes.`;
+        setOtpStatus('');
         if (otpInput) { otpInput.value = ''; otpInput.focus(); }
-        otpPanel?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        otpPanel?.scrollIntoView({ block: 'center', behavior: 'smooth' });
         startResendTimer();
+        updateProgress();
         return true;
       } catch (err) {
         pendingBooking = false;
@@ -759,10 +923,11 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
         if (pendingBooking) {
           pendingBooking = false;
           if (!info.needsChoice) await submitFinalBooking();
-          else confirmBtn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          else confirmBtn.scrollIntoView({ block: 'center', behavior: 'smooth' });
         }
       } catch (err) {
         setOtpStatus(err.message, 'error');
+        otpInput?.classList.add('border-red-500');
         if (otpInput) { otpInput.value = ''; otpInput.focus(); }
       } finally {
         verifyBusy = false;
@@ -771,6 +936,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
 
     // Verifies by itself as soon as the sixth digit is typed or pasted.
     otpInput?.addEventListener('input', () => {
+      otpInput.classList.remove('border-red-500');
       otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 6);
       if (otpInput.value.length === 6) verifyCode();
     });
@@ -779,22 +945,21 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
 
     // ---------------------------------------------------------------- confirmation card
     const plainDoctor = (name) => String(name || '').replace(/^dr\.?\s*/i, '').trim();
+    const utcStamp = (date, time24, addMinutes) => {
+      const [y, m, d] = date.split('-').map(Number);
+      const [h, mi] = time24.split(':').map(Number);
+      return new Date(Date.UTC(y, m - 1, d, h, mi) - 330 * 60000 + addMinutes * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); // IST -> UTC
+    };
 
     function buildIcs({ ref, date, time24, minutes, summary, description, location }) {
-      const stamp = (mins) => {
-        const [y, m, d] = date.split('-').map(Number);
-        const [h, mi] = time24.split(':').map(Number);
-        const ms = Date.UTC(y, m - 1, d, h, mi) - 330 * 60000 + mins * 60000; // IST -> UTC
-        return new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-      };
       const esc = (s) => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
       return [
         'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//CRISPR Skin and Hair Clinic//Booking//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
         'BEGIN:VEVENT',
-        `UID:${ref || stamp(0)}@booking`,
-        `DTSTAMP:${stamp(0)}`,
-        `DTSTART:${stamp(0)}`,
-        `DTEND:${stamp(minutes)}`,
+        `UID:${ref || utcStamp(date, time24, 0)}@booking`,
+        `DTSTAMP:${utcStamp(date, time24, 0)}`,
+        `DTSTART:${utcStamp(date, time24, 0)}`,
+        `DTEND:${utcStamp(date, time24, minutes)}`,
         `SUMMARY:${esc(summary)}`,
         `DESCRIPTION:${esc(description)}`,
         `LOCATION:${esc(location)}`,
@@ -817,11 +982,24 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
 
       $('confirmTitle').textContent = moved ? 'Your appointment has been moved' : "You're booked";
       $('confirmSubtitle').textContent = `We have sent the details on WhatsApp to +91 ${phoneDigits(body.phone)}.`;
+      $('confirmWhen').textContent = `${fmtDate(date, { weekday: 'short', day: 'numeric', month: 'short' })} · ${timeText}`;
+      $('confirmType').textContent = `${review ? 'Follow-up' : 'Consultation'} · ${minutes} min`;
+      const copyBtn = $('copyRefBtn');
+      if (ref) {
+        copyBtn.textContent = `${ref} · Copy`;
+        copyBtn.classList.remove('hidden');
+        copyBtn.onclick = async () => {
+          try { await navigator.clipboard.writeText(ref); copyBtn.textContent = 'Copied ✓'; } catch { copyBtn.textContent = ref; }
+          setTimeout(() => { copyBtn.textContent = `${ref} · Copy`; }, 1800);
+        };
+      } else {
+        copyBtn.classList.add('hidden');
+      }
 
       const rows = [
         ['Patient', body.name],
         ['Date', dateText],
-        ['Time', `${timeText} (${minutes} min ${review ? 'follow-up' : 'consultation'})`],
+        ['Time', timeText],
         ['Doctor', doctorText],
         ['Reason', body.service],
         ['Clinic', `${clinic.name}, ${clinic.address}`],
@@ -833,7 +1011,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
         const row = document.createElement('div');
         row.className = 'flex flex-col gap-0.5 px-4 py-3 sm:flex-row sm:gap-4';
         const dt = document.createElement('dt');
-        dt.className = 'w-28 shrink-0 font-semibold text-slate-500';
+        dt.className = 'w-24 shrink-0 font-semibold text-slate-500';
         dt.textContent = k;
         const dd = document.createElement('dd');
         dd.className = 'text-slate-900';
@@ -842,17 +1020,13 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
         details.appendChild(row);
       });
 
+      const location = `${clinic.name}, ${clinic.address}`;
       const summary = `Appointment at ${clinic.name}`;
       const description = `${review ? 'Follow-up' : 'Consultation'} with ${doctorText}. Reason: ${body.service}.${ref ? ` Reference ${ref}.` : ''} Please arrive 10 minutes early. Questions? Call ${clinic.phone}.`;
-      const stamp = (mins) => {
-        const [y, m, d] = date.split('-').map(Number);
-        const [h, mi] = time24.split(':').map(Number);
-        return new Date(Date.UTC(y, m - 1, d, h, mi) - 330 * 60000 + mins * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-      };
-      $('gcalLink').href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(summary)}&dates=${stamp(0)}/${stamp(minutes)}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(`${clinic.name}, ${clinic.address}`)}`;
-      $('mapLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${clinic.name}, ${clinic.address}`)}`;
+      $('gcalLink').href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(summary)}&dates=${utcStamp(date, time24, 0)}/${utcStamp(date, time24, minutes)}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}`;
+      $('mapLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
       $('icsBtn').onclick = () => {
-        const blob = new Blob([buildIcs({ ref, date, time24, minutes, summary, description, location: `${clinic.name}, ${clinic.address}` })], { type: 'text/calendar;charset=utf-8' });
+        const blob = new Blob([buildIcs({ ref, date, time24, minutes, summary, description, location })], { type: 'text/calendar;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -865,9 +1039,11 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       $('confirmArrival').textContent = `Please arrive about 10 minutes early. Clinic hours: ${clinic.hours}.`;
       const call = $('callLink');
       call.textContent = `Call ${clinic.phone}`;
-      call.href = `tel:${clinic.phone.replace(/[^0-9+]/g, '')}`;
+      call.href = `tel:${clinicTel}`;
 
+      updateProgress('done');
       $('bookingForm').classList.add('hidden');
+      stickyBar?.classList.add('hidden');
       const card = $('confirmationCard');
       card.classList.remove('hidden');
       card.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -891,7 +1067,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       clearFieldErrors();
       const errors = [];
       if (!$('firstName').value.trim()) errors.push(['firstName', 'Enter the patient’s first name.']);
-      if (!/^[6-9]\d{9}$/.test(phoneDigits(phoneInput.value))) errors.push(['phone', 'Enter a valid 10-digit mobile number that uses WhatsApp.']);
+      if (!validPhone()) errors.push(['phone', 'Enter a valid 10-digit mobile number that uses WhatsApp.']);
       if (!doctorSelect.value) errors.push(['doctor', 'Choose a doctor, or “No preference”.']);
       if (!serviceSelect.value) errors.push(['service', 'Choose the reason for your visit.']);
       if (!dateInput.value) errors.push(['date', 'Choose a date.']);
@@ -928,7 +1104,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
 
     keepBtn?.addEventListener('click', () => {
       rescheduleActions?.classList.add('hidden');
-      if (rescheduleText) rescheduleText.textContent = 'No changes made — your existing appointment stays as it is. To book another day, choose a different date.';
+      if (rescheduleText) rescheduleText.textContent = 'No changes made. Your existing appointment stays as it is. To book another day, choose a different date.';
     });
 
     async function submitFinalBooking() {
@@ -976,6 +1152,8 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
 
       try {
         hideReschedule();
+        busy = true;
+        updateProgress();
         confirmBtn.textContent = 'Securing your slot…';
         confirmBtn.disabled = true;
 
@@ -987,8 +1165,11 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
           if (rescheduleBtn) rescheduleBtn.innerText = `Move it to ${selectedTime}`;
           rescheduleActions?.classList.remove('hidden');
           reschedulePrompt?.classList.remove('hidden');
+          reschedulePrompt?.scrollIntoView({ block: 'center', behavior: 'smooth' });
           confirmBtn.textContent = 'Confirm Appointment';
           confirmBtn.disabled = false;
+          busy = false;
+          updateProgress();
           return;
         }
 
@@ -1010,13 +1191,16 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
           doctor_id: isNoPreference ? undefined : doctorId,
         });
 
+        busy = false;
         showConfirmation({ result, body: lastBookingBody, moved: false });
       } catch (err) {
         console.error('Error booking:', err);
+        busy = false;
         showError(err.message || 'Could not complete your booking. Please try again or call us directly.');
         if (/verif/i.test(err.message || '')) resetOtp();
         confirmBtn.textContent = 'Confirm Appointment';
         confirmBtn.disabled = false;
+        updateProgress();
       }
     }
 
@@ -1090,6 +1274,7 @@ const fieldError = 'field-error hidden mt-1 text-sm text-red-700';
       refreshAvailability();
     });
 
+    updateProgress();
     // Show times immediately (No preference is the default), jumping to the first day with availability.
     refreshAvailability({ jumpToEarliest: true });
   });
