@@ -1,0 +1,7 @@
+---
+// Inline SVG icon from src/utils/icons.js (Lucide). Usage: <Icon name="sparkles" class="h-6 w-6" />
+import { icons } from '../../utils/icons.js';
+const { name, class: className = 'h-5 w-5', stroke = 1.8, fill = 'none' } = Astro.props;
+const inner = icons[name] || '';
+---
+<svg class={className} viewBox="0 0 24 24" fill={fill} stroke="currentColor" stroke-width={stroke} stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" set:html={inner}></svg>

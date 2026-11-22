@@ -1,9 +1,10 @@
 ---
+import ClinicIcon from '../ui/ClinicIcon.astro';
 const pillars = [
-  { title: 'AIIMS-trained consultants', body: 'Three dermatologists with training at AIIMS and in dermatosurgery, hair restoration and paediatric skin care.', icon: '<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/>' },
-  { title: 'No unnecessary procedures', body: 'We explain your options, including doing nothing yet. Treatment is advised only when it is indicated.', icon: '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>' },
-  { title: 'Booking that respects your time', body: 'Real slots, WhatsApp confirmation, and a page to change or cancel. Reception is one message away.', icon: '<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>' },
-  { title: 'Care for the whole family', body: 'Adults and children, hair and skin, medical and cosmetic, under one roof in KK Nagar.', icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>' },
+  { title: 'AIIMS-trained consultants', body: 'Three dermatologists with training at AIIMS and in dermatosurgery, hair restoration and paediatric skin care.', icon: 'shield' },
+  { title: 'No unnecessary procedures', body: 'We explain your options, including doing nothing yet. Treatment is advised only when it is indicated.', icon: 'nosyringe' },
+  { title: 'Booking that respects your time', body: 'Real slots, WhatsApp confirmation, and a page to change or cancel. Reception is one message away.', icon: 'clocked' },
+  { title: 'Care for the whole family', body: 'Adults and children, hair and skin, medical and cosmetic, under one roof in KK Nagar.', icon: 'family' },
 ];
 ---
 <section class="px-5 py-6 md:px-6 md:py-10">
@@ -20,8 +21,8 @@ const pillars = [
       <div class="grid gap-4 sm:grid-cols-2">
         {pillars.map((p) => (
           <div class="reveal rounded-3xl border border-white/10 bg-white/[0.06] p-6 backdrop-blur-sm transition hover:bg-white/[0.09]">
-            <span class="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-white/10 text-brand-200" aria-hidden="true">
-              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={p.icon}></svg>
+            <span class="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-white/15 to-white/5 text-brand-100 ring-1 ring-white/10 [--ic-accent:#F0A6C8]" aria-hidden="true">
+              <ClinicIcon name={p.icon} class="h-8 w-8" stroke={2} />
             </span>
             <h3 class="mb-1.5 font-sans text-base font-bold">{p.title}</h3>
             <p class="text-sm leading-relaxed text-slate-300">{p.body}</p>

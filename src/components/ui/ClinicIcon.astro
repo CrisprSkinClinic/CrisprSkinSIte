@@ -1,0 +1,13 @@
+---
+// Original clinic icon (see src/utils/clinicIcons.js). Usage: <ClinicIcon name="acne" class="h-8 w-8" />
+// Colour comes from `currentColor`; the pink accent comes from --ic-accent (override it on a hover state or dark tile).
+import { clinicIcons } from '../../utils/clinicIcons.js';
+const { name, class: className = 'h-8 w-8', stroke = 2.2 } = Astro.props;
+---
+<svg class={`ci ${className}`} viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width={stroke} stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" set:html={clinicIcons[name] || ''}></svg>
+
+<style is:global>
+  .ci .s  { fill: currentColor; fill-opacity: .14; stroke: none; }
+  .ci .a  { stroke: var(--ic-accent, #C36F9A); }
+  .ci .af { fill: var(--ic-accent, #C36F9A); stroke: var(--ic-accent, #C36F9A); stroke-width: 1.2; }
+</style>
