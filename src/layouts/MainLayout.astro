@@ -49,7 +49,7 @@ const showClinic = ['/', '/contact/', '/book/'].includes(path) || path.startsWit
 const doctorsToShow = path === '/' || path === '/our-doctors/'
   ? siteConfig.doctors
   : siteConfig.doctors.filter((d) => path.startsWith(`/our-doctors/${d.slug}`));
-const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteConfig.name}, ${siteConfig.contact.address.street}, ${siteConfig.contact.address.locality}, ${siteConfig.contact.address.city}`)}`;
+const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteConfig.name}, ${siteConfig.contact.address.street}, ${siteConfig.contact.address.locality}, ${siteConfig.contact.address.city}`)}`;
 ---
 
 <!DOCTYPE html>

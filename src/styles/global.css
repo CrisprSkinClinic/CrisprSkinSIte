@@ -59,3 +59,12 @@ h1, h2, .font-display {
     -webkit-backdrop-filter: blur(14px) saturate(110%);
   }
 }
+
+/* Phones: the display-serif headings are large enough to fill half of the first screen, so they are scaled down a
+   step. Body text (16px), form fields and buttons are deliberately left alone. */
+@media (max-width: 639px) {
+  main h1 { font-size: 1.875rem !important; line-height: 1.15 !important; letter-spacing: -0.01em; }
+  main h2[class*="text-3xl"], main h2[class*="text-4xl"], main h2[class*="text-5xl"] { font-size: 1.75rem !important; line-height: 1.2 !important; }
+  main .prose h2 { font-size: 1.375rem; line-height: 1.3; }
+  main p.text-lg, main p.text-xl { font-size: 1.0625rem !important; line-height: 1.6 !important; }
+}
