@@ -56,7 +56,7 @@ An enlarged or elongated hole, a lobe that looks thin or stretched, a visible sl
 
 ## Earrings for Children and Babies
 
-Small children grab and tug at earrings, so tears are especially common in households with babies. Choose small, light studs with secure backs, avoid hoops and danglers around young children, and take your own earrings out when holding or feeding an infant if they tend to pull. If a child's ear is pierced, keep it clean and use hypoallergenic metals.
+Small children grab and tug at earrings, so tears are especially common in households with babies. Choose small, light studs with secure backs, avoid hoops and danglers around young children, and take your own earrings out when holding or feeding an infant if they tend to pull. If a child's ear is pierced, keep it clean and use hypoallergenic metals. Check the lobes regularly for redness or a widening hole.
 
 ## What About Stretched Lobes From Choice
 
