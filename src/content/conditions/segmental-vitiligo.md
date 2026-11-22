@@ -43,6 +43,42 @@ faqIds:
 ctaTitle: "Book a Vitiligo Evaluation"
 ---
 
-Segmental vitiligo affects one part of the body, in a distribution that does not cross the midline. It tends to start earlier in life than the common non-segmental form, spreads for a limited period, and then often remains stable for years, rather than continuing to appear in new places.
+Segmental vitiligo is a form of vitiligo in which depigmentation is confined to one segment or area of the body, such as one side of the face, one side of the trunk, or one limb. It does not cross the midline, and it differs in several important ways from the more common non-segmental type, which affects both sides of the body and tends to progress over years. Recognising it early changes the treatment plan.
 
-It is less responsive to creams and light treatment than the common type, but its tendency to stabilise makes it a good candidate for surgical repigmentation, which is why accurate classification matters at the first visit.
+## How Common Is It?
+
+Segmental vitiligo accounts for a minority of people with vitiligo, but it is relatively more common in children. Many patients first notice it in childhood or young adulthood, and parents are often the first to seek advice.
+
+## What It Looks Like
+
+The patch is smooth, milk-white, and sharply bordered, as in other forms of vitiligo, but its distribution is confined to one side or area. On the face, it often involves one side of the forehead, cheek, or around one eye. Hair within the patch, including eyebrows, eyelashes, and scalp hair, may turn white, and this is more common in segmental vitiligo than in the other type. White hair matters because it suggests the pigment cell reserve in the follicle has also been lost, which affects how well creams and light work.
+
+## How It Behaves
+
+Typically, there is a period of spread over several months, sometimes up to one or two years, followed by stabilisation. After that, the patch often remains unchanged for years, and does not usually continue to appear in new places. A minority of people with segmental vitiligo later develop non-segmental patches elsewhere, so ongoing awareness is sensible, but most remain confined to the original segment.
+
+## Why It Is Different
+
+The exact mechanism is not fully understood. A localised process is thought to be involved, rather than the more generalised immune activity seen in non-segmental disease. A practical consequence is that segmental vitiligo tends to respond less well to creams and phototherapy than the non-segmental type.
+
+## Diagnosis
+
+Examination is usually enough, supported by a Wood's lamp to define the extent. We look at the distribution, check for white hairs, and ask about when it began and whether it has changed. We also check whether any other patches are present elsewhere, because that changes the classification. Because other conditions can cause one-sided pale patches, confirming the diagnosis matters.
+
+## Treatment in the Active Phase
+
+When the patch is spreading, treatment aims to limit progression. Topical therapy and targeted light treatment may be used, and in some cases short courses of other medicines are considered. Patients and families should understand that response may be limited, and that the main aim is to avoid further spread while awaiting stability.
+
+## Treatment Once Stable
+
+Because segmental vitiligo tends to stabilise, it is often an excellent candidate for surgical repigmentation. Techniques that move pigment cells into the patch, such as suction blister grafting, non-cultured cell suspension transfer, or hair follicle transplantation, can give good and lasting results, and the tendency of the disease to stay confined helps results last. The choice of technique depends on the size and site of the patch. Surgery requires confirmed stability, commonly after a sustained period without change.
+
+## Children and Families
+
+Because the condition often starts young, special considerations apply. Surgery is generally postponed until the child is old enough to cooperate, and decisions are individualised. Parents often feel guilt or worry, and it is worth saying clearly that nothing they did caused it. Support at school and at home helps children cope, particularly when patches are on the face.
+
+## Camouflage and Sun Protection
+
+While waiting for stability or surgery, cosmetic camouflage and daily sunscreen are helpful. Sunscreen protects depigmented skin from burning and reduces tanning of the surrounding skin, which makes the contrast less noticeable.
+
+If you or your child has a patch limited to one area, an early evaluation helps classify it and plan treatment.
