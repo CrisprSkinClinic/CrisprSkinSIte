@@ -2,7 +2,7 @@
 title: "Collagen Supplements: What the Evidence Actually Says"
 pubDate: 2026-05-22
 description: "Collagen powders and drinks are heavily marketed. A balanced look at what is known and what is not."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan A"
 tags: ["Skincare Ingredients"]
 service: "anti-ageing"
 condition: "photoageing"

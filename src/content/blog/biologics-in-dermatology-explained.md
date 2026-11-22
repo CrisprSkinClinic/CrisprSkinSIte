@@ -2,7 +2,7 @@
 title: "Biologics in Dermatology: What They Are and Who They Are For"
 pubDate: 2025-12-10
 description: "Targeted injectable medicines have changed how severe skin disease is treated. A plain-language guide to what they are and when they are considered."
-author: "Dr. Narayanan B"
+author: "Dr. Narayanan A"
 tags: ["Psoriasis"]
 service: "psoriasis"
 condition: "moderate-to-severe-psoriasis"

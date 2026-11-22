@@ -82,3 +82,7 @@ Hairline design accounts for your face shape, age, and how your hair loss is lik
 Transplanted grafts typically shed within the first few weeks after surgery -- this is expected and normal, not a sign of failure. New growth from the transplanted follicles usually begins around three to four months post-procedure, with visible density improving steadily over the following months. Final results are typically assessed at twelve to fourteen months, once growth has fully matured.
 
 Most patients return to non-strenuous activity within a few days and can resume exercise within a couple of weeks, following specific post-operative care instructions to protect graft survival during the critical early healing period.
+
+## Medicines Alongside Surgery
+
+A transplant does not stop the surrounding natural hair from thinning, so medicines such as finasteride and minoxidil are usually advised. See [medical treatment for hair loss](/services/hair-loss-medical-treatment) and [what happens if you stop](/blog/stopping-hair-loss-medicines-what-happens).

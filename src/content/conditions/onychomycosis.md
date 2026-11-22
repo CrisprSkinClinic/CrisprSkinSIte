@@ -39,3 +39,7 @@ ctaTitle: "Book a Nail Evaluation"
 Onychomycosis is a fungal infection of the nail, causing discoloration, thickening, and sometimes separation from the nail bed. Because several other conditions -- including [nail psoriasis](/conditions/nail-psoriasis) and trauma -- can produce similar-looking nail changes, [confirming the diagnosis](/blog/nail-changes-when-to-see-a-doctor) with a nail sample sent for microscopy or culture is an important step before committing to what is typically a months-long treatment course.
 
 Nail growth is inherently slow -- fingernails take months and toenails can take the better part of a year to grow out fully -- so visible improvement during treatment is gradual by nature, and this timeline is explained clearly upfront so progress is judged accurately.
+
+## Staying on Treatment
+
+Nails grow slowly, so treatment continues for months. Stopping early is the commonest reason for failure. See [how long to continue antifungal treatment](/blog/tinea-how-long-to-continue-treatment).

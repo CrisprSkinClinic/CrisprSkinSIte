@@ -2,7 +2,7 @@
 title: "A Vitiligo Treatment Roadmap: What to Expect From First Visit to Long-Term Care"
 pubDate: 2026-11-20
 description: "A step-by-step view of how vitiligo is evaluated and treated, and how the options fit together over time."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan B"
 tags: ["Vitiligo"]
 service: "vitiligo"
 condition: "vitiligo"

@@ -2,7 +2,7 @@
 title: "Is Your Vitiligo Stable or Active? Why the Answer Changes Treatment"
 pubDate: 2026-07-28
 description: "Stability decides whether treatment aims to halt spread, restore pigment, or consider surgery."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan B"
 tags: ["Vitiligo"]
 service: "vitiligo"
 condition: "stable-vs-active-vitiligo"

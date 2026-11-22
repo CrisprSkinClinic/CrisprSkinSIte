@@ -2,7 +2,7 @@
 title: "Xanthelasma Aftercare and Recurrence: What to Expect and How to Lower the Risk"
 pubDate: 2026-01-01
 description: "Healing after xanthelasma removal, why patches can return, and what helps reduce the chance of recurrence."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan B"
 tags: ["Xanthelasma"]
 service: "xanthelasma-treatment"
 condition: "xanthelasma"

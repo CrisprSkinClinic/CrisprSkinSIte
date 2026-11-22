@@ -2,7 +2,7 @@
 title: "Why Acne Treatment Takes Longer Than You'd Like"
 pubDate: 2026-07-17
 description: "If you've started acne treatment and don't see results in a week, that's not a sign it's failing -- here's why patience actually matters here."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan A"
 tags: ["Acne"]
 service: "acne"
 condition: "acne-vulgaris"

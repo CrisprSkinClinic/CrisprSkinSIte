@@ -40,3 +40,7 @@ ctaTitle: "Book a Female Hair Loss Consultation"
 Female pattern hair loss presents differently from the [male pattern](/conditions/androgenetic-alopecia) -- rather than a receding hairline, it typically shows up as gradual diffuse thinning across the scalp or a progressively widening centre part, with the hairline itself usually remaining intact. It's influenced by genetic factors, hormonal changes (including those around menopause), and sometimes coexists with other contributing factors like PCOS or nutritional deficiencies.
 
 Because the possible contributing causes are broader than in male pattern hair loss, [a careful evaluation](/services/female-hair-loss) -- including relevant blood investigations where indicated -- helps ensure treatment addresses what's actually driving the thinning in your specific case, rather than treating it generically. Shedding after childbirth or illness is a different pattern; see [postpartum hair loss](/conditions/postpartum-hair-loss) and [telogen effluvium](/conditions/telogen-effluvium).
+
+## Medical Options
+
+Topical or low-dose oral minoxidil, and anti-androgens in selected women, are the main medicines. Finasteride is not used in women who could become pregnant. See [medical treatment for female pattern hair loss](/blog/medical-treatment-for-female-pattern-hair-loss).

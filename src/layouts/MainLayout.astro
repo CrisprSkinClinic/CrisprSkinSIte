@@ -150,6 +150,7 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <noscript><style>[data-shuffle]{visibility:visible!important;animation:none!important}</style></noscript>
   </head>
 
   <body class="bg-warmwhite text-charcoal antialiased selection:bg-brand-200 selection:text-brand-900 flex flex-col min-h-screen pb-20 md:pb-0">
@@ -163,6 +164,23 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
     {!bare && <Footer />}
 
     {!bare && <FloatingContact />}
+
+    <script>
+      // Equal billing for the doctors: any element marked data-shuffle has its
+      // children put in a fresh random order on every page load, so no doctor is
+      // always first. (The pages are static, so this has to happen in the browser.)
+      document.addEventListener('astro:page-load', () => {
+        document.querySelectorAll('[data-shuffle]').forEach((el) => {
+          const kids = Array.from(el.children);
+          for (let i = kids.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [kids[i], kids[j]] = [kids[j], kids[i]];
+          }
+          kids.forEach((k) => el.appendChild(k));
+          el.setAttribute('data-shuffled', '');
+        });
+      });
+    </script>
 
     <script>
       // GA4 conversion tracking via event delegation -- a single

@@ -2,7 +2,7 @@
 title: "Living With Alopecia Areata: What We Know and What We Don't"
 pubDate: 2026-07-06
 description: "Alopecia areata's unpredictable course is one of the hardest parts of the condition. Here's an honest look at what treatment can and can't promise."
-author: "Dr. Narayanan B"
+author: "Dr. Karthik L"
 tags: ["Alopecia Areata"]
 service: "alopecia-areata"
 condition: "alopecia-areata"

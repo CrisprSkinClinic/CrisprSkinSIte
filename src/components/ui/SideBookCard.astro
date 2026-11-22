@@ -7,7 +7,7 @@ const tel = siteConfig.contact.phone.replace(/[^0-9+]/g, '');
 <div class="ui-card overflow-hidden">
   <img src="/images/clinic/waiting-area.jpg" alt={`Waiting area at ${siteConfig.name}`} width="340" height="220" loading="lazy" decoding="async" class="h-36 w-full object-cover" />
   <div class="p-6">
-    <div class="mb-4 flex -space-x-2.5" aria-hidden="true">
+    <div data-shuffle class="mb-4 flex -space-x-2.5" aria-hidden="true">
       {siteConfig.doctors.map((d) => (
         <img src={`/images/doctors/${d.slug}.jpg`} alt="" width="40" height="40" loading="lazy" class="h-10 w-10 rounded-full border-2 border-white object-cover object-top shadow-sm" />
       ))}

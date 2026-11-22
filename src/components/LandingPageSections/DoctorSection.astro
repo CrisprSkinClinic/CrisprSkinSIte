@@ -13,7 +13,7 @@ import { siteConfig } from '../../config/site.js';
         <h3 class="text-2xl md:text-3xl font-extrabold text-brand-900 tracking-tight mb-2">Meet Our Doctors</h3>
         <p class="text-slate-600 max-w-2xl mx-auto">Three AIIMS-trained consultant dermatologists, committed to providing ethical, evidence-based care -- prioritizing your long-term skin and hair health over high-volume transactions.</p>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+      <div data-shuffle class="grid grid-cols-1 sm:grid-cols-3 gap-8">
         {siteConfig.doctors.map((doc) => (
           <div class="text-center">
             <img

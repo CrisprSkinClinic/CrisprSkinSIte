@@ -33,9 +33,18 @@ relatedConditions:
   - "pityriasis-versicolor"
   - "nummular-eczema"
 
+faqIds:
+  - "tinea-how-long-treatment"
+  - "tinea-steroid-cream-danger"
+  - "tinea-stop-when-itch-gone"
+
 ctaTitle: "Book a Fungal Infection Evaluation"
 ---
 
 Tinea infections are fungal skin infections that present differently depending on the body site involved: tinea corporis (commonly known as ringworm) on the body, tinea pedis (athlete's foot) on the feet, and tinea cruris (jock itch) in the groin. All three are caused by the same category of fungus and are treated with the same general [antifungal approach](/services/fungal-infections), though the specific location can affect product choice and treatment duration.
 
 The most common reason these infections seem to recur is [stopping treatment too early](/blog/fungal-infection-recurrence) once visible symptoms improve, or reinfection from an untreated source like contaminated footwear or shared towels -- continuing treatment for the full prescribed duration is the single most important factor in preventing this.
+
+## Treatment Compliance
+
+Take the full course, even after the skin looks normal, avoid steroid or combination creams unless prescribed, and treat the household and clothing together. See [why tinea treatment fails](/blog/tinea-treatment-why-it-fails-and-compliance) and [how long to continue](/blog/tinea-how-long-to-continue-treatment).

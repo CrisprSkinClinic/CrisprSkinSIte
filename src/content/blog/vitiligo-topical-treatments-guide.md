@@ -2,7 +2,7 @@
 title: "Vitiligo Creams Explained: Steroids, Tacrolimus, and Other Topical Options"
 pubDate: 2026-11-09
 description: "Topical treatment is the usual starting point for limited vitiligo. How each option works and where it fits."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan B"
 tags: ["Vitiligo"]
 service: "vitiligo"
 condition: "vitiligo"

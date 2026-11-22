@@ -2,7 +2,7 @@
 title: "JAK Inhibitors in Dermatology: Benefits, Risks, and Monitoring"
 pubDate: 2026-01-19
 description: "JAK inhibitors are small-molecule medicines used for several skin and hair conditions. What they are and what responsible use looks like."
-author: "Dr. Karthik L"
+author: "Dr. Narayanan A"
 tags: ["Alopecia Areata"]
 service: "alopecia-areata"
 condition: "alopecia-areata"

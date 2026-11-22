@@ -2,7 +2,7 @@
 title: "Building a Skincare Routine: Order, Actives, and What Not to Combine"
 pubDate: 2026-08-24
 description: "More products do not mean better skin. A simple structure for your routine and how to avoid irritating your skin barrier."
-author: "Dr. Narayanan B"
+author: "Dr. Narayanan A"
 tags: ["Skincare Ingredients"]
 service: "eczema"
 condition: "damaged-skin-barrier"
