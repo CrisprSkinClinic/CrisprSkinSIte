@@ -29,7 +29,9 @@ body {
 
 h1, h2, .font-display {
   font-family: 'DM Serif Display', Georgia, serif;
-  font-weight: 400;
+  /* DM Serif Display ships in one weight; without this the browser fakes a bold cut (smudgy, wider letters). */
+  font-weight: 400 !important;
+  font-synthesis: none;
   letter-spacing: -0.025em;
 }
 
