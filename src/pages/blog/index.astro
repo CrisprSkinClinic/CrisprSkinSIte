@@ -1,12 +1,26 @@
 ---
 import MainLayout from '../../layouts/MainLayout.astro';
 import { getCollection } from 'astro:content';
+import ListingFilter from '../../components/ListingFilter.astro';
 import { siteConfig } from '../../config/site.js';
 
 const pageTitle = "Skin & Hair Health Blog";
 const pageDescription = `Patient guides and clinical insights on hair loss, acne, pigmentation, and more from the dermatologists at ${siteConfig.name}, Chennai.`;
 
 const allPosts = await getCollection('blog');
+const allServices = await getCollection('services');
+const allConditions = await getCollection('conditions');
+const serviceCategoryBySlug = Object.fromEntries(allServices.map((x) => [x.slug, x.data.category]));
+const conditionServiceBySlug = Object.fromEntries(allConditions.map((x) => [x.slug, x.data.parentService]));
+const categoryLabels = { hair: 'Hair', skin: 'Skin', cosmetic: 'Cosmetic', pediatric: 'Pediatric', general: 'General' };
+const filterCategories = ['hair', 'skin', 'cosmetic', 'pediatric', 'general'].map((value) => ({ value, label: categoryLabels[value] }));
+// An article's category comes from the service it is linked to (or its condition's parent service).
+const categoryOf = (post) => serviceCategoryBySlug[post.data.service] || serviceCategoryBySlug[conditionServiceBySlug[post.data.condition]] || 'general';
+const slugify = (t) => String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+const topicCounts = {};
+allPosts.forEach((post) => (post.data.tags || []).forEach((t) => { topicCounts[t] = (topicCounts[t] || 0) + 1; }));
+// Only topics with at least two articles are worth a filter.
+const topics = Object.entries(topicCounts).filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([t, n]) => ({ value: slugify(t), label: `${t} (${n})` }));
 const sortedPosts = allPosts.sort(
   (a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf()
 );
@@ -21,13 +35,20 @@ const sortedPosts = allPosts.sort(
     </div>
   </section>
 
-  <section class="py-16 px-6 max-w-7xl mx-auto">
+  <ListingFilter noun="articles" placeholder="Search articles" categories={filterCategories} topics={topics} />
+
+  <section class="py-10 px-6 max-w-7xl mx-auto">
     {sortedPosts.length === 0 ? (
       <p class="text-center text-slate-600 text-lg">No articles published yet. Check back soon.</p>
     ) : (
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         {sortedPosts.map((post) => (
-          <a href={`/blog/${post.slug}`} class="bg-white rounded-2xl shadow-sm border border-champagne-200 hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full p-6 md:p-8 relative overflow-hidden">
+          <a href={`/blog/${post.slug}`}
+             data-filter-item
+             data-cat={categoryOf(post)}
+             data-topics={(post.data.tags || []).map(slugify).join('|')}
+             data-search={`${post.data.title} ${post.data.description} ${(post.data.tags || []).join(' ')} ${categoryLabels[categoryOf(post)]}`.toLowerCase()}
+             class="bg-white rounded-2xl shadow-sm border border-champagne-200 hover:shadow-xl hover:border-brand-200 transition-all duration-300 group flex flex-col h-full p-6 md:p-8 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-1.5 h-full bg-brand-600 group-hover:bg-brand-700 transition-colors"></div>
             <p class="text-xs text-brand-600 mb-3 font-bold uppercase tracking-wider">
               {new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}

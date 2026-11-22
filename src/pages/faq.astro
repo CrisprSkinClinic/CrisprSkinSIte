@@ -1,12 +1,23 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
 import { getCollection } from 'astro:content';
+import ListingFilter from '../components/ListingFilter.astro';
 import { siteConfig } from '../config/site.js';
 
 const pageTitle = "Frequently Asked Questions";
 const pageDescription = `Answers to common questions about hair transplant, acne, pigmentation, vitiligo, psoriasis, and cosmetic dermatology at ${siteConfig.name}, Chennai.`;
 
 const allFaqs = await getCollection('faqs');
+const allServices = await getCollection('services');
+const allConditions = await getCollection('conditions');
+const serviceCategoryBySlug = Object.fromEntries(allServices.map((x) => [x.slug, x.data.category]));
+// A question belongs to the category of the service or condition page that uses it; the rest are General.
+const faqCategory = {};
+allServices.forEach((x) => (x.data.faqIds || []).forEach((id) => { faqCategory[id] ??= x.data.category; }));
+allConditions.forEach((x) => (x.data.faqIds || []).forEach((id) => { faqCategory[id] ??= serviceCategoryBySlug[x.data.parentService]; }));
+const categoryLabels = { hair: 'Hair', skin: 'Skin', cosmetic: 'Cosmetic', pediatric: 'Pediatric', general: 'General' };
+const filterCategories = ['hair', 'skin', 'cosmetic', 'pediatric', 'general'].map((value) => ({ value, label: categoryLabels[value] }));
+const catOf = (faq) => faqCategory[faq.slug] || 'general';
 const sortedFaqs = allFaqs.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
 
 const schema = {
@@ -34,10 +45,12 @@ const schema = {
     </div>
   </section>
 
-  <section class="py-16 px-6 max-w-3xl mx-auto">
+  <ListingFilter noun="questions" placeholder="Search questions" categories={filterCategories} />
+
+  <section class="py-10 px-6 max-w-3xl mx-auto">
     <div class="space-y-4">
       {sortedFaqs.map((faq) => (
-        <details class="group bg-champagne-50 rounded-lg border border-slate-200 overflow-hidden">
+        <details data-filter-item data-open-on-match data-cat={catOf(faq)} data-search={`${faq.data.question} ${faq.body} ${(faq.data.tags || []).join(' ')} ${categoryLabels[catOf(faq)]}`.toLowerCase()} class="group bg-champagne-50 rounded-lg border border-slate-200 overflow-hidden">
           <summary class="flex items-center justify-between cursor-pointer p-6 font-bold text-lg text-slate-900 group-hover:text-brand-600 transition">
             {faq.data.question}
             <span class="transition group-open:rotate-180 shrink-0 ml-4">

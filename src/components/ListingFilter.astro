@@ -1,0 +1,178 @@
+---
+// src/components/ListingFilter.astro
+//
+// Search + filter bar for the Services, Conditions, Blog and FAQ listing pages. It is progressive
+// enhancement: every item is in the HTML (so search engines and no-JS visitors see the full list) and the
+// script only hides items that do not match.
+//
+// The page marks up its own content:
+//   [data-filter-root]     wraps the bar's target area (this component renders the bar, the page the list)
+//   [data-filter-item]     one searchable item; data-search = lowercase text, data-cat = category value,
+//                          data-topics = "|"-separated topic values (optional)
+//   [data-filter-section]  a group (e.g. "Hair") that is hidden when none of its items match
+//   data-open-on-match     on <details> items: opened while a search is active
+//
+// Props:
+//   noun         "services" / "conditions" / "articles" / "questions": used in the count and empty state
+//   placeholder  search box placeholder
+//   categories   [{ value, label }] filter chips (an "All" chip is added)
+//   topics       optional [{ value, label }] shown as a "Topic" select
+const { noun, placeholder, categories = [], topics = [], total } = Astro.props;
+---
+
+<div id="listingFilter" data-noun={noun} data-total={total} class="mx-auto max-w-7xl px-6 pt-10" role="search">
+  <div class="relative">
+    <label for="lfSearch" class="sr-only">Search {noun}</label>
+    <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="lfSearch" type="search" autocomplete="off" enterkeyhint="search" placeholder={placeholder}
+           class="w-full min-h-[52px] rounded-full border border-slate-300 bg-white py-3 pl-12 pr-12 text-base text-slate-900 placeholder:text-slate-400 shadow-sm outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 [&::-webkit-search-cancel-button]:hidden" />
+    <button id="lfClear" type="button" class="absolute right-3 top-1/2 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-800" aria-label="Clear search">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2">
+    {categories.length > 0 && (
+      <div id="lfChips" class="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+        <button type="button" data-cat="" aria-pressed="true" class="lf-chip">All</button>
+        {categories.map((c) => (
+          <button type="button" data-cat={c.value} aria-pressed="false" class="lf-chip">{c.label}</button>
+        ))}
+      </div>
+    )}
+    {topics.length > 0 && (
+      <div class="ml-auto flex items-center gap-2">
+        <label for="lfTopic" class="text-sm font-semibold text-slate-600">Topic</label>
+        <select id="lfTopic" class="min-h-[44px] rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15">
+          <option value="">All topics</option>
+          {topics.map((t) => <option value={t.value}>{t.label}</option>)}
+        </select>
+      </div>
+    )}
+  </div>
+
+  <div class="mt-4 flex min-h-[1.5rem] items-center gap-3 text-sm text-slate-600">
+    <p id="lfCount" role="status" aria-live="polite"></p>
+    <button id="lfReset" type="button" class="hidden font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Clear filters</button>
+  </div>
+
+  <div id="lfEmpty" class="mt-6 hidden rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center">
+    <p class="text-lg font-semibold text-slate-900">No {noun} match <span id="lfEmptyQuery" class="break-words"></span></p>
+    <p class="mt-2 text-slate-600">Try a different word, or clear the filters to see everything.</p>
+    <div class="mt-5 flex flex-wrap justify-center gap-3">
+      <button id="lfEmptyReset" type="button" class="min-h-[44px] rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-white hover:bg-brand-700">Clear filters</button>
+      <a href="/contact" class="inline-flex min-h-[44px] items-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-semibold text-slate-800 hover:bg-slate-50">Ask our team</a>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .lf-chip { min-height: 44px; padding: 0.5rem 1rem; border-radius: 9999px; border: 1px solid rgb(203 213 225); background: #fff; color: rgb(30 41 59); font-size: 0.875rem; font-weight: 600; transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s, transform .1s; }
+  .lf-chip:hover { border-color: #7E4D8B; background: #FBF8FC; }
+  .lf-chip:active { transform: scale(.97); }
+  .lf-chip:focus-visible { outline: 2px solid #7E4D8B; outline-offset: 2px; }
+  .lf-chip[aria-pressed="true"] { background: #7E4D8B; border-color: #7E4D8B; color: #fff; box-shadow: 0 4px 12px rgba(126, 77, 139, .28); }
+  @media (prefers-reduced-motion: reduce) { .lf-chip { transition: none; } }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const bar = document.getElementById('listingFilter');
+    if (!bar) return;
+    const items = Array.from(document.querySelectorAll('[data-filter-item]'));
+    const sections = Array.from(document.querySelectorAll('[data-filter-section]'));
+    if (!items.length) return;
+
+    const input = document.getElementById('lfSearch');
+    const clearBtn = document.getElementById('lfClear');
+    const chips = Array.from(bar.querySelectorAll('.lf-chip'));
+    const topicSel = document.getElementById('lfTopic');
+    const countEl = document.getElementById('lfCount');
+    const resetBtn = document.getElementById('lfReset');
+    const empty = document.getElementById('lfEmpty');
+    const noun = bar.dataset.noun || 'items';
+    const total = items.length;
+
+    // Lower-case, strip accents and punctuation so "Café", "acne-scars" and "acne scars" all match.
+    const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    const haystacks = items.map((el) => norm(el.dataset.search || el.textContent));
+
+    const state = { q: '', cat: '', topic: '' };
+    let opened = new Set();
+
+    const matches = (i) => {
+      const el = items[i];
+      if (state.cat && el.dataset.cat !== state.cat) return false;
+      if (state.topic && !(el.dataset.topics || '').split('|').includes(state.topic)) return false;
+      if (!state.q) return true;
+      // Every word must appear; a trailing "s" is ignored so "scars" finds "scar" and vice versa.
+      const hay = haystacks[i];
+      return norm(state.q).split(' ').every((w) => hay.includes(w) || (w.length > 3 && w.endsWith('s') && hay.includes(w.slice(0, -1))));
+    };
+
+    function apply({ updateUrl = true } = {}) {
+      let shown = 0;
+      items.forEach((el, i) => {
+        const ok = matches(i);
+        el.classList.toggle('hidden', !ok);
+        if (ok) shown += 1;
+        // FAQ answers: open the matches while searching, then put them back as they were.
+        if (el.tagName === 'DETAILS' && el.hasAttribute('data-open-on-match')) {
+          if (ok && state.q && shown <= 8) { if (!el.open) { el.open = true; opened.add(el); } }
+          else if (opened.has(el)) { el.open = false; opened.delete(el); }
+        }
+      });
+      sections.forEach((sec) => {
+        const any = Array.from(sec.querySelectorAll('[data-filter-item]')).some((el) => !el.classList.contains('hidden'));
+        sec.classList.toggle('hidden', !any);
+      });
+
+      const filtering = Boolean(state.q || state.cat || state.topic);
+      countEl.textContent = filtering ? `Showing ${shown} of ${total} ${noun}` : `${total} ${noun}`;
+      resetBtn.classList.toggle('hidden', !filtering);
+      clearBtn.classList.toggle('hidden', !state.q);
+      clearBtn.classList.toggle('flex', Boolean(state.q));
+      empty.classList.toggle('hidden', shown !== 0);
+      document.getElementById('lfEmptyQuery').textContent = state.q ? `“${state.q}”` : 'these filters';
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.cat === state.cat)));
+      if (topicSel) topicSel.value = state.topic;
+
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        ['q', 'cat', 'topic'].forEach((k) => (state[k] ? url.searchParams.set(k, state[k]) : url.searchParams.delete(k)));
+        history.replaceState(history.state, '', url);
+      }
+    }
+
+    let timer = null;
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { state.q = input.value.trim(); apply(); }, 120);
+    });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Escape' && input.value) { e.preventDefault(); resetQuery(); } });
+    const resetQuery = () => { input.value = ''; state.q = ''; apply(); input.focus(); };
+    clearBtn.addEventListener('click', resetQuery);
+    chips.forEach((chip) => chip.addEventListener('click', () => { state.cat = chip.dataset.cat || ''; apply(); }));
+    topicSel?.addEventListener('change', () => { state.topic = topicSel.value; apply(); });
+    const resetAll = () => { input.value = ''; Object.assign(state, { q: '', cat: '', topic: '' }); apply(); input.focus(); };
+    resetBtn.addEventListener('click', resetAll);
+    document.getElementById('lfEmptyReset')?.addEventListener('click', resetAll);
+
+    // "/" jumps to the search box (as on most documentation sites) unless the visitor is already typing.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target;
+      if (t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      e.preventDefault();
+      input.focus();
+    });
+
+    // Restore from a shared link such as /faq/?q=acne&cat=skin.
+    const params = new URLSearchParams(window.location.search);
+    state.q = (params.get('q') || '').trim();
+    state.cat = chips.some((c) => c.dataset.cat === params.get('cat')) ? params.get('cat') : '';
+    state.topic = topicSel && Array.from(topicSel.options).some((o) => o.value === params.get('topic')) ? params.get('topic') : '';
+    input.value = state.q;
+    apply({ updateUrl: false });
+  });
+</script>

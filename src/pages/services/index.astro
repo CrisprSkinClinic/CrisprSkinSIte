@@ -2,6 +2,7 @@
 import MainLayout from '../../layouts/MainLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import ServiceCard from '../../components/ServiceCard.astro';
+import ListingFilter from '../../components/ListingFilter.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '../../config/site.js';
 import { getServiceImage, getServiceImageAlt } from '../../utils/serviceImages';
@@ -19,6 +20,8 @@ const categoryLabels = {
 };
 
 const categoryOrder = ['hair', 'skin', 'cosmetic', 'pediatric'];
+
+const filterCategories = categoryOrder.map((value) => ({ value, label: categoryLabels[value] }));
 
 const servicesByCategory = categoryOrder.map((cat) => ({
   category: cat,
@@ -38,16 +41,19 @@ const servicesByCategory = categoryOrder.map((cat) => ({
     <p class="text-lg text-slate-600 max-w-2xl mx-auto">Evidence-based hair, skin, cosmetic, and paediatric dermatology care under one roof in KK Nagar, Chennai.</p>
   </div>
 
-  <div class="max-w-7xl mx-auto py-16 px-6">
+  <ListingFilter noun="services" placeholder="Search services" categories={filterCategories} />
+
+  <div class="max-w-7xl mx-auto py-10 px-6">
     {servicesByCategory.map(({ category, label, services }) => (
       services.length > 0 && (
-        <section class="mb-16 last:mb-0">
+        <section class="mb-16 last:mb-0" data-filter-section>
           <div class="flex items-center gap-4 mb-8">
             <h2 class="text-2xl md:text-3xl font-bold text-brand-900">{label}</h2>
             <a href={`/${category}`} class="text-sm text-brand-600 font-semibold hover:underline">View {label} overview &rarr;</a>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
+              <div class="h-full" data-filter-item data-cat={category} data-search={`${service.data.title} ${service.data.heroSubheadline || ''} ${service.data.metaDescription || ''} ${label} ${(service.data.conditionsManaged || []).join(' ')}`.toLowerCase()}>
               <ServiceCard
                 image={getServiceImage(service.data.heroImage) ?? (service.data.heroImage ? `/images/services/${service.data.heroImage}.jpg` : undefined)}
                 alt={getServiceImageAlt(service.data.heroImage, service.data.title)}
@@ -55,6 +61,7 @@ const servicesByCategory = categoryOrder.map((cat) => ({
                 description={service.data.heroSubheadline || service.data.metaDescription || ''}
                 link={`/services/${service.slug}`}
               />
+              </div>
             ))}
           </div>
         </section>
