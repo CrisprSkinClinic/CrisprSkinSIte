@@ -19,7 +19,12 @@ diagnostics:
   - "Nail clipping/scraping for fungal culture or microscopy where infection is suspected"
   - "Assessment for underlying causes: psoriasis, trauma, systemic conditions"
 
-conditionsManaged: []
+conditionsManaged:
+  - "onychomycosis"
+  - "ingrown-toenail"
+  - "recurrent-ingrown-toenail"
+  - "nail-psoriasis"
+  - "paronychia"
 
 treatments:
   - name: "Antifungal Therapy (Topical or Oral)"

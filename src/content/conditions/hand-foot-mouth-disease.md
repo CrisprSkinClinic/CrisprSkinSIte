@@ -28,11 +28,13 @@ treatmentOverview:
   - name: "Monitoring for Complications"
     description: "Watching for signs of dehydration from reduced fluid intake due to mouth discomfort, and following up if symptoms don't follow the expected course."
 
-relatedConditions: []
+relatedConditions:
+  - "molluscum-contagiosum"
+  - "viral-warts"
 
 ctaTitle: "Book a Consultation for Your Child"
 ---
 
-Hand, foot and mouth disease is a common, contagious viral illness in young children, causing small sores inside the mouth alongside a rash or small blisters on the hands, feet, and sometimes buttocks. It typically follows a mild, self-limiting course over about a week, though the mouth sores can make eating and drinking uncomfortable in the meantime.
+Hand, foot and mouth disease is a common, contagious [viral illness](/blog/viral-skin-infections-school) in young children, causing small sores inside the mouth alongside a rash or small blisters on the hands, feet, and sometimes buttocks. It typically follows a mild, self-limiting course over about a week, though the mouth sores can make eating and drinking uncomfortable in the meantime.
 
-Treatment is supportive -- managing discomfort, encouraging fluid intake despite mouth soreness, and monitoring for the illness to follow its expected course. Because it spreads easily through close contact, simple hygiene measures help limit transmission to other children and family members while your child recovers.
+Treatment is supportive -- managing discomfort, encouraging fluid intake despite mouth soreness, and monitoring for the illness to follow its expected course. Because it spreads easily through close contact, simple hygiene measures help limit transmission to other children and family members while your child recovers. See also [molluscum contagiosum](/conditions/molluscum-contagiosum) and [viral warts](/conditions/viral-warts), two other viral skin infections common in children.

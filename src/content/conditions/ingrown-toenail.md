@@ -28,11 +28,14 @@ treatmentOverview:
   - name: "In-Clinic Procedure"
     description: "For recurrent or more severe cases, a minor procedure to address the underlying nail edge and reduce recurrence."
 
-relatedConditions: []
+relatedConditions:
+  - "recurrent-ingrown-toenail"
+  - "paronychia"
+  - "onychomycosis"
 
 ctaTitle: "Book a Nail Evaluation"
 ---
 
-An ingrown toenail occurs when the edge of the nail grows into the surrounding skin, most commonly affecting the big toe, leading to pain, swelling, and sometimes infection if left untreated. It's largely a mechanical problem, often related to how nails are trimmed, footwear choice, or the natural curve of the nail.
+An ingrown toenail occurs when the edge of the nail grows into the surrounding skin, most commonly affecting the big toe, leading to pain, swelling, and sometimes [infection](/conditions/paronychia) if left untreated. It's largely a mechanical problem, often related to how nails are trimmed, footwear choice, or the natural curve of the nail.
 
-Early or mild cases often respond well to conservative measures and improved nail care -- trimming straight across rather than in a curve, and avoiding overly tight footwear. For ingrown nails that recur despite this, a minor in-clinic procedure addressing the nail edge directly reduces the likelihood of the problem returning.
+Early or mild cases often respond well to conservative measures and improved nail care -- trimming straight across rather than in a curve, and avoiding overly tight footwear. For ingrown nails that recur despite this, a [minor in-clinic procedure](/services/nail-avulsion-lateral-matricectomy) addressing the nail edge directly (see [lateral chemical matricectomy explained](/blog/lateral-chemical-matricectomy-explained)) reduces the likelihood of the problem returning.

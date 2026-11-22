@@ -1,13 +1,14 @@
 ---
 title: "Laser Hair Reduction: Why It's Called 'Reduction,' Not 'Removal'"
-pubDate: 2026-04-30
+pubDate: 2026-03-24
 description: "This one word choice matters -- here's what laser hair reduction can realistically achieve, and why a full course of sessions is essential."
 author: "Dr. Karthik L"
 tags: ["Laser Hair Reduction"]
 service: "laser-hair-reduction"
+condition: "unwanted-body-and-facial-hair"
 ---
 
-We deliberately use the term "reduction" rather than "removal" when talking about laser hair treatment, and it's worth explaining why that distinction matters for setting the right expectations from the start.
+We deliberately use the term "reduction" rather than "removal" when talking about [laser hair treatment](/services/laser-hair-reduction), and it's worth explaining why that distinction matters for setting the right expectations from the start.
 
 ## Why a Single Session Isn't Enough
 

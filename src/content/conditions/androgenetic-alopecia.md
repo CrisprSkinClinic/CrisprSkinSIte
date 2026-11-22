@@ -30,10 +30,13 @@ treatmentOverview:
 
 relatedConditions:
   - "telogen-effluvium"
+  - "norwood-scale-male-pattern-baldness"
+  - "donor-area-depletion"
+  - "scarring-alopecia"
 
 ctaTitle: "Book a Hair Loss Evaluation"
 ---
 
-Androgenetic alopecia, commonly known as male pattern baldness, is the most common cause of hair loss in men, driven by a genetic sensitivity to dihydrotestosterone (DHT), a hormone that gradually shrinks hair follicles over time. It follows a recognizable pattern -- typically starting with a receding hairline at the temples and thinning at the crown -- that progresses gradually over years.
+Androgenetic alopecia, commonly known as [male pattern baldness](/conditions/norwood-scale-male-pattern-baldness), is the most common cause of hair loss in men, driven by a genetic sensitivity to dihydrotestosterone (DHT), a hormone that gradually shrinks hair follicles over time. It follows a recognizable pattern -- typically starting with a receding hairline at the temples and thinning at the crown -- that progresses gradually over years.
 
-Because the pattern and progression are well understood, treatment started earlier tends to have more existing hair to work with and can meaningfully slow further miniaturization, though the condition itself is genetic and not something current treatment reverses to a pre-loss state.
+Because the pattern and progression are well understood, treatment started earlier tends to have more existing hair to work with and can meaningfully slow further miniaturization, though the condition itself is genetic and not something current treatment reverses to a pre-loss state. Where surgery is considered, [hair transplant planning](/services/hair-transplant-fue) depends on [donor supply](/conditions/donor-area-depletion) and whether the pattern has stabilised; see also [who should wait before a transplant](/blog/who-should-delay-a-hair-transplant).

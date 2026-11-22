@@ -19,7 +19,8 @@ diagnostics:
   - "Discussion of skincare history, sun exposure, and lifestyle factors"
   - "Goal-setting to prioritize which changes matter most to you"
 
-conditionsManaged: []
+conditionsManaged:
+  - "photoageing"
 
 treatments:
   - name: "Medical-Grade Skincare"
@@ -33,6 +34,10 @@ faqIds:
   - "anti-ageing-when-to-start"
   - "anti-ageing-skincare-vs-procedures"
   - "anti-ageing-realistic-results"
+  - "ingredients-retinol-vs-retinoid"
+  - "ingredients-retinoid-pregnancy"
+  - "ingredients-collagen-supplements"
+  - "ingredients-vitamin-c-how-to-use"
 
 ctaTitle: "Book an Anti-Ageing Consultation"
 ---

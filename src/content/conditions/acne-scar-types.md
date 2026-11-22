@@ -28,11 +28,13 @@ treatmentOverview:
   - name: "Microneedling"
     description: "Particularly useful for rolling and boxcar scars, stimulating the skin's own collagen response."
 
-relatedConditions: []
+relatedConditions:
+  - "hormonal-acne"
+  - "post-inflammatory-hyperpigmentation"
 
 ctaTitle: "Book an Acne Scar Evaluation"
 ---
 
-Acne scarring typically presents as one of three recognized patterns, often in combination rather than in isolation: icepick scars, which are narrow and deep; boxcar scars, which are broader with sharply defined edges; and rolling scars, which are broad with sloping edges that give the skin an uneven, wave-like texture. Each pattern responds differently to available treatments, which is why classifying the specific type -- or combination of types -- present matters more here than almost anywhere else in cosmetic dermatology.
+Acne scarring typically presents as one of three recognized patterns, often in combination rather than in isolation: icepick scars, which are narrow and deep; boxcar scars, which are broader with sharply defined edges; and rolling scars, which are broad with sloping edges that give the skin an uneven, wave-like texture. Each pattern responds differently to available treatments, which is why [classifying the specific type](/blog/acne-scar-types-explained) -- or combination of types -- present matters more here than almost anywhere else in cosmetic dermatology.
 
-A treatment that meaningfully improves rolling scars, for instance, may do very little for icepick scars, so an accurate evaluation of your specific scarring pattern is the necessary first step before choosing a treatment course.
+A treatment that meaningfully improves rolling scars, for instance, may do very little for icepick scars, so [an accurate evaluation](/services/acne-scars) of your specific scarring pattern is the necessary first step before choosing a treatment course. Scars are best prevented by treating [acne](/conditions/acne-vulgaris) early.

@@ -31,11 +31,14 @@ treatmentOverview:
   - name: "Surgical Removal"
     description: "For moles removed for cosmetic reasons or based on clinical concern, in-clinic removal under local anaesthesia."
 
-relatedConditions: []
+relatedConditions:
+  - "congenital-melanocytic-naevus"
+  - "skin-tags"
+  - "viral-warts"
 
 ctaTitle: "Book a Mole Evaluation"
 ---
 
-Melanocytic naevi, commonly known as moles, are usually harmless pigmented growths that most people have in some number. The recognized warning signs worth checking are asymmetry, an irregular border, multiple or uneven colors, a diameter larger than a pencil eraser, and any recent evolution in size, shape, or color -- these are worth a prompt evaluation rather than a wait-and-see approach.
+Melanocytic naevi, commonly known as moles, are usually harmless pigmented growths that most people have in some number. The recognized [warning signs](/blog/mole-warning-signs) worth checking are asymmetry, an irregular border, multiple or uneven colors, a diameter larger than a pencil eraser, and any recent evolution in size, shape, or color -- these are worth a prompt evaluation rather than a wait-and-see approach.
 
-Most moles need no treatment at all. For moles that a patient wants removed for cosmetic or comfort reasons, or where a mole shows any features raising a clinical question, removal or biopsy is performed to provide either cosmetic resolution or definitive pathology confirmation.
+Most moles need no treatment at all. For moles that a patient wants removed for cosmetic or comfort reasons, or where a mole shows any features raising a clinical question, [removal or biopsy](/services/warts-moles-skin-tags) is performed to provide either cosmetic resolution or definitive pathology confirmation. Sun protection also matters; see [sun safety and skin cancer awareness](/blog/sun-safety-and-skin-cancer-awareness).

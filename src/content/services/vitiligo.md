@@ -21,20 +21,47 @@ diagnostics:
 
 conditionsManaged:
   - "vitiligo"
+  - "stable-vs-active-vitiligo"
+  - "segmental-vitiligo"
+  - "vitiligo-surgical-treatment"
 
 treatments:
-  - name: "Topical Therapy"
-    description: "Topical treatments to reduce the local immune activity driving pigment loss, most effective on certain body areas and in earlier, more limited disease."
-  - name: "Phototherapy Referral"
-    description: "For more extensive vitiligo, phototherapy is often the most effective option, considered and coordinated based on extent and access."
-  - name: "Camouflage & Cosmetic Guidance"
-    description: "Practical guidance on cosmetic camouflage options for patients who want them, alongside -- not instead of -- medical treatment."
+  - name: "Topical Corticosteroids"
+    description: "Short, supervised courses for limited patches, used carefully on the face and folds to avoid skin thinning."
+  - name: "Topical Calcineurin Inhibitors"
+    description: "Tacrolimus and similar creams that act on the same immune process without thinning the skin, preferred for the face, neck, and folds and for longer-term use."
+  - name: "Newer Topical Agents"
+    description: "Topical JAK inhibitors and other agents where approved and accessible, discussed honestly in terms of evidence and availability."
+  - name: "Narrowband UVB Phototherapy"
+    description: "The established first-line light treatment for more extensive vitiligo, given in short supervised sessions over many months."
+  - name: "Targeted Excimer Light"
+    description: "Focused light treatment for limited or localised patches, sparing surrounding skin."
+  - name: "Oral Therapy for Active Disease"
+    description: "A short, supervised course of oral medicine in rapidly spreading vitiligo to help halt progression, with careful monitoring."
+  - name: "Surgical Repigmentation"
+    description: "Grafting and cell-transfer techniques for stable patches that have not responded to medical treatment, including segmental vitiligo."
+  - name: "Camouflage, Micropigmentation & Sun Protection"
+    description: "Cosmetic camouflage, selected medical tattooing, and daily sunscreen as supportive measures alongside medical treatment."
+  - name: "Depigmentation for Extensive Disease"
+    description: "For very extensive vitiligo where repigmentation is unrealistic, lightening remaining skin is discussed only after other options and careful reflection."
 
 faqIds:
   - "vitiligo-cause"
+  - "vitiligo-new-topical-treatments"
   - "vitiligo-will-it-spread"
   - "vitiligo-can-it-be-cured"
   - "vitiligo-treatment-options"
+  - "vitiligo-topical-steroids-vs-tacrolimus"
+  - "vitiligo-nbuvb-how-it-works"
+  - "vitiligo-phototherapy-how-long"
+  - "vitiligo-stable-meaning"
+  - "vitiligo-segmental-vs-nonsegmental"
+  - "vitiligo-surgery-who-qualifies"
+  - "vitiligo-oral-medicines-active-disease"
+  - "vitiligo-sun-protection-tanning"
+  - "vitiligo-depigmentation-therapy"
+  - "vitiligo-diet-and-supplements"
+  - "vitiligo-in-children"
 
 ctaTitle: "Book a Vitiligo Evaluation"
 ---
@@ -49,9 +76,19 @@ We examine the affected areas, often using a Wood's lamp to confirm the diagnosi
 
 ## Treatment Approach
 
-For limited, stable vitiligo, topical treatment is often the starting point, working best on the face and other areas with good response rates, and less reliably on hands, feet, and areas over bony prominences. For more extensive disease, phototherapy tends to offer better results and is discussed as an option based on the extent of involvement and practical access to treatment.
+Treatment depends on three things: the type of vitiligo, how much of the body is involved, and whether it is currently active or stable. We work through the options in a sensible order rather than offering everything at once.
 
-For patients who want it, we also discuss cosmetic camouflage options honestly as a complement to medical treatment for areas that are slow to respond or difficult to treat, not as a replacement for pursuing repigmentation where it's realistic.
+**Active, spreading vitiligo.** The first aim is to halt progression, using phototherapy and topical treatment, and in rapidly progressing cases a short, supervised course of oral medicine.
+
+**Limited patches.** Topical treatment is usually the starting point. Steroid creams are used in short supervised courses, while tacrolimus-type creams are preferred for the face, neck, and skin folds because they do not thin the skin. Newer topical agents are discussed where they are approved and available.
+
+**Extensive vitiligo.** Narrowband UVB phototherapy is the established first-line option, with targeted excimer light for localised patches.
+
+**Stable patches that have not responded.** Surgical repigmentation, including grafting and cell-transfer techniques, is considered once disease has been stable for a sustained period. Segmental vitiligo often responds particularly well.
+
+**Supportive care.** Daily sun protection, cosmetic camouflage, and in selected cases medical tattooing are offered alongside medical treatment. For very extensive disease, where repigmentation is unrealistic, lightening the remaining skin is discussed only after other options and careful reflection.
+
+We are candid about each option's benefits, limits, and time frame, so you can decide what is right for you.
 
 ## Setting Realistic Expectations
 

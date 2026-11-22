@@ -21,8 +21,10 @@ diagnostics:
   - "Graft requirement estimation"
 
 conditionsManaged:
-  - "hair-loss"
+  - "androgenetic-alopecia"
   - "alopecia-areata"
+  - "norwood-scale-male-pattern-baldness"
+  - "donor-area-depletion"
 
 treatments:
   - name: "Follicular Unit Extraction (FUE)"
@@ -40,6 +42,15 @@ faqIds:
   - "fue-pain-recovery"
   - "fue-scar-visibility"
   - "fue-candidacy-age"
+  - "fue-return-to-work"
+  - "fue-transplanted-hair-shedding"
+  - "fue-medicines-after-transplant"
+  - "fue-medical-conditions-safety"
+  - "fue-cost-factors"
+  - "fue-sleeping-washing-aftercare"
+  - "fue-hairline-and-crown"
+  - "fue-procedure-duration"
+  - "fue-smoking-alcohol"
 
 ctaTitle: "Book Your Hair Transplant Consultation"
 ---

@@ -1,17 +1,18 @@
 ---
 title: "Botox Without Looking 'Done': How Dosing Actually Works"
-pubDate: 2026-04-16
+pubDate: 2026-02-13
 description: "The frozen, overdone look people worry about with Botox is almost always about dosing and technique, not the treatment itself."
 author: "Dr. Karthik L"
 tags: ["Botox"]
 service: "botox"
+condition: "expression-lines"
 ---
 
 The most common concern we hear before a first Botox treatment isn't about safety -- it's "will I look frozen." It's a reasonable worry, and understanding where that look actually comes from helps explain why it isn't an inevitable outcome.
 
 ## It's a Dosing Decision, Not a Property of the Drug
 
-Botox relaxes the specific facial muscles responsible for expression lines. How much movement is preserved afterward is a direct function of dose and placement, not something built into the treatment itself. A conservative dose softens lines while allowing natural expression to remain; a heavier dose produces a flatter, more uniform look.
+[Botox](/services/botox) relaxes the specific facial muscles responsible for expression lines. How much movement is preserved afterward is a direct function of dose and placement, not something built into the treatment itself. A conservative dose softens lines while allowing natural expression to remain; a heavier dose produces a flatter, more uniform look.
 
 ## Our Default Is Conservative
 
@@ -27,4 +28,4 @@ Results build over the days following treatment and typically last a few months 
 
 ## The Bottom Line
 
-A natural-looking result isn't a matter of luck -- it's a deliberate dosing choice, discussed with you at your consultation rather than applied as a fixed, generic protocol.
+A natural-looking result isn't a matter of luck -- it's a deliberate dosing choice, discussed with you at your consultation rather than applied as a fixed, generic protocol. Wondering how it differs from fillers? See [Botox vs. fillers](/blog/fillers-vs-botox), and our [individualized approach to anti-ageing](/blog/anti-ageing-individualized-approach).

@@ -14,21 +14,28 @@ const clinicTel = clinicPhone.replace(/[^0-9+]/g, '');
   data-clinic-phone={clinicPhone}
   data-clinic-tel={clinicTel}
   data-doctors={JSON.stringify(siteConfig.doctors.map((d) => ({ id: d.dbId, name: d.name })))}
-  class="max-w-3xl mx-auto p-5 md:p-8 bg-white border border-slate-200 rounded-2xl shadow-lg space-y-5"
+  class="max-w-3xl mx-auto p-5 md:p-8 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-5"
 >
   <div id="manageVerify" class="space-y-4">
     <h3 class="text-2xl font-bold text-brand-900">Find your appointments</h3>
     <p class="text-slate-600">Enter the WhatsApp number you booked with. We'll send a code to confirm it's you, then show every upcoming appointment on that number — including family members'.</p>
-    <div class="flex gap-3">
-      <input type="tel" id="mPhone" placeholder="WhatsApp Mobile Number" autocomplete="tel-national" inputmode="tel" class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none" />
-      <button type="button" id="mSendBtn" class="px-4 rounded-xl bg-brand-100 text-brand-900 font-semibold whitespace-nowrap hover:bg-brand-200 transition disabled:opacity-50">Send code</button>
-    </div>
-    <div id="mOtpBlock" class="hidden space-y-2">
+    <div>
+      <label for="mPhone" class="block text-sm font-semibold text-slate-700 mb-1.5">WhatsApp mobile number</label>
       <div class="flex gap-3">
-        <input type="text" id="mOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" class="flex-1 min-w-0 p-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none tracking-widest" />
-        <button type="button" id="mVerifyBtn" class="px-5 rounded-xl bg-brand-600 text-white font-semibold whitespace-nowrap hover:bg-brand-700 transition disabled:opacity-50">Verify</button>
+        <div class="flex flex-1 min-w-0 items-stretch rounded-xl border border-slate-300 bg-white transition focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/30">
+          <span class="inline-flex items-center rounded-l-xl border-r border-slate-200 bg-slate-50 px-3 text-slate-600" aria-hidden="true">+91</span>
+          <input type="tel" id="mPhone" placeholder="10-digit number" autocomplete="tel-national" inputmode="numeric" maxlength="10" class="min-h-[48px] min-w-0 flex-1 rounded-r-xl bg-transparent px-3.5 py-3 text-slate-900 outline-none placeholder:text-slate-400" />
+        </div>
+        <button type="button" id="mSendBtn" class="min-h-[48px] px-5 rounded-xl bg-brand-600 text-white font-semibold whitespace-nowrap hover:bg-brand-700 transition disabled:opacity-50">Send code</button>
       </div>
-      <p id="mOtpStatus" class="text-sm text-slate-600"></p>
+    </div>
+    <div id="mOtpBlock" class="hidden space-y-2 rounded-xl border border-green-200 bg-green-50 p-4">
+      <label for="mOtp" class="block text-sm font-semibold text-green-900">Enter the 6-digit code from WhatsApp</label>
+      <div class="flex gap-3">
+        <input type="text" id="mOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" class="min-h-[52px] flex-1 min-w-0 rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-xl font-semibold tracking-[0.4em] outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/30" />
+        <button type="button" id="mVerifyBtn" class="min-h-[52px] px-5 rounded-xl bg-brand-600 text-white font-semibold whitespace-nowrap hover:bg-brand-700 transition disabled:opacity-50">Verify</button>
+      </div>
+      <p id="mOtpStatus" class="text-sm text-slate-700" role="status" aria-live="polite"></p>
     </div>
   </div>
 
@@ -78,16 +85,38 @@ const clinicTel = clinicPhone.replace(/[^0-9+]/g, '');
     }
     const manage = (action, extra = {}) => post('/.netlify/functions/manage-appointments', { action, phone: phoneInput.value, otpToken, ...extra });
 
+    // Auto-send: the code goes out as soon as a valid 10-digit number is typed or pasted. Editing the number
+    // afterwards discards the old code box so a new number is never checked against an old code.
+    let sentTo = '';
+    let sending = false;
+    phoneInput.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+      const digits = phoneInput.value;
+      if (sentTo && digits !== sentTo) {
+        sentTo = '';
+        if (resendTimer) { clearInterval(resendTimer); resendTimer = null; }
+        otpBlock.classList.add('hidden');
+        otpInput.value = '';
+        sendBtn.disabled = false; sendBtn.innerText = 'Send code';
+      }
+      clearError();
+      if (/^[6-9]\d{9}$/.test(digits) && digits !== sentTo && !sending) sendBtn.click();
+    });
+    phoneInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (!sentTo) sendBtn.click(); else otpInput.focus(); } });
+
     sendBtn.addEventListener('click', async () => {
+      if (sending) return;
       clearError();
       const digits = phoneInput.value.replace(/\D/g, '').slice(-10);
       if (!/^[6-9]\d{9}$/.test(digits)) return showError('Enter a valid 10-digit mobile number that uses WhatsApp.');
+      sending = true;
       sendBtn.disabled = true; sendBtn.innerText = 'Sending…';
       try {
         const { response, result } = await post('/.netlify/functions/send-booking-otp', { phone: phoneInput.value });
         if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
+        sentTo = digits;
         otpBlock.classList.remove('hidden');
-        otpStatus.textContent = `Code sent on WhatsApp to +91 ${digits}. Enter it and tap Verify (expires in 5 minutes).`;
+        otpStatus.textContent = `Code sent on WhatsApp to +91 ${digits}. It expires in 5 minutes.`;
         otpInput.focus();
         let wait = 30; sendBtn.innerText = `Resend in ${wait}s`;
         resendTimer = setInterval(() => {
@@ -97,13 +126,18 @@ const clinicTel = clinicPhone.replace(/[^0-9+]/g, '');
         }, 1000);
       } catch (err) {
         showError(err.message); sendBtn.disabled = false; sendBtn.innerText = 'Send code';
+      } finally {
+        sending = false;
       }
     });
 
+    let verifying = false;
     async function verify() {
+      if (verifying) return;
       clearError();
       const code = otpInput.value.replace(/\D/g, '');
       if (code.length !== 6) return showError('Enter the 6-digit code from WhatsApp.');
+      verifying = true;
       verifyBtn.disabled = true; verifyBtn.innerText = 'Checking…';
       try {
         const { response, result } = await post('/.netlify/functions/verify-booking-otp', { phone: phoneInput.value, code });
@@ -115,12 +149,18 @@ const clinicTel = clinicPhone.replace(/[^0-9+]/g, '');
         $('mVerifiedAs').textContent = `✓ +91 ${phoneInput.value.replace(/\D/g, '').slice(-10)}`;
         await loadList();
       } catch (err) {
-        showError(err.message); otpInput.focus();
+        showError(err.message); otpInput.value = ''; otpInput.focus();
       } finally {
+        verifying = false;
         verifyBtn.disabled = false; verifyBtn.innerText = 'Verify';
       }
     }
     verifyBtn.addEventListener('click', verify);
+    // Verifies by itself as soon as the sixth digit is typed or pasted.
+    otpInput.addEventListener('input', () => {
+      otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 6);
+      if (otpInput.value.length === 6) verify();
+    });
     otpInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); verify(); } });
 
     function expired() {

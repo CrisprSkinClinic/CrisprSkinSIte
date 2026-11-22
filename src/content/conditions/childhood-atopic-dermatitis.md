@@ -28,11 +28,14 @@ treatmentOverview:
   - name: "Barrier Repair Routine"
     description: "A consistent, practical moisturizing routine that parents can realistically maintain daily."
 
-relatedConditions: []
+relatedConditions:
+  - "atopic-eczema-adults"
+  - "moderate-to-severe-atopic-dermatitis"
+  - "hand-eczema"
 
 ctaTitle: "Book a Consultation for Your Child's Eczema"
 ---
 
 Childhood atopic dermatitis is the most common form of eczema in children, typically appearing as dry, intensely itchy, inflamed patches that present differently by age -- often on the face and scalp in infants, and in the creases of elbows and knees in older children. It's frequently linked to a personal or family history of other atopic conditions like asthma or hay fever.
 
-Many children see it improve significantly as they grow, though the timeline varies considerably between children. In the meantime, consistent management -- a sustainable daily moisturizing routine alongside appropriate treatment for flares -- provides genuine, practical control of the condition.
+Many children see it improve significantly as they grow, though the timeline varies considerably between children. In the meantime, consistent management -- a [sustainable daily moisturizing routine](/blog/managing-childhood-eczema) alongside appropriate treatment for flares -- provides genuine, practical control of the condition. For eczema that continues into adulthood, see [atopic eczema in adults](/conditions/atopic-eczema-adults).

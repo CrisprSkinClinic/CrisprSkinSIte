@@ -21,8 +21,11 @@ diagnostics:
   - "Age-appropriate explanation to the child where possible, to reduce anxiety around the visit"
 
 conditionsManaged:
-  - "atopic-dermatitis"
-  - "birthmarks"
+  - "childhood-atopic-dermatitis"
+  - "infantile-haemangioma"
+  - "diaper-dermatitis"
+  - "molluscum-contagiosum"
+  - "hand-foot-mouth-disease"
 
 treatments:
   - name: "Age-Appropriate Medical Therapy"

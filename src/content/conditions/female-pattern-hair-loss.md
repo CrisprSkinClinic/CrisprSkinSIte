@@ -29,11 +29,14 @@ treatmentOverview:
   - name: "Addressing Underlying Contributing Factors"
     description: "Correcting an identified hormonal, thyroid, or nutritional factor alongside topical treatment for a more complete approach."
 
-relatedConditions: []
+relatedConditions:
+  - "androgenetic-alopecia"
+  - "telogen-effluvium"
+  - "postpartum-hair-loss"
 
 ctaTitle: "Book a Female Hair Loss Consultation"
 ---
 
-Female pattern hair loss presents differently from the male pattern -- rather than a receding hairline, it typically shows up as gradual diffuse thinning across the scalp or a progressively widening centre part, with the hairline itself usually remaining intact. It's influenced by genetic factors, hormonal changes (including those around menopause), and sometimes coexists with other contributing factors like PCOS or nutritional deficiencies.
+Female pattern hair loss presents differently from the [male pattern](/conditions/androgenetic-alopecia) -- rather than a receding hairline, it typically shows up as gradual diffuse thinning across the scalp or a progressively widening centre part, with the hairline itself usually remaining intact. It's influenced by genetic factors, hormonal changes (including those around menopause), and sometimes coexists with other contributing factors like PCOS or nutritional deficiencies.
 
-Because the possible contributing causes are broader than in male pattern hair loss, a careful evaluation -- including relevant blood investigations where indicated -- helps ensure treatment addresses what's actually driving the thinning in your specific case, rather than treating it generically.
+Because the possible contributing causes are broader than in male pattern hair loss, [a careful evaluation](/services/female-hair-loss) -- including relevant blood investigations where indicated -- helps ensure treatment addresses what's actually driving the thinning in your specific case, rather than treating it generically. Shedding after childbirth or illness is a different pattern; see [postpartum hair loss](/conditions/postpartum-hair-loss) and [telogen effluvium](/conditions/telogen-effluvium).

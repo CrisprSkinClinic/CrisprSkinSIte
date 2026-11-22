@@ -32,10 +32,11 @@ treatmentOverview:
 
 relatedConditions:
   - "post-inflammatory-hyperpigmentation"
+  - "photoageing"
 
 ctaTitle: "Book a Melasma Consultation"
 ---
 
-Melasma is a common form of facial pigmentation, typically appearing as symmetric brown-to-grey-brown patches on the cheeks, forehead, upper lip, or chin. It's driven by a combination of genetic susceptibility, hormonal factors -- which is why it's common during pregnancy or with certain hormonal medications -- and sun or visible light exposure, making it more stubborn and recurrence-prone than most other forms of pigmentation.
+Melasma is a common form of facial pigmentation, typically appearing as symmetric brown-to-grey-brown patches on the cheeks, forehead, upper lip, or chin. It's driven by a combination of genetic susceptibility, hormonal factors -- which is why it's common during pregnancy or with certain hormonal medications -- and sun or visible light exposure, making it more stubborn and recurrence-prone than [most other forms of pigmentation](/blog/pigmentation-vs-melasma).
 
-We treat melasma honestly as a chronic, manageable condition rather than something with a one-time cure. Strict, daily sun protection is a core part of treatment, since UV and even visible light exposure are established triggers for flares, and many patients need periodic maintenance treatment over the years.
+We treat melasma honestly as a chronic, manageable condition rather than something with a one-time cure. [Strict, daily sun protection](/blog/sunscreen-and-visible-light-indian-skin) is a core part of treatment, since UV and even visible light exposure are established triggers for flares, and many patients need periodic maintenance treatment over the years. See [melasma, sunscreen, and triggers](/blog/melasma-sunscreen-and-triggers) for practical guidance.

@@ -20,7 +20,7 @@ diagnostics:
   - "Confirmation that active acne is adequately controlled before starting scar treatment"
 
 conditionsManaged:
-  - "acne-scars"
+  - "acne-scar-types"
 
 treatments:
   - name: "Chemical Peels"

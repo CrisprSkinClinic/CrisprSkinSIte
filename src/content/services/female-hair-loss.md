@@ -20,8 +20,9 @@ diagnostics:
   - "Hormonal and nutritional blood investigations where indicated"
 
 conditionsManaged:
-  - "hair-loss"
   - "alopecia-areata"
+  - "female-pattern-hair-loss"
+  - "postpartum-hair-loss"
 
 treatments:
   - name: "Topical & Oral Medical Therapy"

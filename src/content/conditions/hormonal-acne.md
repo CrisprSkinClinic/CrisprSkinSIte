@@ -28,11 +28,13 @@ treatmentOverview:
   - name: "Standard Topical Therapy"
     description: "Often used alongside hormonally-targeted treatment for a more complete approach."
 
-relatedConditions: []
+relatedConditions:
+  - "acne-scar-types"
+  - "post-inflammatory-hyperpigmentation"
 
 ctaTitle: "Book an Acne Evaluation"
 ---
 
-Hormonal acne is a distinct pattern of acne linked to hormonal fluctuations, most commonly affecting adult women along the jawline and chin, often flaring in a pattern that correlates with the menstrual cycle. It can also be associated with underlying hormonal conditions such as PCOS.
+Hormonal acne is a distinct pattern of [acne](/conditions/acne-vulgaris) linked to hormonal fluctuations, most commonly affecting adult women along the jawline and chin, often flaring in a pattern that correlates with the menstrual cycle. It can also be associated with underlying hormonal conditions such as PCOS.
 
-Because the underlying driver is hormonal rather than purely related to oil production or bacteria on the skin surface, hormonal acne often responds better to treatment that specifically addresses this component, considered alongside standard topical therapy as part of a complete plan.
+Because the underlying driver is hormonal rather than purely related to oil production or bacteria on the skin surface, hormonal acne often responds better to treatment that specifically addresses this component, considered alongside [standard topical therapy](/services/acne) as part of a complete plan. Marks and scars are covered under [acne scar types](/conditions/acne-scar-types), and [why acne treatment takes time](/blog/why-acne-treatment-takes-time) explains realistic timelines.

@@ -1,6 +1,6 @@
 ---
 title: "Postpartum Hair Shedding: What's Normal and What Isn't"
-pubDate: 2026-01-29
+pubDate: 2026-04-21
 description: "Noticing more hair in the brush a few months after delivery? Here's what's typically happening, and when it's worth a closer look."
 author: "Dr. Karthik L"
 tags: ["Female Hair Loss"]
@@ -16,11 +16,11 @@ During pregnancy, elevated hormone levels keep more hair than usual in its activ
 
 ## The Typical Timeline
 
-Shedding usually starts around two to three months after delivery, peaks somewhere in that window, and then gradually tapers off. Most women see this settle back to normal within six to twelve months. It can feel alarming in the moment, especially if you're already sleep-deprived and adjusting to a new baby, but it is a well-recognized, temporary pattern.
+Shedding usually starts around two to three months after delivery, peaks somewhere in that window, and then gradually tapers off. Most women see this settle back to normal within six to twelve months. It can feel alarming in the moment, especially if you're already sleep-deprived and adjusting to a new baby, but it is a [well-recognized, temporary pattern](/conditions/telogen-effluvium).
 
 ## When It's Worth a Visit
 
-If shedding continues well beyond a year, or if you're noticing thinning that seems disproportionate or isn't following this typical improving pattern, it's worth an evaluation. Iron deficiency and thyroid changes are both common in the postpartum period and can compound normal postpartum shedding -- these are identifiable and very treatable when caught.
+If shedding continues well beyond a year, or if you're noticing thinning that seems disproportionate or isn't following this typical improving pattern, it's worth [an evaluation](/services/female-hair-loss). Iron deficiency and thyroid changes are both common in the postpartum period and can compound normal postpartum shedding -- these are identifiable and very treatable when caught.
 
 ## The Reassurance That Actually Helps
 

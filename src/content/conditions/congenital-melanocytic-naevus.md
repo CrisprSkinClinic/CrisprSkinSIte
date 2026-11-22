@@ -29,10 +29,11 @@ treatmentOverview:
 
 relatedConditions:
   - "infantile-haemangioma"
+  - "melanocytic-naevi-moles"
 
 ctaTitle: "Book a Birthmark Evaluation"
 ---
 
-A congenital melanocytic naevus is a pigmented birthmark present from birth, ranging widely in size from small spots to larger areas of pigmented skin. Most small and medium congenital naevi are monitored over time as part of routine paediatric skin care, with an appropriate follow-up schedule based on size and appearance.
+A congenital melanocytic naevus is a pigmented birthmark present from birth, ranging widely in size from small spots to larger areas of pigmented skin. Most small and medium congenital naevi are monitored over time as part of routine [paediatric skin care](/services/pediatric-dermatology), with an appropriate follow-up schedule based on size and appearance.
 
-Larger congenital naevi carry a somewhat higher, though still generally low, long-term monitoring consideration, and are discussed individually in terms of an appropriate follow-up plan, and occasionally surgical options, based on their specific size and features.
+Larger congenital naevi carry a somewhat higher, though still generally low, long-term monitoring consideration, and are discussed individually in terms of an appropriate follow-up plan, and occasionally surgical options, based on their specific size and features. See also [moles in general](/conditions/melanocytic-naevi-moles) and our guide to [birthmarks for parents](/blog/birthmarks-for-parents).

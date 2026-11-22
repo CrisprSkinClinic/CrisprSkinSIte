@@ -34,6 +34,8 @@ faqIds:
   - "melasma-cause"
   - "melasma-permanent-or-not"
   - "melasma-pregnancy-related"
+  - "ingredients-sunscreen-amount-and-spf"
+  - "ingredients-sunscreen-indoors"
   - "melasma-recurrence"
 
 ctaTitle: "Book a Melasma Consultation"

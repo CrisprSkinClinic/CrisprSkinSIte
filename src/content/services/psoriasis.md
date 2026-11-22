@@ -20,7 +20,11 @@ diagnostics:
   - "Assessment of common trigger factors: stress, infection, certain medications"
 
 conditionsManaged:
-  - "psoriasis"
+  - "plaque-psoriasis"
+  - "scalp-psoriasis"
+  - "nail-psoriasis"
+  - "moderate-to-severe-psoriasis"
+  - "psoriatic-arthritis"
 
 treatments:
   - name: "Topical Therapy"
@@ -35,6 +39,9 @@ faqIds:
   - "psoriasis-cause"
   - "psoriasis-can-it-be-cured"
   - "psoriasis-joint-pain-connection"
+  - "biologics-what-are-they"
+  - "biologics-who-needs-them"
+  - "biologics-safety-screening"
 
 ctaTitle: "Book a Psoriasis Evaluation"
 ---

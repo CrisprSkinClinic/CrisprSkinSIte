@@ -29,10 +29,11 @@ treatmentOverview:
 
 relatedConditions:
   - "plaque-psoriasis"
+  - "seborrheic-dermatitis-scalp"
 
 ctaTitle: "Book a Scalp Evaluation"
 ---
 
-Scalp psoriasis causes thick, well-defined, scaly patches on the scalp that can extend beyond the hairline, and is frequently mistaken for severe dandruff since both cause visible flaking. The scale in scalp psoriasis tends to be thicker and more tightly adherent than typical dandruff, and standard anti-dandruff shampoos are usually far less effective, since the underlying cause is different.
+Scalp psoriasis causes thick, well-defined, scaly patches on the scalp that can extend beyond the hairline, and is frequently mistaken for [severe dandruff](/blog/dandruff-myths) since both cause visible flaking. The scale in scalp psoriasis tends to be thicker and more tightly adherent than typical dandruff, and standard anti-dandruff shampoos are usually far less effective, since the underlying cause is different.
 
-Treatment typically requires medicated formulations specifically suited to scalp application, and where psoriasis is present elsewhere on the body as well, scalp-specific treatment is coordinated as part of a broader management plan rather than treated in isolation.
+Treatment typically requires medicated formulations specifically suited to scalp application, and where psoriasis is present elsewhere on the body as well, scalp-specific treatment is coordinated as part of a [broader management plan](/services/psoriasis) rather than treated in isolation. Greasy, yellowish scale points instead to [seborrheic dermatitis](/conditions/seborrheic-dermatitis-scalp).

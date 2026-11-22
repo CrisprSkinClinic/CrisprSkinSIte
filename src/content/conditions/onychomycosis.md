@@ -28,11 +28,14 @@ treatmentOverview:
   - name: "Oral Antifungal Therapy"
     description: "Considered for more established infection, given as a course over several months."
 
-relatedConditions: []
+relatedConditions:
+  - "nail-psoriasis"
+  - "paronychia"
+  - "tinea-infections"
 
 ctaTitle: "Book a Nail Evaluation"
 ---
 
-Onychomycosis is a fungal infection of the nail, causing discoloration, thickening, and sometimes separation from the nail bed. Because several other conditions -- including nail psoriasis and trauma -- can produce similar-looking nail changes, confirming the diagnosis with a nail sample sent for microscopy or culture is an important step before committing to what is typically a months-long treatment course.
+Onychomycosis is a fungal infection of the nail, causing discoloration, thickening, and sometimes separation from the nail bed. Because several other conditions -- including [nail psoriasis](/conditions/nail-psoriasis) and trauma -- can produce similar-looking nail changes, [confirming the diagnosis](/blog/nail-changes-when-to-see-a-doctor) with a nail sample sent for microscopy or culture is an important step before committing to what is typically a months-long treatment course.
 
 Nail growth is inherently slow -- fingernails take months and toenails can take the better part of a year to grow out fully -- so visible improvement during treatment is gradual by nature, and this timeline is explained clearly upfront so progress is judged accurately.

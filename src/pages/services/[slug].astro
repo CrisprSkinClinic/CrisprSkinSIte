@@ -42,6 +42,18 @@ if (data.faqIds && data.faqIds.length > 0) {
     .map((f) => ({ question: f.data.question, answer: f.body }));
 }
 
+// Blog articles tied to this service, either directly (service field)
+// or through one of the conditions it manages. Newest first.
+const managedConditionSlugs = data.conditionsManaged ?? [];
+const relatedArticles = (await getCollection('blog'))
+  .filter(
+    (post) =>
+      post.data.service === entry.slug ||
+      (post.data.condition && managedConditionSlugs.includes(post.data.condition))
+  )
+  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
+  .slice(0, 6);
+
 const relatedDoctor = data.defaultDoctorId
   ? siteConfig.doctors.find((d) => d.dbId === data.defaultDoctorId)
   : null;
@@ -238,6 +250,20 @@ const medicalServiceSchema = {
           <a href={`/conditions/${c.slug}`} class="block p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 transition-colors">
             <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Condition</p>
             <p class="font-semibold text-slate-900">{c.data.title}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {relatedArticles.length > 0 && (
+    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
+      <h2 class="text-2xl font-bold text-brand-900 mb-6">Related Articles</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {relatedArticles.map((post) => (
+          <a href={`/blog/${post.slug}`} class="block p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 transition-colors">
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Article</p>
+            <p class="font-semibold text-slate-900">{post.data.title}</p>
           </a>
         ))}
       </div>

@@ -20,7 +20,9 @@ diagnostics:
   - "Assessment for hormonal or other contributing factors where indicated"
 
 conditionsManaged:
-  - "acne-scars"
+  - "acne-vulgaris"
+  - "hormonal-acne"
+  - "acne-scar-types"
 
 treatments:
   - name: "Topical Therapy"
@@ -34,6 +36,9 @@ faqIds:
   - "acne-how-long-to-clear"
   - "acne-diet-connection"
   - "acne-adult-onset"
+  - "ingredients-niacinamide-strength"
+  - "ingredients-niacinamide-purging"
+  - "ingredients-retinoid-starting-routine"
   - "acne-picking-scarring"
 
 ctaTitle: "Book an Acne Evaluation"

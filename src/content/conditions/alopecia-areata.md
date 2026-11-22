@@ -33,6 +33,6 @@ relatedConditions:
 ctaTitle: "Book an Alopecia Areata Evaluation"
 ---
 
-Alopecia areata occurs when the immune system mistakenly attacks hair follicles, causing sudden, well-defined patches of hair loss, most commonly on the scalp but occasionally elsewhere on the body. It's distinct from pattern hair loss and requires a different diagnostic and treatment approach, usually confirmed on examination alone or with dermoscopy.
+Alopecia areata occurs when the immune system mistakenly attacks hair follicles, causing sudden, well-defined patches of hair loss, most commonly on the scalp but occasionally elsewhere on the body. It's distinct from [pattern hair loss](/conditions/androgenetic-alopecia) and requires a different diagnostic and treatment approach, usually confirmed on examination alone or with dermoscopy.
 
-The course of alopecia areata is genuinely unpredictable: some patches regrow spontaneously without treatment, others respond well to treatment, and the condition can recur, sometimes in new areas, over months or years. It's somewhat more common in people with a personal or family history of other autoimmune conditions, such as thyroid disease.
+The course of alopecia areata is [genuinely unpredictable](/blog/living-with-alopecia-areata): some patches regrow spontaneously without treatment, others respond well to treatment, and the condition can recur, sometimes in new areas, over months or years. It's somewhat more common in people with a personal or family history of other autoimmune conditions, such as thyroid disease. For newer options in severe disease, see [alopecia areata: newer treatment options](/blog/alopecia-areata-newer-treatment-options).

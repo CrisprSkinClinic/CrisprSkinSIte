@@ -20,7 +20,8 @@ diagnostics:
   - "Review of hair care products and routine"
 
 conditionsManaged:
-  - "dandruff"
+  - "seborrheic-dermatitis-scalp"
+  - "scalp-psoriasis"
 
 treatments:
   - name: "Medicated Shampoo Protocols"

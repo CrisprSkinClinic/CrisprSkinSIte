@@ -19,7 +19,8 @@ diagnostics:
   - "History of triggers: allergens, irritants, weather, stress, personal or family history of atopic conditions"
   - "Assessment for secondary infection in actively flaring or broken skin"
 
-conditionsManaged: []
+conditionsManaged:
+  - "damaged-skin-barrier"
 
 treatments:
   - name: "Topical Anti-Inflammatory Therapy"
@@ -33,6 +34,8 @@ faqIds:
   - "eczema-vs-dry-skin"
   - "eczema-triggers"
   - "eczema-moisturizer-routine"
+  - "jak-inhibitors-what-are-they"
+  - "biologics-what-are-they"
 
 ctaTitle: "Book an Eczema Evaluation"
 ---

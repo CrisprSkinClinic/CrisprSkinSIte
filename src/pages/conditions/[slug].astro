@@ -25,6 +25,12 @@ const relatedConditionEntries = data.relatedConditions
     )).filter(Boolean)
   : [];
 
+// Blog articles that declare this condition, newest first.
+const relatedArticles = (await getCollection('blog'))
+  .filter((post) => post.data.condition === entry.slug)
+  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
+  .slice(0, 6);
+
 let faqEntries = [];
 if (data.faqIds && data.faqIds.length > 0) {
   const resolved = await Promise.all(
@@ -173,6 +179,20 @@ const conditionSchema = {
         <ul class="list-disc pl-6 space-y-2 text-red-800">
           {data.urgentScenarios.map((item) => <li>{item}</li>)}
         </ul>
+      </div>
+    </section>
+  )}
+
+  {relatedArticles.length > 0 && (
+    <section class="py-12 px-6 max-w-4xl mx-auto border-t border-slate-200">
+      <h2 class="text-2xl font-bold text-brand-900 mb-6">Related Articles</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {relatedArticles.map((post) => (
+          <a href={`/blog/${post.slug}`} class="block p-5 rounded-xl bg-champagne-50 hover:bg-slate-100 transition-colors">
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Article</p>
+            <p class="font-semibold text-slate-900">{post.data.title}</p>
+          </a>
+        ))}
       </div>
     </section>
   )}

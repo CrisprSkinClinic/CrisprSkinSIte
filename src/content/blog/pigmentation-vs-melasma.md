@@ -1,6 +1,6 @@
 ---
 title: "Pigmentation or Melasma? Why the Difference Changes Everything"
-pubDate: 2026-03-05
+pubDate: 2026-06-25
 description: "Not all dark spots are the same -- melasma specifically needs a different, more sustained treatment approach than typical pigmentation."
 author: "Dr. Karthik L"
 tags: ["Pigmentation"]
@@ -12,11 +12,11 @@ condition: "melasma"
 
 ## Post-Inflammatory Pigmentation Usually Fades on Its Own
 
-Dark marks left behind after a pimple heals or a minor injury resolves are typically post-inflammatory pigmentation, and these often fade on their own over several months, with treatment able to speed the process along. This is the most common and most straightforward category.
+Dark marks left behind after a pimple heals or a minor injury resolves are typically [post-inflammatory pigmentation](/conditions/post-inflammatory-hyperpigmentation), and these often fade on their own over several months, with treatment able to speed the process along. This is the most common and most straightforward category.
 
 ## Melasma Is a Different, More Stubborn Pattern
 
-Melasma presents as symmetric, brown-to-grey patches, usually on the cheeks, forehead, or upper lip, and it's driven by a combination of genetic susceptibility, hormonal factors, and sun or even visible light exposure. This combination makes it considerably more prone to recurrence than typical pigmentation, and it needs a more sustained, ongoing management approach rather than a single treatment course.
+[Melasma](/conditions/melasma) presents as symmetric, brown-to-grey patches, usually on the cheeks, forehead, or upper lip, and it's driven by a combination of genetic susceptibility, hormonal factors, and sun or even visible light exposure. This combination makes it considerably more prone to recurrence than typical pigmentation, and it needs a more sustained, ongoing management approach rather than a single treatment course.
 
 ## Why Overly Aggressive Treatment Can Backfire in Melasma
 
@@ -24,4 +24,4 @@ One important nuance: peels and treatments that work well for general pigmentati
 
 ## The Honest Long-Term Picture
 
-We treat melasma as a manageable, chronic condition rather than something with a one-time cure. Patients who understand this from the outset -- including the importance of strict, daily sun protection -- tend to have better long-term results than those expecting a single treatment to make it disappear permanently.
+We treat melasma as a manageable, chronic condition rather than something with a one-time cure. Patients who understand this from the outset -- including the importance of strict, daily [sun protection](/blog/sunscreen-and-visible-light-indian-skin) -- tend to have better long-term results than those expecting a single treatment to make it disappear permanently.

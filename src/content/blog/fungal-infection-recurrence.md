@@ -1,6 +1,6 @@
 ---
 title: "Why Your Fungal Skin Infection Keeps Coming Back"
-pubDate: 2026-04-02
+pubDate: 2026-03-13
 description: "Fungal infections are very treatable, but they seem to recur constantly for one common, avoidable reason."
 author: "Dr. Narayanan B"
 tags: ["Fungal Infections"]
@@ -8,7 +8,7 @@ service: "fungal-infections"
 condition: "tinea-infections"
 ---
 
-Ringworm, athlete's foot, and similar fungal skin infections are genuinely easy to treat -- and yet we regularly see patients on their third or fourth "recurrence" of what looks like the exact same infection. In most cases, this isn't really a new infection each time. It's the same one, incompletely treated.
+[Ringworm](/conditions/tinea-infections), athlete's foot, and similar fungal skin infections (including yeast-related ones such as [pityriasis versicolor](/conditions/pityriasis-versicolor)) are genuinely easy to treat -- and yet we regularly see patients on their third or fourth "recurrence" of what looks like the exact same infection. In most cases, this isn't really a new infection each time. It's the same one, incompletely treated.
 
 ## The Number One Cause: Stopping Too Early
 
@@ -24,4 +24,4 @@ Using a steroid cream on what's actually a fungal infection -- a common mix-up, 
 
 ## Breaking the Cycle
 
-If you feel like you're stuck in a loop of treating and "recurring" fungal infections, the fix usually isn't a stronger medication -- it's completing the full prescribed course and addressing the environmental source alongside it. That combination is what actually breaks the cycle for most patients.
+If you feel like you're [stuck in a loop](/services/fungal-infections) of treating and "recurring" fungal infections, the fix usually isn't a stronger medication -- it's completing the full prescribed course and addressing the environmental source alongside it. That combination is what actually breaks the cycle for most patients.

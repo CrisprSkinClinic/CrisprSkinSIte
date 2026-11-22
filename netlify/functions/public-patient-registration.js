@@ -141,7 +141,7 @@ exports.handler = async (event) => {
   }
   const normalizedEmail = String(email || "").trim();
   const normalizedOccupation = String(occupation || "").trim();
-  if (normalizedEmail && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/.test(normalizedEmail)) {
+  if (normalizedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(normalizedEmail)) {
     return { statusCode: 400, body: JSON.stringify({ error: "Please enter a valid email address." }) };
   }
   if (!phone || !/^[6-9][0-9]{9}$/.test(String(phone).trim())) {

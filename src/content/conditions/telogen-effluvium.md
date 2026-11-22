@@ -32,10 +32,11 @@ treatmentOverview:
 
 relatedConditions:
   - "androgenetic-alopecia"
+  - "postpartum-hair-loss"
 
 ctaTitle: "Book a Hair Loss Evaluation"
 ---
 
 Telogen effluvium is a common cause of diffuse hair shedding, occurring when a significant stressor -- physical or emotional -- pushes a larger-than-usual proportion of hair follicles into their resting (telogen) phase simultaneously. Because hair typically sheds two to three months after entering this resting phase, the shedding itself often appears well after the actual triggering event, which can make the connection less obvious to patients.
 
-Common triggers include significant illness, surgery, high fever, childbirth, major stress, rapid weight loss, or starting or stopping certain medications. In most cases, telogen effluvium is self-limiting and resolves within six to twelve months once the underlying trigger has passed, though an evaluation helps confirm this diagnosis and rule out other causes of diffuse thinning.
+Common triggers include significant illness, surgery, high fever, [childbirth](/conditions/postpartum-hair-loss), major stress, [rapid weight loss](/blog/weight-loss-medicines-and-hair-shedding), or starting or stopping certain medications. In most cases, telogen effluvium is self-limiting and resolves within six to twelve months once the underlying trigger has passed, though [an evaluation](/services/hair-loss) helps confirm this diagnosis and rule out other causes of diffuse thinning.
