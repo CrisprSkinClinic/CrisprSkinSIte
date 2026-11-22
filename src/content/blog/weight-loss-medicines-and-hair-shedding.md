@@ -12,7 +12,7 @@ As newer weight-loss medicines have become popular, more patients ask about hair
 
 ## Why Shedding Happens
 
-Rapid weight loss, reduced food intake, and nutrient shortfalls can push many hairs into a resting phase, causing diffuse shedding a few months later. This pattern is called telogen effluvium, and it is not specific to any one medicine.
+Rapid weight loss, reduced food intake, and nutrient shortfalls can push many hairs into a resting phase, causing diffuse shedding a few months later. This pattern is called [telogen effluvium](/conditions/telogen-effluvium), and it is not specific to any one medicine.
 
 ## What We Know and Do Not
 
@@ -24,7 +24,7 @@ Adequate protein, iron, vitamin D, and overall calories support hair, and slower
 
 ## When to Get Checked
 
-See us if shedding is heavy, lasts beyond a few months, or comes with patchy loss, a widening parting, or scalp symptoms. Other causes such as thyroid problems, iron deficiency, or pattern hair loss can coexist and need separate treatment.
+[See us](/services/hair-loss) if shedding is heavy, lasts beyond a few months, or comes with patchy loss, a widening parting, or scalp symptoms. Other causes such as thyroid problems, iron deficiency, or [pattern hair loss](/conditions/androgenetic-alopecia) can coexist and need separate treatment.
 
 ## Do Not Stop Medicines on Your Own
 

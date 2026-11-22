@@ -16,7 +16,7 @@ Fine vertical ridges that become more visible with age and the occasional white 
 
 ## Worth Getting Checked
 
-Thickened, yellowed, or crumbling nails may be fungal infection or psoriasis. Pitting, separation from the nail bed, painful swelling at the nail fold, or a dark streak that is new, widening, or changing all merit examination.
+Thickened, yellowed, or crumbling nails may be [fungal infection](/conditions/onychomycosis) or [psoriasis](/conditions/nail-psoriasis). Pitting, separation from the nail bed, [painful swelling at the nail fold](/conditions/paronychia), or a dark streak that is new, widening, or changing all merit examination.
 
 ## Why Diagnosis Comes First
 

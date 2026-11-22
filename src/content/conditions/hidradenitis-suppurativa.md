@@ -51,4 +51,4 @@ Hidradenitis suppurativa is a long-term inflammatory condition affecting the hai
 
 It is not caused by poor hygiene and it is not contagious, though many patients are told or assume otherwise. It is frequently mistaken for recurring boils, so diagnosis is often delayed by years.
 
-Earlier treatment generally leads to better control and less scarring. A plan usually combines medicines, lifestyle measures, and, where needed, procedures, with more advanced options for severe disease.
+Earlier treatment generally leads to better control and less scarring. A plan usually combines medicines, lifestyle measures, and, where needed, procedures, with [more advanced options](/services/biologics) for severe disease.

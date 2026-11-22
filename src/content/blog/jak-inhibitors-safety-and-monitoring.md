@@ -8,15 +8,15 @@ service: "alopecia-areata"
 condition: "alopecia-areata"
 ---
 
-JAK inhibitors have attracted a lot of attention for conditions such as alopecia areata and severe atopic dermatitis. They deserve both interest and care.
+JAK inhibitors have attracted a lot of attention for conditions such as [alopecia areata](/blog/alopecia-areata-newer-treatment-options) and [severe atopic dermatitis](/conditions/moderate-to-severe-atopic-dermatitis). They deserve both interest and care.
 
 ## What They Are
 
-They are not biologics. They are small molecules, taken as tablets or applied as creams, that block signalling inside immune cells.
+They are not [biologics](/blog/biologics-in-dermatology-explained). They are small molecules, taken as tablets or applied as creams, that block signalling inside immune cells.
 
 ## Where They Are Used
 
-Depending on the specific medicine, uses include certain forms of severe atopic dermatitis, alopecia areata, and some other inflammatory conditions. Approved uses differ between medicines, and not every JAK inhibitor suits every condition.
+Depending on the specific medicine, uses include certain forms of severe atopic dermatitis, alopecia areata, and some other inflammatory conditions, such as [vitiligo](/blog/vitiligo-newer-treatment-developments) in cream form. Approved uses differ between medicines, and not every JAK inhibitor suits every condition.
 
 ## Benefits
 

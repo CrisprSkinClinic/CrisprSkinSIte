@@ -11,7 +11,7 @@ Niacinamide, a form of vitamin B3, has become a staple in skincare. It earns its
 
 ## What It Can Help With
 
-It supports the skin barrier, can reduce visible oiliness and the look of enlarged pores, and may help with mild acne and uneven tone. It is generally well tolerated, including by sensitive skin.
+It supports [the skin barrier](/conditions/damaged-skin-barrier), can reduce visible oiliness and the look of enlarged pores, and may help with mild acne and uneven tone. It is generally well tolerated, including by sensitive skin.
 
 ## Strength Is Not Everything
 
@@ -23,8 +23,8 @@ It will not clear moderate or severe acne on its own, and it does not replace pr
 
 ## Combining It With Other Products
 
-It pairs easily with most routines, including vitamin C and retinoids, though introducing one new product at a time makes any reaction easier to trace.
+It pairs easily with most routines, including [vitamin C](/blog/does-vitamin-c-serum-work) and [retinoids](/blog/retinol-vs-retinoids-how-to-start), though introducing one new product at a time makes any reaction easier to trace.
 
 ## When to Get Help
 
-If acne is leaving marks, scarring, or persisting despite a good routine, an evaluation is worthwhile. Treating acne early protects the skin in the long run.
+If [acne](/services/acne) is leaving marks, [scarring](/services/acne-scars), or persisting despite a good routine, an evaluation is worthwhile. Treating acne early protects the skin in the long run.

@@ -16,15 +16,15 @@ They speed up skin renewal, help unclog pores, and over time can improve fine li
 
 ## Retinol vs. Prescription Retinoids
 
-Over-the-counter retinol is converted by the skin into its active form, so it tends to be gentler and slower. Prescription retinoids are stronger and used for acne and more significant ageing changes. Which suits you depends on your skin and goals.
+Over-the-counter retinol is converted by the skin into its active form, so it tends to be gentler and slower. Prescription retinoids are stronger and used for [acne](/services/acne) and more significant [ageing changes](/conditions/photoageing). Which suits you depends on your skin and goals.
 
 ## How to Start
 
-Use a small amount, two or three evenings a week, on dry skin, and build up gradually. Pair it with a plain moisturizer and use sunscreen every morning.
+Use a small amount, two or three evenings a week, on dry skin, and build up gradually. Pair it with a plain moisturizer and use [sunscreen](/blog/sunscreen-and-visible-light-indian-skin) every morning.
 
 ## What Is Normal
 
-Some dryness and flaking in the first few weeks is common. Severe burning, swelling, or persistent peeling is not, and means you should stop and speak to us.
+Some dryness and flaking in the first few weeks is common. Severe burning, swelling, or persistent peeling is not, and means you should stop and speak to us (see [skin barrier damage](/conditions/damaged-skin-barrier)).
 
 ## Pregnancy
 

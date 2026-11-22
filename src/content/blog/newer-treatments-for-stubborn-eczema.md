@@ -12,11 +12,11 @@ For many years, the options for severe eczema were limited and often blunt. That
 
 ## Start With the Basics
 
-Before considering anything advanced, we check that moisturizing and topical treatment are being used correctly and consistently, and look for triggers, infections, or another diagnosis. Many "stubborn" cases improve at this stage.
+Before considering anything advanced, we check that [moisturizing and topical treatment](/services/eczema) are being used correctly and consistently, and look for triggers, infections, or another diagnosis. Many "stubborn" cases improve at this stage.
 
 ## When Disease Is Still Uncontrolled
 
-Options for severe disease include phototherapy, established oral medicines, and newer targeted treatments such as biologics and JAK inhibitors. These work on specific parts of the immune response involved in eczema.
+Options for severe disease include phototherapy, established oral medicines, and newer targeted treatments such as [biologics](/blog/biologics-in-dermatology-explained) and [JAK inhibitors](/blog/jak-inhibitors-safety-and-monitoring). These work on specific parts of the immune response involved in eczema.
 
 ## What They Involve
 
@@ -28,4 +28,4 @@ Age, other health conditions, pregnancy plans, and cost all matter. We discuss r
 
 ## The Outlook
 
-Severe eczema is better controlled now than it used to be. If you have been struggling despite good basic care, it is reasonable to ask whether your plan needs a fresh look.
+[Severe eczema](/conditions/moderate-to-severe-atopic-dermatitis) is better controlled now than it used to be. If you have been struggling despite good basic care, it is reasonable to ask whether your plan needs a fresh look.

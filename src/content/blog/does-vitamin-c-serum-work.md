@@ -12,11 +12,11 @@ Vitamin C is widely marketed, and it does have a place in a routine. It is not a
 
 ## What It Does
 
-Vitamin C is an antioxidant. Applied to the skin, it can help protect against some sun-related damage, support a brighter-looking tone, and contribute modestly to fading dark marks over time.
+Vitamin C is an antioxidant. Applied to the skin, it can help protect against some [sun-related damage](/conditions/photoageing), support a brighter-looking tone, and contribute modestly to fading dark marks over time.
 
 ## What It Does Not Do
 
-It does not replace sunscreen, and it will not change deep pigmentation or scars overnight. Results build slowly, usually over weeks to months.
+It does not replace [sunscreen](/blog/sunscreen-and-visible-light-indian-skin), and it will not change deep pigmentation or scars overnight. Results build slowly, usually over weeks to months.
 
 ## Choosing a Product
 
@@ -28,4 +28,4 @@ Most people use it in the morning, followed by sunscreen. Introduce it gradually
 
 ## When to See Us
 
-If you have stubborn pigmentation, dark marks after acne, or melasma, a prescription-guided plan usually works better than any single serum.
+If you have [stubborn pigmentation](/services/pigmentation), dark marks after acne, or [melasma](/conditions/melasma), a prescription-guided plan usually works better than any single serum.

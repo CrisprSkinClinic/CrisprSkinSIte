@@ -12,11 +12,11 @@ For a long time, treatment for alopecia areata relied on a small set of options 
 
 ## What Has Changed
 
-Medicines that block specific signals inside immune cells, known as JAK inhibitors, have shown meaningful hair regrowth in some people with extensive alopecia areata in clinical studies. They are used for selected patients, and which medicines are approved or available differs between countries.
+Medicines that block specific signals inside immune cells, known as [JAK inhibitors](/blog/jak-inhibitors-safety-and-monitoring), have shown meaningful hair regrowth in some people with extensive alopecia areata in clinical studies. They are used for selected patients, and which medicines are approved or available differs between countries.
 
 ## What Has Not Changed
 
-Many people with patchy alopecia areata still do well with established treatments such as topical and injected corticosteroids and other topical therapy. Hair regrowth can also happen on its own. Newer medicines are generally reserved for more extensive or persistent disease.
+Many people with patchy [alopecia areata](/services/alopecia-areata) still do well with established treatments such as topical and injected corticosteroids and other topical therapy. Hair regrowth can also happen on its own. Newer medicines are generally reserved for more extensive or persistent disease.
 
 ## Things to Weigh Up
 
@@ -24,7 +24,7 @@ These medicines need pre-treatment assessment, monitoring, and a realistic conve
 
 ## Support Matters Too
 
-Alopecia areata can be distressing, and emotional support, honest expectations, and practical options such as camouflage are part of good care.
+[Alopecia areata can be distressing](/blog/living-with-alopecia-areata), and emotional support, honest expectations, and practical options such as camouflage are part of good care.
 
 ## What to Do
 

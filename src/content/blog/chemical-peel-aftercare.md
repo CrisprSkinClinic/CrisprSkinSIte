@@ -16,11 +16,11 @@ Mild redness, tightness, and flaking are normal and settle over several days, de
 
 ## Moisturize Gently and Protect From the Sun
 
-Use a bland moisturizer and a gentle cleanser. Daily broad-spectrum sunscreen is essential, because freshly peeled skin is more vulnerable to sun-triggered pigmentation, particularly in deeper skin tones.
+Use a bland moisturizer and a gentle cleanser. Daily broad-spectrum [sunscreen](/blog/sunscreen-and-visible-light-indian-skin) is essential, because freshly peeled skin is more vulnerable to [sun-triggered pigmentation](/conditions/post-inflammatory-hyperpigmentation), particularly in deeper skin tones.
 
 ## Pause Active Products
 
-Hold off on retinoids, exfoliating acids, and scrubs until we advise you to restart them. Combining them with healing skin invites irritation.
+Hold off on [retinoids](/blog/retinol-vs-retinoids-how-to-start), exfoliating acids, and scrubs until we advise you to restart them. Combining them with healing skin invites irritation.
 
 ## When to Call Us
 

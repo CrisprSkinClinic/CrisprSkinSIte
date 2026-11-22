@@ -12,7 +12,7 @@ Many people with deeper skin tones assume they do not need much sun protection. 
 
 ## Why It Matters
 
-Light, including visible light and not just UV, can stimulate pigment cells. In people prone to melasma or dark marks after acne, repeated exposure keeps pigmentation active or brings it back.
+Light, including visible light and not just UV, can stimulate pigment cells. In people prone to [melasma](/conditions/melasma) or dark marks after acne, repeated exposure keeps pigmentation active or brings it back.
 
 ## What to Look For
 
@@ -28,4 +28,4 @@ Daylight comes through windows and clouds. If you are prone to pigmentation, dai
 
 ## Beyond Sunscreen
 
-Hats, shade, and avoiding peak sun add protection. A good plan also treats the pigmentation itself, which we can guide you on after an evaluation.
+Hats, shade, and avoiding peak sun add protection. A good plan also treats the [pigmentation](/services/pigmentation) itself, which we can guide you on after an evaluation.

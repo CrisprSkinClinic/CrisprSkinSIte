@@ -47,4 +47,4 @@ ctaTitle: "Book a Psoriasis Evaluation"
 
 Psoriasis is considered moderate-to-severe when it covers a large area, involves difficult sites such as the scalp, nails, or genitals, causes significant distress, or fails to respond to topical treatment. Severity is judged by the extent of skin involved and by how much the condition affects daily life, not just by appearance.
 
-Treatment steps up gradually: phototherapy, established oral medicines, and, where appropriate, biologic therapy. The right option depends on your health, other conditions, and goals, and safety screening comes first. The aim is long-term control, since psoriasis is a chronic condition rather than one that is cured.
+Treatment [steps up gradually](/blog/psoriasis-treatment-ladder): phototherapy, established oral medicines, and, where appropriate, [biologic therapy](/blog/biologics-in-dermatology-explained). The right option depends on your health, other conditions, and goals, and safety screening comes first. The aim is long-term control, since psoriasis is a chronic condition rather than one that is cured.

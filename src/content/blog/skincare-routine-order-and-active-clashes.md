@@ -12,7 +12,7 @@ Social media makes skincare look complicated. In practice, a short, consistent r
 
 ## A Simple Structure
 
-Morning: gentle cleanser, an optional treatment such as vitamin C, moisturizer, and sunscreen. Evening: cleanser, a treatment such as a retinoid if suited to you, and moisturizer. Apply products from thinnest to thickest.
+Morning: gentle cleanser, an optional treatment such as [vitamin C](/blog/does-vitamin-c-serum-work), moisturizer, and [sunscreen](/blog/sunscreen-and-visible-light-indian-skin). Evening: cleanser, a treatment such as a [retinoid](/blog/retinol-vs-retinoids-how-to-start) if suited to you, and moisturizer. Apply products from thinnest to thickest.
 
 ## Introduce One Thing at a Time
 
@@ -24,8 +24,8 @@ Strong exfoliating acids, scrubs, and retinoids used together on the same night 
 
 ## Signs You Have Overdone It
 
-Stinging with products that used to be fine, tightness, flaking, and sudden redness suggest a stressed skin barrier.
+Stinging with products that used to be fine, tightness, flaking, and sudden redness suggest a [stressed skin barrier](/conditions/damaged-skin-barrier).
 
 ## What to Do
 
-Stop all actives and exfoliants, and use only a gentle cleanser, plain moisturizer, and sunscreen for a few weeks. If skin does not settle, come in for an evaluation, since eczema or an allergic reaction can look similar.
+Stop all actives and exfoliants, and use only a gentle cleanser, plain moisturizer, and sunscreen for a few weeks. If skin does not settle, come in for an evaluation, since [eczema](/services/eczema) or an allergic reaction can look similar.

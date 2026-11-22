@@ -8,7 +8,7 @@ service: "biologics"
 condition: "hidradenitis-suppurativa"
 ---
 
-Many people with hidradenitis suppurativa spend years being treated for "boils" before getting the right diagnosis. Knowing the pattern can shorten that journey.
+Many people with [hidradenitis suppurativa](/conditions/hidradenitis-suppurativa) spend years being treated for "boils" before getting the right diagnosis. Knowing the pattern can shorten that journey.
 
 ## What It Looks Like
 
@@ -24,8 +24,8 @@ Repeated antibiotic courses for each lump rarely solve the underlying inflammati
 
 ## What Helps
 
-Treatment is stepwise: medicines matched to severity, lifestyle measures such as stopping smoking and reducing friction, procedures for persistent lesions, and targeted options for severe disease.
+Treatment is stepwise: medicines matched to severity, lifestyle measures such as stopping smoking and reducing friction, procedures for persistent lesions, and [targeted options](/blog/biologics-in-dermatology-explained) for severe disease.
 
 ## When to Come In
 
-If you have recurring painful lumps in the same folds, an evaluation is worthwhile, and earlier is better.
+If you have recurring painful lumps in the same folds, [an evaluation](/services/biologics) is worthwhile, and earlier is better.

@@ -16,16 +16,16 @@ Biologics are medicines made from living cells that block one specific signal dr
 
 ## Where They Are Used
 
-They are used for severe or difficult-to-control psoriasis, some forms of severe atopic dermatitis, and certain other conditions, depending on the specific medicine. Not every biologic is used for every condition.
+They are used for severe or difficult-to-control [psoriasis](/conditions/moderate-to-severe-psoriasis), some forms of severe [atopic dermatitis](/conditions/moderate-to-severe-atopic-dermatitis), and certain other conditions such as [chronic hives](/conditions/antihistamine-resistant-urticaria) and [hidradenitis suppurativa](/conditions/hidradenitis-suppurativa), depending on the specific medicine. Not every biologic is used for every condition.
 
 ## Who Is Considered
 
-People with extensive disease, disease at sensitive sites, joint involvement, or poor response to simpler treatments. Many patients never need one, and we do not reach for them first.
+People with extensive disease, disease at sensitive sites, joint involvement, or poor response to simpler treatments. Many patients never need one, and we do not reach for them first (see the [psoriasis treatment ladder](/blog/psoriasis-treatment-ladder)).
 
 ## What Happens Before Starting
 
-A full review, blood tests, and screening for infections such as tuberculosis and hepatitis B. Monitoring continues afterwards.
+A full review, blood tests, and screening for infections such as tuberculosis and hepatitis B. Monitoring continues afterwards. [JAK inhibitors](/blog/jak-inhibitors-safety-and-monitoring), which are not biologics, have their own monitoring needs.
 
 ## A Measured View
 
-They are powerful tools used within a longer treatment plan. The aim is a plan that works for you and that you can sustain, with the least treatment needed to keep you well.
+They are powerful tools used within a longer treatment plan. The aim is a plan that works for you and that you can sustain, with the least treatment needed to keep you well. You can read more about [biologics and advanced therapy](/services/biologics) at our clinic.

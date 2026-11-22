@@ -16,11 +16,11 @@ Fair skin carries higher risk, but skin cancer occurs in all skin tones, and in 
 
 ## Prevention
 
-Daily broad-spectrum sunscreen, shade, protective clothing, and avoiding the strongest midday sun all reduce risk. Avoid tanning beds.
+[Daily broad-spectrum sunscreen](/blog/sunscreen-and-visible-light-indian-skin), shade, protective clothing, and avoiding the strongest midday sun all reduce risk. Avoid tanning beds.
 
 ## What to Look For
 
-A new growth that does not heal, a sore that bleeds or crusts repeatedly, a mole that is changing, or a dark streak under a nail that is new or widening. Painless changes still count.
+A new growth that does not heal, a sore that bleeds or crusts repeatedly, [a mole that is changing](/blog/mole-warning-signs), or a dark streak under a [nail](/services/nail-disorders) that is new or widening. Painless changes still count.
 
 ## How Often to Check
 
@@ -28,4 +28,4 @@ Look over your skin every month or so, including the scalp, soles, and between t
 
 ## Early Detection Works
 
-Most skin cancers found early are highly treatable. If you notice something suspicious, book an examination rather than waiting to see what happens.
+Most skin cancers found early are highly treatable. If you notice something suspicious, [book an examination](/services/warts-moles-skin-tags) rather than waiting to see what happens.

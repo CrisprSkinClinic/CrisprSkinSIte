@@ -24,4 +24,4 @@ Antihistamines are the first-line treatment, sometimes at higher doses under med
 
 ## Outlook
 
-Chronic hives can last months to years, but most cases eventually settle. Effective treatment keeps symptoms controlled while that happens.
+[Chronic hives](/blog/hives-not-responding-to-antihistamines) can last months to years, but most cases eventually settle. Effective treatment keeps symptoms controlled while that happens.

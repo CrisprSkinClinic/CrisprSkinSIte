@@ -13,11 +13,11 @@ Skin rejuvenation covers a range of approaches aimed at improving tone, texture,
 
 ## Start With Your Concern
 
-Uneven tone, dullness, early lines, and textural roughness each respond to different treatments, so naming your priority helps us choose well.
+Uneven tone, dullness, [early lines](/conditions/photoageing), and textural roughness each respond to different treatments, so naming your priority helps us choose well.
 
 ## Treatments Work Best in Combination
 
-Sun protection and a sound skincare routine form the base. In-clinic treatments then build on it, and results are usually gradual across a series of sessions.
+[Sun protection](/blog/sunscreen-and-visible-light-indian-skin) and a sound [skincare routine](/blog/skincare-routine-order-and-active-clashes) form the base. In-clinic treatments then build on it, and results are usually gradual across a series of sessions.
 
 ## Skin Type Matters
 

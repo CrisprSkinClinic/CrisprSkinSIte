@@ -20,12 +20,14 @@ These include several classes that act on different inflammatory pathways. Avail
 
 ## Where They Fit
 
-They are often used for sensitive sites, for maintenance between flares, or in people who need long-term treatment. They do not replace stronger treatment for severe disease.
+They are often used for sensitive sites, for maintenance between flares, or in people who need long-term treatment. They do not replace stronger treatment for [severe disease](/blog/psoriasis-treatment-ladder).
 
 ## Using Them Well
+
+(For eczema in particular, see [newer treatments for stubborn eczema](/blog/newer-treatments-for-stubborn-eczema).)
 
 As with any cream, correct amount, correct site, and consistency matter. Some can cause temporary stinging when first applied.
 
 ## What to Do
 
-If you rely on steroid creams, use them often, or worry about long-term use, a review of your plan may identify better options. We can discuss what suits your skin and condition.
+If you rely on steroid creams, use them often, or worry about long-term use, [a review of your plan](/services/psoriasis) may identify better options. We can discuss what suits your skin and condition.

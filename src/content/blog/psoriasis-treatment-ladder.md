@@ -8,7 +8,7 @@ service: "psoriasis"
 condition: "moderate-to-severe-psoriasis"
 ---
 
-Psoriasis is treated in steps, starting simple and moving up only when needed. Understanding the ladder helps you take part in the decision.
+[Psoriasis](/services/psoriasis) is treated in steps, starting simple and moving up only when needed. Understanding the ladder helps you take part in the decision.
 
 ## Step One: Topical Treatment
 
@@ -24,7 +24,7 @@ Older oral medicines can control more extensive psoriasis, with monitoring suite
 
 ## Step Four: Biologic Therapy
 
-For moderate-to-severe disease, or disease affecting the joints, targeted injectable medicines may be considered after screening.
+For [moderate-to-severe disease](/conditions/moderate-to-severe-psoriasis), or disease affecting the [joints](/conditions/psoriatic-arthritis), [targeted injectable medicines](/blog/biologics-in-dermatology-explained) may be considered after screening.
 
 ## How We Decide
 

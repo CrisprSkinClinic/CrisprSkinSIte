@@ -24,7 +24,9 @@ For most healthy people, supplements appear to be reasonably safe, though qualit
 
 ## What Protects Collagen Best
 
-Daily sunscreen, not smoking, a balanced diet, and a sound skincare routine are the best-supported ways to preserve collagen. Prescription retinoids also have good evidence.
+(Sun exposure is a major contributor to collagen breakdown in the skin; see [photoageing](/conditions/photoageing).)
+
+[Daily sunscreen](/blog/sunscreen-and-visible-light-indian-skin), not smoking, a balanced diet, and a sound [skincare routine](/blog/skincare-routine-order-and-active-clashes) are the best-supported ways to preserve collagen. [Prescription retinoids](/blog/retinol-vs-retinoids-how-to-start) also have good evidence.
 
 ## A Reasonable Position
 

@@ -8,7 +8,7 @@ service: "urticaria"
 condition: "antihistamine-resistant-urticaria"
 ---
 
-If you have taken antihistamines for weeks and still get hives, you are not alone, and it does not mean nothing can be done.
+If you have taken antihistamines for weeks and still get [hives](/conditions/antihistamine-resistant-urticaria), you are not alone, and it does not mean nothing can be done.
 
 ## First, Review the Basics
 
@@ -20,11 +20,11 @@ Some medicines, infections, or associated conditions can play a role. Testing is
 
 ## Add-on Treatment
 
-When antihistamines alone do not give control, further options exist, including injectable treatment targeting part of the allergic pathway. Selection depends on assessment and your circumstances.
+When antihistamines alone do not give control, further options exist, including [injectable treatment](/blog/biologics-in-dermatology-explained) targeting part of the allergic pathway. Selection depends on assessment and your circumstances.
 
 ## Realistic Expectations
 
-Chronic hives often settle over time, even if that takes months or longer. The goal is good symptom control while it does.
+[Chronic hives](/blog/hives-when-to-worry) often settle over time, even if that takes months or longer. The goal is good symptom control while it does.
 
 ## When to Seek Urgent Help
 

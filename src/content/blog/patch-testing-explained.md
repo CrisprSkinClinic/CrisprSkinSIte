@@ -16,7 +16,7 @@ Small amounts of common allergens are applied to the skin of the back under adhe
 
 ## Who Benefits
 
-People with suspected allergic contact dermatitis, persistent hand or facial rashes, or reactions to cosmetics, metals, or workplace substances are the usual candidates.
+People with suspected [allergic contact dermatitis](/conditions/contact-dermatitis), persistent [hand](/conditions/hand-eczema) or facial rashes, or reactions to cosmetics, metals, or workplace substances are the usual candidates.
 
 ## What to Know Beforehand
 
