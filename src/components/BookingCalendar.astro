@@ -1,7 +1,7 @@
 ---
 // src/components/BookingCalendar.astro
 //
-// Online booking for a consultation. Flow: details -> date/time -> Confirm -> WhatsApp code (only
+// Online booking for a consultation. Flow: date/slot -> details (revealed after a slot is picked) -> Confirm -> WhatsApp code (only
 // at this point) -> booked, with a confirmation card. Procedures are deliberately NOT bookable
 // online: they are scheduled by the clinic after an examination.
 import { siteConfig } from '../config/site.js';
@@ -34,15 +34,47 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     </div>
 
     <ol id="bookingProgress" class="mb-6 grid grid-cols-3 gap-2 text-xs font-semibold sm:text-sm" aria-label="Booking progress">
-      <li data-step="1" class="step flex items-center gap-2 rounded-full border px-3 py-2"><span class="step-dot inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">1</span><span class="truncate">Your details</span></li>
-      <li data-step="2" class="step flex items-center gap-2 rounded-full border px-3 py-2"><span class="step-dot inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">2</span><span class="truncate">Date &amp; time</span></li>
+      <li data-step="1" class="step flex items-center gap-2 rounded-full border px-3 py-2"><span class="step-dot inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">1</span><span class="truncate">Slot</span></li>
+      <li data-step="2" class="step flex items-center gap-2 rounded-full border px-3 py-2"><span class="step-dot inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">2</span><span class="truncate">Your details</span></li>
       <li data-step="3" class="step flex items-center gap-2 rounded-full border px-3 py-2"><span class="step-dot inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">3</span><span class="truncate">Confirm</span></li>
     </ol>
 
-    <div class="grid gap-6 md:grid-cols-2 md:items-start">
+    <div class="mx-auto max-w-2xl space-y-6">
 
-      <section class={`${card} min-w-0`} aria-labelledby="detailsTitle">
-        <h3 id="detailsTitle" class="mb-5 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>1</span>Your details</h3>
+      <section class={`${card} min-w-0`} aria-labelledby="timeTitle">
+        <h3 id="timeTitle" class="mb-5 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>1</span>Choose a slot</h3>
+
+        <div id="earliestWrap" class="mb-5 hidden flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3.5">
+          <p id="earliestText" class="text-sm text-brand-900"></p>
+          <button type="button" id="earliestBtn" class="min-h-[40px] rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Use this slot</button>
+        </div>
+
+        <p id="datesLabel" class="mb-2 text-sm font-semibold text-slate-700">Next 7 days</p>
+        <div id="datesStrip" class="-mx-1 mb-4 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-labelledby="datesLabel">
+          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
+        </div>
+
+        <label for="date" class={label}>Or choose another date</label>
+        <input type="date" id="date" required aria-describedby="err-date" class={field} />
+        <p id="err-date" class={fieldError} role="alert"></p>
+
+        <div class="mb-3 mt-6 flex items-baseline justify-between gap-2">
+          <h4 class="text-sm font-semibold text-slate-700" id="slotsLabel">Available slots</h4>
+          <p id="slotsDateLabel" class="text-sm text-slate-500"></p>
+        </div>
+        <div id="slotsContainer" class="grid grid-cols-3 gap-2.5 sm:grid-cols-4" role="radiogroup" aria-labelledby="slotsLabel">
+          <div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>
+          <div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>
+        </div>
+        <p id="err-slot" class={fieldError} role="alert"></p>
+      </section>
+
+      <section id="detailsStage" class={`${card} min-w-0 hidden`} aria-labelledby="detailsTitle">
+        <h3 id="detailsTitle" class="mb-5 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>2</span>Your details</h3>
 
         <div class="space-y-5">
           <div>
@@ -154,38 +186,6 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
             </div>
           </div>
         </div>
-      </section>
-
-      <section class={`${card} min-w-0`} aria-labelledby="timeTitle">
-        <h3 id="timeTitle" class="mb-5 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>2</span>Date &amp; time</h3>
-
-        <div id="earliestWrap" class="mb-5 hidden flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3.5">
-          <p id="earliestText" class="text-sm text-brand-900"></p>
-          <button type="button" id="earliestBtn" class="min-h-[40px] rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Use this slot</button>
-        </div>
-
-        <p id="datesLabel" class="mb-2 text-sm font-semibold text-slate-700">Next 7 days</p>
-        <div id="datesStrip" class="-mx-1 mb-4 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-labelledby="datesLabel">
-          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
-          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
-          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
-          <div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>
-        </div>
-
-        <label for="date" class={label}>Or choose another date</label>
-        <input type="date" id="date" required aria-describedby="err-date" class={field} />
-        <p id="err-date" class={fieldError} role="alert"></p>
-
-        <div class="mb-3 mt-6 flex items-baseline justify-between gap-2">
-          <h4 class="text-sm font-semibold text-slate-700" id="slotsLabel">Available slots</h4>
-          <p id="slotsDateLabel" class="text-sm text-slate-500"></p>
-        </div>
-        <div id="slotsContainer" class="grid grid-cols-3 gap-2.5 sm:grid-cols-4" role="radiogroup" aria-labelledby="slotsLabel">
-          <div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>
-          <div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>
-          <div class="h-12 animate-pulse rounded-lg bg-slate-100 motion-reduce:animate-none"></div>
-        </div>
-        <p id="err-slot" class={fieldError} role="alert"></p>
 
         <div id="selectionBox" class="mt-5 hidden items-center gap-3 rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800" role="status" aria-live="polite">
           <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -405,11 +405,11 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
 
     // ---------------------------------------------------------------- progress + sticky bar
     function updateProgress(state) {
-      const detailsDone = Boolean($('firstName').value.trim()) && validPhone();
       const timeDone = Boolean(selectedTime);
+      const detailsDone = Boolean($('firstName').value.trim()) && validPhone();
       const states = state === 'done'
         ? ['done', 'done', 'done']
-        : [detailsDone ? 'done' : 'current', timeDone ? 'done' : (detailsDone ? 'current' : 'todo'), otpOpen() || busy ? 'current' : 'todo'];
+        : [timeDone ? 'done' : 'current', detailsDone ? 'done' : (timeDone ? 'current' : 'todo'), otpOpen() || busy ? 'current' : 'todo'];
       document.querySelectorAll('#bookingProgress .step').forEach((li, i) => { li.dataset.state = states[i]; });
     }
 
@@ -578,12 +578,23 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       return request;
     }
 
+    // Details appear only once a slot has been chosen, and then stay (a later slot change must not hide typed input).
+    let detailsRevealed = false;
+    function revealDetails() {
+      if (detailsRevealed) return;
+      detailsRevealed = true;
+      const stage = $('detailsStage');
+      stage.classList.remove('hidden');
+      requestAnimationFrame(() => stage.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+    }
+
     function updateSelectionUI() {
       const date = dateInput?.value;
       if (selectedTime && date) {
         selectionSummary.textContent = `${fmtDate(date, { weekday: 'long', day: 'numeric', month: 'long' })} at ${selectedTime}`;
         selectionBox.classList.remove('hidden');
         selectionBox.classList.add('flex');
+        revealDetails();
       } else {
         selectionSummary.textContent = '';
         selectionBox.classList.add('hidden');
