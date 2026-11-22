@@ -19,7 +19,8 @@ diagnostics:
   - "History of triggers: allergens, irritants, weather, stress, personal or family history of atopic conditions"
   - "Assessment for secondary infection in actively flaring or broken skin"
 
-conditionsManaged: []
+conditionsManaged:
+  - "damaged-skin-barrier"
 
 treatments:
   - name: "Topical Anti-Inflammatory Therapy"

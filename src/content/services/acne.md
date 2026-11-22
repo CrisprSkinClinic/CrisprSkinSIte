@@ -34,6 +34,8 @@ faqIds:
   - "acne-how-long-to-clear"
   - "acne-diet-connection"
   - "acne-adult-onset"
+  - "ingredients-niacinamide-strength"
+  - "ingredients-retinoid-starting-routine"
   - "acne-picking-scarring"
 
 ctaTitle: "Book an Acne Evaluation"

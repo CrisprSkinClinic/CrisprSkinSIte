@@ -34,6 +34,8 @@ faqIds:
   - "pigmentation-causes"
   - "pigmentation-how-long-to-fade"
   - "pigmentation-sun-protection-importance"
+  - "ingredients-vitamin-c-how-to-use"
+  - "ingredients-sunscreen-amount-and-spf"
 
 ctaTitle: "Book a Pigmentation Evaluation"
 ---
