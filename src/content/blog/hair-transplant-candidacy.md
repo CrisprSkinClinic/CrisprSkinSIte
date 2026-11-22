@@ -12,19 +12,19 @@ One of the most common questions we hear isn't "how much does a hair transplant 
 
 ## First, What Is the Diagnosis?
 
-Hair transplantation works for pattern hair loss, where hair is lost from the front, temples, and crown while the back and sides of the scalp stay resistant. Other causes of hair loss behave differently. Alopecia areata, scarring alopecias, thyroid or nutritional hair loss, and shedding after illness or childbirth need their own diagnosis and treatment, and transplanting hair into an area affected by an unrecognised condition can fail or waste donor supply. The first step in any consultation is therefore confirming what is actually causing your hair loss.
+Hair transplantation works for pattern hair loss, where hair is lost from the front, temples, and crown while the back and sides of the scalp stay resistant. Other causes of hair loss behave differently. Alopecia areata, [scarring alopecias](/conditions/scarring-alopecia), thyroid or nutritional hair loss, and shedding after illness or childbirth need their own diagnosis and treatment, and transplanting hair into an area affected by an unrecognised condition can fail or waste donor supply. The first step in any consultation is therefore confirming what is actually causing your hair loss.
 
 ## Donor Density Matters More Than People Expect
 
-The donor area -- typically the back and sides of the scalp -- has a finite, genetically determined supply of permanent hair. A transplant redistributes this hair; it doesn't create new hair follicles. If donor density is limited relative to the area needing coverage, overharvesting to chase a higher graft count can permanently reduce future donor supply, which matters if hair loss continues to progress elsewhere on the scalp and a second session is ever needed.
+The [donor area](/conditions/donor-area-depletion) -- typically the back and sides of the scalp -- has a finite, genetically determined supply of permanent hair. A transplant redistributes this hair; it doesn't create new hair follicles. If donor density is limited relative to the area needing coverage, overharvesting to chase a higher graft count can permanently reduce future donor supply, which matters if hair loss continues to progress elsewhere on the scalp and a second session is ever needed.
 
 We assess donor density, the calibre of individual hairs, how many hairs each follicular unit carries, and how elastic the scalp is. These features vary between people, and they set the ceiling on what a transplant can achieve, regardless of how much coverage a patient hopes for.
 
 ## Stability of Hair Loss Is Just as Important
 
-If your hair loss is still actively progressing rather than stable, we often recommend medical therapy first to slow it down before considering surgery. Transplanting hair into an area while loss continues around it can produce a result that looks less natural over time as the surrounding native hair continues to thin, leaving isolated islands of transplanted hair.
+If your hair loss is still actively progressing rather than stable, we often recommend [medical therapy](/blog/medical-therapy-with-hair-transplant) first to slow it down before considering surgery. Transplanting hair into an area while loss continues around it can produce a result that looks less natural over time as the surrounding native hair continues to thin, leaving isolated islands of transplanted hair.
 
-Pattern hair loss tends to progress over many years, so planning has to account for where loss is heading, not just where it is today. That is one reason a hairline designed for a very young patient needs particular care.
+[Pattern hair loss](/conditions/norwood-scale-male-pattern-baldness) tends to progress over many years, so planning has to account for where loss is heading, not just where it is today. That is one reason a hairline designed for a very young patient needs particular care.
 
 ## Age Isn't the Deciding Factor -- Pattern Stability Is
 
@@ -44,7 +44,7 @@ A transplant can restore density and shape, and frame the face naturally. It can
 
 ## Who Might Need to Wait
 
-Some people are better served by waiting: very young patients with unstable loss, those with an unclear diagnosis, those with active scalp disease, and those whose donor supply cannot support their goals. Waiting often involves medical treatment to slow progression, followed by reassessment. We would rather advise patience than operate on someone who will be better served later.
+Some people are [better served by waiting](/blog/who-should-delay-a-hair-transplant): very young patients with unstable loss, those with an unclear diagnosis, those with active scalp disease, and those whose donor supply cannot support their goals. Waiting often involves medical treatment to slow progression, followed by reassessment. We would rather advise patience than operate on someone who will be better served later.
 
 ## The Honest Bottom Line
 

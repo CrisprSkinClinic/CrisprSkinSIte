@@ -8,13 +8,13 @@ service: "vitiligo"
 condition: "vitiligo-surgical-treatment"
 ---
 
-Surgical treatment for vitiligo works by moving pigment-producing cells from healthy skin into a depigmented patch. It can give excellent results in carefully chosen patients, but it is not for everyone, and it is only appropriate once the disease is stable. This article explains who qualifies, how the main techniques differ, and what to expect.
+Surgical treatment for vitiligo works by moving pigment-producing cells from healthy skin into a depigmented patch. It can give excellent results in carefully chosen patients, but it is not for everyone, and it is only appropriate once the disease is [stable](/blog/stable-or-active-vitiligo-why-it-matters). This article explains who qualifies, how the main techniques differ, and what to expect.
 
 ## Who Is a Candidate
 
 The key requirement is stability. Patches should generally have shown no new spread and no enlargement for a sustained period, commonly around six to twelve months or more, and without new patches appearing at sites of injury or friction. Surgery on active vitiligo risks the disease appearing in the grafted skin or the donor site, undoing the result.
 
-Surgery is typically considered for patches that have stayed stable but have not repigmented adequately with creams or light treatment. It is often a very good option for segmental vitiligo, which tends to respond poorly to medical therapy but to stabilise on its own. It is also used for small, localised patches in visible areas where the cosmetic benefit is high.
+Surgery is typically considered for patches that have stayed stable but have not repigmented adequately with creams or light treatment. It is often a very good option for [segmental vitiligo](/blog/segmental-vitiligo-why-it-is-different), which tends to respond poorly to medical therapy but to stabilise on its own. It is also used for small, localised patches in visible areas where the cosmetic benefit is high.
 
 Patients with a tendency to form keloids or thick scars, those with unrealistic expectations, and those whose disease is still active are generally not good candidates. A test graft on a small area is sometimes done first to see how your skin responds, including whether it forms scars or develops pigment mismatch.
 
@@ -36,7 +36,7 @@ The decision depends on the size, site, and type of patch, how much donor skin i
 
 ## What Recovery Looks Like
 
-The treated and donor areas are covered with dressings and need protection from friction and wetting for a period. Healing takes several weeks, and pigment typically begins to appear over the following weeks to months. Many centres combine surgery with light treatment or sun exposure afterward, since this can help the transferred cells spread and improve colour match.
+The treated and donor areas are covered with dressings and need protection from friction and wetting for a period. Healing takes several weeks, and pigment typically begins to appear over the following weeks to months. Many centres combine surgery with [light treatment](/blog/phototherapy-for-vitiligo-nbuvb-excimer) or sun exposure afterward, since this can help the transferred cells spread and improve colour match.
 
 ## Risks and Limitations
 

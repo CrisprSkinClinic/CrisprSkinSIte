@@ -38,11 +38,11 @@ Some patients need to attend regularly for months, which is a real practical bur
 
 ## Who Benefits Most
 
-Phototherapy is generally recommended for vitiligo covering a larger area, for active disease, and for patches that have not responded to creams. It is also used before and after surgery, since it can help stabilise disease and improve repigmentation of grafted areas.
+Phototherapy is generally recommended for vitiligo covering a larger area, for [active disease](/blog/stable-or-active-vitiligo-why-it-matters), and for patches that have not responded to creams. It is also used before and after [surgery](/blog/vitiligo-surgery-options-explained), since it can help stabilise disease and improve repigmentation of grafted areas.
 
 ## Combining Phototherapy With Other Treatment
 
-Many patients use phototherapy with a topical cream, which can improve results, especially on resistant patches. We choose the combination depending on your skin and sites involved.
+Many patients use phototherapy with a [topical cream](/blog/vitiligo-topical-treatments-guide), which can improve results, especially on resistant patches. We choose the combination depending on your skin and sites involved.
 
 ## Safety and Practical Points
 

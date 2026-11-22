@@ -28,7 +28,7 @@ There is no single test, so we combine several sources of information. We take a
 
 ## Why It Matters for Treatment
 
-**If the disease is active,** the priority is to calm the immune process and limit further loss. Options include phototherapy, topical treatment, and in rapidly progressing cases a short, supervised course of oral medicine to halt progress, with careful monitoring. Surgery is avoided, because grafted skin and donor skin can be affected by ongoing disease.
+**If the disease is active,** the priority is to calm the immune process and limit further loss. Options include [phototherapy](/blog/phototherapy-for-vitiligo-nbuvb-excimer), [topical treatment](/blog/vitiligo-topical-treatments-guide), and in rapidly progressing cases a short, supervised course of oral medicine to halt progress, with careful monitoring. [Surgery](/blog/vitiligo-surgery-options-explained) is avoided, because grafted skin and donor skin can be affected by ongoing disease.
 
 **If the disease is stable,** the aim shifts to restoring pigment. Topical treatment and phototherapy can encourage repigmentation, and for patches that remain resistant, surgical repigmentation becomes a realistic option.
 

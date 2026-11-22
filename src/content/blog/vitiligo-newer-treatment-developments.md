@@ -32,11 +32,11 @@ Research suggests combining approaches, for example topical treatment with photo
 
 Despite the excitement, established treatments remain the core of care, and many patients do very well with them.
 
-**Phototherapy.** Narrowband UVB remains a first-line option for extensive vitiligo, with excimer light for limited patches.
+**[Phototherapy](/blog/phototherapy-for-vitiligo-nbuvb-excimer).** Narrowband UVB remains a first-line option for extensive vitiligo, with excimer light for limited patches.
 
-**Topical therapy.** Steroids in short supervised courses and tacrolimus-type creams, especially for the face and folds, remain widely used and accessible.
+**[Topical therapy](/blog/vitiligo-topical-treatments-guide).** Steroids in short supervised courses and tacrolimus-type creams, especially for the face and folds, remain widely used and accessible.
 
-**Surgery.** For stable patches that have not responded, grafting and cell transfer techniques remain highly effective for suitable patients.
+**[Surgery](/blog/vitiligo-surgery-options-explained).** For stable patches that have not responded, grafting and cell transfer techniques remain highly effective for suitable patients.
 
 **Supportive care.** Sun protection, camouflage, and attention to emotional wellbeing remain important parts of the plan.
 

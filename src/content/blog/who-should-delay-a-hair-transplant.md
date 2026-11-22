@@ -21,7 +21,7 @@ In these patients, medical treatment to slow progression and a period of monitor
 Not all hair loss is pattern baldness, and transplantation works for pattern hair loss, not every cause. Conditions that need a different approach include:
 
 - **Alopecia areata,** an autoimmune cause of patchy hair loss, where transplanted hair may be lost again if the disease is active.
-- **Scarring alopecias,** in which inflammation destroys follicles, and surgery is considered only after a long period of disease quiet.
+- **[Scarring alopecias](/conditions/scarring-alopecia),** in which inflammation destroys follicles, and surgery is considered only after a long period of disease quiet.
 - **Telogen effluvium,** diffuse shedding after illness, childbirth, stress, or nutritional problems, which is usually temporary.
 - **Thyroid, iron, or other medical causes,** which need to be found and treated.
 - **Traction alopecia,** from prolonged tight hairstyles, which may recover if the cause stops.
@@ -34,7 +34,7 @@ Inflammatory scalp conditions, infections, or active skin disease in the donor o
 
 ## Limited Donor Supply
 
-The donor area is finite. If it cannot support the coverage a patient wants, or if it is already thin, we discuss realistic goals. Sometimes the plan is to focus on the hairline only, or to accept more modest density. Occasionally, we advise against surgery because the benefit would not justify the use of donor supply.
+The [donor area](/conditions/donor-area-depletion) is finite. If it cannot support the coverage a patient wants, or if it is already thin, we discuss realistic goals. Sometimes the plan is to focus on the hairline only, or to accept more modest density. Occasionally, we advise against surgery because the benefit would not justify the use of donor supply.
 
 ## Unrealistic Expectations
 
@@ -50,7 +50,7 @@ If you have recently had a major illness, rapid weight loss, childbirth, or a st
 
 ## Not Yet on Medical Therapy
 
-Patients with progressive pattern loss who have not tried medical treatment are often advised to start it first, and to review after some months. This may slow loss enough to change the plan, or even reduce the need for surgery.
+Patients with progressive pattern loss who have not tried [medical treatment](/blog/medical-therapy-with-hair-transplant) are often advised to start it first, and to review after some months. This may slow loss enough to change the plan, or even reduce the need for surgery.
 
 ## What "Wait" Actually Means
 

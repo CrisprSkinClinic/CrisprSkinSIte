@@ -24,11 +24,11 @@ The exact reasons are not fully understood. The segmental pattern is thought to 
 
 ## Medical Treatment
 
-Creams and phototherapy are still often tried, particularly early in the disease, and may help in some patients. In the active phase, treatment can be useful to try to limit spread. Topical treatment, targeted light treatment such as excimer, and sometimes short courses of other medicines are used depending on the case. However, patients and families should be prepared for the possibility that response may be limited.
+[Creams](/blog/vitiligo-topical-treatments-guide) and [phototherapy](/blog/phototherapy-for-vitiligo-nbuvb-excimer) are still often tried, particularly early in the disease, and may help in some patients. In the active phase, treatment can be useful to try to limit spread. Topical treatment, targeted light treatment such as excimer, and sometimes short courses of other medicines are used depending on the case. However, patients and families should be prepared for the possibility that response may be limited.
 
 ## Why Surgery Often Works Well
 
-Because segmental vitiligo tends to stabilise, it is often a good candidate for surgical repigmentation once stability is confirmed, commonly after a sustained period without change. Surgical techniques that move pigment cells into the patch, such as suction blister grafting, cell suspension transfer, or hair follicle transplantation, can give good and lasting results in segmental vitiligo. The tendency of the disease to stay confined helps results last.
+Because segmental vitiligo tends to stabilise, it is often a good candidate for surgical repigmentation once stability is confirmed, commonly after a sustained period without change. [Surgical techniques](/blog/vitiligo-surgery-options-explained) that move pigment cells into the patch, such as suction blister grafting, cell suspension transfer, or hair follicle transplantation, can give good and lasting results in segmental vitiligo. The tendency of the disease to stay confined helps results last.
 
 The choice of technique depends on the size and location of the patch. Visible sites such as the face and forehead often have high cosmetic value, and results can be very satisfying when patients are well selected.
 
@@ -42,7 +42,7 @@ While waiting for stability or surgery, camouflage cosmetics and daily sun prote
 
 ## What to Expect From an Evaluation
 
-We examine the pattern, check for white hairs, use a Wood's lamp to confirm extent, and ask about timing and any change. We also assess whether the disease appears active or stable, and discuss which options fit your or your child's situation. If the patch is stable, we can talk about surgery realistically, including benefits, risks, and the technique we would consider.
+We examine the pattern, check for white hairs, use a Wood's lamp to confirm extent, and ask about timing and any change. We also assess whether the disease appears [active or stable](/blog/stable-or-active-vitiligo-why-it-matters), and discuss which options fit your or your child's situation. If the patch is stable, we can talk about surgery realistically, including benefits, risks, and the technique we would consider.
 
 ## A Realistic Outlook
 

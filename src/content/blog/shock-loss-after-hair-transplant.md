@@ -12,7 +12,7 @@ Some patients notice that after a transplant not only the transplanted hair shed
 
 ## What Shock Loss Is
 
-Shock loss is the temporary shedding of existing, native hair in or around the area that was operated on. It is different from the planned shedding of the transplanted hair shafts themselves, which is expected in the first few weeks. In shock loss, hairs that were already growing in your scalp enter a resting phase and fall out, usually within the first few weeks after surgery.
+Shock loss is the temporary shedding of existing, native hair in or around the area that was operated on. It is different from the planned shedding of the transplanted hair shafts themselves, which is [expected in the first few weeks](/blog/hair-transplant-timeline-month-by-month). In shock loss, hairs that were already growing in your scalp enter a resting phase and fall out, usually within the first few weeks after surgery.
 
 ## Why It Happens
 
@@ -34,7 +34,7 @@ Most native hairs affected by shock loss begin to regrow within about three to f
 
 ## What Helps
 
-There is no proven way to prevent shock loss entirely, but several measures help support recovery. Follow your aftercare instructions closely. Maintain any medical treatment advised to protect native hair, since medicines that support existing hair may help limit loss and aid regrowth. Eat a balanced diet, avoid smoking, and manage stress where possible. Avoid unproven products or treatments that promise to prevent shock loss, as they add expense without reliable benefit.
+There is no proven way to prevent shock loss entirely, but several measures help support recovery. Follow your aftercare instructions closely. Maintain any [medical treatment](/blog/medical-therapy-with-hair-transplant) advised to protect native hair, since medicines that support existing hair may help limit loss and aid regrowth. Eat a balanced diet, avoid smoking, and manage stress where possible. Avoid unproven products or treatments that promise to prevent shock loss, as they add expense without reliable benefit.
 
 ## When to Seek Advice
 

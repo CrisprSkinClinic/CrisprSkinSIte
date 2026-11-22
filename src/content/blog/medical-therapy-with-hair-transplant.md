@@ -12,7 +12,7 @@ Many people assume a transplant ends their hair loss. It does not. A transplant 
 
 ## What a Transplant Actually Does
 
-Pattern hair loss happens because hair follicles in certain areas of the scalp, mainly the front, temples, and crown, are genetically sensitive to a hormone derivative called DHT, and they gradually shrink. The follicles at the back and sides of the scalp are largely resistant. A transplant moves resistant follicles from the donor area to thinning areas, and because they keep their resistance, they typically continue to grow in their new location for the long term.
+[Pattern hair loss](/conditions/norwood-scale-male-pattern-baldness) happens because hair follicles in certain areas of the scalp, mainly the front, temples, and crown, are genetically sensitive to a hormone derivative called DHT, and they gradually shrink. The follicles at the back and sides of the scalp are largely resistant. A transplant moves resistant follicles from the donor area to thinning areas, and because they keep their resistance, they typically continue to grow in their new location for the long term.
 
 ## What a Transplant Does Not Do
 
@@ -20,13 +20,13 @@ A transplant does not change the sensitivity of the follicles that were not move
 
 ## Why Medical Therapy Is Often Recommended
 
-Medical treatments that slow or reduce hair loss help preserve your existing hair, which maintains overall density and keeps the transplanted area blending naturally with the rest of the scalp. They may also lessen the need for further surgery by preserving donor-adjacent areas and reducing the rate at which loss progresses. Medical therapy can also help support native hair that may be affected by shock loss after surgery.
+Medical treatments that slow or reduce hair loss help preserve your existing hair, which maintains overall density and keeps the transplanted area blending naturally with the rest of the scalp. They may also lessen the need for further surgery by preserving donor-adjacent areas and reducing the rate at which loss progresses. Medical therapy can also help support native hair that may be affected by [shock loss](/blog/shock-loss-after-hair-transplant) after surgery.
 
 Several approaches exist, including medicines that act on the hormonal pathway behind pattern hair loss and treatments applied to the scalp to support growth. Which is appropriate for you depends on your age, pattern, general health, and any medical conditions, and some options are not suitable for everyone, so they should be started and monitored by a doctor rather than self-prescribed.
 
 ## Before or After Surgery?
 
-For many patients, we recommend starting medical treatment before surgery, particularly when hair loss is still progressing. This helps stabilise the pattern so that the transplant can be planned around a more predictable picture, and the results are likely to hold up better. After surgery, treatment is often continued to protect native hair.
+For many patients, we recommend [starting medical treatment before surgery](/blog/who-should-delay-a-hair-transplant), particularly when hair loss is still progressing. This helps stabilise the pattern so that the transplant can be planned around a more predictable picture, and the results are likely to hold up better. After surgery, treatment is often continued to protect native hair.
 
 In patients whose loss is stable and whose goals are modest, the plan may differ. This is a decision made at consultation, not a default.
 

@@ -32,7 +32,7 @@ Creams containing vitamin D derivatives are sometimes used, mainly alongside oth
 
 ## Newer Topical Agents
 
-Topical JAK inhibitor creams, which block signalling inside immune cells, have shown repigmentation in clinical studies, with the best results on the face. Approval and availability differ between countries, and cost may be a factor. We will tell you honestly what is accessible and what the evidence supports, rather than recommending a product because it is new.
+[Topical JAK inhibitor creams](/blog/vitiligo-newer-treatment-developments), which block signalling inside immune cells, have shown repigmentation in clinical studies, with the best results on the face. Approval and availability differ between countries, and cost may be a factor. We will tell you honestly what is accessible and what the evidence supports, rather than recommending a product because it is new.
 
 ## Where Creams Work Best and Where They Struggle
 
@@ -44,10 +44,10 @@ Repigmentation is slow. Treatment is usually continued for several months before
 
 ## Combining Creams With Other Treatment
 
-Creams are frequently combined with light treatment, because the combination can work better than either alone, particularly for stubborn patches. For extensive vitiligo, topical treatment alone is usually not enough, and phototherapy is generally added.
+Creams are frequently combined with light treatment, because the combination can work better than either alone, particularly for stubborn patches. For extensive vitiligo, topical treatment alone is usually not enough, and [phototherapy](/blog/phototherapy-for-vitiligo-nbuvb-excimer) is generally added.
 
 ## Practical Tips
 
 Apply the cream as directed, in a thin layer only to the affected skin, and avoid applying steroids to normal skin around the patch. Take photographs under the same lighting every few weeks to track progress, since gradual change is hard to notice day to day. Use sunscreen on treated areas, and tell your doctor about any thinning, redness, or persistent burning.
 
-If you have new or spreading patches, avoid self-treating with leftover or borrowed creams. A proper assessment first, including whether your vitiligo is active or stable, helps us choose creams that suit your skin and your pattern.
+If you have new or spreading patches, avoid self-treating with leftover or borrowed creams. A proper assessment first, including whether your vitiligo is [active or stable](/blog/stable-or-active-vitiligo-why-it-matters), helps us choose creams that suit your skin and your pattern.

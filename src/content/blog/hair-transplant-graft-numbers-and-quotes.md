@@ -22,7 +22,7 @@ Several factors feed into the estimate.
 
 **The density you hope to achieve.** Natural scalp hair density is higher at the front than at the crown. Planning decides what density to aim for in each zone, and trade-offs are necessary.
 
-**Your donor supply.** The back and sides of the scalp have a finite number of permanent hairs. The estimate must stay within what the donor area can safely give without leaving it visibly thin.
+**Your donor supply.** The back and sides of the scalp have a finite number of permanent hairs. The estimate must stay within what the [donor area](/conditions/donor-area-depletion) can safely give without leaving it visibly thin.
 
 **The characteristics of your hair.** Thicker, coarser, or curlier hair gives more visual coverage per graft than fine, straight hair, and hair colour contrast with the skin also affects how dense the result appears.
 
@@ -45,11 +45,11 @@ When you receive an estimate, consider asking:
 - What happens if I need more coverage later?
 - Who will carry out the key steps, and what is their experience?
 
-A good clinic answers these clearly and does not pressure you to commit quickly.
+A [good clinic](/blog/hair-transplant-clinic-choice-and-low-cost-offers) answers these clearly and does not pressure you to commit quickly.
 
 ## Planning for the Long Term
 
-Hair loss in pattern baldness usually continues over the years, so the plan must account for the future. That means keeping donor supply in reserve, designing a hairline that will still look natural as surrounding hair thins, and considering medical treatment to slow progression. A transplant that looks good in the first year but leaves no room for future changes is not a good plan.
+Hair loss in pattern baldness usually continues over the years, so the plan must account for the future. That means keeping donor supply in reserve, designing a hairline that will still look natural as surrounding hair thins, and considering [medical treatment](/blog/medical-therapy-with-hair-transplant) to slow progression. A transplant that looks good in the first year but leaves no room for future changes is not a good plan.
 
 ## Understanding Quotes
 

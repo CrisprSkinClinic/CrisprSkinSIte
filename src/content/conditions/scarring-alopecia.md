@@ -70,7 +70,7 @@ Redness, scaling, or crusting around hair follicles, itching, burning, or tender
 
 ## Why It Is Often Missed
 
-Scarring alopecia can resemble more common causes of hair loss, particularly in the early stages, and may be mistaken for pattern hair loss, dandruff, or alopecia areata. Because the damage is permanent, delay in diagnosis can mean losing hair that might have been saved. Anyone with persistent scalp symptoms or hair loss accompanied by inflammation should have an examination.
+Scarring alopecia can resemble more common causes of hair loss, particularly in the early stages, and may be mistaken for [pattern hair loss](/conditions/androgenetic-alopecia), dandruff, or [alopecia areata](/conditions/alopecia-areata). Because the damage is permanent, delay in diagnosis can mean losing hair that might have been saved. Anyone with persistent scalp symptoms or hair loss accompanied by inflammation should have an examination.
 
 ## How We Diagnose It
 
@@ -90,7 +90,7 @@ The aim is to control inflammation and stop progression. Treatment depends on th
 
 Hair transplantation is not suitable for active scarring alopecia. If the inflammatory process is still going, it can destroy transplanted follicles as well, and surgery can even provoke new activity. A transplant may be considered only after the diagnosis is secure, and after the disease has been quiet for a prolonged period under treatment, and even then results are less predictable than in pattern hair loss. In some types, surgery is not recommended at all.
 
-This is why we always confirm the cause of hair loss before recommending a transplant, and why a patient with unexplained scalp symptoms should not proceed to surgery without a proper diagnosis.
+This is why we always confirm the cause of hair loss before recommending a transplant (see [who is a good candidate](/blog/hair-transplant-candidacy)), and why a patient with unexplained scalp symptoms should not proceed to surgery without a proper diagnosis.
 
 ## Living With the Condition
 

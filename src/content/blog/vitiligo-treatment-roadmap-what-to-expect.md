@@ -18,7 +18,7 @@ We then classify your vitiligo. Is it non-segmental, the more common type, or se
 
 ## Step 2: Is It Active or Stable?
 
-Establishing whether the disease is spreading or settled is central, because it determines the treatment order. We use your history, examination, and photographs, and may reassess at later visits. See our article on stable versus active vitiligo for more detail.
+Establishing whether the disease is spreading or settled is central, because it determines the treatment order. We use your history, examination, and photographs, and may reassess at later visits. See our article on [stable versus active vitiligo](/blog/stable-or-active-vitiligo-why-it-matters) for more detail.
 
 ## Step 3: Calm the Disease if It Is Active
 
@@ -26,17 +26,17 @@ For active, spreading vitiligo, the first aim is to halt progression. Options in
 
 ## Step 4: Restore Pigment
 
-Once the disease is calmer, treatment focuses on repigmentation. For limited patches, topical treatment is often the start: steroid creams in short supervised courses for the body, and tacrolimus-type creams for the face, neck, and folds. For more extensive vitiligo, narrowband UVB phototherapy is the established first-line option. Excimer light can target individual stubborn patches. Treatments are often combined for better results.
+Once the disease is calmer, treatment focuses on repigmentation. For limited patches, [topical treatment](/blog/vitiligo-topical-treatments-guide) is often the start: steroid creams in short supervised courses for the body, and tacrolimus-type creams for the face, neck, and folds. For more extensive vitiligo, [narrowband UVB phototherapy](/blog/phototherapy-for-vitiligo-nbuvb-excimer) is the established first-line option. Excimer light can target individual stubborn patches. Treatments are often combined for better results.
 
 This phase takes time. Repigmentation usually starts as small pigmented dots around hair follicles after a few months, and a fair trial typically needs six months or longer. We review at regular intervals, with photographs, and adjust the plan if a patch is not responding.
 
 ## Step 5: Consider Surgery for Resistant, Stable Patches
 
-For patches that have been stable but have not repigmented with medical treatment, surgical repigmentation may be considered. Techniques include punch grafting, suction blister grafting, cell suspension transfer, and hair follicle transplantation, and the choice depends on the size and site of the patch. Segmental vitiligo is often a particularly good candidate. This step is only appropriate when the disease has been stable for a sustained period.
+For patches that have been stable but have not repigmented with medical treatment, [surgical repigmentation](/blog/vitiligo-surgery-options-explained) may be considered. Techniques include punch grafting, suction blister grafting, cell suspension transfer, and hair follicle transplantation, and the choice depends on the size and site of the patch. Segmental vitiligo is often a particularly good candidate. This step is only appropriate when the disease has been stable for a sustained period.
 
 ## Step 6: Supportive Care and Long-Term Follow-Up
 
-Alongside medical treatment, we offer supportive options: daily sun protection, cosmetic camouflage, and, in selected cases, medical tattooing for stable patches. For very extensive vitiligo, where repigmentation is not realistic, we discuss lightening the remaining skin, but only after other options and careful reflection.
+Alongside medical treatment, we offer supportive options: daily sun protection, cosmetic camouflage, and, in selected cases, medical tattooing for stable patches. For very extensive vitiligo, where repigmentation is not realistic, we [discuss lightening the remaining skin](/blog/vitiligo-camouflage-micropigmentation-and-depigmentation), but only after other options and careful reflection.
 
 Because vitiligo can recur, follow-up continues after a good response. We recommend monitoring for new patches, and returning early if you notice changes, since early treatment generally works better.
 

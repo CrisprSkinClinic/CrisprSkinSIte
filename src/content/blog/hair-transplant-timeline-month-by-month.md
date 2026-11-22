@@ -12,7 +12,7 @@ The most common source of worry after a hair transplant is not knowing what is n
 
 ## The Day of Surgery
 
-The procedure is done under local anaesthesia, so you are awake but comfortable. Individual follicular units are removed from the donor area and then placed into the recipient area following the hairline design agreed beforehand. Most patients go home the same day with instructions on washing, sleeping position, and medicines. The grafts are fragile in the first days, so you will be asked to avoid touching, scratching, or rubbing the area.
+Good [preparation](/blog/preparing-for-hair-transplant-checklist) makes the day smoother. The procedure is done under local anaesthesia, so you are awake but comfortable. Individual follicular units are removed from the donor area and then placed into the recipient area following the hairline design agreed beforehand. Most patients go home the same day with instructions on washing, sleeping position, and medicines. The grafts are fragile in the first days, so you will be asked to avoid touching, scratching, or rubbing the area.
 
 ## Days 1 to 7: Early Healing
 
@@ -28,7 +28,7 @@ Scabs typically fall off within the first one to two weeks, often taking the hai
 
 This is the stage that surprises people most. The transplanted hair shafts commonly shed, and the area may look as though the transplant has not worked. This is normal and expected. The hair shaft falls out but the follicle, which carries the growth potential, stays safely under the skin and enters a resting phase. Shedding does not mean the grafts have failed.
 
-Some existing native hair near the transplanted area can also shed temporarily, which is called shock loss, and it usually regrows. See our article on shock loss for more detail.
+Some existing native hair near the transplanted area can also shed temporarily, which is called shock loss, and it usually regrows. See our article on [shock loss](/blog/shock-loss-after-hair-transplant) for more detail.
 
 ## Months 2 to 3: The Quiet Phase
 
@@ -44,7 +44,7 @@ Hairs lengthen and gradually thicken, and the overall density improves. Texture 
 
 ## Months 9 to 12 and Beyond
 
-Most of the final result is visible around a year after surgery. Some patients see continued maturing and increased density up to fourteen months or slightly beyond. Final results are assessed once growth has fully matured. If density is lower than expected in some areas, we discuss options, which may include a further session if donor supply allows.
+Most of the final result is visible around a year after surgery. Some patients see continued maturing and increased density up to fourteen months or slightly beyond. Final results are assessed once growth has fully matured. If density is lower than expected in some areas, we discuss options, which may include a further session if [donor supply](/conditions/donor-area-depletion) allows.
 
 ## Follow-Up Visits
 
@@ -52,7 +52,7 @@ We review progress at set intervals, check graft growth and healing, and adjust 
 
 ## Things That Help
 
-Follow the aftercare instructions closely, protect the scalp from sun, avoid smoking and heavy alcohol around the time of surgery, and maintain any medical treatment advised to protect native hair. Good nutrition supports healing and growth.
+Follow the aftercare instructions closely, protect the scalp from sun, avoid smoking and heavy alcohol around the time of surgery, and maintain any [medical treatment](/blog/medical-therapy-with-hair-transplant) advised to protect native hair. Good nutrition supports healing and growth.
 
 ## When to Call Us
 

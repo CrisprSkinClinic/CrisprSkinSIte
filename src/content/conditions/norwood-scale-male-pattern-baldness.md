@@ -46,7 +46,7 @@ The Norwood scale is the standard way of describing the stages of male pattern h
 
 ## What Male Pattern Hair Loss Is
 
-Male pattern hair loss, also called androgenetic alopecia, is the most common cause of hair loss in men. Hair follicles at the front, temples, and crown are genetically sensitive to a hormone derivative called DHT, and over time they shrink, producing thinner, shorter hairs until they stop producing visible hair. The follicles at the back and sides of the scalp are largely resistant, which is why this area is used as the donor site in hair transplantation. It tends to progress gradually over years, though the rate varies widely between individuals.
+Male pattern hair loss, also called [androgenetic alopecia](/conditions/androgenetic-alopecia), is the most common cause of hair loss in men. Hair follicles at the front, temples, and crown are genetically sensitive to a hormone derivative called DHT, and over time they shrink, producing thinner, shorter hairs until they stop producing visible hair. The follicles at the back and sides of the scalp are largely resistant, which is why this area is used as the donor site in hair transplantation. It tends to progress gradually over years, though the rate varies widely between individuals.
 
 ## The Stages
 
@@ -78,9 +78,9 @@ The scale runs from stage 1 to stage 7, with several intermediate variants.
 
 ## Staging and Hair Transplant Planning
 
-Stage and donor supply are considered together. Patients at moderate stages often have enough donor hair to achieve good coverage of the frontal hairline and mid-scalp. In advanced stages, supply may not cover everything at natural density, so a plan prioritises the areas that frame the face. We estimate graft numbers based on your area of loss and your donor density, and discuss what is realistic.
+Stage and [donor supply](/conditions/donor-area-depletion) are considered together. Patients at moderate stages often have enough donor hair to achieve good coverage of the frontal hairline and mid-scalp. In advanced stages, supply may not cover everything at natural density, so a plan prioritises the areas that frame the face. We estimate graft numbers based on your area of loss and your donor density, and discuss what is realistic.
 
-Importantly, transplanting too early, in a patient whose loss is still evolving, can lead to an unnatural result later. This is why we sometimes recommend medical treatment and monitoring first, particularly in younger patients.
+Importantly, transplanting too early, in a patient whose loss is still evolving, can lead to an unnatural result later. This is why we sometimes [recommend medical treatment and monitoring first](/blog/who-should-delay-a-hair-transplant), particularly in younger patients.
 
 ## Limitations of the Scale
 

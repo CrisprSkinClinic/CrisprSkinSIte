@@ -14,13 +14,13 @@ Even with good treatment, some patches respond slowly or not at all. The hands, 
 
 Camouflage covers the patch with colour. Specially formulated waterproof cosmetics and body make-up can match skin tone and stay in place through the day, and some are designed to resist rubbing and sweat. Self-tanning products containing a colouring agent can also be used to darken depigmented skin, though the result can look uneven and fades as the skin surface renews. Some people use dyes or stains made for this purpose.
 
-**Practical points.** Colour matching takes practice, and it helps to try a few products before settling on one. Test any new product on a small area first, since cosmetics can cause allergic reactions, and avoid products with harsh ingredients. Camouflage can be used alongside medical treatment, and many patients combine the two. Ask us for guidance, since the right shade and formulation depend on your skin tone.
+**Practical points.** Colour matching takes practice, and it helps to try a few products before settling on one. Test any new product on a small area first, since cosmetics can cause allergic reactions, and avoid products with harsh ingredients. Camouflage can be used alongside [medical treatment](/blog/vitiligo-treatment-roadmap-what-to-expect), and many patients combine the two. Ask us for guidance, since the right shade and formulation depend on your skin tone.
 
 ## Micropigmentation (Medical Tattooing)
 
 Micropigmentation places pigment into the skin using a needle, similar to a tattoo but done with colours matched to your skin. It is sometimes used for small, stable patches, particularly on the lips, where other treatments are often disappointing, and sometimes on the areola or other limited areas.
 
-**Limitations.** Matching colour is difficult, and the pigment can fade or change shade over time, so touch-ups may be needed. The tattoo does not stop the underlying disease, and injury to the skin can occasionally trigger new patches (the Koebner phenomenon) in people with active vitiligo, which is why this is considered only for stable areas. Choose a practitioner with specific experience, and discuss it with your dermatologist first.
+**Limitations.** Matching colour is difficult, and the pigment can fade or change shade over time, so touch-ups may be needed. The tattoo does not stop the underlying disease, and injury to the skin can occasionally trigger new patches (the Koebner phenomenon) in people with active vitiligo, which is why this is considered only for [stable areas](/blog/stable-or-active-vitiligo-why-it-matters). Choose a practitioner with specific experience, and discuss it with your dermatologist first.
 
 ## Sun Protection
 

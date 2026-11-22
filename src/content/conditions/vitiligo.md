@@ -63,7 +63,7 @@ Patches are smooth, milk-white, and sharply bordered, and are not scaly, itchy, 
 
 ## Types of Vitiligo
 
-**Non-segmental vitiligo** is the commonest type, with patches that often appear symmetrically on both sides of the body and tend to progress and sometimes recur over years. **Segmental vitiligo** is limited to one area or segment of the body, tends to start early in life, spreads for a limited period, and then often stabilises. Other, rarer patterns exist, including involvement of a limited number of patches or of mucosal sites such as the lips and genitals.
+**Non-segmental vitiligo** is the commonest type, with patches that often appear symmetrically on both sides of the body and tend to progress and sometimes recur over years. **[Segmental vitiligo](/conditions/segmental-vitiligo)** is limited to one area or segment of the body, tends to start early in life, spreads for a limited period, and then often stabilises. Other, rarer patterns exist, including involvement of a limited number of patches or of mucosal sites such as the lips and genitals.
 
 ## Why It Happens
 
@@ -71,7 +71,7 @@ Genetics, the immune system, and environmental triggers all appear to play a par
 
 ## Active or Stable?
 
-One of the most important questions at a first visit is whether the disease is currently active, with new or enlarging patches, or stable, with no change over a sustained period. This shapes the treatment order, and determines whether surgery is an option. We assess it using your history, examination, photographs, and often a Wood's lamp, and we reassess over time. See our page on stable versus active vitiligo for more detail.
+One of the most important questions at a first visit is whether the disease is currently active, with new or enlarging patches, or stable, with no change over a sustained period. This shapes the treatment order, and determines whether surgery is an option. We assess it using your history, examination, photographs, and often a Wood's lamp, and we reassess over time. See our page on [stable versus active vitiligo](/conditions/stable-vs-active-vitiligo) for more detail.
 
 ## Diagnosis
 
@@ -79,7 +79,7 @@ Vitiligo is usually diagnosed by examination. A Wood's lamp, which shines ultrav
 
 ## Treatment Overview
 
-There is currently no guaranteed cure, but treatment can meaningfully restore pigment in many cases, particularly with early and consistent treatment. The options include topical corticosteroids and tacrolimus-type creams, newer topical agents where approved and available, narrowband UVB phototherapy and targeted excimer light, short courses of oral medicine for rapidly spreading disease, and surgical repigmentation for stable patches that have not responded. Supportive options include sun protection, cosmetic camouflage, and in selected cases medical tattooing. For very extensive vitiligo, where repigmentation is unrealistic, lightening the remaining skin is discussed only after other options and careful reflection.
+There is currently no guaranteed cure, but treatment can meaningfully restore pigment in many cases, particularly with early and consistent treatment. The options include [topical corticosteroids and tacrolimus-type creams](/blog/vitiligo-topical-treatments-guide), [newer topical agents](/blog/vitiligo-newer-treatment-developments) where approved and available, [narrowband UVB phototherapy and targeted excimer light](/blog/phototherapy-for-vitiligo-nbuvb-excimer), short courses of oral medicine for rapidly spreading disease, and [surgical repigmentation](/conditions/vitiligo-surgical-treatment) for stable patches that have not responded. Supportive options include sun protection, cosmetic camouflage, and in selected cases medical tattooing. For very extensive vitiligo, where repigmentation is unrealistic, lightening the remaining skin is discussed only after other options and careful reflection.
 
 ## Where Treatment Works Best
 
@@ -87,7 +87,7 @@ Response varies by body area. The face and neck respond best, followed by the tr
 
 ## Living With Vitiligo
 
-Vitiligo rarely causes physical symptoms, but the emotional effect can be significant. Many people feel self-conscious, avoid certain clothing or social situations, or experience anxiety or low mood. This is common, and it deserves attention. Protecting depigmented skin from the sun with daily sunscreen is important, since it burns easily. Cosmetic camouflage is a legitimate option for those who want it, alongside medical treatment, and counselling or support groups can help.
+Vitiligo rarely causes physical symptoms, but the emotional effect can be significant. Many people feel self-conscious, avoid certain clothing or social situations, or experience anxiety or low mood. This is common, and it deserves attention. Protecting depigmented skin from the sun with daily sunscreen is important, since it burns easily. [Cosmetic camouflage](/blog/vitiligo-camouflage-micropigmentation-and-depigmentation) is a legitimate option for those who want it, alongside medical treatment, and counselling or support groups can help.
 
 ## Realistic Expectations
 

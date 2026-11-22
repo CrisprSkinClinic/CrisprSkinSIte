@@ -28,7 +28,7 @@ An honest clinic tells you if you are not a good candidate, or if you should wai
 
 **Pressure to book quickly.** Limited-time discounts and urgency tactics are not appropriate for a surgical decision.
 
-**Very large graft counts promised in one session.** Overharvesting can permanently thin the donor area and may compromise graft survival.
+**Very large graft counts promised in one session.** Overharvesting can permanently thin the [donor area](/conditions/donor-area-depletion) and may compromise graft survival.
 
 **Unclear plans for follow-up.** You should know how and when you will be reviewed, and whom to contact if there is a problem.
 
@@ -46,7 +46,7 @@ Compare offers like for like. Ask what is included: the procedure itself, anaest
 
 ## Travelling for a Procedure
 
-Some patients are tempted by low-cost packages that involve travel. The main concerns are follow-up and accountability. Healing, shedding, and growth take a year, and you may need advice or review during that time. It is much harder to get timely help if the clinic is far away. Consider how complications or concerns would be handled before you commit.
+Some patients are tempted by low-cost packages that involve travel. The main concerns are follow-up and accountability. [Healing, shedding, and growth take a year](/blog/hair-transplant-timeline-month-by-month), and you may need advice or review during that time. It is much harder to get timely help if the clinic is far away. Consider how complications or concerns would be handled before you commit.
 
 ## Aftercare and Accessibility
 
@@ -58,7 +58,7 @@ Look at patient experiences, but interpret them carefully. Photographs can be se
 
 ## Questions to Ask
 
-Who will design my hairline? Who will perform the extraction and implantation? How many grafts are you planning, and why? How will my donor area look afterwards? What if I need a second session? What follow-up is included? What are the risks, and how do you handle complications?
+(For graft-number questions in particular, see [how to read a transplant quote](/blog/hair-transplant-graft-numbers-and-quotes).) Who will design my hairline? Who will perform the extraction and implantation? How many grafts are you planning, and why? How will my donor area look afterwards? What if I need a second session? What follow-up is included? What are the risks, and how do you handle complications?
 
 ## The Bottom Line
 

@@ -70,7 +70,7 @@ Every person has a limited number of follicular units, which are the natural gro
 
 ## What Donor Depletion Means
 
-Donor depletion describes a situation in which the donor area has been used up, or is too limited to support further harvesting without visible thinning. It can occur in patients with advanced baldness and a small safe zone, in patients with naturally low donor density, and in patients who have had multiple procedures, particularly where grafts were taken too aggressively in previous sessions.
+Donor depletion describes a situation in which the donor area has been used up, or is too limited to support further harvesting without visible thinning. It can occur in patients with [advanced baldness](/conditions/norwood-scale-male-pattern-baldness) and a small safe zone, in patients with naturally low donor density, and in patients who have had multiple procedures, particularly where grafts were taken too aggressively in previous sessions.
 
 A depleted donor area may appear sparse or see-through, and cannot give more without a visible penalty. In some cases, harvesting beyond the safe zone produces hairs that may not last, because they come from areas that are not truly resistant.
 
@@ -80,7 +80,7 @@ Taking too many grafts in a single session, or taking them too close together, c
 
 ## How Planning Works Around Limits
 
-We assess donor supply before planning anything. We then design a procedure that fits within it, with these principles.
+We assess donor supply before planning anything. We then design a procedure that fits within it (see [how graft numbers are worked out](/blog/hair-transplant-graft-numbers-and-quotes)), with these principles.
 
 **Prioritise the areas that matter most.** The frontal hairline and forelock frame the face and produce the greatest visual impact, so they are generally prioritised. The crown, which needs many grafts for modest gain, may be addressed later or not at all.
 
@@ -88,7 +88,7 @@ We assess donor supply before planning anything. We then design a procedure that
 
 **Keep supply in reserve.** We plan for the long term, leaving room for future procedures if hair loss progresses.
 
-**Use medical therapy.** Medicines that slow loss help preserve native hair and may reduce the area that needs to be covered, stretching the benefit of your donor supply.
+**Use medical therapy.** [Medicines that slow loss](/blog/medical-therapy-with-hair-transplant) help preserve native hair and may reduce the area that needs to be covered, stretching the benefit of your donor supply.
 
 ## Setting Realistic Goals
 

@@ -32,7 +32,7 @@ Good preparation makes the day of your hair transplant smoother and supports hea
 
 ## Skincare and Hair Products
 
-Follow any specific instructions about shampoos, scalp treatments, or medicated products. If you are using medical treatment for hair loss, continue it unless told otherwise.
+Follow any specific instructions about shampoos, scalp treatments, or medicated products. If you are using [medical treatment for hair loss](/blog/medical-therapy-with-hair-transplant), continue it unless told otherwise.
 
 ## The Day Before
 
@@ -68,7 +68,7 @@ What will the aftercare routine be? When can I wash my hair, and how? When can I
 
 ## Set Your Expectations
 
-Remember that shedding of the transplanted hair is a normal stage in the first weeks, and that results take about a year. Having this clear in advance makes recovery less stressful.
+Remember that shedding of the transplanted hair is a [normal stage in the first weeks](/blog/hair-transplant-timeline-month-by-month), and that results take about a year. Having this clear in advance makes recovery less stressful.
 
 ## The Bottom Line
 

@@ -64,7 +64,7 @@ There is no single test. We combine several sources of information. We take a ca
 
 ## Treatment When Vitiligo Is Active
 
-The priority is to calm the immune process and limit further loss. Options include narrowband UVB phototherapy, topical treatment, and in rapidly progressing cases a short, supervised course of oral medicine to help stop spread, with careful monitoring because of possible side effects. Protecting skin from sunburn and injury is also part of the plan. Surgery is avoided, and other skin procedures on active areas should be approached with care.
+The priority is to calm the immune process and limit further loss. Options include [narrowband UVB phototherapy](/blog/phototherapy-for-vitiligo-nbuvb-excimer), [topical treatment](/blog/vitiligo-topical-treatments-guide), and in rapidly progressing cases a short, supervised course of oral medicine to help stop spread, with careful monitoring because of possible side effects. Protecting skin from sunburn and injury is also part of the plan. [Surgery](/conditions/vitiligo-surgical-treatment) is avoided, and other skin procedures on active areas should be approached with care.
 
 ## Treatment When Vitiligo Is Stable
 

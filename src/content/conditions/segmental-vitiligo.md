@@ -43,7 +43,7 @@ faqIds:
 ctaTitle: "Book a Vitiligo Evaluation"
 ---
 
-Segmental vitiligo is a form of vitiligo in which depigmentation is confined to one segment or area of the body, such as one side of the face, one side of the trunk, or one limb. It does not cross the midline, and it differs in several important ways from the more common non-segmental type, which affects both sides of the body and tends to progress over years. Recognising it early changes the treatment plan.
+Segmental vitiligo is a form of [vitiligo](/conditions/vitiligo) in which depigmentation is confined to one segment or area of the body, such as one side of the face, one side of the trunk, or one limb. It does not cross the midline, and it differs in several important ways from the more common non-segmental type, which affects both sides of the body and tends to progress over years. Recognising it early changes the treatment plan.
 
 ## How Common Is It?
 
@@ -71,7 +71,7 @@ When the patch is spreading, treatment aims to limit progression. Topical therap
 
 ## Treatment Once Stable
 
-Because segmental vitiligo tends to stabilise, it is often an excellent candidate for surgical repigmentation. Techniques that move pigment cells into the patch, such as suction blister grafting, non-cultured cell suspension transfer, or hair follicle transplantation, can give good and lasting results, and the tendency of the disease to stay confined helps results last. The choice of technique depends on the size and site of the patch. Surgery requires confirmed stability, commonly after a sustained period without change.
+Because segmental vitiligo tends to stabilise, it is often an excellent candidate for surgical repigmentation. [Techniques that move pigment cells into the patch](/conditions/vitiligo-surgical-treatment), such as suction blister grafting, non-cultured cell suspension transfer, or hair follicle transplantation, can give good and lasting results, and the tendency of the disease to stay confined helps results last. The choice of technique depends on the size and site of the patch. Surgery requires [confirmed stability](/conditions/stable-vs-active-vitiligo), commonly after a sustained period without change.
 
 ## Children and Families
 

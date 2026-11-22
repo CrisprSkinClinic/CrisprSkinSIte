@@ -28,7 +28,7 @@ Nothing a person does or fails to do causes vitiligo. It has a genetic component
 
 ## "There Is No Treatment"
 
-This is the opposite myth, and equally unhelpful. Vitiligo is manageable, and a range of treatments can meaningfully restore pigment in many patients. These include creams, light treatment (phototherapy), short courses of oral medicine in rapidly spreading disease, and surgical repigmentation for stable patches. Which of them suits you depends on the type of vitiligo, how much skin is involved, and whether the disease is currently active or settled.
+This is the opposite myth, and equally unhelpful. Vitiligo is manageable, and a range of treatments can meaningfully restore pigment in many patients. These include [creams](/blog/vitiligo-topical-treatments-guide), light treatment ([phototherapy](/blog/phototherapy-for-vitiligo-nbuvb-excimer)), short courses of oral medicine in rapidly spreading disease, and [surgical repigmentation](/conditions/vitiligo-surgical-treatment) for stable patches. Which of them suits you depends on the type of vitiligo, how much skin is involved, and whether the disease is currently [active or settled](/conditions/stable-vs-active-vitiligo).
 
 ## "There Is a Guaranteed Cure"
 
@@ -36,7 +36,7 @@ We think patients deserve honesty here. Treatment can restore pigment in many ca
 
 ## "It Always Spreads Everywhere"
 
-The course genuinely varies. Some people have a few small, stable patches for years. Others have more extensive or actively spreading depigmentation. A form called segmental vitiligo, which affects one side or area of the body, usually spreads for a limited period and then settles. We cannot predict exactly what will happen at a first visit, which is why ongoing assessment, rather than a single guess, is part of good care.
+The course genuinely varies. Some people have a few small, stable patches for years. Others have more extensive or actively spreading depigmentation. A form called [segmental vitiligo](/conditions/segmental-vitiligo), which affects one side or area of the body, usually spreads for a limited period and then settles. We cannot predict exactly what will happen at a first visit, which is why ongoing assessment, rather than a single guess, is part of good care.
 
 ## "Sun Exposure Will Cure It"
 

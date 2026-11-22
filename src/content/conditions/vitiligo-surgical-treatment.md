@@ -51,11 +51,11 @@ Surgical treatment for vitiligo works by moving pigment-producing cells from hea
 
 ## When Surgery Is Considered
 
-Medical treatment, meaning creams and light, is usually tried first. Surgery is considered when patches have been stable for a sustained period, commonly around six to twelve months or more, and have not repigmented adequately despite a fair trial of medical treatment. It is often a very good option for segmental vitiligo, which tends to respond poorly to creams and light but to stabilise on its own. It is also used for small, localised patches in visible areas, where cosmetic benefit is high.
+Medical treatment, meaning [creams](/blog/vitiligo-topical-treatments-guide) and [light](/blog/phototherapy-for-vitiligo-nbuvb-excimer), is usually tried first. Surgery is considered when patches have been stable for a sustained period, commonly around six to twelve months or more, and have not repigmented adequately despite a fair trial of medical treatment. It is often a very good option for [segmental vitiligo](/conditions/segmental-vitiligo), which tends to respond poorly to creams and light but to stabilise on its own. It is also used for small, localised patches in visible areas, where cosmetic benefit is high.
 
 ## Who Is Not a Good Candidate
 
-Active, spreading vitiligo is not suitable, because the immune process can attack the transferred cells and new patches can appear at the donor site. People who tend to form keloids or thick scars are at higher risk of poor cosmetic results. Very large areas, or sites that respond poorly to grafting, may not be suitable, and unrealistic expectations are a reason to pause and talk. A small test graft on one area is sometimes done first, to see how your skin responds.
+[Active, spreading vitiligo](/conditions/stable-vs-active-vitiligo) is not suitable, because the immune process can attack the transferred cells and new patches can appear at the donor site. People who tend to form keloids or thick scars are at higher risk of poor cosmetic results. Very large areas, or sites that respond poorly to grafting, may not be suitable, and unrealistic expectations are a reason to pause and talk. A small test graft on one area is sometimes done first, to see how your skin responds.
 
 ## The Main Techniques
 
