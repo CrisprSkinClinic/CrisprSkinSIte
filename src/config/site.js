@@ -94,6 +94,9 @@ export const siteConfig = {
 
     whatsapp: "https://wa.me/919698444888",
 
+    // WhatsApp Business number that sends the booking / registration OTP. "Open WhatsApp" in the OTP pop-ups opens this chat.
+    otpWhatsapp: "https://wa.me/917806880801",
+
     // Machine-readable, schema.org format -- used ONLY in JSON-LD structured data.
     // Mon-Sat 4-9pm; Sunday 9am-1pm & 4-9pm.
     workingHours: "Mo-Sa 16:00-21:00, Su 09:00-13:00,16:00-21:00",
