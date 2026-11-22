@@ -55,3 +55,7 @@ Where a specific trigger is identified, practical guidance on avoidance reduces 
 ## Setting Realistic Expectations
 
 Acute urticaria typically resolves within days to a few weeks. Chronic urticaria is more variable -- some patients see it resolve within months, others manage it as a longer-term, fluctuating condition -- and we discuss this range honestly rather than promising a fixed timeline, since chronic urticaria's course is genuinely less predictable than acute cases.
+
+## Hives and Food
+
+Food is the cause in only a small share of hives. See [hives and food: do low-histamine diets work](/blog/hives-and-food-do-low-histamine-diets-work).

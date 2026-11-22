@@ -1,5 +1,5 @@
 ---
-title: "Steroid and Combination Creams on Ringworm: Why They Make It Worse"
+title: "Steroid Creams on Ringworm: Why They Make It Worse"
 pubDate: 2026-11-06
 description: "Why steroid-containing creams are a major cause of stubborn, spreading tinea, and what to do instead."
 author: "Dr. Karthik L"

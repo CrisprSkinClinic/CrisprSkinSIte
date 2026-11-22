@@ -1,5 +1,5 @@
 ---
-title: "Hair Fall After Pregnancy: Timeline, Nutrition and When to Treat"
+title: "Hair Fall After Pregnancy: Timeline and Treatment"
 pubDate: 2026-11-22
 description: "What happens to hair after delivery, how long shedding lasts, what helps, and the signs that need a check."
 author: "Dr. Narayanan A"

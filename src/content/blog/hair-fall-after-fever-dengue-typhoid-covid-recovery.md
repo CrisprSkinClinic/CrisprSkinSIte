@@ -1,5 +1,5 @@
 ---
-title: "Hair Fall After Fever or Illness: Why It Happens and When It Stops"
+title: "Hair Fall After Fever, Dengue or COVID: Recovery"
 pubDate: 2026-11-22
 description: "Why hair sheds two to three months after a high fever, dengue, typhoid, COVID or surgery, and how long recovery takes."
 author: "Dr. Narayanan A"

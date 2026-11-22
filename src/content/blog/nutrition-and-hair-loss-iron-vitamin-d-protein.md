@@ -1,5 +1,5 @@
 ---
-title: "Nutrition and Hair Loss: Iron, Vitamin D, Protein and Crash Diets"
+title: "Nutrition and Hair Loss: Iron, Vitamin D, Protein"
 pubDate: 2026-11-18
 description: "Which deficiencies can cause hair shedding, which tests are useful and which supplements are not."
 author: "Dr. Karthik L"

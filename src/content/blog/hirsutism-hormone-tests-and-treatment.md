@@ -1,7 +1,7 @@
 ---
 title: "Hirsutism: Hormone Tests and Medical Treatment"
 pubDate: 2026-11-05
-description: "Which tests help explain excess hair, and how medicines slow hair growth."
+description: "Which hormone tests explain excess facial and body hair in women, and how medicines slow hair growth, with key safety cautions."
 author: "Dr. Narayanan B"
 tags: ["Hirsutism", "PCOS"]
 service: "hormonal-skin-conditions"

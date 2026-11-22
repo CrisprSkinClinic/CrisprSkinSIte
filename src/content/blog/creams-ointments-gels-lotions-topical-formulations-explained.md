@@ -1,5 +1,5 @@
 ---
-title: "Creams, Ointments, Gels, Lotions and Foams: Topical Formulations Explained"
+title: "Cream, Ointment, Gel or Lotion? Topicals Explained"
 pubDate: 2026-11-21
 description: "A plain-language guide to what each topical form is, where it works best, and why the same medicine comes in several forms."
 author: "Dr. Karthik L"

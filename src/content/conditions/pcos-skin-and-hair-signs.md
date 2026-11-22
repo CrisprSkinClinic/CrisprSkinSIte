@@ -1,5 +1,5 @@
 ---
-title: "PCOS: Skin and Hair Signs"
+title: "PCOS Skin and Hair Signs"
 metaDescription: "How polycystic ovary syndrome shows on the skin and scalp: acne, excess hair, hair thinning and dark velvety patches. KK Nagar, Chennai."
 heroEyebrow: "Skin Condition"
 heroHeadline: "PCOS: Skin and Hair Signs"

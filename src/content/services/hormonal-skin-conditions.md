@@ -1,5 +1,5 @@
 ---
-title: "Hormonal Skin and Hair Conditions"
+title: "PCOS Skin, Hirsutism and Hormonal Acne Care"
 metaDescription: "Hormonal acne, excess facial and body hair (hirsutism), acanthosis nigricans and PCOS-related skin changes, assessed by dermatologists in KK Nagar, Chennai."
 heroEyebrow: "Hormonal Dermatology"
 heroHeadline: "Hormonal Skin and Hair Conditions"

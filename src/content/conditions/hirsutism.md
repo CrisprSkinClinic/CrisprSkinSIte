@@ -1,5 +1,5 @@
 ---
-title: "Hirsutism (Excess Facial and Body Hair in Women)"
+title: "Hirsutism (Excess Hair in Women)"
 metaDescription: "Hirsutism: coarse dark hair on the face, chest or abdomen in women, often from PCOS. Causes, tests and treatment in KK Nagar, Chennai."
 heroEyebrow: "Skin Condition"
 heroHeadline: "Hirsutism"

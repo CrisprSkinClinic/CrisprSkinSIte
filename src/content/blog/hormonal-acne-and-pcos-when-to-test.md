@@ -1,7 +1,7 @@
 ---
 title: "Hormonal Acne and PCOS: When Should You Be Tested?"
 pubDate: 2026-11-11
-description: "Who with adult acne should have hormone or sugar tests, and who can skip them."
+description: "Which women with adult acne need hormone or blood sugar tests for PCOS, and who can safely skip them. A dermatologist explains."
 author: "Dr. Narayanan A"
 tags: ["Hormonal acne", "PCOS"]
 service: "hormonal-skin-conditions"

@@ -63,3 +63,7 @@ For moderate-to-severe psoriasis, or when joints are involved, systemic treatmen
 ## Setting Realistic Expectations
 
 Psoriasis is a long-term condition with a relapsing-remitting course -- flares and periods of improvement are both expected parts of managing it, not a sign that treatment has failed. We build treatment plans around sustained, long-term control instead of promising a permanent cure that current medical evidence doesn't yet support, and we help you develop a realistic sense of your own flare pattern and triggers over time.
+
+## Diet, Winter and Vaccines
+
+See [psoriasis and diet](/blog/psoriasis-diet-weight-alcohol-gluten-evidence), [why psoriasis flares in winter](/blog/psoriasis-in-winter-why-flares), and [vaccines and autoimmune skin disease](/blog/vaccines-and-psoriasis-vitiligo-alopecia-flares-myths). If you are starting a biologic, see our [vaccination service](/services/vaccination).

@@ -56,3 +56,7 @@ Most patients need a course of multiple sessions for substantial, visible reduct
 ## Setting Realistic Expectations
 
 Laser hair reduction meaningfully reduces hair growth for most patients over a full course of treatment, with regrowth -- when it occurs -- typically finer and sparser than before. We're clear that results vary by hair and skin type, that a full course (not a single session) is what produces visible change, and that periodic maintenance sessions are a normal part of sustaining results long-term for most patients.
+
+## When Excess Hair Is Hormonal
+
+In women, coarse dark hair with acne or irregular periods may reflect PCOS. See [hirsutism](/conditions/hirsutism) and [why laser and medicines work best together](/blog/hirsutism-laser-and-medical-treatment-together).

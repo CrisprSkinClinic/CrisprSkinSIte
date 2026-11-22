@@ -1,7 +1,7 @@
 ---
 title: "Cracked Heels and Chapped Lips in Winter"
 pubDate: 2026-11-17
-description: "How to heal and prevent cracked heels and chapped lips when the air turns dry."
+description: "How to heal and prevent cracked heels and chapped lips when the air turns dry: simple routines, what to avoid, and when to see a dermatologist."
 author: "Dr. Karthik L"
 tags: ["Winter skin care", "Cracked heels", "Lips"]
 service: "winter-skin-care"

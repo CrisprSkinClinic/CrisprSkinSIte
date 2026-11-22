@@ -61,3 +61,7 @@ Eczema, particularly atopic dermatitis, is often a long-term pattern with period
 ## Using Topical Treatment Well
 
 The form and the amount both matter. See [creams, ointments, gels and lotions explained](/blog/creams-ointments-gels-lotions-topical-formulations-explained) and [how much to apply](/blog/how-much-topical-medicine-to-apply-fingertip-unit-guide).
+
+## Winter, Food and Children
+
+Read [why eczema flares in winter](/blog/eczema-flares-in-winter), [food allergy and eczema: when to test](/blog/food-allergy-and-eczema-when-to-test-and-when-not-to), and [vaccinating a child with eczema](/blog/vaccinating-children-with-eczema).

@@ -59,3 +59,7 @@ Where any lesion shows features that raise even a modest question, we recommend 
 ## When Removal Is (and Isn't) Necessary
 
 Most skin tags and cosmetically bothersome moles are removed simply because the patient wants them gone -- that's a perfectly valid reason, and we're happy to help. But we're equally direct when a growth doesn't need removal at all, since minor surgical procedures, however low-risk, are still procedures, and we'd rather tell you it's unnecessary than perform a removal that wasn't actually indicated.
+
+## HPV and Shingles Vaccines
+
+Common warts are not prevented by the HPV vaccine. See [what the HPV vaccine does and does not do](/blog/hpv-vaccine-what-it-prevents-and-what-it-does-not).

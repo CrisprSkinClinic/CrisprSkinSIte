@@ -1,5 +1,5 @@
 ---
-title: "Why Tinea Treatment Fails, and the Compliance That Makes It Work"
+title: "Why Tinea Treatment Fails: Compliance That Works"
 pubDate: 2026-11-02
 description: "The commonest reasons ringworm does not clear or keeps returning, and the habits that make treatment succeed."
 author: "Dr. Narayanan B"

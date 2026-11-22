@@ -1,5 +1,5 @@
 ---
-title: "HPV Infection and HPV Vaccination"
+title: "HPV Infection and Vaccination"
 metaDescription: "What HPV causes, how the HPV vaccine protects against genital warts and cancers, and who should be vaccinated. Dermatologists in KK Nagar, Chennai."
 heroEyebrow: "Skin Condition"
 heroHeadline: "HPV Infection and HPV Vaccination"

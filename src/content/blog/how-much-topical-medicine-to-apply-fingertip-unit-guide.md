@@ -1,5 +1,5 @@
 ---
-title: "How Much Cream Should You Apply? The Fingertip Unit and Medicine-Specific Amounts"
+title: "How Much Cream to Apply: The Fingertip Unit Guide"
 pubDate: 2026-11-22
 description: "Why too little or too much topical medicine causes problems, how to measure with the fingertip unit, and how amounts differ between medicines."
 author: "Dr. Narayanan B"

@@ -1,5 +1,5 @@
 ---
-title: "Acanthosis Nigricans and Insulin Resistance: Which Tests to Ask For"
+title: "Acanthosis Nigricans: Insulin Resistance and Tests"
 pubDate: 2026-10-28
 description: "Which blood tests help explain dark velvety skin, and why catching insulin resistance early matters."
 author: "Dr. Narayanan A"

@@ -1,5 +1,5 @@
 ---
-title: "Hormonal Acne Medicines Explained: Pills, Spironolactone and Isotretinoin"
+title: "Hormonal Acne Medicines: Pills, Spironolactone, Isotretinoin"
 pubDate: 2026-11-13
 description: "A plain guide to the medicines used for hormonal acne, who they suit, and what safety checks matter."
 author: "Dr. Narayanan A"

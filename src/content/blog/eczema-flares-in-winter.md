@@ -1,7 +1,7 @@
 ---
 title: "Why Eczema Flares in Winter, and How to Calm It"
 pubDate: 2026-11-20
-description: "Why eczema gets worse in dry weather and how to keep flares under control."
+description: "Why eczema flares in dry, cooler weather and air-conditioning, and a practical routine to calm itching and protect the skin barrier."
 author: "Dr. Narayanan A"
 tags: ["Winter skin care", "Eczema"]
 service: "eczema"

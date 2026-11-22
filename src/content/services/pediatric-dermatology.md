@@ -60,3 +60,7 @@ We spend real time explaining the condition and the home-care routine clearly, s
 ## Setting Realistic Expectations
 
 Many childhood skin conditions are common, well-understood, and respond well to appropriate treatment, though how quickly and how completely varies by condition and by child. We discuss a realistic course and timeline specific to what your child is dealing with, and plan follow-up visits around how that particular condition typically evolves as children grow.
+
+## Related Guides
+
+See [baby and child skin in winter](/blog/baby-and-child-skin-in-winter), [vaccinating a child with eczema](/blog/vaccinating-children-with-eczema) and [dark neck in children and teens](/blog/acanthosis-nigricans-in-children-and-teens).

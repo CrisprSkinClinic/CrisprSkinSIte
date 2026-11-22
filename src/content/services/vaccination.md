@@ -1,5 +1,5 @@
 ---
-title: "Vaccination in Dermatology"
+title: "Shingles and HPV Vaccination in Chennai"
 metaDescription: "Shingles (herpes zoster) and HPV vaccination, and vaccine planning before immunosuppressant or biologic treatment, with dermatologists in KK Nagar, Chennai."
 heroEyebrow: "Preventive Dermatology"
 heroHeadline: "Vaccination in Dermatology"

@@ -1,5 +1,5 @@
 ---
-title: "Winter Skin Care"
+title: "Winter Dry Skin Treatment in Chennai"
 metaDescription: "Dry, itchy, cracked skin and winter flares of eczema, psoriasis and scalp problems, assessed by dermatologists in KK Nagar, Chennai."
 heroEyebrow: "Seasonal Skin Care"
 heroHeadline: "Winter Skin Care"
