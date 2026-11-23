@@ -42,3 +42,8 @@ import { siteConfig } from '../config/site.js';
     </div>
   </section>
 </MainLayout>
+
+<script>
+  // Tell Analytics which address was missing and where the visitor came from, so broken links can be fixed.
+  (window as any).gtag?.('event', 'page_not_found', { page_path: location.pathname, referrer: document.referrer || '(direct)' });
+</script>

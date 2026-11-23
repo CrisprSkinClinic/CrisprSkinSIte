@@ -3,6 +3,7 @@ import { ViewTransitions } from 'astro:transitions';
 import FloatingContact from '../components/FloatingContact.astro';
 import LandingFooter from '../components/LandingPageSections/LandingFooter.astro';
 import { siteConfig } from '../config/site.js';
+import Analytics from '../components/Analytics.astro';
 import '../styles/global.css';
 
 // Landing pages are built for paid traffic (Goog<FloatingContact />le Ads). They deliberately
@@ -42,13 +43,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(image, Astro.site || siteConfig.url)} />
 
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-6JTEB0S8T0"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6JTEB0S8T0');
-    </script>
+    <Analytics />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,99 +74,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || siteConfig.url);
     <LandingFooter />
 
     <FloatingContact />
-
-    <script>
-      // GA4 conversion tracking via event delegation -- mirrors the
-      // same logic in MainLayout.astro so landing pages report
-      // phone_call_click, whatsapp_click, directions_click, and
-      // booking_click identically to the main site. Booking
-      // completion is tracked separately, directly from
-      // BookingCalendar.astro's confirm handler.
-      document.addEventListener('astro:page-load', () => {
-        document.addEventListener('click', (e) => {
-          if (typeof gtag !== 'function') return;
-
-          const link = e.target.closest('a');
-          if (!link) return;
-
-          const href = link.getAttribute('href') || '';
-
-          if (href.startsWith('tel:')) {
-            gtag('event', 'phone_call_click', {
-              event_category: 'engagement',
-              event_label: href.replace('tel:', ''),
-            });
-            return;
-          }
-
-          if (href.includes('wa.me') || href.includes('whatsapp.com')) {
-            gtag('event', 'whatsapp_click', {
-              event_category: 'engagement',
-              event_label: 'whatsapp_button',
-            });
-            return;
-          }
-
-          if (href.includes('google.com/maps') || href.includes('goo.gl/maps')) {
-            gtag('event', 'directions_click', {
-              event_category: 'engagement',
-              event_label: 'get_directions',
-            });
-            return;
-          }
-
-          if (href.startsWith('mailto:')) {
-            gtag('event', 'email_click', {
-              event_category: 'engagement',
-              event_label: href.replace('mailto:', ''),
-            });
-            return;
-          }
-
-          if (link.dataset.track === 'booking-click') {
-            gtag('event', 'booking_click', {
-              event_category: 'engagement',
-              event_label: link.dataset.trackLabel || 'book_now_button',
-            });
-          }
-        });
-      });
-
-      // Scroll depth tracking: fires once each at 50% and 90% of
-      // total page height. Reset per navigation (ViewTransitions
-      // swaps content without a full reload) so depth re-fires on
-      // every new page rather than only the first.
-      document.addEventListener('astro:page-load', () => {
-        let firedDepths = { 50: false, 90: false };
-
-        function checkScrollDepth() {
-          if (typeof gtag !== 'function') return;
-
-          const scrollTop = window.scrollY;
-          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-          if (docHeight <= 0) return;
-
-          const percentScrolled = (scrollTop / docHeight) * 100;
-
-          if (!firedDepths[50] && percentScrolled >= 50) {
-            firedDepths[50] = true;
-            gtag('event', 'scroll_depth_50', {
-              event_category: 'engagement',
-              event_label: window.location.pathname,
-            });
-          }
-          if (!firedDepths[90] && percentScrolled >= 90) {
-            firedDepths[90] = true;
-            gtag('event', 'scroll_depth_90', {
-              event_category: 'engagement',
-              event_label: window.location.pathname,
-            });
-          }
-        }
-
-        window.addEventListener('scroll', checkScrollDepth, { passive: true });
-      });
-    </script>
 
     <style is:global>
       h1, h2, h3, h4, h5, h6 {

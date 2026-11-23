@@ -31,7 +31,7 @@ const referralOptions = [
 ];
 ---
 
-<MainLayout title={`Patient Registration | ${siteConfig.name}`} description="Register as a new patient at CRISPR Skin and Hair Clinic ahead of your visit." bare noindex>
+<MainLayout title={`Patient Registration | ${siteConfig.name}`} description="Register as a new patient at CRISPR Skin and Hair Clinic ahead of your visit." bare quiet noindex>
   <div class="max-w-xl mx-auto pt-6 pb-10 md:pt-10 md:pb-16 px-4">
     <img src="/images/crispr-logo.png" alt="CRISPR Skin and Hair Clinic" width="3240" height="1493" class="h-auto w-[150px] mx-auto mb-4" />
     <h1 class="text-2xl md:text-3xl font-extrabold text-[#17233d] mb-5 text-center">Patient Registration</h1>
@@ -672,6 +672,8 @@ const referralOptions = [
       $('reg-success-container').classList.remove('hidden');
       $('reg-success-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
       $('reg-success-title').focus({ preventScroll: true });
+      // A patient who has just registered is not a website visitor: keep this browser tab out of Analytics.
+      try { sessionStorage.setItem('crisprPatientTab', '1'); } catch (e) {}
       setTimeout(() => { window.location.href = '/'; }, 2500);
     } catch (err) {
       $('reg-error-3').textContent = err.message;
