@@ -19,7 +19,9 @@ function addMinutes(time, minutes) {
   return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}:00`;
 }
 
-exports.handler = async (event) => {
+// Every booking the server turns down is logged with its reason, so failures can be counted from the Netlify
+// function logs. Only the status and the reason are logged: no names, phone numbers or other patient details.
+const handle = async (event) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
   let payload;
@@ -270,4 +272,14 @@ exports.handler = async (event) => {
     console.error("public-book-appointment error:", error);
     return core.json(500, { error: error.message || "Something went wrong." });
   }
+};
+
+exports.handler = async (event) => {
+  const response = await handle(event);
+  if (response && response.statusCode >= 400 && event.httpMethod === "POST") {
+    let reason = "";
+    try { reason = JSON.parse(response.body).error || ""; } catch {}
+    console.warn("booking_rejected", JSON.stringify({ status: response.statusCode, reason }));
+  }
+  return response;
 };

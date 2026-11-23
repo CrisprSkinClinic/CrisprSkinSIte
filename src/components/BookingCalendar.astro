@@ -1212,10 +1212,23 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         }
 
         if (!response.ok || !result.success) {
+          // A short, countable reason, so failures can be grouped in Analytics instead of read one by one.
+          const msg = result.error || '';
+          const failureReason =
+            /already have an appointment|one booking per day/i.test(msg) ? 'already_booked_that_day'
+            : /30 minutes/i.test(msg) ? 'needs_30_minutes'
+            : /slot|time|available|taken/i.test(msg) ? 'slot_unavailable'
+            : /verification|verify|expired/i.test(msg) ? 'verification_expired'
+            : /valid .*mobile|phone/i.test(msg) ? 'invalid_phone'
+            : /missing required/i.test(msg) ? 'missing_field'
+            : response.status >= 500 ? 'server_error'
+            : 'other';
           window.gtag?.('event', 'booking_failed', {
             event_category: 'engagement',
             event_label: service,
-            error_message: result.error || 'unknown_error',
+            failure_reason: failureReason,
+            http_status: response.status,
+            error_message: msg || 'unknown_error',
           });
           // The slot may have just been taken: refresh the slots so the patient can pick another.
           if (/slot|time|available|taken|booked|30 minutes/i.test(result.error || '')) refreshAvailability();
@@ -1233,6 +1246,8 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         showConfirmation({ result, body: lastBookingBody, moved: false });
       } catch (err) {
         console.error('Error booking:', err);
+        // The request never got an answer (connection dropped, offline): the server never saw it, so it can only be counted here.
+        if (err instanceof TypeError) window.gtag?.('event', 'booking_failed', { event_category: 'engagement', event_label: service, failure_reason: 'network_error' });
         busy = false;
         showError(err.message || 'Could not complete your booking. Please try again or call us directly.');
         if (/verif/i.test(err.message || '')) resetOtp();
