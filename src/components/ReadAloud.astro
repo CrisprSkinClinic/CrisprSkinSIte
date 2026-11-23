@@ -1,38 +1,94 @@
 ---
-// Read-aloud player. Uses the browser's built-in speech voices (no audio files, no cost, no data leaves the
-// device). It reads the article one block at a time, highlights what is being read, and keeps playing while
-// the reader scrolls. Drop <ReadAloud /> into any page that has a `.prose` content area.
+// "Sarah", the page's audio guide. Reads the article aloud using the visitor's own device voices (no audio
+// files, no cost, nothing leaves the device), highlights what is being read, and keeps going while the reader
+// scrolls. Prefers a natural female voice. Drop <ReadAloud /> into any page that has a `.prose` content area.
 ---
 <style is:global>
-  .ra-trigger { display: inline-flex; align-items: center; gap: .55rem; margin: 0 0 1.5rem; padding: .6rem 1.05rem .6rem .8rem; border-radius: 999px; border: 1px solid rgb(var(--ra-line, 226 232 240)); background: #fff; color: #503057; font: 700 .875rem/1 var(--font-sans, inherit); box-shadow: 0 1px 2px rgba(15,23,42,.06); cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
-  .ra-trigger:hover { background: #f8f4fa; box-shadow: 0 6px 18px -8px rgba(80,48,87,.45); transform: translateY(-1px); }
-  .ra-trigger .ra-ico { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 999px; background: #7E4D8B; color: #fff; }
-  .ra-trigger small { font-weight: 600; color: #64748b; }
-  .ra-current { background: linear-gradient(90deg, rgba(174,137,184,.22), rgba(174,137,184,.08)); box-shadow: -6px 0 0 0 rgba(126,77,139,.55); border-radius: .35rem; transition: background .3s ease; }
-  #raPlayer { position: fixed; z-index: 55; left: 50%; transform: translateX(-50%) translateY(0); bottom: 1.25rem; width: min(40rem, calc(100vw - 1.5rem)); }
-  @media (max-width: 767px) { #raPlayer { bottom: 5.4rem; } }
+  :root { --ra-ink: #3a2142; --ra-brand: #7E4D8B; --ra-brand-deep: #503057; --ra-soft: #f6f0f8; }
+
+  /* ---------- Page trigger ---------- */
+  .ra-trigger { display: flex; width: 100%; align-items: center; gap: .9rem; margin: 0 0 1.75rem; padding: .8rem 1rem .8rem .8rem; border-radius: 1.25rem; border: 1px solid #ece3f0; background: linear-gradient(135deg, #fff, var(--ra-soft)); text-align: left; cursor: pointer; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; box-shadow: 0 1px 2px rgba(58,33,66,.05); }
+  .ra-trigger:hover { transform: translateY(-1px); border-color: #d8c3e0; box-shadow: 0 14px 30px -18px rgba(80,48,87,.55); }
+  .ra-trigger:focus-visible, #raPlayer button:focus-visible, #raPlayer input:focus-visible { outline: 2px solid var(--ra-brand); outline-offset: 2px; }
+  .ra-trigger .ra-text { min-width: 0; flex: 1; }
+  .ra-trigger .ra-name { display: block; font: 700 1rem/1.2 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--ra-ink); }
+  .ra-trigger .ra-sub { display: block; margin-top: .2rem; font: 500 .8rem/1.3 'Plus Jakarta Sans', system-ui, sans-serif; color: #64748b; }
+  .ra-trigger .ra-go { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; flex: none; border-radius: 999px; background: var(--ra-brand-deep); color: #fff; box-shadow: 0 8px 18px -8px rgba(80,48,87,.7); transition: background .2s ease, transform .2s ease; }
+  .ra-trigger:hover .ra-go { background: var(--ra-brand); transform: scale(1.06); }
+
+  /* ---------- Avatar ---------- */
+  .ra-avatar { position: relative; display: grid; place-items: center; flex: none; width: 3rem; height: 3rem; border-radius: 999px; background: linear-gradient(145deg, #AE89B8, #7E4D8B 55%, #503057); box-shadow: inset 0 0 0 2px rgba(255,255,255,.35); overflow: visible; }
+  .ra-avatar svg { width: 72%; height: 72%; }
+  .ra-avatar::after { content: ""; position: absolute; inset: -5px; border-radius: 999px; border: 2px solid rgba(126,77,139,.35); opacity: 0; transform: scale(.92); }
+  .ra-speaking .ra-avatar::after { animation: ra-pulse 1.6s ease-out infinite; }
+  @keyframes ra-pulse { 0% { opacity: .9; transform: scale(.92); } 100% { opacity: 0; transform: scale(1.35); } }
+  .ra-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
+  .ra-eq i { width: 3px; height: 4px; border-radius: 2px; background: var(--ra-brand); }
+  .ra-speaking .ra-eq i { animation: ra-eq 1s ease-in-out infinite; }
+  .ra-speaking .ra-eq i:nth-child(2) { animation-delay: .18s; } .ra-speaking .ra-eq i:nth-child(3) { animation-delay: .36s; } .ra-speaking .ra-eq i:nth-child(4) { animation-delay: .54s; }
+  @keyframes ra-eq { 0%, 100% { height: 4px; } 50% { height: 14px; } }
+  @media (prefers-reduced-motion: reduce) { .ra-speaking .ra-avatar::after, .ra-speaking .ra-eq i { animation: none; } .ra-eq i { height: 9px; } }
+
+  /* ---------- Highlight of the line being read ---------- */
+  .ra-current { background: linear-gradient(90deg, rgba(174,137,184,.24), rgba(174,137,184,.07)); box-shadow: -7px 0 0 0 rgba(126,77,139,.6); border-radius: .4rem; transition: background .3s ease; }
+
+  /* ---------- Player ---------- */
+  #raPlayer { position: fixed; z-index: 55; left: 50%; bottom: 1.25rem; width: min(37rem, calc(100vw - 1.25rem)); transform: translateX(-50%); color: var(--ra-ink); border-radius: 1.6rem; padding: .85rem .95rem .8rem; background: rgba(255,255,255,.86); -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5); border: 1px solid rgba(255,255,255,.8); box-shadow: 0 24px 60px -18px rgba(58,33,66,.5), 0 2px 6px rgba(58,33,66,.08); }
+  @media (max-width: 767px) { #raPlayer { bottom: 5.5rem; } }
   #raPlayer[hidden] { display: none; }
-  #raPlayer .ra-bar { height: 3px; border-radius: 3px; background: rgba(126,77,139,.18); overflow: hidden; }
-  #raPlayer .ra-bar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #AE89B8, #7E4D8B); transition: width .3s ease; }
-  #raPlayer button { -webkit-tap-highlight-color: transparent; }
-  #raPlayer .ra-btn { flex: none; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 999px; color: #503057; transition: background .2s ease, transform .15s ease; }
-  #raPlayer .ra-btn:hover { background: rgba(126,77,139,.12); }
-  #raPlayer .ra-btn:active { transform: scale(.94); }
-  #raPlayer .ra-play { width: 2.9rem; height: 2.9rem; background: #503057; color: #fff; }
-  #raPlayer .ra-play:hover { background: #7E4D8B; }
-  #raPlayer .ra-chip { padding: .3rem .6rem; border-radius: 999px; font: 700 .75rem/1 var(--font-sans, inherit); color: #503057; background: rgba(126,77,139,.1); }
-  #raPlayer .ra-chip[aria-pressed="true"] { background: #503057; color: #fff; }
-  @media (max-width: 639px) { #raPlayer select { display: none !important; } }
-  #raPlayer select { max-width: 9.5rem; border-radius: 999px; padding: .3rem .5rem; font: 600 .75rem/1 var(--font-sans, inherit); color: #503057; background: rgba(126,77,139,.1); border: 0; }
-  @media (prefers-reduced-motion: no-preference) { #raPlayer:not([hidden]) { animation: ra-in .35s cubic-bezier(.2,.8,.2,1) both; } @keyframes ra-in { from { opacity: 0; transform: translateX(-50%) translateY(14px); } } }
+  @media (prefers-reduced-motion: no-preference) { #raPlayer:not([hidden]) { animation: ra-in .4s cubic-bezier(.2,.8,.2,1) both; } @keyframes ra-in { from { opacity: 0; transform: translateX(-50%) translateY(16px) scale(.98); } } }
+  #raPlayer .ra-top { display: flex; align-items: center; gap: .75rem; }
+  #raPlayer .ra-info { min-width: 0; flex: 1; }
+  #raPlayer .ra-who { white-space: nowrap; display: flex; align-items: center; gap: .45rem; font: 700 .7rem/1 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--ra-brand); }
+  #raPlayer .ra-section { margin-top: .3rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 .95rem/1.2 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--ra-ink); }
+  #raPlayer .ra-meta { margin-top: .2rem; font: 500 .75rem/1.2 'Plus Jakarta Sans', system-ui, sans-serif; color: #64748b; }
+  #raPlayer .ra-ibtn { display: grid; place-items: center; flex: none; width: 2.2rem; height: 2.2rem; border-radius: 999px; color: #64748b; transition: background .2s ease, color .2s ease; }
+  #raPlayer .ra-ibtn:hover { background: rgba(126,77,139,.12); color: var(--ra-brand-deep); }
+  #raPlayer .ra-range { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 1.4rem; margin: .45rem 0 .1rem; background: transparent; cursor: pointer; --p: 0%; }
+  #raPlayer .ra-range::-webkit-slider-runnable-track { height: 5px; border-radius: 5px; background: linear-gradient(90deg, #AE89B8, var(--ra-brand)) 0 / var(--p) 100% no-repeat, rgba(126,77,139,.16); }
+  #raPlayer .ra-range::-moz-range-track { height: 5px; border-radius: 5px; background: rgba(126,77,139,.16); }
+  #raPlayer .ra-range::-moz-range-progress { height: 5px; border-radius: 5px; background: var(--ra-brand); }
+  #raPlayer .ra-range::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; margin-top: -5px; border-radius: 50%; background: #fff; border: 3px solid var(--ra-brand); box-shadow: 0 2px 6px rgba(58,33,66,.3); }
+  #raPlayer .ra-range::-moz-range-thumb { width: 11px; height: 11px; border-radius: 50%; background: #fff; border: 3px solid var(--ra-brand); }
+  #raPlayer .ra-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+  #raPlayer .ra-transport { display: flex; align-items: center; gap: .2rem; }
+  #raPlayer .ra-skip-btn { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 999px; color: var(--ra-brand-deep); transition: background .2s ease, transform .15s ease; }
+  #raPlayer .ra-skip-btn:hover { background: rgba(126,77,139,.12); }
+  #raPlayer .ra-skip-btn:active { transform: scale(.92); }
+  #raPlayer .ra-play { display: grid; place-items: center; width: 3.2rem; height: 3.2rem; border-radius: 999px; color: #fff; background: linear-gradient(145deg, var(--ra-brand), var(--ra-brand-deep)); box-shadow: 0 12px 22px -10px rgba(80,48,87,.8); transition: transform .15s ease, box-shadow .2s ease; }
+  #raPlayer .ra-play:hover { box-shadow: 0 16px 26px -10px rgba(80,48,87,.9); }
+  #raPlayer .ra-play:active { transform: scale(.94); }
+  #raPlayer .ra-pill { display: inline-flex; align-items: center; gap: .35rem; padding: .45rem .75rem; border-radius: 999px; font: 700 .78rem/1 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--ra-brand-deep); background: rgba(126,77,139,.1); transition: background .2s ease, color .2s ease; }
+  #raPlayer .ra-pill:hover { background: rgba(126,77,139,.18); }
+  #raPlayer .ra-pill[aria-pressed="true"] { background: var(--ra-brand-deep); color: #fff; }
+  #raPlayer .ra-pop { position: absolute; right: .9rem; bottom: calc(100% + .5rem); width: min(19rem, calc(100vw - 2rem)); padding: .9rem; border-radius: 1.2rem; background: #fff; border: 1px solid #ece3f0; box-shadow: 0 24px 50px -20px rgba(58,33,66,.55); }
+  #raPlayer .ra-pop[hidden] { display: none; }
+  #raPlayer .ra-pop h4 { margin: 0 0 .5rem; font: 700 .7rem/1 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #64748b; }
+  #raPlayer .ra-voices { display: grid; gap: .25rem; max-height: 11rem; overflow: auto; }
+  #raPlayer .ra-voice { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .55rem .7rem; border-radius: .8rem; text-align: left; font: 600 .82rem/1.2 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--ra-ink); }
+  #raPlayer .ra-voice:hover { background: var(--ra-soft); }
+  #raPlayer .ra-voice[aria-checked="true"] { background: rgba(126,77,139,.12); color: var(--ra-brand-deep); }
+  #raPlayer .ra-note { margin: .65rem 0 0; font: 500 .72rem/1.35 'Plus Jakarta Sans', system-ui, sans-serif; color: #64748b; }
+
+  /* Minimised: just Sarah and a play button */
+  #raPlayer[data-min="true"] { width: auto; left: auto; right: 5.5rem; transform: none; border-radius: 999px; padding: .4rem .5rem .4rem .4rem; }
+  @media (max-width: 767px) { #raPlayer[data-min="true"] { right: auto; left: .75rem; } }
+  #raPlayer[data-min="true"] .ra-info, #raPlayer[data-min="true"] .ra-range, #raPlayer[data-min="true"] .ra-row, #raPlayer[data-min="true"] .ra-pop, #raPlayer[data-min="true"] [data-a="close"], #raPlayer[data-min="true"] [data-a="min"], #raPlayer[data-min="true"] [data-r="av"] { display: none; }
+  #raPlayer .ra-mini { display: none; }
+  #raPlayer[data-min="true"] .ra-mini { display: grid; }
+  #raPlayer[data-min="true"] .ra-top { gap: .5rem; }
+  @media (prefers-reduced-motion: no-preference) { #raPlayer[data-min="true"]:not([hidden]) { animation: ra-in-min .3s cubic-bezier(.2,.8,.2,1) both; } @keyframes ra-in-min { from { opacity: 0; transform: scale(.9); } } }
+
+  @media (max-width: 420px) { #raPlayer .ra-guide { display: none; } #raPlayer .ra-pill .ra-lab { display: none; } #raPlayer .ra-skip-btn { width: 2.3rem; } }
 </style>
 
 <script>
   const synth = 'speechSynthesis' in window ? window.speechSynthesis : null;
+  const NAME = 'Sarah';
   let state = null;
 
   // ---- Say it the way a person would -------------------------------------------------------------------
-  const ACRONYMS = ['PCOS', 'HPV', 'DHT', 'PSA', 'TSH', 'FUE', 'UVB', 'UVA', 'SPF', 'AIIMS', 'RFA', 'TCA', 'BMI', 'IgE', 'HIV', 'MRCP', 'DNB', 'FTU', 'LH', 'FSH', 'AMH', 'AN', 'HOMA-IR'];
+  const ACRONYMS = ['PCOS', 'HPV', 'DHT', 'PSA', 'TSH', 'FUE', 'UVB', 'UVA', 'SPF', 'AIIMS', 'RFA', 'TCA', 'BMI', 'IgE', 'HIV', 'MRCP', 'DNB', 'FTU', 'LH', 'FSH', 'AMH', 'HOMA-IR'];
   function speakable(t) {
     let s = t
       .replace(/ /g, ' ')
@@ -53,10 +109,9 @@
       .replace(/\s*(?:--|—|–)\s*/g, ', ')
       .replace(/[→←↑↓]/g, ' ')
       .replace(/[*_`#>|]/g, ' ');
-    ACRONYMS.forEach((a) => { s = s.replace(new RegExp('\\b' + a + '\\b', 'g'), a.split('').join(' ').replace(/ - /g, ' ')); });
+    ACRONYMS.forEach((a) => { s = s.replace(new RegExp('\\b' + a + '\\b', 'g'), a.replace(/-/g, ' ').split('').join(' ').replace(/ {2,}/g, ' ')); });
     return s.replace(/\s+/g, ' ').trim();
   }
-
   function chunksOf(text) {
     const sentences = text.match(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g) || [text];
     const out = [];
@@ -72,8 +127,11 @@
     return out;
   }
 
-  // ---- Voices -----------------------------------------------------------------------------------------
-  function englishVoices() { return (synth ? synth.getVoices() : []).filter((v) => /^en(-|_|$)/i.test(v.lang)); }
+  // ---- Voices: Sarah is a woman's voice --------------------------------------------------------------------
+  const FEMALE = /\b(female|woman|zira|hazel|susan|heera|neerja|swara|aria|jenny|sonia|libby|maisie|mia|natasha|clara|emma|michelle|ava|ana|nova|samantha|karen|moira|tessa|veena|fiona|victoria|allison|kate|serena|siri|catherine|lekha|kalpana|eva|linda|sara|sarah|joanna|ivy|kendra|kimberly|salli|amy|nicole|olivia|raveena|aditi|priya|isha|jane|joanne|paulina|ellen|nora)\b|google us english|google uk english female/i;
+  const MALE = /\b(male|man|ravi|hemant|prabhat|rishi|david|mark|george|guy|ryan|thomas|daniel|alex|fred|james|richard|oliver|arthur|eric|brian|christopher|davis|tony|jason|ronit|kumar|rocko|reed|eddy|grandpa)\b/i;
+  const isFemale = (v) => FEMALE.test(v.name) && !(MALE.test(v.name) && !/female|woman/i.test(v.name));
+  const allEnglish = () => (synth ? synth.getVoices() : []).filter((v) => /^en(-|_|$)/i.test(v.lang));
   function scoreVoice(v) {
     let s = 0;
     const lang = v.lang.replace('_', '-');
@@ -81,32 +139,43 @@
     if (/natural|neural|online|premium|enhanced/i.test(v.name)) s += 40;
     if (/google/i.test(v.name)) s += 12;
     if (/microsoft/i.test(v.name)) s += 8;
-    if (/compact|espeak|novelty|fred|whisper|zarvox|bad news|bells|boing|cellos|trinoids|albert|junior/i.test(v.name)) s -= 80;
+    if (/compact|espeak|novelty|whisper|zarvox|bad news|bells|boing|cellos|trinoids|albert|junior|organ/i.test(v.name)) s -= 80;
     if (v.localService === false) s += 4;
     return s;
   }
-  function bestVoice() {
-    let saved = null; try { saved = localStorage.getItem('raVoice'); } catch (e) {}
-    const list = englishVoices();
-    if (saved) { const f = list.find((v) => v.name === saved); if (f) return f; }
-    return list.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
+  const rank = (list) => list.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a));
+  function voiceLists() {
+    const eng = allEnglish();
+    const women = rank(eng.filter(isFemale));
+    return { women, others: rank(eng.filter((v) => !isFemale(v))), hasWoman: women.length > 0 };
   }
+  function pickVoice() {
+    const { women, others } = voiceLists();
+    let saved = null; try { saved = localStorage.getItem('raVoiceSarah'); } catch (e) {}
+    const pool = women.length ? women : others;
+    return (saved && pool.find((v) => v.name === saved)) || pool[0] || null;
+  }
+  const prettyName = (v) => v.name.replace(/^(Microsoft|Google)\s+/i, '').replace(/\s*-\s*English.*$/i, '').replace(/\s*\(Natural\)/i, ' · natural').trim();
 
-  // ---- Player -----------------------------------------------------------------------------------------
-  const ICON = {
-    play: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>',
-    pause: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4.5" height="14" rx="1.2"/><rect x="13.5" y="5" width="4.5" height="14" rx="1.2"/></svg>',
-    prev: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M6 5h2v14H6zM20 5.5v13a1 1 0 0 1-1.6.8L10 12.8a1 1 0 0 1 0-1.6l8.4-6.5a1 1 0 0 1 1.6.8z"/></svg>',
-    next: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5.5v13a1 1 0 0 0 1.6.8L14 12.8a1 1 0 0 0 0-1.6L5.6 4.7A1 1 0 0 0 4 5.5z"/></svg>',
+  // ---- Icons -----------------------------------------------------------------------------------------
+  const I = {
+    play: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4.6" height="14" rx="1.3"/><rect x="13.4" y="5" width="4.6" height="14" rx="1.3"/></svg>',
+    prev: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M6 5h2.2v14H6zM20 5.7v12.6a1 1 0 0 1-1.6.8l-8.1-6.3a1 1 0 0 1 0-1.6l8.1-6.3a1 1 0 0 1 1.6.8z"/></svg>',
+    next: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M15.8 5H18v14h-2.2zM4 5.7v12.6a1 1 0 0 0 1.6.8l8.1-6.3a1 1 0 0 0 0-1.6L5.6 4.9A1 1 0 0 0 4 5.7z"/></svg>',
     close: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
-    ear: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M3 14a2 2 0 0 1 2-2h1v7H5a2 2 0 0 1-2-2v-3zM21 14a2 2 0 0 0-2-2h-1v7h1a2 2 0 0 0 2-2v-3z"/></svg>',
+    min: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+    follow: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
+    voice: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+    avatar: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 7c-8 0-12.5 6-12.5 13.5 0 4 .9 7.2 2.4 9.5-1.6.9-2.9 2.3-3.5 4.5h27.2c-.6-2.2-1.9-3.6-3.5-4.5 1.5-2.3 2.4-5.5 2.4-9.5C36.5 13 32 7 24 7z" fill="#2a1630"/><circle cx="24" cy="20.5" r="7.6" fill="#fff"/><path d="M12 44c1.2-8.3 6.4-12.6 12-12.6S34.8 35.7 36 44z" fill="#fff"/><path d="M16.2 19.5c3.8-.4 7.3-2.4 8.9-5.4 1.7 2.7 4.2 4.6 7 5.3-.4-6-3.7-9.6-8-9.6s-7.5 3.5-7.9 9.7z" fill="#2a1630"/></svg>',
   };
   const SPEEDS = [1, 1.2, 1.4, 0.85];
 
   function collectBlocks(root) {
     const blocks = [];
     const h1 = document.querySelector('main h1');
-    if (h1 && h1.textContent.trim()) blocks.push({ el: h1, text: speakable(h1.textContent) });
+    if (h1 && h1.textContent.trim()) blocks.push({ el: h1, text: speakable(h1.textContent), section: h1.textContent.trim() });
+    let section = h1 ? h1.textContent.trim() : '';
     root.querySelectorAll('h2, h3, h4, p, li, blockquote, tr').forEach((el) => {
       if (el.closest('[aria-hidden="true"], .ra-skip, nav, aside')) return;
       if (el.tagName === 'P' && el.closest('li, blockquote')) return;
@@ -114,8 +183,8 @@
       let text = el.tagName === 'TR' ? Array.from(el.children).map((c) => c.textContent.trim()).join(', ') : el.textContent;
       text = speakable(text);
       if (text.length < 2) return;
-      if (/^[A-Z]/.test(text) && /^H[2-4]$/.test(el.tagName) && !/[.!?]$/.test(text)) text += '.';
-      blocks.push({ el, text });
+      if (/^H[2-4]$/.test(el.tagName)) { section = el.textContent.trim(); if (!/[.!?]$/.test(text)) text += '.'; }
+      blocks.push({ el, text, section });
     });
     return blocks;
   }
@@ -137,60 +206,92 @@
     const blocks = collectBlocks(root);
     if (blocks.length < 3) return;
 
-    const words = blocks.reduce((n, b) => n + b.text.split(/\s+/).length, 0);
-    const minutes = Math.max(1, Math.round(words / 150));
+    const wordsOf = (b) => b.text.split(/\s+/).length;
+    const totalWords = blocks.reduce((n, b) => n + wordsOf(b), 0);
+    const minutes = Math.max(1, Math.round(totalWords / 150));
 
     const trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.className = 'ra-trigger ra-skip';
-    trigger.setAttribute('aria-label', 'Listen to this page read aloud');
-    trigger.innerHTML = `<span class="ra-ico">${ICON.ear}</span><span>Listen to this page <small>· about ${minutes} min</small></span>`;
+    trigger.setAttribute('aria-label', `Listen to this page read aloud by ${NAME}`);
+    trigger.innerHTML = `<span class="ra-avatar">${I.avatar}</span>
+      <span class="ra-text"><span class="ra-name">Listen with ${NAME}</span><span class="ra-sub" data-r="tsub">Audio version of this page · about ${minutes} min</span></span>
+      <span class="ra-go" aria-hidden="true">${I.play}</span>`;
     root.parentElement.insertBefore(trigger, root);
 
     const player = document.createElement('div');
     player.id = 'raPlayer';
     player.hidden = true;
-    player.className = 'glass rounded-3xl p-2.5 shadow-2xl';
     player.setAttribute('role', 'region');
-    player.setAttribute('aria-label', 'Read aloud controls');
+    player.setAttribute('aria-label', `${NAME}, audio guide`);
     player.innerHTML = `
-      <div class="ra-bar mb-2 mx-1"><i></i></div>
-      <div class="flex items-center gap-1">
-        <button class="ra-btn" data-a="prev" type="button" aria-label="Previous paragraph">${ICON.prev}</button>
-        <button class="ra-btn ra-play" data-a="play" type="button" aria-label="Pause">${ICON.pause}</button>
-        <button class="ra-btn" data-a="next" type="button" aria-label="Next paragraph">${ICON.next}</button>
-        <p class="ml-2 mr-auto min-w-0 truncate text-xs font-semibold text-slate-600" data-r="status" aria-live="off">Reading…</p>
-        <button class="ra-chip" data-a="speed" type="button" aria-label="Change reading speed">1×</button>
-        <button class="ra-chip" data-a="follow" type="button" aria-pressed="false" aria-label="Scroll along with the reading" title="Scroll along with the reading">Follow</button>
-        <select data-r="voice" aria-label="Voice"></select>
-        <button class="ra-btn" data-a="close" type="button" aria-label="Close player">${ICON.close}</button>
+      <div class="ra-top">
+        <button class="ra-mini ra-avatar" data-a="expand" type="button" aria-label="Open ${NAME}'s controls">${I.avatar}</button>
+        <span class="ra-avatar" data-r="av">${I.avatar}</span>
+        <div class="ra-info">
+          <p class="ra-who"><span class="ra-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>${NAME}<span class="ra-guide"> · audio guide</span></p>
+          <p class="ra-section" data-r="section">Getting ready…</p>
+          <p class="ra-meta" data-r="meta"></p>
+        </div>
+        <button class="ra-ibtn ra-mini" data-a="mplay" type="button" aria-label="Play">${I.play}</button>
+        <button class="ra-ibtn" data-a="min" type="button" aria-label="Minimise">${I.min}</button>
+        <button class="ra-ibtn" data-a="close" type="button" aria-label="Close ${NAME}">${I.close}</button>
+      </div>
+      <input class="ra-range" data-r="seek" type="range" min="0" max="${blocks.length - 1}" value="0" step="1" aria-label="Position in the page" />
+      <div class="ra-row">
+        <div class="ra-transport">
+          <button class="ra-skip-btn" data-a="prev" type="button" aria-label="Previous paragraph">${I.prev}</button>
+          <button class="ra-play" data-a="play" type="button" aria-label="Pause">${I.pause}</button>
+          <button class="ra-skip-btn" data-a="next" type="button" aria-label="Next paragraph">${I.next}</button>
+        </div>
+        <div class="flex items-center gap-1.5" style="display:flex;align-items:center;gap:.4rem">
+          <button class="ra-pill" data-a="speed" type="button" aria-label="Reading speed">1×</button>
+          <button class="ra-pill" data-a="follow" type="button" aria-pressed="false" aria-label="Scroll along as ${NAME} reads">${I.follow}<span class="ra-lab">Follow</span></button>
+          <button class="ra-pill" data-a="voice" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Choose ${NAME}'s voice">${I.voice}<span class="ra-lab">Voice</span></button>
+        </div>
+      </div>
+      <div class="ra-pop" data-r="pop" hidden>
+        <h4>${NAME}'s voice</h4>
+        <div class="ra-voices" role="radiogroup" aria-label="Voice" data-r="voices"></div>
+        <p class="ra-note" data-r="note"></p>
       </div>`;
     document.body.appendChild(player);
 
     state = { blocks, i: 0, c: 0, playing: false, token: 0, rate: 1, follow: false, voice: null, trigger, player, chunks: [] };
     const $ = (sel) => player.querySelector(sel);
-    const playBtn = $('[data-a="play"]');
-    const status = $('[data-r="status"]');
-    const bar = $('.ra-bar > i');
-    const voiceSel = $('[data-r="voice"]');
+    const playBtn = $('[data-a="play"]'), mplay = $('[data-a="mplay"]');
+    const secEl = $('[data-r="section"]'), metaEl = $('[data-r="meta"]'), seek = $('[data-r="seek"]');
+    const pop = $('[data-r="pop"]'), voicesEl = $('[data-r="voices"]'), noteEl = $('[data-r="note"]');
+    const tsub = trigger.querySelector('[data-r="tsub"]');
+    const wordsAfter = (idx) => state.blocks.slice(idx).reduce((n, b) => n + wordsOf(b), 0);
 
     function fillVoices() {
-      const list = englishVoices().sort((a, b) => scoreVoice(b) - scoreVoice(a));
-      state.voice = bestVoice();
-      voiceSel.innerHTML = list.map((v) => `<option value="${v.name.replace(/"/g, '&quot;')}">${v.name.replace(/Microsoft |Google /, '')}</option>`).join('');
-      if (state.voice) voiceSel.value = state.voice.name;
-      voiceSel.style.display = list.length > 1 ? '' : 'none';
+      state.voice = pickVoice();
+      const { women, others, hasWoman } = voiceLists();
+      const list = hasWoman ? women : others;
+      voicesEl.innerHTML = list.map((v) => `<button class="ra-voice" role="radio" type="button" data-voice="${v.name.replace(/"/g, '&quot;')}" aria-checked="${state.voice && v.name === state.voice.name}"><span>${prettyName(v)}</span><span style="font-weight:500;color:#64748b">${v.lang.replace('_', '-')}</span></button>`).join('');
+      noteEl.textContent = hasWoman
+        ? `${NAME} is an automated voice generated on your device, so how natural she sounds depends on your phone or computer.`
+        : `Your device has no female English voice installed, so ${NAME} is using the best voice it offers. Adding one in your device's speech settings will help.`;
     }
     fillVoices();
     synth.addEventListener && synth.addEventListener('voiceschanged', fillVoices);
 
     function paint() {
-      state.blocks.forEach((b, k) => b.el.classList.toggle('ra-current', k === state.i && player.hidden === false));
-      const cur = state.blocks[state.i];
-      status.textContent = `${state.i + 1} of ${state.blocks.length} · ${cur.el.tagName.startsWith('H') ? cur.text.replace(/\.$/, '') : 'Reading'}`;
-      bar.style.width = `${Math.round((state.i / Math.max(1, state.blocks.length - 1)) * 100)}%`;
-      playBtn.innerHTML = state.playing ? ICON.pause : ICON.play;
+      const b = state.blocks[state.i];
+      state.blocks.forEach((x, k) => x.el.classList.toggle('ra-current', k === state.i && !player.hidden));
+      secEl.textContent = b.section || 'Reading';
+      const mins = Math.max(0, Math.ceil(wordsAfter(state.i) / (150 * state.rate)));
+      metaEl.textContent = `${state.i + 1} of ${state.blocks.length} · ${mins <= 1 ? 'under a minute' : mins + ' min'} left`;
+      seek.value = state.i;
+      seek.style.setProperty('--p', `${(state.i / Math.max(1, state.blocks.length - 1)) * 100}%`);
+      playBtn.innerHTML = mplay.innerHTML = state.playing ? I.pause : I.play;
       playBtn.setAttribute('aria-label', state.playing ? 'Pause' : 'Play');
+      mplay.setAttribute('aria-label', state.playing ? 'Pause' : 'Play');
+      document.documentElement.classList.toggle('ra-speaking', state.playing);
+      player.classList.toggle('ra-speaking', state.playing);
+      trigger.classList.toggle('ra-speaking', state.playing);
+      tsub.textContent = state.playing ? `${NAME} is reading…` : (player.hidden ? `Audio version of this page · about ${minutes} min` : `${NAME} is paused`);
     }
     function reveal() {
       if (!state.follow) return;
@@ -202,11 +303,9 @@
       const my = ++state.token;
       synth.cancel();
       const block = state.blocks[state.i];
-      if (!block) { stop(true); return; }
       state.chunks = chunksOf(block.text);
-      if (state.c >= state.chunks.length) { state.c = 0; }
-      const text = state.chunks[state.c];
-      const u = new SpeechSynthesisUtterance(text);
+      if (state.c >= state.chunks.length) state.c = 0;
+      const u = new SpeechSynthesisUtterance(state.chunks[state.c]);
       if (state.voice) { u.voice = state.voice; u.lang = state.voice.lang; } else { u.lang = 'en-IN'; }
       u.rate = state.rate; u.pitch = 1;
       const advance = () => {
@@ -214,7 +313,7 @@
         state.c += 1;
         if (state.c >= state.chunks.length) {
           state.c = 0; state.i += 1;
-          if (state.i >= state.blocks.length) { state.i = state.blocks.length - 1; stop(true); return; }
+          if (state.i >= state.blocks.length) { state.i = 0; state.playing = false; state.token++; paint(); return; }
           paint(); reveal();
         }
         speak();
@@ -223,39 +322,41 @@
       u.onerror = (e) => { if (e.error === 'interrupted' || e.error === 'canceled') return; advance(); };
       synth.speak(u);
     }
-    function play() { state.playing = true; paint(); reveal(); speak(); }
-    function pause() { state.playing = false; state.token++; synth.cancel(); paint(); }
-    function stop(done) { state.playing = false; state.token++; synth.cancel(); if (done) { state.i = 0; state.c = 0; } paint(); }
-    function go(delta) {
-      state.i = Math.min(state.blocks.length - 1, Math.max(0, state.i + delta)); state.c = 0;
-      paint(); reveal(); if (state.playing) speak();
-    }
+    const play = () => { state.playing = true; paint(); reveal(); speak(); };
+    const pause = () => { state.playing = false; state.token++; synth.cancel(); paint(); };
+    function seekTo(i) { state.i = Math.min(state.blocks.length - 1, Math.max(0, i)); state.c = 0; paint(); reveal(); if (state.playing) speak(); }
+    const setMin = (v) => { player.dataset.min = String(v); if (v) pop.hidden = true; };
 
-    trigger.addEventListener('click', () => {
-      player.hidden = false;
-      if (!state.playing) play(); else paint();
-    });
+    trigger.addEventListener('click', () => { player.hidden = false; setMin(false); if (!state.playing) play(); else paint(); });
     player.addEventListener('click', (e) => {
+      const vb = e.target.closest('[data-voice]');
+      if (vb) {
+        state.voice = allEnglish().find((v) => v.name === vb.dataset.voice) || state.voice;
+        try { localStorage.setItem('raVoiceSarah', vb.dataset.voice); } catch (err) {}
+        voicesEl.querySelectorAll('[data-voice]').forEach((x) => x.setAttribute('aria-checked', String(x === vb)));
+        if (state.playing) speak();
+        return;
+      }
       const b = e.target.closest('[data-a]'); if (!b) return;
       const a = b.dataset.a;
-      if (a === 'play') { state.playing ? pause() : play(); }
-      else if (a === 'prev') { go(state.c > 0 ? 0 : -1); }
-      else if (a === 'next') go(1);
-      else if (a === 'speed') {
-        const k = (SPEEDS.indexOf(state.rate) + 1) % SPEEDS.length; state.rate = SPEEDS[k]; b.textContent = state.rate + '×';
-        if (state.playing) speak();
-      } else if (a === 'follow') {
-        state.follow = !state.follow; b.setAttribute('aria-pressed', String(state.follow)); if (state.follow) reveal();
-      } else if (a === 'close') { pause(); player.hidden = true; state.blocks.forEach((x) => x.el.classList.remove('ra-current')); }
+      if (a === 'play' || a === 'mplay') { state.playing ? pause() : play(); }
+      else if (a === 'prev') seekTo(state.c > 0 ? state.i : state.i - 1);
+      else if (a === 'next') seekTo(state.i + 1);
+      else if (a === 'speed') { state.rate = SPEEDS[(SPEEDS.indexOf(state.rate) + 1) % SPEEDS.length]; b.textContent = state.rate + '×'; paint(); if (state.playing) speak(); }
+      else if (a === 'follow') { state.follow = !state.follow; b.setAttribute('aria-pressed', String(state.follow)); if (state.follow) reveal(); }
+      else if (a === 'voice') { pop.hidden = !pop.hidden; b.setAttribute('aria-expanded', String(!pop.hidden)); }
+      else if (a === 'min') setMin(true);
+      else if (a === 'expand') setMin(false);
+      else if (a === 'close') { pause(); player.hidden = true; state.blocks.forEach((x) => x.el.classList.remove('ra-current')); paint(); }
     });
-    voiceSel.addEventListener('change', () => {
-      state.voice = englishVoices().find((v) => v.name === voiceSel.value) || state.voice;
-      try { localStorage.setItem('raVoice', voiceSel.value); } catch (e) {}
-      if (state.playing) speak();
+    seek.addEventListener('input', () => seekTo(Number(seek.value)));
+    document.addEventListener('keydown', function onKey(e) {
+      if (!state || player.hidden || !document.contains(player)) { return; }
+      if (e.key === 'Escape') { if (!pop.hidden) pop.hidden = true; else setMin(true); }
     });
-    // Tap a paragraph while the player is open to start reading from it.
+    // Tap a paragraph while Sarah is open to start reading from it.
     root.addEventListener('click', (e) => {
-      if (player.hidden) return;
+      if (player.hidden || player.dataset.min === 'true') return;
       if (e.target.closest('a, button, summary, input, select')) return;
       const k = state.blocks.findIndex((b) => b.el === e.target || b.el.contains(e.target));
       if (k >= 0 && window.getSelection().toString() === '') { state.i = k; state.c = 0; paint(); if (state.playing) speak(); }
@@ -263,7 +364,6 @@
     paint();
   }
 
-  // Stop speaking whenever the page is left, including client-side navigation.
   document.addEventListener('astro:before-swap', teardown);
   window.addEventListener('pagehide', () => { synth && synth.cancel(); });
   document.addEventListener('astro:page-load', init);
