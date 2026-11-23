@@ -12,6 +12,7 @@ import TocChips from '../../components/ui/TocChips.astro';
 import SideBookCard from '../../components/ui/SideBookCard.astro';
 import { siteConfig } from '../../config/site.js';
 import { getServiceImage } from '../../utils/serviceImages';
+import ReadAloud from '../../components/ReadAloud.astro';
 
 export async function getStaticPaths() {
   const conditions = await getCollection('conditions');
@@ -74,6 +75,7 @@ const conditionSchema = {
 ---
 
 <MainLayout title={`${data.title}: Symptoms & Treatment`.length <= 48 ? `${data.title}: Symptoms & Treatment` : data.title} description={data.metaDescription} image={shareImage}>
+  <ReadAloud />
   <script type="application/ld+json" set:html={JSON.stringify(conditionSchema)} />
 
   <Breadcrumbs items={[

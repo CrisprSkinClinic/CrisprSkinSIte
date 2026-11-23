@@ -22,13 +22,13 @@ const schema = {
 };
 ---
 
-<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+<script type="application/ld+json" id={limit ? 'homeFaqSchema' : undefined} set:html={JSON.stringify(schema)} />
 
 <section class="mx-auto max-w-4xl px-5 py-16 md:px-6 md:py-24">
   <p class="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-brand-600">Questions patients ask</p>
   <h2 class="mb-10 text-center text-4xl text-brand-900 md:text-5xl">Frequently asked questions</h2>
 
-  <div class="space-y-3">
+  <div class="space-y-3" data-rotate={limit ? 'faqs' : undefined}>
     {sortedFaqs.map((faq) => (
       <details class="group ui-card overflow-hidden open:border-brand-300 open:shadow-lg">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 p-5 font-sans text-base font-bold text-slate-900 transition-colors hover:text-brand-700 md:p-6 md:text-lg [&::-webkit-details-marker]:hidden">
