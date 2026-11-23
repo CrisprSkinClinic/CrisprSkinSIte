@@ -13,6 +13,7 @@ import TocChips from '../../components/ui/TocChips.astro';
 import SideBookCard from '../../components/ui/SideBookCard.astro';
 import { siteConfig } from '../../config/site.js';
 import { getServiceImage, getServiceImageAlt } from '../../utils/serviceImages';
+import ReadAloud from '../../components/ReadAloud.astro';
 
 export async function getStaticPaths() {
   const services = await getCollection('services');
@@ -123,6 +124,7 @@ const medicalServiceSchema = {
 ---
 
 <MainLayout title={data.title} description={data.metaDescription} image={optimizedHero?.src}>
+  <ReadAloud />
   <script type="application/ld+json" set:html={JSON.stringify(medicalWebPageSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(medicalServiceSchema)} />
 

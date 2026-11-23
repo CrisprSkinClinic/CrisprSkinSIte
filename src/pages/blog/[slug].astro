@@ -6,6 +6,7 @@ import LinkCards from '../../components/ui/LinkCards.astro';
 import TocChips from '../../components/ui/TocChips.astro';
 import { siteConfig } from '../../config/site.js';
 import { getServiceImage } from '../../utils/serviceImages';
+import ReadAloud from '../../components/ReadAloud.astro';
 
 // 1. Generate a new path for every collection entry
 export async function getStaticPaths() {
@@ -67,6 +68,7 @@ const articleSchema = {
 ---
 
 <MainLayout title={entry.data.title} description={entry.data.description} image={shareImage} type="article">
+  <ReadAloud />
   <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
   <Breadcrumbs items={[{ name: "Blog", url: "/blog" }, { name: entry.data.title, url: `/blog/${entry.slug}` }]} />
   <div class="read-progress" aria-hidden="true"></div>

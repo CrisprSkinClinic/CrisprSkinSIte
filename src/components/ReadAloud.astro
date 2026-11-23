@@ -1,0 +1,270 @@
+---
+// Read-aloud player. Uses the browser's built-in speech voices (no audio files, no cost, no data leaves the
+// device). It reads the article one block at a time, highlights what is being read, and keeps playing while
+// the reader scrolls. Drop <ReadAloud /> into any page that has a `.prose` content area.
+---
+<style is:global>
+  .ra-trigger { display: inline-flex; align-items: center; gap: .55rem; margin: 0 0 1.5rem; padding: .6rem 1.05rem .6rem .8rem; border-radius: 999px; border: 1px solid rgb(var(--ra-line, 226 232 240)); background: #fff; color: #503057; font: 700 .875rem/1 var(--font-sans, inherit); box-shadow: 0 1px 2px rgba(15,23,42,.06); cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+  .ra-trigger:hover { background: #f8f4fa; box-shadow: 0 6px 18px -8px rgba(80,48,87,.45); transform: translateY(-1px); }
+  .ra-trigger .ra-ico { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 999px; background: #7E4D8B; color: #fff; }
+  .ra-trigger small { font-weight: 600; color: #64748b; }
+  .ra-current { background: linear-gradient(90deg, rgba(174,137,184,.22), rgba(174,137,184,.08)); box-shadow: -6px 0 0 0 rgba(126,77,139,.55); border-radius: .35rem; transition: background .3s ease; }
+  #raPlayer { position: fixed; z-index: 55; left: 50%; transform: translateX(-50%) translateY(0); bottom: 1.25rem; width: min(40rem, calc(100vw - 1.5rem)); }
+  @media (max-width: 767px) { #raPlayer { bottom: 5.4rem; } }
+  #raPlayer[hidden] { display: none; }
+  #raPlayer .ra-bar { height: 3px; border-radius: 3px; background: rgba(126,77,139,.18); overflow: hidden; }
+  #raPlayer .ra-bar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #AE89B8, #7E4D8B); transition: width .3s ease; }
+  #raPlayer button { -webkit-tap-highlight-color: transparent; }
+  #raPlayer .ra-btn { flex: none; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 999px; color: #503057; transition: background .2s ease, transform .15s ease; }
+  #raPlayer .ra-btn:hover { background: rgba(126,77,139,.12); }
+  #raPlayer .ra-btn:active { transform: scale(.94); }
+  #raPlayer .ra-play { width: 2.9rem; height: 2.9rem; background: #503057; color: #fff; }
+  #raPlayer .ra-play:hover { background: #7E4D8B; }
+  #raPlayer .ra-chip { padding: .3rem .6rem; border-radius: 999px; font: 700 .75rem/1 var(--font-sans, inherit); color: #503057; background: rgba(126,77,139,.1); }
+  #raPlayer .ra-chip[aria-pressed="true"] { background: #503057; color: #fff; }
+  @media (max-width: 639px) { #raPlayer select { display: none !important; } }
+  #raPlayer select { max-width: 9.5rem; border-radius: 999px; padding: .3rem .5rem; font: 600 .75rem/1 var(--font-sans, inherit); color: #503057; background: rgba(126,77,139,.1); border: 0; }
+  @media (prefers-reduced-motion: no-preference) { #raPlayer:not([hidden]) { animation: ra-in .35s cubic-bezier(.2,.8,.2,1) both; } @keyframes ra-in { from { opacity: 0; transform: translateX(-50%) translateY(14px); } } }
+</style>
+
+<script>
+  const synth = 'speechSynthesis' in window ? window.speechSynthesis : null;
+  let state = null;
+
+  // ---- Say it the way a person would -------------------------------------------------------------------
+  const ACRONYMS = ['PCOS', 'HPV', 'DHT', 'PSA', 'TSH', 'FUE', 'UVB', 'UVA', 'SPF', 'AIIMS', 'RFA', 'TCA', 'BMI', 'IgE', 'HIV', 'MRCP', 'DNB', 'FTU', 'LH', 'FSH', 'AMH', 'AN', 'HOMA-IR'];
+  function speakable(t) {
+    let s = t
+      .replace(/ /g, ' ')
+      .replace(/CRISPR/g, 'Crisper')
+      .replace(/HbA1c/g, 'H b A 1 c')
+      .replace(/\be\.g\./gi, 'for example')
+      .replace(/\bi\.e\./gi, 'that is')
+      .replace(/\bvs\.?\b/gi, 'versus')
+      .replace(/\betc\./gi, 'etcetera')
+      .replace(/&/g, ' and ')
+      .replace(/(\d)\s*%/g, '$1 percent')
+      .replace(/(\d+)\s*mg\/dL/gi, '$1 milligrams per decilitre')
+      .replace(/(\d+)\s*ng\/mL/gi, '$1 nanograms per millilitre')
+      .replace(/(\d+(?:\.\d+)?)\s*mg\b/gi, '$1 milligrams')
+      .replace(/(\d+(?:\.\d+)?)\s*mL\b/g, '$1 millilitres')
+      .replace(/(\d+(?:\.\d+)?)\s*g\b(?![a-z])/g, '$1 grams')
+      .replace(/(\d+)\s*(?:–|-)\s*(\d+)/g, '$1 to $2')
+      .replace(/\s*(?:--|—|–)\s*/g, ', ')
+      .replace(/[→←↑↓]/g, ' ')
+      .replace(/[*_`#>|]/g, ' ');
+    ACRONYMS.forEach((a) => { s = s.replace(new RegExp('\\b' + a + '\\b', 'g'), a.split('').join(' ').replace(/ - /g, ' ')); });
+    return s.replace(/\s+/g, ' ').trim();
+  }
+
+  function chunksOf(text) {
+    const sentences = text.match(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g) || [text];
+    const out = [];
+    sentences.forEach((s) => {
+      s = s.trim(); if (!s) return;
+      if (s.length <= 220) { out.push(s); return; }
+      let cur = '';
+      s.split(/(?<=[,;:])\s+/).forEach((part) => {
+        if ((cur + ' ' + part).trim().length > 200 && cur) { out.push(cur.trim()); cur = part; } else { cur = (cur + ' ' + part).trim(); }
+      });
+      if (cur) out.push(cur.trim());
+    });
+    return out;
+  }
+
+  // ---- Voices -----------------------------------------------------------------------------------------
+  function englishVoices() { return (synth ? synth.getVoices() : []).filter((v) => /^en(-|_|$)/i.test(v.lang)); }
+  function scoreVoice(v) {
+    let s = 0;
+    const lang = v.lang.replace('_', '-');
+    if (/^en-IN$/i.test(lang)) s += 100; else if (/^en-GB$/i.test(lang)) s += 60; else if (/^en-US$/i.test(lang)) s += 50; else s += 30;
+    if (/natural|neural|online|premium|enhanced/i.test(v.name)) s += 40;
+    if (/google/i.test(v.name)) s += 12;
+    if (/microsoft/i.test(v.name)) s += 8;
+    if (/compact|espeak|novelty|fred|whisper|zarvox|bad news|bells|boing|cellos|trinoids|albert|junior/i.test(v.name)) s -= 80;
+    if (v.localService === false) s += 4;
+    return s;
+  }
+  function bestVoice() {
+    let saved = null; try { saved = localStorage.getItem('raVoice'); } catch (e) {}
+    const list = englishVoices();
+    if (saved) { const f = list.find((v) => v.name === saved); if (f) return f; }
+    return list.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
+  }
+
+  // ---- Player -----------------------------------------------------------------------------------------
+  const ICON = {
+    play: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4.5" height="14" rx="1.2"/><rect x="13.5" y="5" width="4.5" height="14" rx="1.2"/></svg>',
+    prev: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M6 5h2v14H6zM20 5.5v13a1 1 0 0 1-1.6.8L10 12.8a1 1 0 0 1 0-1.6l8.4-6.5a1 1 0 0 1 1.6.8z"/></svg>',
+    next: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5.5v13a1 1 0 0 0 1.6.8L14 12.8a1 1 0 0 0 0-1.6L5.6 4.7A1 1 0 0 0 4 5.5z"/></svg>',
+    close: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    ear: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M3 14a2 2 0 0 1 2-2h1v7H5a2 2 0 0 1-2-2v-3zM21 14a2 2 0 0 0-2-2h-1v7h1a2 2 0 0 0 2-2v-3z"/></svg>',
+  };
+  const SPEEDS = [1, 1.2, 1.4, 0.85];
+
+  function collectBlocks(root) {
+    const blocks = [];
+    const h1 = document.querySelector('main h1');
+    if (h1 && h1.textContent.trim()) blocks.push({ el: h1, text: speakable(h1.textContent) });
+    root.querySelectorAll('h2, h3, h4, p, li, blockquote, tr').forEach((el) => {
+      if (el.closest('[aria-hidden="true"], .ra-skip, nav, aside')) return;
+      if (el.tagName === 'P' && el.closest('li, blockquote')) return;
+      if (el.tagName === 'LI' && el.querySelector('p')) return;
+      let text = el.tagName === 'TR' ? Array.from(el.children).map((c) => c.textContent.trim()).join(', ') : el.textContent;
+      text = speakable(text);
+      if (text.length < 2) return;
+      if (/^[A-Z]/.test(text) && /^H[2-4]$/.test(el.tagName) && !/[.!?]$/.test(text)) text += '.';
+      blocks.push({ el, text });
+    });
+    return blocks;
+  }
+
+  function teardown() {
+    if (!state) return;
+    synth && synth.cancel();
+    state.blocks.forEach((b) => b.el.classList.remove('ra-current'));
+    state.player && state.player.remove();
+    state.trigger && state.trigger.remove();
+    state = null;
+  }
+
+  function init() {
+    teardown();
+    if (!synth) return;
+    const root = document.querySelector('main .prose');
+    if (!root) return;
+    const blocks = collectBlocks(root);
+    if (blocks.length < 3) return;
+
+    const words = blocks.reduce((n, b) => n + b.text.split(/\s+/).length, 0);
+    const minutes = Math.max(1, Math.round(words / 150));
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'ra-trigger ra-skip';
+    trigger.setAttribute('aria-label', 'Listen to this page read aloud');
+    trigger.innerHTML = `<span class="ra-ico">${ICON.ear}</span><span>Listen to this page <small>· about ${minutes} min</small></span>`;
+    root.parentElement.insertBefore(trigger, root);
+
+    const player = document.createElement('div');
+    player.id = 'raPlayer';
+    player.hidden = true;
+    player.className = 'glass rounded-3xl p-2.5 shadow-2xl';
+    player.setAttribute('role', 'region');
+    player.setAttribute('aria-label', 'Read aloud controls');
+    player.innerHTML = `
+      <div class="ra-bar mb-2 mx-1"><i></i></div>
+      <div class="flex items-center gap-1">
+        <button class="ra-btn" data-a="prev" type="button" aria-label="Previous paragraph">${ICON.prev}</button>
+        <button class="ra-btn ra-play" data-a="play" type="button" aria-label="Pause">${ICON.pause}</button>
+        <button class="ra-btn" data-a="next" type="button" aria-label="Next paragraph">${ICON.next}</button>
+        <p class="ml-2 mr-auto min-w-0 truncate text-xs font-semibold text-slate-600" data-r="status" aria-live="off">Reading…</p>
+        <button class="ra-chip" data-a="speed" type="button" aria-label="Change reading speed">1×</button>
+        <button class="ra-chip" data-a="follow" type="button" aria-pressed="false" aria-label="Scroll along with the reading" title="Scroll along with the reading">Follow</button>
+        <select data-r="voice" aria-label="Voice"></select>
+        <button class="ra-btn" data-a="close" type="button" aria-label="Close player">${ICON.close}</button>
+      </div>`;
+    document.body.appendChild(player);
+
+    state = { blocks, i: 0, c: 0, playing: false, token: 0, rate: 1, follow: false, voice: null, trigger, player, chunks: [] };
+    const $ = (sel) => player.querySelector(sel);
+    const playBtn = $('[data-a="play"]');
+    const status = $('[data-r="status"]');
+    const bar = $('.ra-bar > i');
+    const voiceSel = $('[data-r="voice"]');
+
+    function fillVoices() {
+      const list = englishVoices().sort((a, b) => scoreVoice(b) - scoreVoice(a));
+      state.voice = bestVoice();
+      voiceSel.innerHTML = list.map((v) => `<option value="${v.name.replace(/"/g, '&quot;')}">${v.name.replace(/Microsoft |Google /, '')}</option>`).join('');
+      if (state.voice) voiceSel.value = state.voice.name;
+      voiceSel.style.display = list.length > 1 ? '' : 'none';
+    }
+    fillVoices();
+    synth.addEventListener && synth.addEventListener('voiceschanged', fillVoices);
+
+    function paint() {
+      state.blocks.forEach((b, k) => b.el.classList.toggle('ra-current', k === state.i && player.hidden === false));
+      const cur = state.blocks[state.i];
+      status.textContent = `${state.i + 1} of ${state.blocks.length} · ${cur.el.tagName.startsWith('H') ? cur.text.replace(/\.$/, '') : 'Reading'}`;
+      bar.style.width = `${Math.round((state.i / Math.max(1, state.blocks.length - 1)) * 100)}%`;
+      playBtn.innerHTML = state.playing ? ICON.pause : ICON.play;
+      playBtn.setAttribute('aria-label', state.playing ? 'Pause' : 'Play');
+    }
+    function reveal() {
+      if (!state.follow) return;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      state.blocks[state.i].el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+    }
+    function speak() {
+      if (!state) return;
+      const my = ++state.token;
+      synth.cancel();
+      const block = state.blocks[state.i];
+      if (!block) { stop(true); return; }
+      state.chunks = chunksOf(block.text);
+      if (state.c >= state.chunks.length) { state.c = 0; }
+      const text = state.chunks[state.c];
+      const u = new SpeechSynthesisUtterance(text);
+      if (state.voice) { u.voice = state.voice; u.lang = state.voice.lang; } else { u.lang = 'en-IN'; }
+      u.rate = state.rate; u.pitch = 1;
+      const advance = () => {
+        if (!state || my !== state.token || !state.playing) return;
+        state.c += 1;
+        if (state.c >= state.chunks.length) {
+          state.c = 0; state.i += 1;
+          if (state.i >= state.blocks.length) { state.i = state.blocks.length - 1; stop(true); return; }
+          paint(); reveal();
+        }
+        speak();
+      };
+      u.onend = advance;
+      u.onerror = (e) => { if (e.error === 'interrupted' || e.error === 'canceled') return; advance(); };
+      synth.speak(u);
+    }
+    function play() { state.playing = true; paint(); reveal(); speak(); }
+    function pause() { state.playing = false; state.token++; synth.cancel(); paint(); }
+    function stop(done) { state.playing = false; state.token++; synth.cancel(); if (done) { state.i = 0; state.c = 0; } paint(); }
+    function go(delta) {
+      state.i = Math.min(state.blocks.length - 1, Math.max(0, state.i + delta)); state.c = 0;
+      paint(); reveal(); if (state.playing) speak();
+    }
+
+    trigger.addEventListener('click', () => {
+      player.hidden = false;
+      if (!state.playing) play(); else paint();
+    });
+    player.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-a]'); if (!b) return;
+      const a = b.dataset.a;
+      if (a === 'play') { state.playing ? pause() : play(); }
+      else if (a === 'prev') { go(state.c > 0 ? 0 : -1); }
+      else if (a === 'next') go(1);
+      else if (a === 'speed') {
+        const k = (SPEEDS.indexOf(state.rate) + 1) % SPEEDS.length; state.rate = SPEEDS[k]; b.textContent = state.rate + '×';
+        if (state.playing) speak();
+      } else if (a === 'follow') {
+        state.follow = !state.follow; b.setAttribute('aria-pressed', String(state.follow)); if (state.follow) reveal();
+      } else if (a === 'close') { pause(); player.hidden = true; state.blocks.forEach((x) => x.el.classList.remove('ra-current')); }
+    });
+    voiceSel.addEventListener('change', () => {
+      state.voice = englishVoices().find((v) => v.name === voiceSel.value) || state.voice;
+      try { localStorage.setItem('raVoice', voiceSel.value); } catch (e) {}
+      if (state.playing) speak();
+    });
+    // Tap a paragraph while the player is open to start reading from it.
+    root.addEventListener('click', (e) => {
+      if (player.hidden) return;
+      if (e.target.closest('a, button, summary, input, select')) return;
+      const k = state.blocks.findIndex((b) => b.el === e.target || b.el.contains(e.target));
+      if (k >= 0 && window.getSelection().toString() === '') { state.i = k; state.c = 0; paint(); if (state.playing) speak(); }
+    });
+    paint();
+  }
+
+  // Stop speaking whenever the page is left, including client-side navigation.
+  document.addEventListener('astro:before-swap', teardown);
+  window.addEventListener('pagehide', () => { synth && synth.cancel(); });
+  document.addEventListener('astro:page-load', init);
+</script>

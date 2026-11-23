@@ -153,5 +153,5 @@ h1.font-sans, h2.font-sans { font-weight: 700 !important; font-synthesis: auto; 
 /* Doctor lists are shuffled in the browser; hide the static (fixed-order) markup
    until that has run so nobody sees one doctor flash up first. The animation is a
    fail-safe that reveals the list after 1.2s even if the script never runs. */
-[data-shuffle]:not([data-shuffled]) { visibility: hidden; animation: shuffle-failsafe 0s 1.2s forwards; }
+[data-shuffle]:not([data-shuffled]), [data-rotate]:not([data-rotated]) { visibility: hidden; animation: shuffle-failsafe 0s 1.2s forwards; }
 @keyframes shuffle-failsafe { to { visibility: visible; } }
