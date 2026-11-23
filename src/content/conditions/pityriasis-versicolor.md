@@ -37,6 +37,7 @@ faqIds:
   - "fungal-infection-contagious"
   - "fungal-infection-why-keeps-coming-back"
   - "pigmentation-causes"
+  - "versicolor-vs-vitiligo"
 
 ctaTitle: "Book a Fungal Infection Evaluation"
 ---
@@ -44,3 +45,7 @@ ctaTitle: "Book a Fungal Infection Evaluation"
 Pityriasis versicolor is caused by overgrowth of a yeast that normally lives on the skin. It produces fine-scaled patches whose colour differs from the surrounding skin, which is why it is often confused with [vitiligo](/conditions/vitiligo) or other pigmentation problems.
 
 [Treatment](/services/fungal-infections) clears the infection quickly, but the pigment difference can take weeks to even out after the yeast is gone. That delay is normal and not a sign that treatment failed. Recurrence is common; see [why fungal infections keep coming back](/blog/fungal-infection-recurrence).
+
+## Read More
+
+See [pityriasis versicolor: light or dark patches on the chest and back](/blog/pityriasis-versicolor-white-and-dark-patches-on-the-skin) for treatment, recurrence and how it differs from vitiligo.

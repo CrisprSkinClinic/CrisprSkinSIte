@@ -48,3 +48,7 @@ The most common reason these infections seem to recur is [stopping treatment too
 ## Treatment Compliance
 
 Take the full course, even after the skin looks normal, avoid steroid or combination creams unless prescribed, and treat the household and clothing together. See [why tinea treatment fails](/blog/tinea-treatment-why-it-fails-and-compliance) and [how long to continue](/blog/tinea-how-long-to-continue-treatment).
+
+## More Guides
+
+[Jock itch](/blog/jock-itch-tinea-cruris-treatment-and-prevention), [athlete's foot](/blog/athletes-foot-tinea-pedis-treatment-and-prevention), [scalp ringworm in children](/blog/tinea-capitis-scalp-ringworm-in-children), and [recurrent or resistant ringworm](/blog/recurrent-and-resistant-ringworm-in-india-what-to-do).

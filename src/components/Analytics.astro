@@ -12,6 +12,8 @@
 //  * One scroll event (`scroll_depth` with a `percent` parameter) replaces scroll_depth_50 and scroll_depth_90,
 //    and every event carries the page type (home, service, condition, blog, booking...).
 //  * Only the live site (crisprdermatology.com) is measured, so previews and local testing never pollute the data.
+//  * Robots and headless browsers are not counted (the visitors from data-centre cities such as Singapore and
+//    Ashburn that never engage with the site).
 //  * A real booking funnel: booking_click -> booking_started -> booking_completed (or booking_failed).
 const { quiet = false } = Astro.props;
 ---
@@ -47,6 +49,13 @@ const { quiet = false } = Astro.props;
     var live = /^(www\.)?crisprdermatology\.com$/.test(location.hostname);
     try { if (localStorage.getItem('crisprAnalyticsDebug') === '1') live = true; } catch (e) {}
     if (!live) skip = true;
+    // Automated visitors (scanners, uptime and speed-test robots, headless browsers) are not patients. Google
+    // filters the best-known robots; this catches the rest before they are counted. (The debug flag above also
+    // lets a test browser through, so tracking can still be verified.)
+    var ua = navigator.userAgent || '';
+    var robot = navigator.webdriver === true || /HeadlessChrome|PhantomJS|Lighthouse|PageSpeed|GTmetrix|Pingdom|UptimeRobot|StatusCake|Datadog|bot\b|crawler|spider|slurp|facebookexternalhit|python-requests|curl\/|wget|Go-http-client|axios|node-fetch|HeadlessChrome/i.test(ua) || !(navigator.languages && navigator.languages.length);
+    var debug = false; try { debug = localStorage.getItem('crisprAnalyticsDebug') === '1'; } catch (e) {}
+    if (robot && !debug) skip = true;
     if (skip) {
       // Keep gtag() calls harmless on pages that are not being measured.
       window.gtag = function () {};

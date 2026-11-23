@@ -25,6 +25,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
   data-clinic-name={siteConfig.name}
   data-clinic-address={clinicAddress}
   data-clinic-phone={siteConfig.contact.phone}
+  data-clinic-whatsapp={siteConfig.contact.whatsapp}
   data-clinic-hours={siteConfig.contact.workingHoursDisplay}
   class="mx-auto max-w-5xl"
 >
@@ -332,6 +333,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       name: root.dataset.clinicName || 'Clinic',
       address: root.dataset.clinicAddress || '',
       phone: root.dataset.clinicPhone || '',
+      whatsapp: root.dataset.clinicWhatsapp || '',
       hours: root.dataset.clinicHours || '',
     };
     const clinicTel = clinic.phone.replace(/[^0-9+]/g, '');
@@ -785,7 +787,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         $('earliestBtn').classList.remove('hidden');
         $('earliestBtn').onclick = () => { userChoseDate = true; pickDate(earliest.date, earliest.slot.time24); };
       } else {
-        $('earliestText').innerHTML = `<span class="font-semibold">No slots in the next 7 days.</span> Pick a later date below, or call <a class="font-semibold underline" href="tel:${clinicTel}">${clinic.phone}</a>.`;
+        $('earliestText').innerHTML = `<span class="font-semibold">No slots in the next 7 days.</span> Pick a later date below, call <a class="font-semibold underline" href="tel:${clinicTel}">${clinic.phone}</a>${clinic.whatsapp ? `, or <a class="font-semibold underline" href="${clinic.whatsapp}" target="_blank" rel="noopener noreferrer">message us on WhatsApp</a>` : ''}.`;
         $('earliestBtn').classList.add('hidden');
       }
       return earliest;
