@@ -46,7 +46,6 @@ exports.handler = async () => {
       "reviews.text",
       "reviews.authorAttribution.displayName",
       "reviews.authorAttribution.photoUri",
-      "reviews.authorAttribution.uri",
       "reviews.publishTime",
       "reviews.relativePublishTimeDescription",
     ].join(",");
@@ -76,7 +75,6 @@ exports.handler = async () => {
     const reviews = (data.reviews || []).map((r) => ({
       name: r.authorAttribution?.displayName || "Google User",
       photoUri: r.authorAttribution?.photoUri || null,
-      authorUrl: r.authorAttribution?.uri || null,
       rating: r.rating || 5,
       quote: r.text?.text || "",
       relativeTime: r.relativePublishTimeDescription || "",

@@ -60,16 +60,6 @@ const reviews = allTestimonials
       ))}
     </div>
 
-    <!-- Latest reviews straight from Google. Hidden until they load, and left hidden if Google cannot be reached. -->
-    <div id="liveGoogleReviews" class="mt-16 hidden">
-      <div class="mb-8 text-center">
-        <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-600">Latest from Google</p>
-        <h3 class="text-3xl text-brand-900">What patients are saying on Google</h3>
-      </div>
-      <div id="liveGoogleReviewsGrid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
-      <p class="mt-4 text-center text-xs text-slate-500">Reviews are posted by patients on Google and shown here as written. We do not edit or select them.</p>
-    </div>
-
     <div class="text-center mt-12">
       <a
         href="https://share.google/VOkSEAUYVlRCSgVgT"
@@ -124,28 +114,6 @@ const reviews = allTestimonials
         ratingLink.href = data.mapsUrl;
       }
       badge.classList.remove('hidden');
-
-      // Show the latest reviews Google returns, with the reviewer's name and a link to Google.
-      const grid = document.getElementById('liveGoogleReviewsGrid');
-      const wrap = document.getElementById('liveGoogleReviews');
-      const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-      const star = '<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>';
-      const live = (data.reviews || []).filter((r) => r.quote && r.quote.trim().length > 20);
-      if (grid && wrap && live.length) {
-        const link = data.mapsUrl || 'https://share.google/VOkSEAUYVlRCSgVgT';
-        grid.innerHTML = live.map((r) => {
-          const text = r.quote.length > 280 ? r.quote.slice(0, 277).replace(/\s+\S*$/, '') + '…' : r.quote;
-          const photo = r.photoUri ? `<img src="${esc(r.photoUri)}" alt="" width="40" height="40" loading="lazy" referrerpolicy="no-referrer" class="h-10 w-10 rounded-full object-cover" />` : '<span class="grid h-10 w-10 place-items-center rounded-full bg-brand-100 font-bold text-brand-700">' + esc((r.name || 'G').charAt(0)) + '</span>';
-          const who = r.authorUrl ? `<a href="${esc(r.authorUrl)}" target="_blank" rel="noopener noreferrer" class="font-bold text-slate-900 hover:underline">${esc(r.name)}</a>` : `<span class="font-bold text-slate-900">${esc(r.name)}</span>`;
-          return `<article class="ui-card flex flex-col p-6">
-            <div class="mb-3 flex gap-0.5 text-amber-400" aria-label="${esc(r.rating)} out of 5 stars">${star.repeat(Math.max(1, Math.min(5, Math.round(r.rating || 5))))}</div>
-            <p class="mb-5 flex-grow leading-relaxed text-slate-700">${esc(text)}</p>
-            <div class="flex items-center gap-3 border-t border-slate-200 pt-4">${photo}
-              <div class="min-w-0 text-sm">${who}<p class="text-xs text-slate-500">${esc(r.relativeTime || '')} · <a href="${esc(link)}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline">on Google</a></p></div>
-            </div></article>`;
-        }).join('');
-        wrap.classList.remove('hidden');
-      }
     } catch (err) {
       // Fails silently -- the curated reviews above are the primary
       // content, so a failed live-rating fetch shouldn't show an error
