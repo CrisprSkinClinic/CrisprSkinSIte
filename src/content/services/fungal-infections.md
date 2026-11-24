@@ -39,6 +39,8 @@ faqIds:
   - "tinea-stop-when-itch-gone"
   - "tinea-steroid-cream-danger"
   - "tinea-family-screening"
+  - "tinea-resistant-india"
+  - "tinea-scalp-children"
 
 ctaTitle: "Book a Fungal Infection Evaluation"
 ---
@@ -64,3 +66,7 @@ Beyond medication, we spend real time on practical prevention: keeping affected 
 ## Completing Treatment
 
 The most important factor is finishing the course. Read [why tinea treatment fails and the compliance that makes it work](/blog/tinea-treatment-why-it-fails-and-compliance), [how long to continue](/blog/tinea-how-long-to-continue-treatment), [why steroid creams make it worse](/blog/steroid-creams-and-tinea-why-they-make-it-worse), and [how to prevent it coming back](/blog/tinea-recurrence-prevention-household-and-hygiene).
+
+## By Site and Type
+
+Read more on [scalp ringworm in children](/blog/tinea-capitis-scalp-ringworm-in-children), [jock itch](/blog/jock-itch-tinea-cruris-treatment-and-prevention), [athlete's foot](/blog/athletes-foot-tinea-pedis-treatment-and-prevention), [fungal nail infection](/blog/fungal-nail-infection-treatment-timeline-and-what-to-expect), [pityriasis versicolor](/blog/pityriasis-versicolor-white-and-dark-patches-on-the-skin), and [ringworm that will not go away](/blog/recurrent-and-resistant-ringworm-in-india-what-to-do).

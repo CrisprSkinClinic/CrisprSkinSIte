@@ -1,0 +1,144 @@
+---
+// One place for all Google Analytics (GA4) setup and tracking, used by both site layouts.
+//
+// What it does differently from the old setup:
+//  * Staff and registration traffic is not counted. Pages marked `quiet` (patient registration) and any browser
+//    that has opted out never load Analytics at all, so they add no page views, sessions or users. A browser
+//    opts out by visiting any page once with ?internal=1 (undo with ?internal=0), which is how reception and
+//    clinic devices are kept out. Anyone who registers is treated as a patient, not a visitor, for the rest of
+//    that browser tab, so the redirect to the home page after registering is not counted as a visit.
+//  * Click and scroll listeners are registered once. They used to be added again on every in-site navigation,
+//    which made phone, WhatsApp, booking and scroll events multiply the more pages someone viewed.
+//  * One scroll event (`scroll_depth` with a `percent` parameter) replaces scroll_depth_50 and scroll_depth_90,
+//    and every event carries the page type (home, service, condition, blog, booking...).
+//  * Only the live site (crisprdermatology.com) is measured, so previews and local testing never pollute the data.
+//  * Robots and headless browsers are not counted (the visitors from data-centre cities such as Singapore and
+//    Ashburn that never engage with the site).
+//  * A real booking funnel: booking_click -> booking_started -> booking_completed (or booking_failed).
+const { quiet = false } = Astro.props;
+---
+<script is:inline data-quiet={quiet ? 'true' : 'false'}>
+  (function () {
+    var ID = 'G-6JTEB0S8T0';
+    window.dataLayer = window.dataLayer || [];
+    window.__crGroup = function (p) {
+      p = (p || '/').replace(/\/+$/, '') || '/';
+      if (p === '/') return 'home';
+      if (p.indexOf('/services') === 0) return p === '/services' ? 'service_list' : 'service';
+      if (p.indexOf('/conditions') === 0) return p === '/conditions' ? 'condition_list' : 'condition';
+      if (p.indexOf('/blog') === 0) return p === '/blog' ? 'blog_list' : 'blog';
+      if (p.indexOf('/our-doctors') === 0) return p === '/our-doctors' ? 'doctors' : 'doctor';
+      if (p.indexOf('/lp') === 0) return 'landing';
+      if (p === '/book') return 'booking';
+      if (p === '/manage-appointment') return 'manage_booking';
+      if (p === '/faq') return 'faq';
+      if (p === '/contact') return 'contact';
+      if (p === '/hair' || p === '/skin' || p === '/cosmetic' || p === '/pediatric') return 'category';
+      return 'other';
+    };
+    var q = new URLSearchParams(location.search);
+    var skip = document.currentScript.getAttribute('data-quiet') === 'true';
+    try {
+      if (q.get('internal') === '1') localStorage.setItem('crisprInternal', '1');
+      if (q.get('internal') === '0') localStorage.removeItem('crisprInternal');
+      if (localStorage.getItem('crisprInternal') === '1') skip = true;
+      if (sessionStorage.getItem('crisprPatientTab') === '1') skip = true;
+    } catch (e) {}
+    // Only the live site is measured: local previews and Netlify deploy previews never reach Analytics
+    // (set localStorage.crisprAnalyticsDebug = '1' to test tracking from one of them).
+    var live = /^(www\.)?crisprdermatology\.com$/.test(location.hostname);
+    try { if (localStorage.getItem('crisprAnalyticsDebug') === '1') live = true; } catch (e) {}
+    if (!live) skip = true;
+    // Automated visitors (scanners, uptime and speed-test robots, headless browsers) are not patients. Google
+    // filters the best-known robots; this catches the rest before they are counted. (The debug flag above also
+    // lets a test browser through, so tracking can still be verified.)
+    var ua = navigator.userAgent || '';
+    var robot = navigator.webdriver === true || /HeadlessChrome|PhantomJS|Lighthouse|PageSpeed|GTmetrix|Pingdom|UptimeRobot|StatusCake|Datadog|bot\b|crawler|spider|slurp|facebookexternalhit|python-requests|curl\/|wget|Go-http-client|axios|node-fetch|HeadlessChrome/i.test(ua) || !(navigator.languages && navigator.languages.length);
+    var debug = false; try { debug = localStorage.getItem('crisprAnalyticsDebug') === '1'; } catch (e) {}
+    if (robot && !debug) skip = true;
+    if (skip) {
+      // Keep gtag() calls harmless on pages that are not being measured.
+      window.gtag = function () {};
+      window.__crNoTrack = true;
+      return;
+    }
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('set', { content_group: window.__crGroup(location.pathname), page_type: window.__crGroup(location.pathname) });
+    gtag('config', ID);
+    var s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ID;
+    document.head.appendChild(s);
+  })();
+</script>
+
+<script>
+  // Registered once per full page load (not once per in-site navigation).
+  if (!(window as any).__crTracking) {
+    (window as any).__crTracking = true;
+    const g = (...a: any[]) => { try { (window as any).gtag?.(...a); } catch (e) {} };
+    const groupOf = (p: string) => (window as any).__crGroup?.(p) || 'other';
+    let depths = new Set<number>();
+    let bookingStarted = false;
+
+    // Page type for everything that follows, including the page view GA records for in-site navigation.
+    document.addEventListener('astro:before-preparation', (e: any) => {
+      try {
+        const t = groupOf(new URL(e.to?.href || e.to, location.href).pathname);
+        g('set', { content_group: t, page_type: t });
+      } catch (err) {}
+    });
+    document.addEventListener('astro:page-load', () => {
+      depths = new Set();
+      bookingStarted = false;
+      const t = groupOf(location.pathname);
+      g('set', { content_group: t, page_type: t });
+    });
+
+    const where = (el: Element) => {
+      if (el.closest('#siteHeader')) return 'header';
+      if (el.closest('footer')) return 'footer';
+      if (el.closest('#siteBottomBar')) return 'bottom_bar';
+      if (el.closest('.fixed')) return 'floating_button';
+      if (el.closest('aside')) return 'sidebar';
+      return 'content';
+    };
+
+    document.addEventListener('click', (e) => {
+      const link = (e.target as Element)?.closest?.('a');
+      if (!link) return;
+      const href = link.getAttribute('href') || '';
+      const common = { link_location: where(link), event_category: 'engagement' };
+      if (href.startsWith('tel:')) return g('event', 'phone_call_click', { ...common, event_label: href.replace('tel:', '') });
+      if (href.includes('wa.me') || href.includes('whatsapp.com')) return g('event', 'whatsapp_click', { ...common, event_label: 'whatsapp_button' });
+      if (href.includes('google.com/maps') || href.includes('goo.gl/maps') || href.includes('maps.app.goo.gl')) return g('event', 'directions_click', { ...common, event_label: 'get_directions' });
+      if (href.startsWith('mailto:')) return g('event', 'email_click', { ...common, event_label: href.replace('mailto:', '') });
+      if ((link as HTMLElement).dataset.track === 'booking-click') {
+        g('event', 'booking_click', { ...common, event_label: (link as HTMLElement).dataset.trackLabel || 'book_now_button' });
+      }
+    });
+
+    // First real interaction with the booking form: separates people who only looked from people who began booking.
+    const started = (e: Event) => {
+      if (bookingStarted) return;
+      if ((e.target as Element)?.closest?.('#bookingCalendarRoot')) {
+        bookingStarted = true;
+        g('event', 'booking_started', { event_category: 'engagement' });
+      }
+    };
+    document.addEventListener('change', started);
+    document.addEventListener('click', started);
+
+    window.addEventListener('scroll', () => {
+      const room = document.documentElement.scrollHeight - window.innerHeight;
+      if (room <= 0) return;
+      const pct = (window.scrollY / room) * 100;
+      [25, 50, 75, 90].forEach((m) => {
+        if (pct >= m && !depths.has(m)) {
+          depths.add(m);
+          g('event', 'scroll_depth', { percent: m, event_category: 'engagement' });
+        }
+      });
+    }, { passive: true });
+  }
+</script>

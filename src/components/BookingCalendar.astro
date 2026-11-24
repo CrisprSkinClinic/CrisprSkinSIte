@@ -25,6 +25,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
   data-clinic-name={siteConfig.name}
   data-clinic-address={clinicAddress}
   data-clinic-phone={siteConfig.contact.phone}
+  data-clinic-whatsapp={siteConfig.contact.whatsapp}
   data-clinic-hours={siteConfig.contact.workingHoursDisplay}
   class="mx-auto max-w-5xl"
 >
@@ -332,6 +333,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       name: root.dataset.clinicName || 'Clinic',
       address: root.dataset.clinicAddress || '',
       phone: root.dataset.clinicPhone || '',
+      whatsapp: root.dataset.clinicWhatsapp || '',
       hours: root.dataset.clinicHours || '',
     };
     const clinicTel = clinic.phone.replace(/[^0-9+]/g, '');
@@ -785,7 +787,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         $('earliestBtn').classList.remove('hidden');
         $('earliestBtn').onclick = () => { userChoseDate = true; pickDate(earliest.date, earliest.slot.time24); };
       } else {
-        $('earliestText').innerHTML = `<span class="font-semibold">No slots in the next 7 days.</span> Pick a later date below, or call <a class="font-semibold underline" href="tel:${clinicTel}">${clinic.phone}</a>.`;
+        $('earliestText').innerHTML = `<span class="font-semibold">No slots in the next 7 days.</span> Pick a later date below, call <a class="font-semibold underline" href="tel:${clinicTel}">${clinic.phone}</a>${clinic.whatsapp ? `, or <a class="font-semibold underline" href="${clinic.whatsapp}" target="_blank" rel="noopener noreferrer">message us on WhatsApp</a>` : ''}.`;
         $('earliestBtn').classList.add('hidden');
       }
       return earliest;
@@ -1212,10 +1214,23 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         }
 
         if (!response.ok || !result.success) {
+          // A short, countable reason, so failures can be grouped in Analytics instead of read one by one.
+          const msg = result.error || '';
+          const failureReason =
+            /already have an appointment|one booking per day/i.test(msg) ? 'already_booked_that_day'
+            : /30 minutes/i.test(msg) ? 'needs_30_minutes'
+            : /slot|time|available|taken/i.test(msg) ? 'slot_unavailable'
+            : /verification|verify|expired/i.test(msg) ? 'verification_expired'
+            : /valid .*mobile|phone/i.test(msg) ? 'invalid_phone'
+            : /missing required/i.test(msg) ? 'missing_field'
+            : response.status >= 500 ? 'server_error'
+            : 'other';
           window.gtag?.('event', 'booking_failed', {
             event_category: 'engagement',
             event_label: service,
-            error_message: result.error || 'unknown_error',
+            failure_reason: failureReason,
+            http_status: response.status,
+            error_message: msg || 'unknown_error',
           });
           // The slot may have just been taken: refresh the slots so the patient can pick another.
           if (/slot|time|available|taken|booked|30 minutes/i.test(result.error || '')) refreshAvailability();
@@ -1233,6 +1248,8 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         showConfirmation({ result, body: lastBookingBody, moved: false });
       } catch (err) {
         console.error('Error booking:', err);
+        // The request never got an answer (connection dropped, offline): the server never saw it, so it can only be counted here.
+        if (err instanceof TypeError) window.gtag?.('event', 'booking_failed', { event_category: 'engagement', event_label: service, failure_reason: 'network_error' });
         busy = false;
         showError(err.message || 'Could not complete your booking. Please try again or call us directly.');
         if (/verif/i.test(err.message || '')) resetOtp();

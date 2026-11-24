@@ -37,6 +37,7 @@ faqIds:
   - "fungal-infection-contagious"
   - "fungal-infection-why-keeps-coming-back"
   - "pigmentation-causes"
+  - "versicolor-vs-vitiligo"
 
 ctaTitle: "Book a Fungal Infection Evaluation"
 ---
@@ -64,3 +65,7 @@ Anti-yeast shampoos or washes left on the skin for the advised time, antifungal 
 ## Recurrence
 
 Relapse is common in hot, humid climates. A once-a-month wash in the warm months, loose breathable clothing and treating dandruff help. See our [fungal infections service](/services/fungal-infections).
+
+## Read More
+
+See [pityriasis versicolor: light or dark patches on the chest and back](/blog/pityriasis-versicolor-white-and-dark-patches-on-the-skin) for treatment, recurrence and how it differs from vitiligo.

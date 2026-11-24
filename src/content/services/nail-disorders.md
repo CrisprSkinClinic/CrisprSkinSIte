@@ -59,3 +59,7 @@ Ingrown nails are managed conservatively where possible, with a minor in-clinic 
 ## Setting Realistic Expectations
 
 Nail growth is slow, and this is the single most important thing to understand before starting nail treatment -- a fungal nail infection that's been present for a year took that long to develop and will take proportionate time to grow out clear, even with fully effective treatment. We set this timeline expectation clearly at your first visit so progress is judged accurately rather than assumed to be failing.
+
+## Fungal Nails
+
+See [fungal nail infection: treatment timeline and what to expect](/blog/fungal-nail-infection-treatment-timeline-and-what-to-expect).

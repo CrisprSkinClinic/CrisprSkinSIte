@@ -43,3 +43,7 @@ Nail growth is inherently slow -- fingernails take months and toenails can take 
 ## Staying on Treatment
 
 Nails grow slowly, so treatment continues for months. Stopping early is the commonest reason for failure. See [how long to continue antifungal treatment](/blog/tinea-how-long-to-continue-treatment).
+
+## Timeline
+
+For how long treatment takes and what to expect month by month, see [fungal nail infection: treatment timeline](/blog/fungal-nail-infection-treatment-timeline-and-what-to-expect).

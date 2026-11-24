@@ -4,6 +4,7 @@ import FloatingContact from '../components/FloatingContact.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import { siteConfig } from '../config/site.js';
+import Analytics from '../components/Analytics.astro';
 import '../styles/global.css';
 
 // Accept SEO properties from individual pages, with safe fallbacks
@@ -18,6 +19,8 @@ const {
   noindex = false,
   // Focused pages (e.g. registration) hide the site header, footer and bottom action bar.
   bare = false,
+  // Pages that should not be counted as website traffic (patient registration).
+  quiet = false,
 } = Astro.props;
 
 // Automatically generate the exact canonical URL for the current page
@@ -59,7 +62,13 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
     
     <ViewTransitions />
     
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#7E4D8B" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     
@@ -82,13 +91,7 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
 
     <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-6JTEB0S8T0"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6JTEB0S8T0');
-    </script>
+    <Analytics quiet={quiet} />
 
     {showClinic && (
       <script type="application/ld+json" set:html={JSON.stringify({
@@ -200,99 +203,6 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
     </script>
 
     <script>
-      // GA4 conversion tracking via event delegation -- a single
-      // document-level click listener catches phone, WhatsApp, and
-      // directions links anywhere on the site (including ones added
-      // later) without needing to wire each link individually.
-      // Booking click/completion are tracked separately: click via
-      // data-track="booking-click" on Book Now buttons/links, and
-      // completion fires directly from BookingCalendar.astro's
-      // confirm handler once public-book-appointment.js succeeds.
-      document.addEventListener('astro:page-load', () => {
-        document.addEventListener('click', (e) => {
-          if (typeof gtag !== 'function') return;
-
-          const link = e.target.closest('a');
-          if (!link) return;
-
-          const href = link.getAttribute('href') || '';
-
-          if (href.startsWith('tel:')) {
-            gtag('event', 'phone_call_click', {
-              event_category: 'engagement',
-              event_label: href.replace('tel:', ''),
-            });
-            return;
-          }
-
-          if (href.includes('wa.me') || href.includes('whatsapp.com')) {
-            gtag('event', 'whatsapp_click', {
-              event_category: 'engagement',
-              event_label: 'whatsapp_button',
-            });
-            return;
-          }
-
-          if (href.includes('google.com/maps') || href.includes('goo.gl/maps')) {
-            gtag('event', 'directions_click', {
-              event_category: 'engagement',
-              event_label: 'get_directions',
-            });
-            return;
-          }
-
-          if (href.startsWith('mailto:')) {
-            gtag('event', 'email_click', {
-              event_category: 'engagement',
-              event_label: href.replace('mailto:', ''),
-            });
-            return;
-          }
-
-          if (link.dataset.track === 'booking-click') {
-            gtag('event', 'booking_click', {
-              event_category: 'engagement',
-              event_label: link.dataset.trackLabel || 'book_now_button',
-            });
-          }
-        });
-      });
-
-      // Scroll depth tracking: fires once each at 50% and 90% of
-      // total page height. Reset per navigation (ViewTransitions
-      // swaps content without a full reload) so depth re-fires on
-      // every new page rather than only the first.
-      document.addEventListener('astro:page-load', () => {
-        let firedDepths = { 50: false, 90: false };
-
-        function checkScrollDepth() {
-          if (typeof gtag !== 'function') return;
-
-          const scrollTop = window.scrollY;
-          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-          if (docHeight <= 0) return;
-
-          const percentScrolled = (scrollTop / docHeight) * 100;
-
-          if (!firedDepths[50] && percentScrolled >= 50) {
-            firedDepths[50] = true;
-            gtag('event', 'scroll_depth_50', {
-              event_category: 'engagement',
-              event_label: window.location.pathname,
-            });
-          }
-          if (!firedDepths[90] && percentScrolled >= 90) {
-            firedDepths[90] = true;
-            gtag('event', 'scroll_depth_90', {
-              event_category: 'engagement',
-              event_label: window.location.pathname,
-            });
-          }
-        }
-
-        window.addEventListener('scroll', checkScrollDepth, { passive: true });
-      });
-
       const observerOptions = {
         root: null,
         rootMargin: '0px',
