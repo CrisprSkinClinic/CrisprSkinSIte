@@ -1,59 +1,36 @@
----
-title: "Botox"
-metaDescription: "Botox treatment for fine lines and wrinkles in KK Nagar, Chennai. Administered by trained dermatologists for natural-looking results."
-heroEyebrow: "Cosmetic Dermatology"
-heroHeadline: "Botox"
-heroSubheadline: "A subtle, natural-looking approach to softening fine lines and expression wrinkles, administered by trained dermatologists."
-heroImage: "botox"
-category: "cosmetic"
-defaultService: "Botox"
 
-twoPaths:
-  screeningTitle: "New to Botox and exploring options?"
-  screeningBody: "An evaluation of your facial muscle patterns, the specific lines you'd like to address, and your goals helps determine dosing and technique before any treatment."
-  symptomsTitle: "Looking to refresh or continue existing treatment?"
-  symptomsBody: "If you've had Botox before, we'll review your history, response, and timing to plan your next session appropriately."
 
-diagnostics:
-  - "Facial assessment of muscle activity and expression lines at rest and in motion"
-  - "Discussion of treatment goals and areas of concern"
-  - "Medical history review to confirm suitability for treatment"
+## What Botulinum Toxin Does
 
-conditionsManaged:
-  - "expression-lines"
-  - "photoageing"
+Botulinum toxin (Botox and similar products) temporarily relaxes the small muscles that cause expression lines, such as frown lines, forehead lines and crow's feet. It softens movement-related lines and prevents them deepening. It does not fill lines already etched in or restore lost volume, which is the job of fillers. See [fillers vs Botox](/blog/fillers-vs-botox).
 
-treatments:
-  - name: "Upper Face Treatment"
-    description: "Softening of forehead lines, frown lines, and crow's feet, dosed and placed to preserve natural expression."
-  - name: "Individualized Dosing"
-    description: "Dosing planned around your specific facial anatomy and muscle strength rather than a fixed, one-size-fits-all unit count."
-  - name: "Maintenance Planning"
-    description: "Botox is a temporary treatment requiring periodic sessions to maintain effect -- planned realistically as part of an ongoing routine if desired, not a one-time procedure."
+## What It Can Be Used For
 
-faqIds:
-  - "botox-how-long-does-it-last"
-  - "botox-natural-looking-results"
-  - "botox-age-to-start"
-  - "botox-safety"
+- Frown lines between the brows, forehead lines and crow's feet.
+- Brow shaping in selected people.
+- Jaw (masseter) slimming and clenching, with careful assessment.
+- Underarm and palm sweating (hyperhidrosis), as a medical use.
 
-ctaTitle: "Book a Botox Consultation"
----
+## The Visit
 
-Botox (botulinum toxin) is a well-established treatment that temporarily relaxes specific facial muscles responsible for expression lines, softening wrinkles caused by repeated movement -- frown lines, forehead lines, and crow's feet being the most commonly treated areas. It does not add volume; for that, dermal fillers are the relevant treatment instead.
+We assess your face at rest and in movement, discuss what you want to change and what you want to keep, and explain the dosing and likely results. The treatment takes about ten minutes, using a very fine needle, with little discomfort.
 
-The most common concern people have going in is looking overdone or "frozen," and that's almost always a function of dosing and technique rather than the treatment itself. Our approach favors conservative, individualized dosing aimed at softening lines while preserving natural facial movement and expression.
+## Results and Duration
 
-## What to Expect at Your Visit
+The effect begins in three to five days, peaks at around two weeks, and lasts three to four months. Natural movement should remain, and you should still look like yourself. See [Botox without looking "done"](/blog/botox-natural-results).
 
-We assess your facial muscle activity both at rest and during expression, since the areas and intensity of movement vary considerably between individuals and directly inform dosing. We'll discuss which lines bother you specifically and what result you're looking for -- subtle softening versus more complete smoothing -- since these call for different dosing approaches.
+## Risks and Safety
 
-## Treatment Approach
+Bruising and mild headache are common. Rarely, a drooping eyelid or brow, uneven effect or asymmetry can occur and settles in weeks to months. It is not used in pregnancy or breastfeeding, or in some nerve and muscle conditions. The result depends on the assessment, correct dose and injection technique, which is why a doctor should do it.
 
-Treatment is dosed to your specific facial anatomy and the strength of your muscle activity, not a fixed unit count applied uniformly. The goal, by default, is a natural, rested appearance rather than a visibly "done" look -- we discuss your preference directly and can adjust the approach for a stronger effect if that's what you want.
+## Aftercare
 
-Botox is a temporary treatment; effects typically build over the days following treatment and gradually fade over months, which is why many patients choose to maintain results with periodic sessions rather than treating it as a one-time procedure.
+Avoid rubbing the area, lying flat and strenuous exercise for several hours, as advised.
 
-## Setting Realistic Expectations
+## What We Do Not Do
 
-Botox softens existing expression lines and helps limit the deepening of new ones with repeated movement, but it does not stop the aging process or address static wrinkles caused by volume loss or skin laxity -- those are managed differently, and we're direct about what Botox can and can't do for your specific concerns during your consultation.
+We do not over-treat to give a frozen look, and we do not offer experimental injectable treatments.
+
+## Related
+
+[Fillers](/services/fillers), [anti-ageing](/services/anti-ageing) and [skin rejuvenation](/services/skin-rejuvenation).
