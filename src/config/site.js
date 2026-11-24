@@ -97,8 +97,8 @@ export const siteConfig = {
 
     // Public profile URLs (Google Business Profile, Instagram, Facebook, YouTube...). Emitted as schema.org `sameAs`
     // so search engines connect the website to the clinic's listings. Add the real URLs here.
-    googleMapsUrl: "https://maps.app.goo.gl/bqzmReZ1VLo4JzAF9",
-    sameAs: ["https://maps.app.goo.gl/bqzmReZ1VLo4JzAF9"],
+    googleMapsUrl: "https://maps.app.goo.gl/nDRcnLdkk5ktBYpZ9",
+    sameAs: ["https://maps.app.goo.gl/nDRcnLdkk5ktBYpZ9"],
 
     // WhatsApp Business number that sends the booking / registration OTP. "Open WhatsApp" in the OTP pop-ups opens this chat.
     otpWhatsapp: "https://wa.me/917806880801",
