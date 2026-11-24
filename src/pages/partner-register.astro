@@ -210,6 +210,8 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
       setPhoneStatus('✓ Number verified', 'ok');
       $('pr-upload').classList.remove('hidden');
       $('pr-upload').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // A rep we already have gets the form pre-filled from our records (their own number only), ready to update.
+      postJson('/.netlify/functions/public-partner-prefill', { phone: verifiedPhone, otpToken }).then((o) => { if (o && o.existing && !val('pr-first') && !rows.length) fill(o, true); }).catch(() => {});
     } catch (err) { setPhoneStatus(err.message, 'error'); }
     finally { $('pr-verify-code').disabled = false; }
   });
@@ -312,7 +314,7 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
 
   // ---- review form ----
   const numStr = (v) => (v === null || v === undefined || v === '' ? '' : String(v));
-  function fill(out) {
+  function fill(out, quiet = false) {
     const r = out.rep || {};
     if (out.upload_id && !uploadIds.includes(out.upload_id)) uploadIds.push(out.upload_id);
     const name = String(r.name || '').replace(/^(mr|ms|mrs|dr)\.?\s+/i, '').trim();
@@ -324,14 +326,15 @@ const btn = "shrink-0 px-5 rounded-xl font-semibold text-base bg-[#9b4fa2] text-
     if (r.offer_type === 'Scheme') { set('pr-buy', numStr(r.buy_or_margin)); set('pr-free', numStr(r.get_free)); }
     if (r.offer_type === 'Discount') set('pr-marginpct', numStr(r.buy_or_margin));
     set('pr-moq', numStr(r.moq)); set('pr-cash', numStr(r.cash_discount_percent)); set('pr-delivery', numStr(r.delivery_days)); set('pr-terms', r.payment_terms); setStockist(r.stockist);
+    if (Array.isArray(out.stockists) && out.stockists.length) { stockists = out.stockists.map((n) => { const hit = options.distributors.find((d) => norm(d) === norm(n)); return hit ? { v: hit, other: '' } : { v: OTHER, other: n }; }); renderStockists(); }
     rows = (out.price_list || []).map((p) => ({ category: p.category || '', brand: p.brand || '', ingredients: p.ingredients || '', sku: p.sku || '', ptr: numStr(p.ptr), mrp: numStr(p.mrp), stockist: '' }));
     openKeys = new Set(); query = ''; onlyCheck = false;
     const gs = groupsOf(); allOpen = gs.length <= 3;
     gs.forEach((g) => { if (g.rows.some((i) => needsCheck(rows[i]))) openKeys.add(g.key); });
     syncOffer(); renderRows(); renderDivs();
-    $('pr-banner').textContent = out.price_list && out.price_list.length ? `We read your documents and filled this in. Everything below can be edited: correct anything that looks wrong, then submit.` : 'Fill in your details below.';
+    $('pr-banner').textContent = out.existing ? 'We found your details on file. Check them, change anything that is out of date, add or update your brochure and rate list above, then submit.' : out.price_list && out.price_list.length ? `We read your documents and filled this in. Everything below can be edited: correct anything that looks wrong, then submit.` : 'Fill in your details below.';
     $('pr-form').classList.remove('hidden');
-    $('pr-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!quiet) $('pr-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   function syncOffer() {
     const t = $('pr-offer').value;
