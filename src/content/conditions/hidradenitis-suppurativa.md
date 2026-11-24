@@ -52,3 +52,32 @@ Hidradenitis suppurativa is a long-term inflammatory condition affecting the hai
 It is not caused by poor hygiene and it is not contagious, though many patients are told or assume otherwise. It involves the same hair follicles as [acne](/conditions/acne-vulgaris) but is a distinct condition. It is frequently mistaken for [recurring boils](/blog/hidradenitis-more-than-recurring-boils), so diagnosis is often delayed by years.
 
 Earlier treatment generally leads to better control and less scarring. A plan usually combines medicines, lifestyle measures, and, where needed, procedures, with [more advanced options](/services/biologics) for severe disease.
+
+## What It Looks Like
+
+Hidradenitis suppurativa (HS) causes painful lumps, abscesses and tunnels under the skin in the armpits, groin, buttocks, under the breasts and inner thighs. Lumps may burst and drain, and heal with scars and sinus tracts. It is often mistaken for recurrent boils, but it is a chronic inflammatory condition, not an infection from poor hygiene.
+
+## Who Gets It and Why
+
+It usually begins after puberty, is more common in women, and runs in families. Smoking, obesity and friction make it worse. It is linked to other conditions, including acne, metabolic problems, joint disease and low mood.
+
+## Stages and Why Early Treatment Matters
+
+Mild disease has isolated nodules. Moderate disease has recurring abscesses with early tunnels. Severe disease has widespread tunnels and scarring. Treating early prevents scars that cannot be undone.
+
+## Treatment
+
+- **Lifestyle:** stop smoking, lose weight if overweight, loose clothing, and gentle skin care.
+- **Topical antibiotics or antiseptic washes** for mild disease.
+- **Oral antibiotics** for several months, or other anti-inflammatory tablets, for moderate disease.
+- **Biologic injections** for moderate to severe disease, which can reduce flares and pain. See [biologics and advanced therapy](/services/biologics).
+- **Procedures:** drainage of painful abscesses, deroofing of tunnels, and surgery for severe disease, usually combined with medical treatment.
+- **Pain control and emotional support.**
+
+## Self-Care
+
+Avoid squeezing nodules, shaving and tight clothing over affected areas, and talk to your doctor about weight and smoking support.
+
+## When to See a Doctor
+
+See a dermatologist for recurring lumps in the folds. See [hidradenitis: more than recurring boils](/blog/hidradenitis-more-than-recurring-boils).

@@ -53,3 +53,11 @@ Snip excision, cautery or freezing in a clinic takes minutes and heals in about 
 ## When to See a Doctor First
 
 A growth that is dark, hard, irregular, bleeding or growing quickly may not be a skin tag and should be examined. Many tags at once should prompt a diabetes check.
+
+## Who Gets Them
+
+Adults of any age, more often in those who are overweight, pregnant, have diabetes or prediabetes, or PCOS. They are not cancer and not contagious.
+
+## What to Expect After Removal
+
+A small scab forms and falls in about a week, leaving a pink spot that fades. New tags can appear elsewhere. Treat the cause where one exists. See [skin tag removal](/services/skin-tag-removal).

@@ -34,9 +34,38 @@ relatedConditions:
   - "post-inflammatory-hyperpigmentation"
   - "photoageing"
 
+faqIds:
+  - "melasma-cause"
+  - "melasma-permanent-or-not"
+  - "melasma-pregnancy-related"
+
 ctaTitle: "Book a Melasma Consultation"
 ---
 
 Melasma is a common form of facial pigmentation, typically appearing as symmetric brown-to-grey-brown patches on the cheeks, forehead, upper lip, or chin. It's driven by a combination of genetic susceptibility, hormonal factors -- which is why it's common during pregnancy or with certain hormonal medications -- and sun or visible light exposure, making it more stubborn and recurrence-prone than [most other forms of pigmentation](/blog/pigmentation-vs-melasma).
 
 We treat melasma honestly as a chronic, manageable condition rather than something with a one-time cure. [Strict, daily sun protection](/blog/sunscreen-and-visible-light-indian-skin) is a core part of treatment, since UV and even visible light exposure are established triggers for flares, and many patients need periodic maintenance treatment over the years. See [melasma, sunscreen, and triggers](/blog/melasma-sunscreen-and-triggers) for practical guidance.
+
+## What Melasma Is
+
+Melasma is a common pigment disorder that causes symmetrical brown or grey-brown patches on the cheeks, forehead, upper lip and nose. It is more frequent in women of medium to brown skin, and is triggered by sunlight and visible light, hormones (pregnancy, contraceptive pills, hormone therapy), heat and some cosmetics. It runs in families.
+
+## Why It Is Difficult
+
+Melasma involves overactive pigment cells that react to many triggers and tend to relapse. Treatment keeps it under control, rather than curing it. Strong, irritating treatments can make it darker.
+
+## Treatment Foundations
+
+1. **Sun and visible-light protection every day:** a broad-spectrum, tinted sunscreen, a hat and shade. This is the most important step. See [melasma: why sun protection matters](/blog/melasma-sunscreen-and-triggers) and [sunscreen for Indian skin](/blog/sunscreen-and-visible-light-indian-skin).
+2. **Prescription brightening creams,** such as combinations containing hydroquinone, azelaic acid, kojic acid or retinoids, used under supervision and for a set time.
+3. **Oral tranexamic acid** in selected patients, with a medical check for clotting risk.
+4. **Gentle peels** at long intervals. See [peels for pigmentation on Indian skin](/blog/chemical-peels-for-pigmentation-and-melasma-on-indian-skin).
+5. **Careful laser use** in selected cases, since heat can worsen melasma.
+
+## Avoid
+
+Strong bleaching creams without advice, hot treatments such as waxing on the face, and picking.
+
+## Expectations
+
+Improvement takes months, patches rarely vanish, and relapse is common, so maintenance matters. See [pigmentation](/services/pigmentation) and our [melasma service](/services/melasma).

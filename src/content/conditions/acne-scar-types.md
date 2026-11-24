@@ -32,6 +32,11 @@ relatedConditions:
   - "hormonal-acne"
   - "post-inflammatory-hyperpigmentation"
 
+faqIds:
+  - "acne-scars-can-they-be-removed"
+  - "acne-scars-how-many-sessions"
+  - "acne-scars-best-treatment-type"
+
 ctaTitle: "Book an Acne Scar Evaluation"
 ---
 
@@ -42,3 +47,20 @@ A treatment that meaningfully improves rolling scars, for instance, may do very 
 ## Treatments by Scar Type
 
 See [acne scar treatments compared](/blog/acne-scar-treatments-by-scar-type-compared), [microneedling](/blog/microneedling-for-acne-scars-what-to-expect) and [fractional laser](/blog/fractional-laser-for-acne-scars-recovery-and-results). Flat red and brown marks are different: see [red and brown marks versus true scars](/blog/red-and-brown-marks-after-acne-vs-true-scars).
+
+## Telling the Types Apart
+
+- **Icepick:** narrow (under 2 mm), deep, pit-like.
+- **Boxcar:** round or oval with sharp edges, shallow to deep.
+- **Rolling:** broad (4 to 5 mm), shallow waves caused by fibrous bands pulling the skin.
+- **Hypertrophic and keloid:** raised scars, usually on the chest, back and jaw.
+
+Most people have a mixture. A simple check: stretch the skin. Scars that flatten when stretched are generally easier to improve than those that stay, such as icepick scars.
+
+## Why They Form
+
+Acne inflammation damages collagen in the deeper skin. Picking, delayed treatment and severe cystic acne raise the risk. Early, effective acne treatment is the best prevention. See [acne treatment](/services/acne).
+
+## Planning Treatment
+
+Treatment begins with controlling acne, then matching methods to scar types, usually in combination over six to twelve months, and with realistic goals (a thirty to seventy percent improvement). See [acne scar treatment](/services/acne-scars).

@@ -36,6 +36,11 @@ relatedConditions:
   - "skin-tags"
   - "viral-warts"
 
+faqIds:
+  - "moles-when-to-worry"
+  - "skin-cancer-self-check-frequency"
+  - "skin-tags-cause"
+
 ctaTitle: "Book a Mole Evaluation"
 ---
 
@@ -58,3 +63,11 @@ Removed moles should be examined under the microscope where advised. See [do rem
 ## Moles in Children
 
 Large moles present from birth need specialist assessment. See [congenital melanocytic naevus](/conditions/congenital-melanocytic-naevus).
+
+## Types of Moles
+
+Common acquired moles appear in childhood and early adulthood, round or oval with an even colour. Atypical (dysplastic) moles are larger, with irregular edges or mixed colours, and need closer watching. Congenital moles are present from birth. See [congenital melanocytic naevus](/conditions/congenital-melanocytic-naevus).
+
+## Protecting Your Skin
+
+Use sunscreen, avoid sunburn, and have a doctor review your skin if you have many moles, fair skin, a history of sunburn or a family history of skin cancer. Report any mole that changes. See [sun safety](/blog/sun-safety-and-skin-cancer-awareness).

@@ -32,9 +32,39 @@ relatedConditions:
   - "molluscum-contagiosum"
   - "viral-warts"
 
+faqIds:
+  - "viral-skin-infections-contagious"
+  - "molluscum-vs-warts"
+  - "viral-skin-infections-school-attendance"
+
 ctaTitle: "Book a Consultation for Your Child"
 ---
 
 Hand, foot and mouth disease is a common, contagious [viral illness](/blog/viral-skin-infections-school) in young children, causing small sores inside the mouth alongside a rash or small blisters on the hands, feet, and sometimes buttocks. It typically follows a mild, self-limiting course over about a week, though the mouth sores can make eating and drinking uncomfortable in the meantime.
 
 Treatment is supportive -- managing discomfort, encouraging fluid intake despite mouth soreness, and monitoring for the illness to follow its expected course. Because it spreads easily through close contact, simple hygiene measures help limit transmission to other children and family members while your child recovers. See also [molluscum contagiosum](/conditions/molluscum-contagiosum) and [viral warts](/conditions/viral-warts), two other viral skin infections common in children.
+
+## What It Is
+
+Hand, foot and mouth disease is a common viral illness of young children, usually caused by coxsackievirus. It spreads easily through saliva, blister fluid and stool, and peaks in the rainy season and at nurseries and schools.
+
+## Symptoms
+
+Fever and sore throat, followed by painful small ulcers in the mouth and a rash of small blisters on the palms, soles, and sometimes buttocks and legs. Children may refuse food and drink because of mouth pain. Nails can shed a few weeks after the illness, and grow back normally.
+
+## Treatment
+
+There is no specific antiviral, and it clears by itself in seven to ten days. Care focuses on comfort and fluids:
+
+- Paracetamol for fever and pain.
+- Plenty of cool fluids, soft cold foods and, for older children, mouth gels advised by a doctor.
+- Rest at home until the fever has gone and blisters have dried.
+- Do not burst blisters.
+
+## Preventing Spread
+
+Wash hands after nappy changes and toilet use, clean toys and surfaces, and keep your child away from nursery or school until recovered.
+
+## When to Seek Urgent Care
+
+See a doctor urgently for signs of dehydration (no urine for 8 hours, dry mouth), high fever lasting more than three days, drowsiness, severe headache, stiff neck, breathing difficulty or weakness. See [viral skin infections](/services/viral-skin-infections) and [molluscum and warts in school](/blog/viral-skin-infections-school).

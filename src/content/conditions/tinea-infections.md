@@ -52,3 +52,23 @@ Take the full course, even after the skin looks normal, avoid steroid or combina
 ## More Guides
 
 [Jock itch](/blog/jock-itch-tinea-cruris-treatment-and-prevention), [athlete's foot](/blog/athletes-foot-tinea-pedis-treatment-and-prevention), [scalp ringworm in children](/blog/tinea-capitis-scalp-ringworm-in-children), and [recurrent or resistant ringworm](/blog/recurrent-and-resistant-ringworm-in-india-what-to-do).
+
+## Types by Site
+
+- **Tinea corporis (body):** ring-shaped, scaly, itchy patches with a clearer centre.
+- **Tinea cruris (groin):** red, scaly patches in the groin and inner thighs.
+- **Tinea pedis (feet):** peeling and cracking between toes, or dry scaling of the soles.
+- **Tinea capitis (scalp):** scaly bald patches in children. See [scalp ringworm in children](/blog/tinea-capitis-scalp-ringworm-in-children).
+- **Tinea faciei, manuum and unguium:** face, hands and nails.
+
+## Why Treatment Often Fails
+
+Stopping early, using steroid or combination creams, reinfection from clothes and family, and sometimes resistant strains. See [why tinea treatment fails](/blog/tinea-treatment-why-it-fails-and-compliance) and [recurrent and resistant ringworm](/blog/recurrent-and-resistant-ringworm-in-india-what-to-do).
+
+## Diagnosis
+
+Often by appearance, with a scraping for microscopy when the picture is unclear or treatment has failed.
+
+## Treatment and Prevention
+
+Antifungal cream for limited disease, tablets for widespread or stubborn disease, completing the full course, and treating family and feet together. Keep skin dry, wear loose cotton, and wash clothes and towels hot. See our [fungal infection service](/services/fungal-infections).

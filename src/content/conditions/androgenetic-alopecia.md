@@ -34,6 +34,11 @@ relatedConditions:
   - "donor-area-depletion"
   - "scarring-alopecia"
 
+faqIds:
+  - "hair-loss-causes"
+  - "hair-shedding-after-weight-loss"
+  - "hair-loss-normal-shedding"
+
 ctaTitle: "Book a Hair Loss Evaluation"
 ---
 
@@ -44,3 +49,23 @@ Because the pattern and progression are well understood, treatment started earli
 ## Medical Treatment
 
 The two best-evidenced medicines are finasteride (for men) and minoxidil. Most men on finasteride stop losing hair, and many regrow some. Results take three to twelve months, and stop if you stop. Read about [oral finasteride](/blog/oral-finasteride-for-hair-loss-benefits-and-side-effects), [oral minoxidil](/blog/oral-minoxidil-for-hair-loss-what-to-know), and a [combination plan](/blog/finasteride-and-minoxidil-together-combination-plan). See [medical treatment for hair loss](/services/hair-loss-medical-treatment).
+
+## How It Looks
+
+In men, hair thins at the temples and crown, forming an "M" shaped hairline and a bald spot, and may progress to a horseshoe pattern. In women, thinning is diffuse over the top with a widening parting. Hairs become finer and shorter before they disappear.
+
+## Why It Happens
+
+Hair follicles are sensitive to DHT, a hormone from testosterone, and shrink over time. Genes from both parents decide the pattern and timing. It begins from the late teens onwards and progresses without treatment.
+
+## Diagnosis
+
+A scalp examination, family history and photographs. Tests are done when other causes are possible, such as iron or thyroid disease.
+
+## Treatment Principles
+
+Treat early. Medicines slow the progress and thicken hairs. A transplant adds hair where it is lost, once loss has stabilised, and medicines continue to protect the rest. See [how effective medical treatment is](/blog/how-effective-is-medical-treatment-for-hair-loss) and [hair transplant candidacy](/blog/hair-transplant-candidacy).
+
+## Common Mistakes
+
+Waiting for years, relying on unproven tonics and changing treatments every few weeks. Judge any treatment after at least six to twelve months. See [medical treatment for hair loss](/services/hair-loss-medical-treatment).

@@ -33,6 +33,11 @@ relatedConditions:
   - "paronychia"
   - "onychomycosis"
 
+faqIds:
+  - "nail-fungus-treatment-duration"
+  - "ingrown-nail-prevention"
+  - "nail-changes-psoriasis-connection"
+
 ctaTitle: "Book a Nail Evaluation"
 ---
 
@@ -47,3 +52,19 @@ Early home care helps mild cases. Pus, spreading redness, repeated episodes or o
 ## Surgery and Recovery
 
 See [recovery week by week](/blog/nail-avulsion-recovery-week-by-week) and our [ingrown toenail surgery service](/services/nail-avulsion-lateral-matricectomy).
+
+## Why Nails Grow In
+
+Tight shoes, curved nail shape, cutting nails too short or round, injury, sweaty feet and an inherited nail shape. Teenagers and athletes are often affected, and nail picking at the edge makes it worse.
+
+## Stages and Warning Signs
+
+Stage one is a tender, red edge. Stage two brings swelling and drainage. Stage three adds overgrown granulation tissue. Spreading redness, pus and fever need urgent treatment.
+
+## Prevention and Early Care
+
+Trim nails straight across, not too short, wear roomy shoes, keep feet dry and soak the toe in warm salty water in the early stage. Do not dig at the nail edge.
+
+## Who Needs a Doctor Early
+
+People with diabetes, poor circulation or reduced foot sensation should seek help at the first sign of an ingrown nail.
