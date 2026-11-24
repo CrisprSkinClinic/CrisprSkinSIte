@@ -90,3 +90,15 @@ Not every graft takes, and results are rarely perfect. Possible problems include
 Good outcomes depend on good selection as much as technique. We discuss your type of vitiligo, its stability, options for your specific patches, and the realistic chance of a good result before any decision, and we will tell you plainly if surgery is not right for you yet.
 
 If you have stable patches that have not responded to treatment, an evaluation will show whether surgical repigmentation is worth considering.
+
+## Who Can Have Surgery
+
+Only people with stable vitiligo, usually no change for about a year. See [who is a good candidate](/blog/vitiligo-surgery-who-is-a-candidate) and [stable or active vitiligo?](/blog/stable-or-active-vitiligo-why-it-matters).
+
+## Methods and Recovery
+
+Cell suspension, blister grafting and punch grafting each suit different patches. See [grafting options compared](/blog/vitiligo-surgery-grafting-options-compared) and [recovery week by week](/blog/vitiligo-surgery-recovery-and-aftercare-timeline).
+
+## Results
+
+Many well-selected patients repigment well, with results varying by site and method. See [success rates and expectations](/blog/vitiligo-surgery-success-rates-and-expectations) and our [vitiligo surgery service](/services/vitiligo-surgery).

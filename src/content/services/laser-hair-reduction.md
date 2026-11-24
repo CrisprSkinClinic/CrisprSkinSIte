@@ -1,6 +1,6 @@
 ---
-title: "Laser Hair Reduction"
-metaDescription: "Laser hair reduction in KK Nagar, Chennai. Realistic expectations and dermatologist-guided treatment courses for long-term hair reduction."
+title: "Laser Hair Reduction in Chennai | KK Nagar"
+metaDescription: "Laser hair reduction in KK Nagar, Chennai: safe lasers for Indian skin, dermatologist-planned courses for face, underarms, bikini, arms and legs."
 heroEyebrow: "Cosmetic Dermatology"
 heroHeadline: "Laser Hair Reduction"
 heroSubheadline: "A course of sessions, planned properly, for long-term reduction in unwanted hair growth."
@@ -60,3 +60,30 @@ Laser hair reduction meaningfully reduces hair growth for most patients over a f
 ## When Excess Hair Is Hormonal
 
 In women, coarse dark hair with acne or irregular periods may reflect PCOS. See [hirsutism](/conditions/hirsutism) and [why laser and medicines work best together](/blog/hirsutism-laser-and-medical-treatment-together).
+
+## Is Laser Hair Reduction Right for You?
+
+It suits people with dark, coarse hair who want long-lasting reduction in the face, underarms, bikini line, arms, legs, back or chest. It is less effective for white, grey, red or very fine hair, and needs extra care in darker skin and in people with tanning. Women with excess coarse hair, acne or irregular periods should check for a hormonal cause first. See [hirsutism](/conditions/hirsutism).
+
+## How a Session Goes
+
+1. **Assessment and test patch:** we examine your skin and hair and test a small area.
+2. **Preparation:** the area is shaved and cleaned, with a cooling gel or contact cooling.
+3. **Laser:** pulses are passed over the area, with a quick snap or sting. A lip takes minutes, and legs take up to an hour.
+4. **Soothing and sun advice:** a cooling cream and sunscreen, with aftercare instructions.
+
+## Downtime and Aftercare
+
+Redness and small bumps last a few hours to a day. Treated hairs shed over one to three weeks. Avoid sun, heat, scrubbing and waxing for the days advised. See [aftercare and side effects](/blog/laser-hair-reduction-aftercare-and-side-effects).
+
+## Risks and How We Reduce Them
+
+Temporary darkening or lightening, blisters, rare infection and rare scarring. We reduce them by choosing a laser suited to your skin tone, testing a patch, adjusting settings each visit and insisting on sun protection. See [laser hair reduction on Indian skin](/blog/laser-hair-reduction-on-indian-skin-safety).
+
+## Questions to Ask Any Clinic
+
+Which laser is used and why does it suit my skin? Who plans my treatment? Is a test patch done? How many sessions are expected? What are the risks? Be careful with promises of permanent removal in a few sessions.
+
+## Our Laser Hair Reduction Guides
+
+[How it works and how many sessions](/blog/laser-hair-reduction-how-it-works-and-session-schedule), [by area](/blog/laser-hair-reduction-which-areas-and-how-many-sessions), [permanent or not](/blog/laser-hair-reduction-expectations), [aftercare](/blog/laser-hair-reduction-aftercare-and-side-effects), [Indian skin safety](/blog/laser-hair-reduction-on-indian-skin-safety) and [laser with hormonal treatment](/blog/hirsutism-laser-and-medical-treatment-together).

@@ -1,6 +1,6 @@
 ---
-title: "Ingrown Toenail Surgery (Lateral Matricectomy)"
-metaDescription: "Ingrown toenail surgery in KK Nagar, Chennai -- partial nail avulsion with lateral chemical matricectomy to lower the chance of the ingrown edge returning."
+title: "Ingrown Toenail Surgery in Chennai | KK Nagar"
+metaDescription: "Ingrown toenail surgery in KK Nagar, Chennai: partial nail avulsion with matricectomy under local anaesthetic, with a low chance of recurrence."
 heroEyebrow: "Minor Dermatosurgery"
 heroHeadline: "Ingrown Toenail Surgery"
 heroSubheadline: "Partial nail avulsion with lateral chemical matricectomy: a short procedure that removes the problem edge and treats the growth point behind it, so it is less likely to return."
@@ -75,3 +75,34 @@ Online booking is for a consultation. The procedure is planned and scheduled wit
 ## Realistic Expectations
 
 No procedure removes every possibility of recurrence, and healing takes several weeks. We explain risks such as infection, delayed healing, and a narrowed nail before you decide, and we tell you plainly when we think the procedure is not the right choice for you yet. If you are unsure whether you need it, an examination gives you a clear answer.
+
+## Why Surgery Rather Than Repeated Trimming
+
+An ingrown edge that keeps coming back, or that has become infected, rarely settles with home care. Removing only the ingrown edge, and treating the matching nail root, prevents that edge from growing back. See [infected ingrown toenail: when to act](/blog/ingrown-toenail-infection-pus-when-to-see-a-doctor).
+
+## The Steps
+
+1. The toe is numbed with a ring block, and a tight band controls bleeding.
+2. The ingrown strip of nail is separated and removed.
+3. A small amount of chemical (phenol) is applied to the nail root on that side, then neutralised.
+4. A dressing is applied. The procedure takes twenty to thirty minutes.
+
+## Recovery
+
+Wear an open shoe for a few days, change dressings as shown, and expect clear or blood-stained drainage for one to three weeks. Most people return to normal footwear in one to two weeks. See [recovery week by week](/blog/nail-avulsion-recovery-week-by-week).
+
+## Results
+
+Most people have no further trouble. The nail is slightly narrower on the treated side, which is intended. A small percentage have a recurrence, which can be treated again. See [ingrown toenails: when to operate](/blog/ingrown-toenail-recurrence-prevention-and-when-to-operate).
+
+## Risks
+
+Infection, delayed healing, a rough nail edge, and recurrence. People with diabetes, poor circulation or reduced foot sensation need extra care and follow-up.
+
+## Other Nail Procedures
+
+For nail injuries, thickened nails, fungal infection and nail diseases, see [nail disorders](/services/nail-disorders) and [fungal nail infection](/conditions/onychomycosis).
+
+## Questions to Ask
+
+Which method do you use to prevent regrowth? How long is recovery? What is the recurrence rate? How will I know if it is infected?

@@ -42,3 +42,19 @@ ctaTitle: "Book a Mole Evaluation"
 Melanocytic naevi, commonly known as moles, are usually harmless pigmented growths that most people have in some number. The recognized [warning signs](/blog/mole-warning-signs) worth checking are asymmetry, an irregular border, multiple or uneven colors, a diameter larger than a pencil eraser, and any recent evolution in size, shape, or color -- these are worth a prompt evaluation rather than a wait-and-see approach.
 
 Most moles need no treatment at all. For moles that a patient wants removed for cosmetic or comfort reasons, or where a mole shows any features raising a clinical question, [removal or biopsy](/services/warts-moles-skin-tags) is performed to provide either cosmetic resolution or definitive pathology confirmation. Sun protection also matters; see [sun safety and skin cancer awareness](/blog/sun-safety-and-skin-cancer-awareness).
+
+## Do Moles Need to Be Removed?
+
+Most moles do not. Removal is for comfort or appearance, or on medical advice when a mole has changed or looks different. See [should a mole be removed?](/blog/should-a-mole-be-removed-medical-vs-cosmetic-reasons).
+
+## How Removal Is Done
+
+Shave, punch or surgical excision under local anaesthetic, chosen for the mole. See [mole removal methods](/blog/mole-removal-methods-shave-punch-excision-laser) and our [mole removal service](/services/mole-removal).
+
+## Testing and Scars
+
+Removed moles should be examined under the microscope where advised. See [do removed moles need testing?](/blog/do-removed-moles-need-testing-histopathology). See [scars and aftercare](/blog/mole-removal-scar-and-aftercare).
+
+## Moles in Children
+
+Large moles present from birth need specialist assessment. See [congenital melanocytic naevus](/conditions/congenital-melanocytic-naevus).

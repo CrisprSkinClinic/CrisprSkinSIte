@@ -97,3 +97,7 @@ Response to treatment varies meaningfully by body area (the face generally respo
 ## Diet Myths
 
 There is no good evidence that milk, fish or citrus affect vitiligo. See [vitiligo and diet](/blog/vitiligo-diet-myths-milk-fish-citrus) and [vaccines and vitiligo](/blog/vaccines-and-psoriasis-vitiligo-alopecia-flares-myths).
+
+## Vitiligo Surgery
+
+For stable patches that have not responded to medicines and light treatment, surgical repigmentation is an option. See [vitiligo surgery](/services/vitiligo-surgery) and [who is a good candidate](/blog/vitiligo-surgery-who-is-a-candidate).

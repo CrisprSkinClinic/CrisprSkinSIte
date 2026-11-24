@@ -52,3 +52,7 @@ Chemical peels are commonly used to improve texture, tone, and radiance as part 
 ## Setting Realistic Expectations
 
 Skin rejuvenation produces genuine, visible improvement in overall skin quality for most patients, but it's a gradual process built on a course of treatment plus consistent skincare -- not a single procedure with an instant, dramatic transformation. We discuss a realistic timeline at your consultation so progress is measured against an accurate expectation from the start.
+
+## Related Treatments
+
+[Chemical peels](/services/chemical-peels), [acne scar treatment](/services/acne-scars) and [scar revision](/services/scar-revision), with [peels vs facials vs microneedling](/blog/chemical-peels-vs-facials-vs-microneedling).

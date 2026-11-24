@@ -39,3 +39,11 @@ ctaTitle: "Book a Nail Evaluation"
 An ingrown toenail occurs when the edge of the nail grows into the surrounding skin, most commonly affecting the big toe, leading to pain, swelling, and sometimes [infection](/conditions/paronychia) if left untreated. It's largely a mechanical problem, often related to how nails are trimmed, footwear choice, or the natural curve of the nail.
 
 Early or mild cases often respond well to conservative measures and improved nail care -- trimming straight across rather than in a curve, and avoiding overly tight footwear. For ingrown nails that recur despite this, a [minor in-clinic procedure](/services/nail-avulsion-lateral-matricectomy) addressing the nail edge directly (see [lateral chemical matricectomy explained](/blog/lateral-chemical-matricectomy-explained)) reduces the likelihood of the problem returning.
+
+## When to Treat and When to Operate
+
+Early home care helps mild cases. Pus, spreading redness, repeated episodes or overgrown tissue need a doctor. See [infected ingrown toenail: when to act](/blog/ingrown-toenail-infection-pus-when-to-see-a-doctor), and [ingrown toenails: when to operate](/blog/ingrown-toenail-recurrence-prevention-and-when-to-operate).
+
+## Surgery and Recovery
+
+See [recovery week by week](/blog/nail-avulsion-recovery-week-by-week) and our [ingrown toenail surgery service](/services/nail-avulsion-lateral-matricectomy).

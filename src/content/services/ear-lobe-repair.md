@@ -1,6 +1,6 @@
 ---
 title: "Ear Lobe Repair in Chennai | KK Nagar"
-metaDescription: "Earlobe repair in KK Nagar, Chennai -- surgical repair of split, torn, or stretched earlobes under local anaesthetic, with guidance on healing and re-piercing."
+metaDescription: "Earlobe repair in KK Nagar, Chennai for split, torn or stretched earlobes under local anaesthetic, with advice on healing, keloids and re-piercing."
 heroEyebrow: "Minor Dermatosurgery"
 heroHeadline: "Ear Lobe Repair"
 heroSubheadline: "A short procedure under local anaesthetic to repair a split, torn, or stretched earlobe and restore a natural-looking lobe."
@@ -76,3 +76,7 @@ Online booking is for a consultation. The repair is planned and scheduled with t
 ## Realistic Expectations
 
 Repair restores the lobe's continuity and shape, but a scar remains, and a repaired lobe is somewhat more vulnerable than an untouched one. We explain what to expect for your lobe before you decide.
+
+## Our Ear Lobe Guides
+
+[Split earlobe repair explained](/blog/split-earlobe-repair-explained), [the procedure step by step](/blog/earlobe-repair-procedure-step-by-step), [recovery and re-piercing](/blog/earlobe-repair-recovery-and-re-piercing), [keloids on the earlobe](/blog/keloids-on-the-earlobe-what-to-know) and [preventing torn and stretched earlobes](/blog/preventing-torn-and-stretched-earlobes).

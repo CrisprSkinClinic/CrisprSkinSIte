@@ -1,6 +1,6 @@
 ---
-title: "Acne Scar Treatment"
-metaDescription: "Acne scar treatment in KK Nagar, Chennai. Honest evaluation of scar type and realistic improvement expectations from AIIMS-trained dermatologists."
+title: "Acne Scar Treatment in Chennai | KK Nagar"
+metaDescription: "Acne scar treatment in KK Nagar, Chennai: subcision, TCA CROSS, microneedling and laser matched to your scar type by AIIMS-trained dermatologists."
 heroEyebrow: "Clinical Dermatology"
 heroHeadline: "Acne Scar Treatment"
 heroSubheadline: "The right treatment depends entirely on your scar type -- an accurate evaluation comes before any procedure."
@@ -53,3 +53,40 @@ Chemical peels work well for superficial scarring and overall texture improvemen
 ## Setting Realistic Expectations
 
 Most patients see meaningful, visible improvement in scar texture and appearance over a course of treatment -- but scar treatment is a gradual process measured in months, not a single dramatic procedure, and different scar types have different ceilings on how much improvement to expect. We discuss this honestly at your evaluation so you can decide whether to proceed with clear expectations.
+
+## Match the Treatment to the Scar
+
+Acne scars come in different forms: narrow icepick scars, wider boxcar scars, broad rolling scars, and raised scars. Each needs a different treatment, and most people need a combination. See [acne scar treatments by scar type](/blog/acne-scar-treatments-by-scar-type-compared).
+
+## Treatments We Use
+
+- **Subcision** for rolling scars: a fine needle releases the bands that pull the skin down.
+- **TCA CROSS** for icepick scars: a strong acid placed in each scar to prompt rebuilding.
+- **Microneedling** for shallow scars and texture. See [microneedling for acne scars](/blog/microneedling-for-acne-scars-what-to-expect).
+- **Fractional laser** for boxcar scars and texture, chosen carefully for darker skin. See [fractional laser recovery and results](/blog/fractional-laser-for-acne-scars-recovery-and-results).
+- **Chemical peels** for marks, tone and mild texture. See [chemical peels](/services/chemical-peels).
+- **Fillers or surgical lifting** for selected deep scars.
+
+## Marks Are Not Scars
+
+Flat red and brown patches left after acne fade with time and sun protection, and are treated differently. See [red and brown marks versus true scars](/blog/red-and-brown-marks-after-acne-vs-true-scars) and [post-inflammatory hyperpigmentation](/conditions/post-inflammatory-hyperpigmentation).
+
+## Before You Start
+
+Active acne must be under control, or new scars will form. See [acne treatment](/services/acne). Tell us about isotretinoin, keloid tendency, cold sores and recent tanning.
+
+## How Many Sessions and What Result?
+
+Most plans use three to six sessions of each method, spaced four to six weeks apart, over six to twelve months. A thirty to seventy percent improvement is a realistic range. Deep icepick scars improve least.
+
+## Downtime and Risks
+
+Downtime ranges from none (peels) to a week (ablative laser). Risks include pigment change, infection, cold sore flares and prolonged redness, and they are lower with careful selection and sun protection.
+
+## Questions to Ask Any Clinic
+
+What type of scars do I have? Which treatments, in which order? How many sessions? What are the risks on my skin type? Beware of promises to remove scars completely.
+
+## Related
+
+[Scar revision](/services/scar-revision), [skin rejuvenation](/services/skin-rejuvenation) and [acne scar types](/conditions/acne-scar-types).

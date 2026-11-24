@@ -63,3 +63,7 @@ Most skin tags and cosmetically bothersome moles are removed simply because the 
 ## HPV and Shingles Vaccines
 
 Common warts are not prevented by the HPV vaccine. See [what the HPV vaccine does and does not do](/blog/hpv-vaccine-what-it-prevents-and-what-it-does-not).
+
+## Dedicated Services
+
+For removal of moles and skin tags, see our pages on [mole removal](/services/mole-removal) and [skin tag removal](/services/skin-tag-removal). For scars from removal, see [scar revision](/services/scar-revision).

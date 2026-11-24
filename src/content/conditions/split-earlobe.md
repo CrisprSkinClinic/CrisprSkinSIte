@@ -82,3 +82,11 @@ Choose lighter earrings, avoid pulling on them, take them out for sport or sleep
 ## Other Lobe Concerns
 
 Not every lump or mark on the earlobe is a tear-related problem. Small growths can be [skin tags](/conditions/skin-tags) or [moles](/conditions/melanocytic-naevi-moles), and an examination sorts them out.
+
+## Repair Step by Step
+
+A short procedure under local anaesthetic, with fine stitches removed after about a week. See [earlobe repair step by step](/blog/earlobe-repair-procedure-step-by-step) and our [ear lobe repair service](/services/ear-lobe-repair).
+
+## Keloids and Earlobes
+
+People who form keloids need special care before any repair or re-piercing. See [keloids on the earlobe](/blog/keloids-on-the-earlobe-what-to-know).
