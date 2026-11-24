@@ -575,13 +575,55 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     }
 
     // ---------------------------------------------------------------- availability
+    // Availability for the next ~6 weeks comes from ONE batch request (started on hover/page load by the layout
+    // script, cached in sessionStorage). Every date, doctor and appointment-type view is derived from it locally.
+    const ALL_DOCTORS = ['514ff136-ee45-4d49-89b5-d128d96aef62', 'd5372165-fc7e-47e8-aee6-ce02e7fefc71', '519dbd89-d3d9-4ee9-8923-5fabbe51cf2e'];
+    const store = window.__slotRange;
+    const mins = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+    const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+    const to12 = (t) => { const h = Number(t.slice(0, 2)); return `${String(h % 12 || 12).padStart(2, '0')}:${t.slice(3, 5)} ${h >= 12 ? 'PM' : 'AM'}`; };
+
+    function deriveDay(body, doctorId, type, dateStr) {
+      const day = body && body.data && body.data[dateStr];
+      if (!day) return null;
+      const nowIst = new Date(Date.now() + 330 * 60000).toISOString();
+      const cutoff = dateStr === nowIst.slice(0, 10) ? nowIst.slice(11, 16) : null;
+      const perDoctor = (id) => {
+        const entry = day[id];
+        if (!entry) return { times: [], reason: '' };
+        let times = entry.times.filter((t) => !cutoff || t > cutoff);
+        if (type !== 'review') {
+          const open = new Set(times);
+          times = times.filter((t) => open.has(hhmm(mins(t) + 15)));
+        }
+        return { times, reason: entry.reason };
+      };
+      if (doctorId !== 'any') {
+        if (!ALL_DOCTORS.includes(doctorId)) return null;
+        const r = perDoctor(doctorId);
+        return { slots: r.times.map((t) => ({ time24: t, display: to12(t) })), reason: r.times.length ? '' : r.reason };
+      }
+      const merged = new Map();
+      ALL_DOCTORS.forEach((id) => perDoctor(id).times.forEach((t) => { if (!merged.has(t)) merged.set(t, []); merged.get(t).push(id); }));
+      const slots = Array.from(merged.keys()).sort().map((t) => ({ time24: t, display: to12(t), doctorIds: merged.get(t) }));
+      return { slots, reason: slots.length ? '' : 'No sessions scheduled with any doctor on the selected date.' };
+    }
+
     async function fetchDay(dateStr) {
       const doctorId = doctorSelect?.value;
       if (!doctorId) return { slots: [], reason: 'Choose a doctor to see available slots.' };
       const type = apptType();
+      if (store) {
+        const instant = deriveDay(store.data, doctorId, type, dateStr);
+        if (instant) return instant;                       // already in memory: no network at all
+        try {
+          const loaded = deriveDay(await store.load(), doctorId, type, dateStr);
+          if (loaded) return loaded;
+        } catch { /* fall through to the single-date request */ }
+      }
       const key = `${doctorId}|${type}|${dateStr}`;
       if (dayCache.has(key)) return dayCache.get(key);
-      // "any" means no preference -- omit doctorId so the function fans out across all doctors.
+      // Date beyond the batch window (or batch unavailable): ask for just this date.
       const doctorParam = doctorId === 'any' ? '' : `&doctorId=${encodeURIComponent(doctorId)}`;
       const request = fetch(`/.netlify/functions/public-available-slots?date=${encodeURIComponent(dateStr)}${doctorParam}&appointmentType=${encodeURIComponent(type)}`)
         .then(async (response) => {
@@ -714,7 +756,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         slotsMessage('Choose a doctor to see available slots.');
         return;
       }
-      slotsContainer.innerHTML = skeletonSlots();
+      if (!(store && store.data)) slotsContainer.innerHTML = skeletonSlots();
       try {
         const { slots, reason } = await fetchDay(dateStr);
         if (seq !== slotsSequence) return; // a newer request superseded this one
@@ -731,7 +773,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         if (seq !== slotsSequence) return;
         console.error('Error loading availability:', err);
         slotsMessage('<p class="font-semibold text-red-700">Could not load availability</p><p class="mt-0.5">Check your connection and try again.</p><button type="button" id="retrySlots" class="mt-3 inline-flex min-h-[40px] items-center rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Try again</button>');
-        $('retrySlots')?.addEventListener('click', () => { dayCache.clear(); loadAvailableSlots(dateStr); });
+        $('retrySlots')?.addEventListener('click', () => { dayCache.clear(); if (store) store.data = null; loadAvailableSlots(dateStr); });
       }
     }
 
@@ -747,7 +789,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       const today = clinicToday();
       const days = Array.from({ length: 7 }, (_, i) => addDays(today, i));
       if (!doctorSelect?.value) return null;
-      datesStrip.innerHTML = Array.from({ length: 5 }, () => '<div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>').join('');
+      if (!(store && store.data)) datesStrip.innerHTML = Array.from({ length: 5 }, () => '<div class="h-[76px] w-[76px] shrink-0 animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>').join('');
       const results = await Promise.all(days.map((d) => fetchDay(d).catch(() => null)));
       if (seq !== stripSequence) return null;
 
@@ -913,6 +955,11 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
       }
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Sending code…';
+      // Open the code box straight away; the WhatsApp message is on its way while the patient reads it.
+      $('verifyTo').textContent = `Sending a code on WhatsApp to +91 ${digits.slice(0, 5)} ${digits.slice(5)}…`;
+      setOtpStatus('');
+      openOtp();
+      if (otpInput) { otpInput.value = ''; otpInput.classList.remove('border-red-500'); otpInput.focus(); }
       try {
         const response = await fetch('/.netlify/functions/send-booking-otp', {
           method: 'POST',
@@ -924,13 +971,11 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
         otpSentTo = digits;
         otpSentAt = Date.now();
         $('verifyTo').textContent = `OTP sent on WhatsApp to +91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
-        setOtpStatus('');
-        openOtp();
-        if (otpInput) { otpInput.value = ''; otpInput.classList.remove('border-red-500'); otpInput.focus(); }
         startResendTimer();
         return true;
       } catch (err) {
         pendingBooking = false;
+        closeOtp();
         showError(err.message);
         return false;
       } finally {
@@ -1233,7 +1278,7 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
             error_message: msg || 'unknown_error',
           });
           // The slot may have just been taken: refresh the slots so the patient can pick another.
-          if (/slot|time|available|taken|booked|30 minutes/i.test(result.error || '')) refreshAvailability();
+          if (/slot|time|available|taken|booked|30 minutes/i.test(result.error || '')) { if (store) store.data = null; store.load(true).finally(() => refreshAvailability()); }
           throw new Error(result.error || 'Could not complete your booking. Please try again or call us directly.');
         }
 
@@ -1337,5 +1382,12 @@ const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-
     updateProgress();
     // Show times immediately (No preference is the default), jumping to the first day with availability.
     refreshAvailability({ jumpToEarliest: true });
+    // Show what is in memory now, then quietly refresh; re-render only if something changed and the patient has not started choosing.
+    if (store) {
+      const before = store.data ? store.data.generatedAt : 0;
+      store.load(true).then((body) => {
+        if (body.generatedAt !== before && !selectedTime && !otpOpen() && !busy) refreshAvailability({ jumpToEarliest: !userChoseDate });
+      }).catch(() => {});
+    }
   });
 </script>

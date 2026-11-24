@@ -170,6 +170,43 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
 
 
     <script is:inline>
+      // Booking availability, fetched once as a batch and kept in memory + sessionStorage so the booking form
+      // opens with dates and times already on screen. Warmed on the booking page, and on hover/touch of any Book link.
+      (function () {
+        if (window.__slotRange) return;
+        var KEY = 'slotRangeV1', URL = '/.netlify/functions/public-availability-range';
+        var st = window.__slotRange = { data: null, at: 0, p: null };
+        var today = function () { return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); };
+        try {
+          var c = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+          if (c && c.body && c.body.from === today() && Date.now() - c.at < 600000) { st.data = c.body; st.at = c.at; }
+        } catch (e) {}
+        st.load = function (force) {
+          if (st.p) return st.p;
+          if (!force && st.data && Date.now() - st.at < 20000) return Promise.resolve(st.data);
+          var p = fetch(URL + '?from=' + today() + '&days=45' + (force ? '&nc=' + Date.now() : ''))
+            .then(function (r) { return r.json(); })
+            .then(function (b) {
+              if (!b || !b.data) throw new Error('bad availability');
+              st.data = b; st.at = Date.now();
+              try { sessionStorage.setItem(KEY, JSON.stringify({ at: st.at, body: b })); } catch (e) {}
+              return b;
+            });
+          st.p = p;
+          var clear = function () { st.p = null; };
+          p.then(clear, clear);
+          return p;
+        };
+        var warm = function (e) {
+          var a = e.target && e.target.closest && e.target.closest('a[href^="/book"]');
+          if (a) st.load().catch(function () {});
+        };
+        ['pointerover', 'touchstart', 'focusin'].forEach(function (t) { document.addEventListener(t, warm, { passive: true, capture: true }); });
+        if (location.pathname.indexOf('/book') === 0) st.load().catch(function () {});
+      })();
+    </script>
+
+    <script is:inline>
       // Equal billing for the doctors: any element marked data-shuffle gets its children put in a fresh
       // random order on every page load, so no doctor is always first. The pages are static, so this has to
       // happen in the browser. It is inline (not bundled) so it runs as soon as the page is parsed, on first
