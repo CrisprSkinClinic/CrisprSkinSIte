@@ -5,6 +5,7 @@ description: "What each common chemical peel does, which skin problems it suits,
 author: "Dr. Karthik L"
 tags: ["Chemical peels", "Procedures"]
 service: "chemical-peels"
+condition: "photoageing"
 ---
 
 A chemical peel uses a controlled acid to remove the outer layers of skin and prompt renewal. The type, strength and number of coats are chosen for your skin and goal. Here is how the common peels differ.

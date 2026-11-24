@@ -5,6 +5,7 @@ description: "Why skin tone changes the laser and settings needed, how to avoid 
 author: "Dr. Karthik L"
 tags: ["Laser hair reduction", "Skin of colour"]
 service: "laser-hair-reduction"
+condition: "unwanted-body-and-facial-hair"
 ---
 
 Most Indian skin falls between medium brown and dark brown. In this skin, the laser has to find the hair without being absorbed by the skin's own pigment. Getting this wrong leads to burns and dark or pale patches, and getting it right gives good, safe results.

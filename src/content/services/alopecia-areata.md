@@ -21,6 +21,7 @@ diagnostics:
 
 conditionsManaged:
   - "alopecia-areata"
+  - "alopecia-totalis-universalis"
 
 treatments:
   - name: "Intralesional Steroid Injections"

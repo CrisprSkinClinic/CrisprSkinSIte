@@ -5,6 +5,7 @@ description: "What a chemical peel looks and feels like in the days after treatm
 author: "Dr. Narayanan A"
 tags: ["Chemical peels", "Aftercare"]
 service: "chemical-peels"
+condition: "photoageing"
 ---
 
 Downtime depends on the strength of the peel. Superficial peels have almost none, and medium peels need a few days. Knowing the timeline lets you plan.

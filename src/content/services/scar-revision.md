@@ -20,6 +20,8 @@ diagnostics:
   - "History of earlier treatment and of keloid tendency in the family"
 
 conditionsManaged:
+  - "keloids-and-hypertrophic-scars"
+  - "stretch-marks"
   - "acne-scar-types"
   - "split-earlobe"
 

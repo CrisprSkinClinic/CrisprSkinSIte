@@ -5,6 +5,7 @@ description: "How peels, salon facials and microneedling differ in what they do,
 author: "Dr. Narayanan A"
 tags: ["Chemical peels", "Microneedling", "Facials"]
 service: "chemical-peels"
+condition: "acne-scar-types"
 ---
 
 Peels, facials and microneedling are often mixed up, but they are different treatments with different depths and aims. Choosing well saves time and money.

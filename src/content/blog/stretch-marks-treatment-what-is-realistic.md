@@ -5,6 +5,7 @@ description: "Why stretch marks form, which treatments help new red marks and ol
 author: "Dr. Narayanan A"
 tags: ["Stretch marks", "Scars"]
 service: "scar-revision"
+condition: "stretch-marks"
 ---
 
 Stretch marks (striae) are very common, affecting most women in pregnancy and many teenagers and men who put on weight or muscle quickly. They are harmless, but many people want them to look less obvious. Knowing what treatment can and cannot do avoids disappointment.

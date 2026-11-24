@@ -5,6 +5,7 @@ description: "What to expect for each area of the body: how many sessions, how p
 author: "Dr. Karthik L"
 tags: ["Laser hair reduction", "Treatment areas"]
 service: "laser-hair-reduction"
+condition: "unwanted-body-and-facial-hair"
 ---
 
 Different areas of the body have hair with different thickness, depth and growth cycles. This changes how many sessions you need, how it feels and what to watch for.

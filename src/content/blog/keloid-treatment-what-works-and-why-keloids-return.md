@@ -5,6 +5,7 @@ description: "Why keloids are hard to treat, which treatments have evidence, why
 author: "Dr. Narayanan B"
 tags: ["Keloid", "Scar revision"]
 service: "scar-revision"
+condition: "keloids-and-hypertrophic-scars"
 ---
 
 Keloids are among the most frustrating scars, because they grow beyond the wound and often return after treatment. A well-planned, combined approach gives the best chance.

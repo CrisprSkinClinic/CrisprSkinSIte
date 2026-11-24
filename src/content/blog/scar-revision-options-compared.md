@@ -5,6 +5,7 @@ description: "Steroid injections, silicone, laser, microneedling, subcision, fre
 author: "Dr. Narayanan B"
 tags: ["Scars", "Scar revision"]
 service: "scar-revision"
+condition: "keloids-and-hypertrophic-scars"
 ---
 
 There is a wide choice of scar treatments, and the best ones depend on the scar type. Here is what each does and where it fits.

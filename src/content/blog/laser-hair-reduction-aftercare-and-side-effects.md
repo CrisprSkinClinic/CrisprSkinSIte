@@ -5,6 +5,7 @@ description: "What to expect in the days after laser hair reduction, how to care
 author: "Dr. Karthik L"
 tags: ["Laser hair reduction", "Aftercare"]
 service: "laser-hair-reduction"
+condition: "unwanted-body-and-facial-hair"
 ---
 
 Laser hair reduction has little downtime, but how you care for your skin afterwards affects both comfort and results.

@@ -5,6 +5,7 @@ description: "How a surgical scar heals, what to do and avoid in each stage, how
 author: "Dr. Narayanan B"
 tags: ["Scars", "Aftercare"]
 service: "scar-revision"
+condition: "keloids-and-hypertrophic-scars"
 ---
 
 A good scar depends partly on the operation and partly on what you do afterwards. Simple care makes a visible difference.

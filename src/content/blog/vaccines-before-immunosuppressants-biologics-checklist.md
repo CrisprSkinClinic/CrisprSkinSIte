@@ -5,6 +5,7 @@ description: "Which vaccines to review before starting a biologic, JAK inhibitor
 author: "Dr. Narayanan A"
 tags: ["Vaccination", "Biologics"]
 service: "vaccination"
+condition: "moderate-to-severe-psoriasis"
 ---
 
 Medicines that lower immunity treat psoriasis, eczema, hidradenitis and other skin disease very well. They also change how vaccines behave. A few weeks of planning before starting can prevent avoidable infections.

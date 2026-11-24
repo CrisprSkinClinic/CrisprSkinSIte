@@ -21,6 +21,7 @@ diagnostics:
 
 conditionsManaged:
   - "melasma"
+  - "post-inflammatory-hyperpigmentation"
 
 treatments:
   - name: "Topical Depigmenting Therapy"
