@@ -1,6 +1,6 @@
 ---
-title: "Chemical Peels"
-metaDescription: "Chemical peels for skin texture, tone, and clarity in KK Nagar, Chennai. Dermatologist-selected peels matched to your skin type and goals."
+title: "Chemical Peels in Chennai | KK Nagar"
+metaDescription: "Chemical peels in KK Nagar, Chennai for acne, marks, melasma and texture, with gentle, dermatologist-chosen peels that are safe on Indian skin."
 heroEyebrow: "Cosmetic Dermatology"
 heroHeadline: "Chemical Peels"
 heroSubheadline: "The right peel depends on your skin type and goal -- selecting it correctly matters as much as the procedure itself."
@@ -54,3 +54,35 @@ Meaningful, visible improvement typically comes from a planned course of several
 ## Setting Realistic Expectations
 
 Chemical peels improve skin texture, tone, and clarity progressively over a course of treatment -- they're a genuinely effective tool for many concerns, but results build gradually and depend on consistent skincare between sessions, not just the peels themselves.
+
+## Peels We Offer
+
+Superficial peels with salicylic, mandelic, lactic and glycolic acids, azelaic and kojic-based peels for brightening, and, in selected cases, low-strength TCA. See [chemical peel types explained](/blog/chemical-peel-types-glycolic-salicylic-tca-explained).
+
+## What Peels Treat
+
+Acne and blackheads, post-acne marks, dull and uneven skin, mild sun damage and fine lines, and, as part of a plan, pigmentation and melasma. See [peels for pigmentation and melasma on Indian skin](/blog/chemical-peels-for-pigmentation-and-melasma-on-indian-skin). Deep acne scars need other methods. See [acne scar treatment](/services/acne-scars).
+
+## Why Skin Tone Changes the Plan
+
+Brown skin reacts to irritation by making more pigment, so we use gentler peels, prepare the skin first and increase strength gradually. A peel that is too strong can darken skin.
+
+## Downtime
+
+Superficial peels cause flaking for a few days with little downtime. Medium peels need about a week of peeling. See [day-by-day recovery](/blog/chemical-peel-downtime-and-recovery-timeline).
+
+## Peel, Facial or Microneedling?
+
+They do different things. See [chemical peels vs facials vs microneedling](/blog/chemical-peels-vs-facials-vs-microneedling).
+
+## Who Should Not Have a Peel
+
+Active infection or cold sores, irritated or broken skin, recent sunburn or tanning, recent isotretinoin, and pregnancy for some acids.
+
+## Questions to Ask Any Clinic
+
+Who chooses the peel? What type and strength? How will you protect my skin from darkening? How many sessions? What aftercare?
+
+## Related
+
+[Acne scars](/services/acne-scars), [pigmentation](/services/pigmentation), [melasma](/services/melasma) and [skin rejuvenation](/services/skin-rejuvenation).

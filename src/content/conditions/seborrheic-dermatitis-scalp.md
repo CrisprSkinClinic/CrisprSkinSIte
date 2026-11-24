@@ -31,9 +31,37 @@ treatmentOverview:
 relatedConditions:
   - "scalp-psoriasis"
 
+faqIds:
+  - "dandruff-vs-dry-scalp"
+  - "dandruff-cause"
+  - "dandruff-shampoo-not-working"
+
 ctaTitle: "Book a Scalp Evaluation"
 ---
 
 Seborrheic dermatitis is an inflammatory skin condition affecting oil-producing areas of the body, with the scalp being one of the most commonly affected sites. It's driven partly by an overgrowth of Malassezia yeast, naturally present on the skin, and presents with redness, greasy yellowish scale, and itching -- distinct from the drier, finer flaking of [simple dandruff](/blog/dandruff-myths) or dry scalp.
 
 Because standard anti-dandruff shampoo alone often isn't enough to control seborrheic dermatitis, treatment typically combines [a medicated shampoo](/services/dandruff), used at the correct frequency and contact time, with a targeted topical anti-inflammatory treatment to address the underlying inflammation directly. Thick, adherent scale may instead be [scalp psoriasis](/conditions/scalp-psoriasis).
+
+## Dandruff and Seborrhoeic Dermatitis
+
+Dandruff is mild flaking. Seborrhoeic dermatitis is the more inflamed form, with red, greasy, yellowish scale and itch on the scalp, and often on the eyebrows, sides of the nose, behind the ears and in the beard. It is common, long-term and tends to flare in cold, dry weather, with stress and with illness.
+
+## Cause
+
+A normal skin yeast (Malassezia) and an inflammatory reaction to it, together with oily skin. It is not caused by poor hygiene or dirty hair, and washing hair more often does not cause it.
+
+## Treatment
+
+- **Medicated shampoos** with ketoconazole, ciclopirox, zinc pyrithione, selenium sulphide or tar, used two to three times a week at first, left on for five minutes, then less often to maintain.
+- **Short courses of scalp steroid lotion** for a red, itchy flare.
+- **Antifungal or gentle anti-inflammatory creams** for the face and eyebrows.
+- **Rotating shampoos** if one stops working.
+
+## Self-Care
+
+Wash regularly, manage stress, and avoid scratching. Heavy oiling of the scalp can worsen it. See [dandruff myths](/blog/dandruff-myths).
+
+## When It Is Something Else
+
+Thick plaques may be scalp psoriasis. Patchy hair loss with scale in a child may be ringworm. See [scalp psoriasis](/conditions/scalp-psoriasis). See a doctor if home shampoos fail. See our [dandruff service](/services/dandruff).

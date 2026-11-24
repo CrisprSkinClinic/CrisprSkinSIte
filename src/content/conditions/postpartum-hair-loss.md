@@ -32,6 +32,11 @@ relatedConditions:
   - "telogen-effluvium"
   - "female-pattern-hair-loss"
 
+faqIds:
+  - "female-hair-loss-causes"
+  - "female-hair-loss-postpartum"
+  - "female-hair-loss-pcos"
+
 ctaTitle: "Book a Consultation"
 ---
 
@@ -40,3 +45,23 @@ Postpartum hair loss is a specific and very common form of [telogen effluvium](/
 Most postpartum shedding peaks around three to four months after delivery and improves gradually over the following months, generally normalizing within a year. [An evaluation](/services/female-hair-loss) can help confirm this is the expected pattern and check for any additional contributing factors, like iron deficiency, that are common in the postpartum period and can be addressed alongside reassurance.
 
 For a month-by-month timeline, what to eat and when to test, read [hair fall after pregnancy](/blog/hair-fall-after-pregnancy-timeline-nutrition-and-when-to-treat).
+
+## Why Hair Sheds After Delivery
+
+During pregnancy, higher oestrogen keeps more hairs in the growth phase. After delivery, levels fall, and the extra hairs move into the shedding phase together about three months later. This is a form of [telogen effluvium](/conditions/telogen-effluvium).
+
+## Typical Course
+
+Shedding starts around two to four months after delivery, peaks, and settles over a few months. Regrowth appears as short "baby hairs" along the hairline, and most women recover their normal density by about twelve months.
+
+## What Helps
+
+Eat enough protein, iron and calories, especially while breastfeeding; rest as far as you can; handle hair gently; and consider a ferritin, thyroid and vitamin D check if shedding is heavy or lasts long. Do not start hair medicines such as minoxidil tablets, finasteride or anti-androgens without medical advice while pregnant or breastfeeding.
+
+## When It May Be More
+
+Shedding beyond nine to twelve months, a widening parting (female pattern hair loss), patches, scalp redness, or fatigue and palpitations (possible thyroid problem after pregnancy) need review.
+
+## Related
+
+See [hair fall after pregnancy](/blog/hair-fall-after-pregnancy-timeline-nutrition-and-when-to-treat), [postpartum hair shedding](/blog/postpartum-hair-shedding) and our [female hair loss service](/services/female-hair-loss).

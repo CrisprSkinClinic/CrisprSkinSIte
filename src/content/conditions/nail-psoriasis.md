@@ -43,3 +43,27 @@ ctaTitle: "Book a Nail Evaluation"
 Up to half of people with [psoriasis](/conditions/plaque-psoriasis) develop nail changes at some point, and in some cases the nails are affected before any skin rash appears. Pitting, thickening, and separation of the nail look similar to a [fungal infection](/conditions/onychomycosis), but the treatments are different, so confirming the diagnosis matters.
 
 Nails grow slowly, so improvement takes months. Treatment aims to improve appearance and comfort, and nail changes also prompt a check for [joint symptoms](/conditions/psoriatic-arthritis). See also [when nail changes are more than cosmetic](/blog/nail-changes-when-to-see-a-doctor).
+
+## Signs
+
+Nail psoriasis affects up to half of people with psoriasis. Look for tiny pits like pinpricks, ridges, thickening, crumbling, yellow-brown "oil drop" patches under the nail, and lifting of the nail from its bed (onycholysis). It often looks like a fungal infection, so confirming the diagnosis matters.
+
+## Why It Matters
+
+Nail changes can be a clue to psoriatic arthritis, which affects the joints, so nail psoriasis deserves a check for joint symptoms. See [psoriatic arthritis](/conditions/psoriatic-arthritis). It can also be painful and affect hand function.
+
+## Diagnosis
+
+By examination of nails and skin, and a nail clipping for fungal testing where needed. Fungus and psoriasis can coexist.
+
+## Treatment
+
+Nail psoriasis is slow to treat, because nails grow slowly: fingernails take about six months and toenails twelve to eighteen months to renew. Options include steroid or vitamin D creams applied to the nail fold, steroid injections into the nail fold in selected cases, and, for severe or multiple nails, systemic treatment, including biologics. See [biologics and advanced therapy](/services/biologics).
+
+## Self-Care
+
+Keep nails short, avoid trauma and aggressive manicures, wear gloves for wet work and moisturise the nail folds.
+
+## Outlook
+
+Improvement takes months, and treatment often needs to be long-term. See [psoriasis](/services/psoriasis) and our [nail disorders service](/services/nail-disorders).

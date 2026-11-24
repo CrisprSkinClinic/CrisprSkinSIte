@@ -19,7 +19,9 @@ diagnostics:
   - "Detailed history of products, exposures, and reaction timing"
   - "Patch testing referral where a specific contact allergen is suspected"
 
-conditionsManaged: []
+conditionsManaged:
+  - "contact-dermatitis"
+  - "hand-eczema"
 
 treatments:
   - name: "Topical Anti-Inflammatory Therapy"

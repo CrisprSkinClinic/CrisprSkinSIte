@@ -6,6 +6,7 @@ import LinkCards from '../../components/ui/LinkCards.astro';
 import TocChips from '../../components/ui/TocChips.astro';
 import { siteConfig } from '../../config/site.js';
 import { getServiceImage } from '../../utils/serviceImages';
+import { extractFaqs } from '../../utils/blogFaq.js';
 
 // 1. Generate a new path for every collection entry
 export async function getStaticPaths() {
@@ -39,6 +40,14 @@ const moreArticles = (await getCollection('blog'))
   .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
   .slice(0, 4);
 
+// Question-and-answer groups written inside the article are shown as accordions and described to search engines.
+const articleFaqs = extractFaqs(entry.body);
+const faqSchema = articleFaqs.length >= 2 ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": articleFaqs.map((f) => ({ "@type": "Question", "name": f.question, "acceptedAnswer": { "@type": "Answer", "text": f.answer } })),
+} : null;
+
 const pageUrl = new URL(`/blog/${entry.slug}/`, siteConfig.url).toString();
 const shareImage = getServiceImage(relatedService?.data.heroImage)?.src;
 const imageAbs = new URL(shareImage || '/images/og-default.jpg', siteConfig.url).toString();
@@ -68,6 +77,7 @@ const articleSchema = {
 
 <MainLayout title={entry.data.title} description={entry.data.description} image={shareImage} type="article">
   <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
   <Breadcrumbs items={[{ name: "Blog", url: "/blog" }, { name: entry.data.title, url: `/blog/${entry.slug}` }]} />
   <div class="read-progress" aria-hidden="true"></div>
   <article class="mx-auto max-w-[46rem] px-6 pb-12 pt-6">

@@ -34,6 +34,11 @@ relatedConditions:
   - "telogen-effluvium"
   - "postpartum-hair-loss"
 
+faqIds:
+  - "female-hair-loss-causes"
+  - "female-hair-loss-postpartum"
+  - "female-hair-loss-pcos"
+
 ctaTitle: "Book a Female Hair Loss Consultation"
 ---
 
@@ -44,3 +49,24 @@ Because the possible contributing causes are broader than in male pattern hair l
 ## Medical Options
 
 Topical or low-dose oral minoxidil, and anti-androgens in selected women, are the main medicines. Finasteride is not used in women who could become pregnant. See [medical treatment for female pattern hair loss](/blog/medical-treatment-for-female-pattern-hair-loss).
+
+## Who Gets It and How It Looks
+
+Female pattern hair loss causes gradual thinning over the top and crown of the scalp, with a widening parting and a preserved frontal hairline. Hair becomes finer, and the scalp shows through. It can begin in the twenties, and becomes more common after menopause. It runs in families.
+
+## What Else to Check
+
+A doctor looks for contributors: low iron, thyroid disease, PCOS and other hormonal conditions, recent illness and crash dieting. Acne, excess hair and irregular periods point to a hormonal cause. See [PCOS skin and hair signs](/conditions/pcos-skin-and-hair-signs).
+
+## Treatment
+
+- **Minoxidil** lotion or foam, or low-dose tablets in selected women.
+- **Anti-androgen medicines** such as spironolactone for women with androgen signs, with contraception.
+- **Treat deficiencies and thyroid disease.**
+- **Camouflage** with fibres and styling while treatment works.
+
+See [medical treatment for female pattern hair loss](/blog/medical-treatment-for-female-pattern-hair-loss) and [oral minoxidil](/blog/oral-minoxidil-for-hair-loss-what-to-know).
+
+## Expectations
+
+Treatment slows loss and thickens hair in many women, with results over six to twelve months. It must continue to keep the benefit. See our [female hair loss service](/services/female-hair-loss) and [hair loss medicines](/services/hair-loss-medical-treatment).

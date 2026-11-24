@@ -86,3 +86,11 @@ Most patients return to non-strenuous activity within a few days and can resume 
 ## Medicines Alongside Surgery
 
 A transplant does not stop the surrounding natural hair from thinning, so medicines such as finasteride and minoxidil are usually advised. See [medical treatment for hair loss](/services/hair-loss-medical-treatment) and [what happens if you stop](/blog/stopping-hair-loss-medicines-what-happens).
+
+## Our FUE Guides
+
+[Are you a candidate?](/blog/hair-transplant-candidacy), [who should wait](/blog/who-should-delay-a-hair-transplant), [how many grafts](/blog/hair-transplant-graft-numbers-and-quotes), [preparing for surgery](/blog/preparing-for-hair-transplant-checklist), [the day of surgery](/blog/fue-hair-transplant-day-of-surgery-step-by-step), [month-by-month timeline](/blog/hair-transplant-timeline-month-by-month), [shock loss](/blog/shock-loss-after-hair-transplant), [risks and how to reduce them](/blog/hair-transplant-risks-and-complications-and-how-to-reduce-them), [choosing a clinic](/blog/hair-transplant-clinic-choice-and-low-cost-offers) and [medicines alongside surgery](/blog/medical-therapy-with-hair-transplant).
+
+## Questions to Ask Any Hair Transplant Clinic
+
+Who plans the hairline and who does the extraction and implantation? How many grafts do you propose and why? What is my donor capacity? What happens if growth is poor? How will you protect my native hair? Be careful with very low offers and promises of unlimited grafts.

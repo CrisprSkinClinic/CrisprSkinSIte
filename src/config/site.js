@@ -89,16 +89,16 @@ export const siteConfig = {
     },
 
     geo: {
-      latitude: "13.0418",   // approximate KK Nagar
-      longitude: "80.1960"
+      latitude: "13.0397",   // the map pin of the clinic address (checked against the embedded map)
+      longitude: "80.2018"
     },
 
     whatsapp: "https://wa.me/919698444888",
 
     // Public profile URLs (Google Business Profile, Instagram, Facebook, YouTube...). Emitted as schema.org `sameAs`
     // so search engines connect the website to the clinic's listings. Add the real URLs here.
-    googleMapsUrl: "https://maps.app.goo.gl/bqzmReZ1VLo4JzAF9",
-    sameAs: ["https://maps.app.goo.gl/bqzmReZ1VLo4JzAF9"],
+    googleMapsUrl: "https://maps.app.goo.gl/nDRcnLdkk5ktBYpZ9",
+    sameAs: ["https://maps.app.goo.gl/nDRcnLdkk5ktBYpZ9"],
 
     // WhatsApp Business number that sends the booking / registration OTP. "Open WhatsApp" in the OTP pop-ups opens this chat.
     otpWhatsapp: "https://wa.me/917806880801",

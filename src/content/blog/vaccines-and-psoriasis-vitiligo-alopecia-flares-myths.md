@@ -5,6 +5,7 @@ description: "Do vaccines make psoriasis, vitiligo or alopecia areata worse? Wha
 author: "Dr. Narayanan B"
 tags: ["Vaccination", "Psoriasis", "Vitiligo", "Alopecia areata"]
 service: "vaccination"
+condition: "plaque-psoriasis"
 ---
 
 People with psoriasis, vitiligo or alopecia areata often avoid vaccines out of fear of a flare. The evidence is reassuring.

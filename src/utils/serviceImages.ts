@@ -21,6 +21,12 @@ export function getServiceImage(slug?: string | null): ImageMetadata | undefined
 }
 
 export const serviceImageAlts: Record<string, string> = {
+  'common-skin-infections': 'Dermatologist examining a skin infection such as scabies, impetigo or folliculitis',
+  'rosacea': 'Facial redness and flushing assessment for rosacea',
+  'mole-removal': 'Dermatologist examining a mole before removal',
+  'skin-tag-removal': 'Skin tag removal consultation with a dermatologist',
+  'scar-revision': 'Scar assessment and revision consultation',
+  'vitiligo-surgery': 'Vitiligo surgery consultation for stable white patches',
   'hair-loss-medical-treatment': 'Hair loss medical treatment consultation with a dermatologist',
   'diet-and-skin-disease': 'Evidence-based guidance on food and skin conditions',
   'vaccination': 'Dermatologists at CRISPR Skin and Hair Clinic who provide shingles and HPV vaccination',

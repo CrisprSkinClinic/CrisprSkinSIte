@@ -41,3 +41,23 @@ ctaTitle: "Book a Skin Growth Evaluation"
 Skin tags (acrochordons) are harmless, extremely common growths that tend to appear in areas of friction. They are not contagious and do not turn cancerous, so removal is a matter of comfort or appearance.
 
 Because other growths, such as [moles](/conditions/melanocytic-naevi-moles) or [warts](/conditions/viral-warts), can resemble skin tags, we examine anything unusual before treating. [Removal](/services/warts-moles-skin-tags) is quick, and new tags can form elsewhere over time, particularly where underlying factors like friction or weight persist.
+
+## Why Skin Tags Appear
+
+Friction in skin folds, weight gain, pregnancy, insulin resistance and family tendency are the usual causes. A sudden crop of tags, particularly with a dark velvety neck, is a reason to check blood sugar. See [why skin tags appear and do they come back](/blog/why-skin-tags-appear-and-do-they-come-back).
+
+## Removal
+
+Snip excision, cautery or freezing in a clinic takes minutes and heals in about a week. See [removal methods compared](/blog/skin-tag-removal-methods-compared) and our [skin tag removal service](/services/skin-tag-removal). Avoid home removal. See [the risks](/blog/skin-tag-removal-at-home-risks).
+
+## When to See a Doctor First
+
+A growth that is dark, hard, irregular, bleeding or growing quickly may not be a skin tag and should be examined. Many tags at once should prompt a diabetes check.
+
+## Who Gets Them
+
+Adults of any age, more often in those who are overweight, pregnant, have diabetes or prediabetes, or PCOS. They are not cancer and not contagious.
+
+## What to Expect After Removal
+
+A small scab forms and falls in about a week, leaving a pink spot that fades. New tags can appear elsewhere. Treat the cause where one exists. See [skin tag removal](/services/skin-tag-removal).

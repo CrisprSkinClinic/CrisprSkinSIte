@@ -21,6 +21,7 @@ diagnostics:
 
 conditionsManaged:
   - "damaged-skin-barrier"
+  - "nummular-eczema"
 
 treatments:
   - name: "Topical Anti-Inflammatory Therapy"

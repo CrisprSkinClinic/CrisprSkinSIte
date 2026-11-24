@@ -4,6 +4,7 @@ import FloatingContact from '../components/FloatingContact.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import { siteConfig } from '../config/site.js';
+import Analytics from '../components/Analytics.astro';
 import '../styles/global.css';
 
 // Accept SEO properties from individual pages, with safe fallbacks
@@ -18,6 +19,8 @@ const {
   noindex = false,
   // Focused pages (e.g. registration) hide the site header, footer and bottom action bar.
   bare = false,
+  // Pages that should not be counted as website traffic (patient registration).
+  quiet = false,
 } = Astro.props;
 
 // Automatically generate the exact canonical URL for the current page
@@ -49,7 +52,7 @@ const showClinic = ['/', '/contact/', '/book/'].includes(path) || path.startsWit
 const doctorsToShow = path === '/' || path === '/our-doctors/'
   ? siteConfig.doctors
   : siteConfig.doctors.filter((d) => path.startsWith(`/our-doctors/${d.slug}`));
-const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteConfig.name}, ${siteConfig.contact.address.street}, ${siteConfig.contact.address.locality}, ${siteConfig.contact.address.city}`)}`;
+const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${siteConfig.name}, ${siteConfig.contact.address.street}, ${siteConfig.contact.address.city}, ${siteConfig.contact.address.city}`)}`;
 ---
 
 <!DOCTYPE html>
@@ -59,7 +62,13 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
     
     <ViewTransitions />
     
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#7E4D8B" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     
@@ -82,13 +91,7 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
 
     <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-6JTEB0S8T0"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6JTEB0S8T0');
-    </script>
+    <Analytics quiet={quiet} />
 
     {showClinic && (
       <script type="application/ld+json" set:html={JSON.stringify({
@@ -107,7 +110,7 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
         "address": {
           "@type": "PostalAddress",
           "streetAddress": siteConfig.contact.address.street,
-          "addressLocality": siteConfig.contact.address.locality,
+          "addressLocality": siteConfig.contact.address.city,
           "addressRegion": siteConfig.contact.address.state,
           "postalCode": siteConfig.contact.address.postalCode,
           "addressCountry": "IN"
@@ -139,7 +142,7 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
         "address": {
           "@type": "PostalAddress",
           "streetAddress": siteConfig.contact.address.street,
-          "addressLocality": siteConfig.contact.address.locality,
+          "addressLocality": siteConfig.contact.address.city,
           "addressRegion": siteConfig.contact.address.state,
           "postalCode": siteConfig.contact.address.postalCode,
           "addressCountry": "IN"
@@ -165,6 +168,43 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
 
     {!bare && <FloatingContact />}
 
+
+    <script is:inline>
+      // Booking availability, fetched once as a batch and kept in memory + sessionStorage so the booking form
+      // opens with dates and times already on screen. Warmed on the booking page, and on hover/touch of any Book link.
+      (function () {
+        if (window.__slotRange) return;
+        var KEY = 'slotRangeV1', URL = '/.netlify/functions/public-availability-range';
+        var st = window.__slotRange = { data: null, at: 0, p: null };
+        var today = function () { return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); };
+        try {
+          var c = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+          if (c && c.body && c.body.from === today() && Date.now() - c.at < 600000) { st.data = c.body; st.at = c.at; }
+        } catch (e) {}
+        st.load = function (force) {
+          if (st.p) return st.p;
+          if (!force && st.data && Date.now() - st.at < 20000) return Promise.resolve(st.data);
+          var p = fetch(URL + '?from=' + today() + '&days=45' + (force ? '&nc=' + Date.now() : ''))
+            .then(function (r) { return r.json(); })
+            .then(function (b) {
+              if (!b || !b.data) throw new Error('bad availability');
+              st.data = b; st.at = Date.now();
+              try { sessionStorage.setItem(KEY, JSON.stringify({ at: st.at, body: b })); } catch (e) {}
+              return b;
+            });
+          st.p = p;
+          var clear = function () { st.p = null; };
+          p.then(clear, clear);
+          return p;
+        };
+        var warm = function (e) {
+          var a = e.target && e.target.closest && e.target.closest('a[href^="/book"]');
+          if (a) st.load().catch(function () {});
+        };
+        ['pointerover', 'touchstart', 'focusin'].forEach(function (t) { document.addEventListener(t, warm, { passive: true, capture: true }); });
+        if (location.pathname.indexOf('/book') === 0) st.load().catch(function () {});
+      })();
+    </script>
 
     <script is:inline>
       // Equal billing for the doctors: any element marked data-shuffle gets its children put in a fresh
@@ -200,99 +240,6 @@ const mapUrl = siteConfig.contact.googleMapsUrl || `https://www.google.com/maps/
     </script>
 
     <script>
-      // GA4 conversion tracking via event delegation -- a single
-      // document-level click listener catches phone, WhatsApp, and
-      // directions links anywhere on the site (including ones added
-      // later) without needing to wire each link individually.
-      // Booking click/completion are tracked separately: click via
-      // data-track="booking-click" on Book Now buttons/links, and
-      // completion fires directly from BookingCalendar.astro's
-      // confirm handler once public-book-appointment.js succeeds.
-      document.addEventListener('astro:page-load', () => {
-        document.addEventListener('click', (e) => {
-          if (typeof gtag !== 'function') return;
-
-          const link = e.target.closest('a');
-          if (!link) return;
-
-          const href = link.getAttribute('href') || '';
-
-          if (href.startsWith('tel:')) {
-            gtag('event', 'phone_call_click', {
-              event_category: 'engagement',
-              event_label: href.replace('tel:', ''),
-            });
-            return;
-          }
-
-          if (href.includes('wa.me') || href.includes('whatsapp.com')) {
-            gtag('event', 'whatsapp_click', {
-              event_category: 'engagement',
-              event_label: 'whatsapp_button',
-            });
-            return;
-          }
-
-          if (href.includes('google.com/maps') || href.includes('goo.gl/maps')) {
-            gtag('event', 'directions_click', {
-              event_category: 'engagement',
-              event_label: 'get_directions',
-            });
-            return;
-          }
-
-          if (href.startsWith('mailto:')) {
-            gtag('event', 'email_click', {
-              event_category: 'engagement',
-              event_label: href.replace('mailto:', ''),
-            });
-            return;
-          }
-
-          if (link.dataset.track === 'booking-click') {
-            gtag('event', 'booking_click', {
-              event_category: 'engagement',
-              event_label: link.dataset.trackLabel || 'book_now_button',
-            });
-          }
-        });
-      });
-
-      // Scroll depth tracking: fires once each at 50% and 90% of
-      // total page height. Reset per navigation (ViewTransitions
-      // swaps content without a full reload) so depth re-fires on
-      // every new page rather than only the first.
-      document.addEventListener('astro:page-load', () => {
-        let firedDepths = { 50: false, 90: false };
-
-        function checkScrollDepth() {
-          if (typeof gtag !== 'function') return;
-
-          const scrollTop = window.scrollY;
-          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-          if (docHeight <= 0) return;
-
-          const percentScrolled = (scrollTop / docHeight) * 100;
-
-          if (!firedDepths[50] && percentScrolled >= 50) {
-            firedDepths[50] = true;
-            gtag('event', 'scroll_depth_50', {
-              event_category: 'engagement',
-              event_label: window.location.pathname,
-            });
-          }
-          if (!firedDepths[90] && percentScrolled >= 90) {
-            firedDepths[90] = true;
-            gtag('event', 'scroll_depth_90', {
-              event_category: 'engagement',
-              event_label: window.location.pathname,
-            });
-          }
-        }
-
-        window.addEventListener('scroll', checkScrollDepth, { passive: true });
-      });
-
       const observerOptions = {
         root: null,
         rootMargin: '0px',
