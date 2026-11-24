@@ -1,5 +1,5 @@
 ---
-title: "Fragrance and Cosmetic Allergy: Reading Labels and Choosing Safely"
+title: "Fragrance and Cosmetic Allergy: Reading Labels"
 pubDate: 2026-11-24
 description: "Why fragrance, preservatives and hair dye cause skin allergy, how to read ingredient labels, which products to choose and what to do after a reaction."
 author: "Dr. Karthik L"

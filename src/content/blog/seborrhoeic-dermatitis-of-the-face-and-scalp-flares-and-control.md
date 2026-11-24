@@ -1,5 +1,5 @@
 ---
-title: "Seborrhoeic Dermatitis of the Face and Scalp: Flares and Control"
+title: "Seborrhoeic Dermatitis of Face and Scalp"
 pubDate: 2026-11-24
 description: "Why red, flaky, greasy patches appear on the scalp, eyebrows and sides of the nose, what triggers flares and how to keep it controlled."
 author: "Dr. Narayanan B"

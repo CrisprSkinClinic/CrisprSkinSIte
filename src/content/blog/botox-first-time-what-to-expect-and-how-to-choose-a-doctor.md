@@ -1,5 +1,5 @@
 ---
-title: "Botox for the First Time: What to Expect and How to Choose a Doctor"
+title: "Botox for the First Time: What to Expect"
 pubDate: 2026-11-24
 description: "A first-timer's guide to Botox: how the visit goes, how it feels, what results look like, the risks and how to choose a safe, natural result."
 author: "Dr. Karthik L"

@@ -1,5 +1,5 @@
 ---
-title: "Botox Beyond Wrinkles: Excess Sweating, Jaw Clenching and Other Medical Uses"
+title: "Botox for Sweating and Jaw Clenching"
 pubDate: 2026-11-24
 description: "How botulinum toxin treats underarm and palm sweating and jaw clenching, how treatment works, how long it lasts and who should have it."
 author: "Dr. Narayanan A"

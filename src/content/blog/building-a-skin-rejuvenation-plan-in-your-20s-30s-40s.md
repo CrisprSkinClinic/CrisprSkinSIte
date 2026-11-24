@@ -1,5 +1,5 @@
 ---
-title: "Building a Skin Rejuvenation Plan: What to Do in Your 20s, 30s and 40s"
+title: "Skin Rejuvenation Plan for Your 20s, 30s, 40s"
 pubDate: 2026-11-24
 description: "A decade-by-decade guide to what actually helps skin, from sunscreen and retinoids to peels, microneedling and injectables, and what to skip."
 author: "Dr. Karthik L"

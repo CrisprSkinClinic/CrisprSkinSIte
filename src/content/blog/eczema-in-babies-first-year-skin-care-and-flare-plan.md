@@ -1,5 +1,5 @@
 ---
-title: "Eczema in Babies: Skin Care and a Flare Plan for the First Year"
+title: "Baby Eczema: First-Year Skin Care and Flare Plan"
 pubDate: 2026-11-24
 description: "How eczema looks in babies, which daily care steps help, how to treat flares, when to worry and how to think about food and vaccines."
 author: "Dr. Narayanan A"
