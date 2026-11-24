@@ -89,8 +89,8 @@ export const siteConfig = {
     },
 
     geo: {
-      latitude: "13.0418",   // approximate KK Nagar
-      longitude: "80.1960"
+      latitude: "13.0397",   // the map pin of the clinic address (checked against the embedded map)
+      longitude: "80.2018"
     },
 
     whatsapp: "https://wa.me/919698444888",
