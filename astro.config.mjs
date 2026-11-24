@@ -4,6 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import remarkFaqGroups from './src/utils/remark-faq-groups.mjs';
 
 const SITE = 'https://crisprdermatology.com';
 
@@ -46,6 +47,7 @@ function trailingSlashLinks() {
 export default defineConfig({
   site: SITE,
   trailingSlash: 'always',
+  markdown: { remarkPlugins: [remarkFaqGroups] },
   prefetch: true,
   integrations: [
     tailwind(),
