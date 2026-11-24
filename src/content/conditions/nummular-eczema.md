@@ -44,3 +44,32 @@ ctaTitle: "Book an Eczema Evaluation"
 Nummular eczema -- from the Latin for coin -- causes well-defined, round patches of inflamed, itchy skin. It is easily mistaken for a fungal infection such as [ringworm](/conditions/tinea-infections), which is why an examination, and sometimes a simple skin scraping, is worth doing before starting treatment.
 
 The patches can be stubborn and tend to recur in the same places. Consistent moisturizing and [appropriate topical treatment](/services/eczema) control most cases well. It is one of several patterns of [adult eczema](/conditions/atopic-eczema-adults).
+
+## What It Looks Like
+
+Nummular eczema forms round or coin-shaped patches, one to several centimetres across, with fine crusting or scaling, on the legs, arms, hands and trunk. The patches are intensely itchy, sometimes weeping, and they are often well defined. They can resemble ringworm, but have no central clearing.
+
+## Causes and Triggers
+
+Very dry skin, cold dry weather, hot showers, skin injury, insect bites, bacterial infection and some medicines are common triggers. It often appears in adults with dry skin, and is more frequent in middle age and in people with other eczema. Stress and poor circulation in the legs can play a part.
+
+## How It Is Diagnosed
+
+By examination. A skin scraping is used when ringworm is possible, and a swab if infection is suspected. Psoriasis and contact dermatitis can look similar. See [tinea infections](/conditions/tinea-infections).
+
+## Treatment
+
+- **Regular moisturiser,** thick creams or ointments, at least twice daily.
+- **Topical steroids** of the right strength for a short time, to calm patches.
+- **Steroid-sparing creams** to maintain control.
+- **Antibiotics** if crusting suggests infection.
+- **Wet wraps or light therapy** for stubborn disease.
+- **Antihistamines at night** for sleep, if itching is severe.
+
+## Self-Care
+
+Short lukewarm showers, soap-free washes, loose cotton clothing, a humidifier in dry rooms and avoiding scratching.
+
+## Outlook
+
+It often clears with treatment but may return, particularly in winter. See [eczema flares in winter](/blog/eczema-flares-in-winter) and our [eczema service](/services/eczema).

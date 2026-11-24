@@ -44,3 +44,32 @@ ctaTitle: "Book a Skin Allergy Evaluation"
 Hand eczema is among the most common skin complaints in people who wash their hands often or work with water, cleaning products, or chemicals. It may be irritant-driven, [allergic](/conditions/contact-dermatitis), [atopic](/conditions/atopic-eczema-adults), or a mix -- and distinguishing these shapes the plan.
 
 Treatment pairs medicated creams with protection and [moisturizing habits](/services/eczema), since without those the hands are quickly re-injured and the problem returns. Persistent cases may need [patch testing](/blog/patch-testing-explained) to look for an allergen.
+
+## Types and Causes
+
+Hand eczema is inflammation of the skin of the hands. The commonest types are **irritant** (from water, soap, sanitiser and work chemicals), **allergic contact** (from a specific allergen such as nickel, fragrance, rubber, hair-dye chemicals or preservatives) and **atopic** (in people with eczema, asthma or hay fever). Many people have more than one cause. Wet work, such as nursing, cooking, hairdressing and cleaning, is a major trigger.
+
+## Symptoms
+
+Dryness, redness, cracks and painful fissures, itching, small blisters on the palms and sides of the fingers, and thickened skin in long-standing cases. Nails may become ridged.
+
+## How It Is Diagnosed
+
+A history of work, hobbies and products, a look at the pattern of the rash, and, where an allergy is suspected, **patch testing**. Fungal infection of the hands can look the same, so a scraping may be done. See [contact dermatitis](/conditions/contact-dermatitis).
+
+## Treatment
+
+- **Protect the skin barrier:** rich moisturiser after every wash, and before bed.
+- **Avoid triggers:** use gloves for wet work, with cotton liners, and avoid long contact with water and harsh soaps.
+- **Anti-inflammatory creams or ointments,** prescribed by strength for short periods.
+- **Steroid-sparing creams** for long-term control.
+- **Light therapy** for stubborn cases.
+- **Tablets** in severe cases, under specialist care.
+
+## Self-Care Tips
+
+Lukewarm water, mild soap-free cleanser, gentle patting dry, a hand cream at every sink, and gloves for dishes and cleaning.
+
+## When to See a Doctor
+
+See a dermatologist if hands crack and bleed, if the rash lasts more than two weeks despite moisturising, or if it affects work. Avoiding long-term problems depends on early treatment. See [eczema](/services/eczema) and [skin allergy](/services/skin-allergy).

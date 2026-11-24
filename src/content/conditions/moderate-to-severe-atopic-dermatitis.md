@@ -47,3 +47,24 @@ ctaTitle: "Book an Eczema Evaluation"
 Atopic dermatitis is considered moderate-to-severe when it covers large areas, remains active despite good basic care, or significantly affects sleep and daily life. Before moving to advanced options, we first check the basics: whether creams are used correctly and consistently, whether a trigger or infection is driving flares, and whether another diagnosis such as [contact dermatitis](/conditions/contact-dermatitis) is at play.
 
 When disease remains uncontrolled, [newer targeted medicines](/blog/newer-treatments-for-stubborn-eczema) have changed what is possible for many patients. These need careful selection, [screening, and monitoring](/services/biologics), and the decision rests on your age, health, and goals.
+
+## When Eczema Is Moderate to Severe
+
+Eczema is considered moderate to severe when large areas are affected, when it keeps coming back despite good moisturising and correctly used creams, or when it disrupts sleep, school or work. It deserves a step up in treatment, not endless creams.
+
+## Before Stepping Up
+
+Doctors first check that basic care is right: enough moisturiser, the right strength and amount of anti-inflammatory creams, trigger avoidance, treatment of infection and good adherence. Many people improve at this stage. See [how much to apply](/blog/how-much-topical-medicine-to-apply-fingertip-unit-guide) if available, and [eczema triggers](/blog/eczema-trigger-identification).
+
+## Advanced Treatments
+
+- **Phototherapy:** controlled narrowband UVB, given two to three times a week.
+- **Conventional immune-modulating tablets** such as methotrexate or ciclosporin, with blood-test monitoring.
+- **Targeted injections (biologics)** that block specific signals driving eczema.
+- **Oral targeted medicines (JAK inhibitors)** for selected patients, with safety monitoring. See [JAK inhibitors](/blog/jak-inhibitors-safety-and-monitoring).
+
+Which option is suitable depends on age, health, other conditions, pregnancy plans and availability. We review the options, benefits, monitoring needs and risks with you. Vaccine planning matters before starting. See [vaccines before immunosuppressants](/blog/vaccines-before-immunosuppressants-biologics-checklist) if available, and [biologics and advanced therapy](/services/biologics).
+
+## Living With It
+
+A written action plan, regular reviews and good sleep habits help. See [newer treatments for stubborn eczema](/blog/newer-treatments-for-stubborn-eczema) and our [eczema service](/services/eczema).
