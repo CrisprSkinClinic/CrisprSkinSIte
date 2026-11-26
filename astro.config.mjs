@@ -9,7 +9,7 @@ import remarkFaqGroups from './src/utils/remark-faq-groups.mjs';
 const SITE = 'https://crisprdermatology.com';
 
 // Pages that must not be offered to search engines: ad landing pages, transactional/utility pages and the 404.
-const NOT_FOR_SEARCH = /\/(lp|register|partner-register|manage-appointment|success|404)(\/|$)/;
+const NOT_FOR_SEARCH = /\/(lp|register|partner-register|manage-appointment|review|success|404)(\/|$)/;
 
 // Last-modified dates for the sitemap: blog posts carry a publication date in their front matter. Other pages
 // have no reliable date, so they are left without one rather than given an inaccurate build date.

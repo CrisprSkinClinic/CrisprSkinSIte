@@ -1,0 +1,30 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import ReviewBooking from '../components/ReviewBooking.astro';
+import { siteConfig } from '../config/site.js';
+
+const pageTitle = "Book Your Review";
+const pageDescription = `Book or change your review appointment at ${siteConfig.name}. Verify your WhatsApp number to see your visits and available times.`;
+---
+
+<MainLayout title={pageTitle} description={pageDescription} noindex>
+  <section class="bg-gradient-to-b from-brand-50/70 to-transparent py-12 md:py-16 px-6 text-center">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-brand-600 mb-4">Your review</p>
+      <h1 class="text-4xl md:text-6xl text-slate-950 mb-4">Book Your Review</h1>
+      <p class="text-xl text-slate-600">Pick a time with your doctor for your follow-up visit.</p>
+    </div>
+  </section>
+
+  <section class="py-12 md:py-16 px-5 md:px-6 bg-brand-50/40">
+    <ReviewBooking />
+  </section>
+
+  <section class="py-12 px-6 max-w-4xl mx-auto text-center border-t border-champagne-200">
+    <h3 class="text-xl font-bold text-brand-900 mb-2">Need help with your review?</h3>
+    <p class="text-slate-600 mb-4">Call us directly and our team will find a time that suits you.</p>
+    <a href={`tel:${siteConfig.contact.phone.replace(/[^0-9+]/g, '')}`} class="inline-block bg-brand-100 text-brand-800 font-bold px-6 py-3 rounded-lg hover:bg-brand-200 transition">
+      Call {siteConfig.contact.phone}
+    </a>
+  </section>
+</MainLayout>
