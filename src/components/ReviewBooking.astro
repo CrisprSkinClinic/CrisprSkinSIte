@@ -1,0 +1,604 @@
+---
+// src/components/ReviewBooking.astro
+//
+// Review booking page, opened from the clinic's WhatsApp review reminder. Same look and flow as BookingCalendar.astro
+// and ManageAppointments.astro: verify the WhatsApp number (OTP pop-up) -> choose the patient when several share the
+// number -> see their visits in date order -> either reschedule / cancel the one upcoming appointment, or pick a slot
+// with the doctor they last saw. A patient can have only one upcoming appointment. Server checks are in
+// netlify/functions/review-context.js, review-book.js and manage-appointments.js.
+import { siteConfig } from '../config/site.js';
+
+const waUrl = siteConfig.contact.otpWhatsapp;
+const a = siteConfig.contact.address;
+const clinicAddress = `${a.street}, ${a.locality}, ${a.city}, ${a.state} ${a.postalCode}`;
+
+const field = 'w-full min-h-[48px] px-3.5 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 outline-none transition';
+const label = 'block text-sm font-semibold text-slate-700 mb-1.5';
+const card = 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6';
+const badge = 'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white';
+---
+
+<div
+  id="reviewRoot"
+  data-clinic-name={siteConfig.name}
+  data-clinic-address={clinicAddress}
+  data-clinic-phone={siteConfig.contact.phone}
+  data-clinic-hours={siteConfig.contact.workingHoursDisplay}
+  data-doctors={JSON.stringify(siteConfig.doctors.map((d) => ({ id: d.dbId, name: d.name })))}
+  class="mx-auto max-w-5xl"
+>
+  <div id="rvForm" class="mx-auto max-w-2xl space-y-6">
+
+    <section id="rvVerify" class={`${card} min-w-0`} aria-labelledby="rvVerifyTitle">
+      <h3 id="rvVerifyTitle" class="mb-5 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>1</span>Verify your number</h3>
+      <label for="phone" class={label}>WhatsApp mobile number</label>
+      <div class="flex items-stretch rounded-xl border border-slate-300 bg-white transition focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/30">
+        <span class="inline-flex items-center rounded-l-xl border-r border-slate-200 bg-slate-50 px-3 text-slate-600" aria-hidden="true">+91</span>
+        <input type="tel" id="phone" placeholder="10-digit number" autocomplete="tel-national" inputmode="numeric" maxlength="14" aria-describedby="err-phone" class="min-h-[48px] min-w-0 flex-1 rounded-r-xl bg-transparent px-3.5 py-3 text-slate-900 outline-none placeholder:text-slate-400" />
+        <span id="phoneTick" class="hidden items-center pr-3 text-green-600" aria-hidden="true"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </div>
+      <p id="phoneVerified" class="mt-1.5 hidden text-sm font-semibold text-green-700" role="status"></p>
+      <p id="err-phone" class="field-error hidden mt-1.5 flex items-start gap-1.5 text-sm text-red-700" role="alert"></p>
+      <button id="sendBtn" type="button" class="mt-5 min-h-[52px] w-full rounded-xl bg-brand-900 py-4 font-bold text-white shadow-lg transition hover:bg-brand-800 disabled:opacity-60">Send OTP</button>
+      <p class="mt-2.5 text-center text-xs text-slate-500">An OTP will be sent to your WhatsApp to confirm it is you.</p>
+    </section>
+
+    <section id="rvPatient" class={`${card} min-w-0 hidden`} aria-labelledby="rvPatientTitle">
+      <h3 id="rvPatientTitle" class="mb-2 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>2</span>Who is this review for?</h3>
+      <p class="mb-4 text-sm text-slate-600">More than one patient is registered on this number. Tap the patient.</p>
+      <div id="rvPatientList" class="grid gap-3"></div>
+    </section>
+
+    <div id="rvWho" class="hidden flex flex-wrap items-center justify-between gap-3 px-1">
+      <p id="rvVisitsFor" class="text-sm font-semibold text-slate-700"></p>
+      <button type="button" id="rvSwitch" class="hidden text-sm font-semibold text-brand-700 underline underline-offset-2 hover:text-brand-900">Change patient</button>
+    </div>
+    <div id="rvNotice" class="hidden rounded-xl border border-green-200 bg-green-50 p-3.5 text-sm font-medium text-green-800" role="status" aria-live="polite"></div>
+
+    <section id="rvUpcoming" class={`${card} min-w-0 hidden`} aria-labelledby="rvUpcomingTitle">
+      <h3 id="rvUpcomingTitle" class="mb-4 text-xl font-bold text-brand-900">Your upcoming appointment</h3>
+      <div id="rvUpcomingBody"></div>
+    </section>
+
+    <section id="rvSlot" class={`${card} min-w-0 hidden`} aria-labelledby="rvSlotTitle">
+      <h3 id="rvSlotTitle" class="mb-5 flex items-center gap-3 text-xl font-bold text-brand-900"><span class={badge}>3</span>Book your review</h3>
+      <div class="mb-5">
+        <label for="doctor" class={label}>Doctor</label>
+        <select id="doctor" class={field}></select>
+        <p id="doctorNote" class="mt-1.5 hidden text-sm text-slate-600"></p>
+      </div>
+      <div id="slotPicker"></div>
+      <button id="bookBtn" type="button" disabled class="mt-5 min-h-[52px] w-full rounded-xl bg-brand-900 py-4 font-bold text-white shadow-lg transition hover:bg-brand-800 disabled:opacity-60">Confirm Review</button>
+    </section>
+
+    <section id="rvVisits" class={`${card} min-w-0 hidden`} aria-labelledby="rvVisitsTitle">
+      <h3 id="rvVisitsTitle" class="mb-4 text-xl font-bold text-brand-900">Previous visits</h3>
+      <ol id="rvVisitList" class="space-y-3"></ol>
+    </section>
+
+    <div id="errorMessage" class="hidden items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-800" role="alert">
+      <svg class="mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p id="errorText" class="flex-1 font-medium"></p>
+      <button type="button" id="errorClose" class="-m-1 p-1 text-red-700 hover:text-red-900" aria-label="Dismiss">✕</button>
+    </div>
+  </div>
+
+  <!-- OTP pop-up, the same as the booking page's. -->
+  <div id="verifyPanel" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 p-4" role="dialog" aria-modal="true" aria-labelledby="verifyTitle">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h3 id="verifyTitle" class="text-xl font-bold text-brand-900">Verify your number</h3>
+          <p id="verifyTo" class="mt-1 text-sm text-slate-600"></p>
+        </div>
+        <button type="button" id="otpClose" class="-m-2 rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800" aria-label="Close">✕</button>
+      </div>
+      <a href={waUrl} target="_blank" rel="noopener noreferrer" class="mt-5 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-base font-semibold text-white shadow-sm transition hover:bg-green-800">Press to Open WhatsApp for OTP</a>
+      <div class="mt-3">
+        <label for="otp" class="sr-only">OTP</label>
+        <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter OTP" class="min-h-[56px] w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-2xl font-semibold tracking-[0.4em] text-slate-900 outline-none transition placeholder:text-base placeholder:font-normal placeholder:tracking-normal placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30" />
+      </div>
+      <p id="otpStatus" class="mt-3 min-h-[1.25rem] text-sm text-slate-700" role="status" aria-live="polite"></p>
+      <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <button type="button" id="resendBtn" class="min-h-[36px] text-sm font-semibold text-brand-700 underline underline-offset-2 disabled:text-slate-400 disabled:no-underline" disabled>Resend OTP</button>
+        <button type="button" id="changeNumberBtn" class="min-h-[36px] text-sm font-semibold text-slate-600 underline underline-offset-2">Change number</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmationCard" class="hidden mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8" role="region" aria-labelledby="confirmTitle">
+    <div class="mb-6 text-center">
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-700 ring-8 ring-green-50" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline class="check-draw" points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3 id="confirmTitle" tabindex="-1" class="text-2xl font-bold text-brand-900 outline-none md:text-3xl">Your review is booked</h3>
+      <p id="confirmSubtitle" class="mt-1.5 text-slate-600"></p>
+    </div>
+    <div class="mx-auto max-w-xl overflow-hidden rounded-xl border border-slate-200">
+      <div class="bg-brand-900 px-4 py-3 text-white">
+        <p id="confirmWhen" class="text-lg font-bold"></p>
+        <p id="confirmType" class="text-sm text-white/80"></p>
+      </div>
+      <dl id="confirmDetails" class="divide-y divide-slate-200 bg-white text-sm"></dl>
+    </div>
+    <div class="mx-auto mt-5 grid max-w-xl gap-3 sm:grid-cols-3">
+      <a id="gcalLink" target="_blank" rel="noopener" class="flex min-h-[48px] items-center justify-center rounded-xl bg-brand-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-brand-700">Add to Google Calendar</a>
+      <button type="button" id="icsBtn" class="min-h-[48px] rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm font-semibold text-brand-900 transition hover:bg-brand-50">Apple / Outlook (.ics)</button>
+      <a id="mapLink" target="_blank" rel="noopener" class="flex min-h-[48px] items-center justify-center rounded-xl border border-brand-200 bg-white px-4 py-3 text-center text-sm font-semibold text-brand-900 transition hover:bg-brand-50">Get directions</a>
+    </div>
+    <div class="mx-auto mt-6 grid max-w-xl gap-4 rounded-xl bg-brand-50 p-4 text-sm text-brand-900">
+      <div>
+        <p class="mb-1.5 font-semibold">What to bring</p>
+        <ul class="list-disc space-y-1 pl-5"><li>Your current medicines and creams, and any new reports</li></ul>
+      </div>
+      <p id="confirmArrival"></p>
+    </div>
+    <div class="mx-auto mt-5 flex max-w-xl flex-wrap items-center justify-between gap-3 text-sm">
+      <button type="button" id="viewVisitsBtn" class="font-semibold text-brand-700 underline underline-offset-2">Change or cancel</button>
+      <a id="callLink" class="font-semibold text-brand-700 underline underline-offset-2"></a>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  #reviewRoot .check-draw { stroke-dasharray: 30; stroke-dashoffset: 30; animation: bk-check .5s .15s ease forwards; }
+  @keyframes bk-check { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { #reviewRoot .check-draw { animation: none; stroke-dashoffset: 0; } }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const $ = (id) => document.getElementById(id);
+    const root = $('reviewRoot');
+    if (!root) return;
+
+    const doctors = JSON.parse(root.dataset.doctors || '[]');
+    const ALL_DOCTORS = doctors.map((d) => d.id);
+    const clinic = { name: root.dataset.clinicName || 'Clinic', address: root.dataset.clinicAddress || '', phone: root.dataset.clinicPhone || '', hours: root.dataset.clinicHours || '' };
+    const clinicTel = clinic.phone.replace(/[^0-9+]/g, '');
+    const phoneInput = $('phone'), sendBtn = $('sendBtn'), otpPanel = $('verifyPanel'), otpInput = $('otp'), otpStatus = $('otpStatus'), resendBtn = $('resendBtn');
+    const errorBox = $('errorMessage');
+
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const phoneDigits = (v) => String(v || '').replace(/\D/g, '').slice(-10);
+    const validPhone = () => /^[6-9]\d{9}$/.test(phoneDigits(phoneInput.value));
+    const show = (id, on = true) => { $(id).classList.toggle('hidden', !on); };
+    const showError = (m) => { $('errorText').textContent = m; errorBox.classList.remove('hidden'); errorBox.classList.add('flex'); errorBox.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
+    const clearError = () => { errorBox.classList.add('hidden'); errorBox.classList.remove('flex'); };
+    $('errorClose').addEventListener('click', clearError);
+
+    // ---------------------------------------------------------------- dates (clinic time, IST)
+    const clinicToday = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    const addDays = (iso, n) => { const d = new Date(`${iso}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+    const fmtDate = (iso, opts) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-IN', { timeZone: 'UTC', ...opts });
+    const mins = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+    const to12 = (t) => { const h = Number(t.slice(0, 2)); return `${String(h % 12 || 12).padStart(2, '0')}:${t.slice(3, 5)} ${h >= 12 ? 'PM' : 'AM'}`; };
+    const to24 = (display) => { const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(String(display || '').trim()); if (!m) return ''; let h = Number(m[1]) % 12; if (m[3].toUpperCase() === 'PM') h += 12; return `${String(h).padStart(2, '0')}:${m[2]}`; };
+    const period = (t) => { const h = Number(String(t).slice(0, 2)); return h < 12 ? 'Morning' : h < 16 ? 'Afternoon' : 'Evening'; };
+    const dayLabel = (iso) => { const today = clinicToday(); return iso === today ? 'Today' : iso === addDays(today, 1) ? 'Tom' : fmtDate(iso, { weekday: 'short' }); };
+    const plainDoctor = (name) => String(name || '').replace(/^dr\.?\s*/i, '').trim();
+
+    // ---------------------------------------------------------------- state
+    let otpToken = '', verifiedPhone = '', otpSentTo = '', resendTimer = null, verifyBusy = false, sending = false;
+    let patients = [], current = null; // current = { id, name, visits, upcoming, doctor }
+
+    async function post(url, body) {
+      const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const result = await response.json().catch(() => ({}));
+      return { response, result };
+    }
+
+    // ---------------------------------------------------------------- slot picker (shared by "book" and "reschedule")
+    // Same strip + slot grid as the booking page. `opts.doctorId()` returns the chosen doctor id or 'any'.
+    function slotPicker(host, opts) {
+      host.innerHTML = `
+        <div class="earliest hidden mb-5 flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3.5"><p class="text-sm text-brand-900" data-earliest-text></p></div>
+        <p class="mb-2 text-sm font-semibold text-slate-700">Next 7 days</p>
+        <div class="relative">
+          <div data-strip class="-mx-1 mb-4 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-label="Dates"></div>
+          <input type="date" data-date tabindex="-1" aria-hidden="true" min="${clinicToday()}" class="pointer-events-none absolute left-0 top-0 h-0 w-0 opacity-0" />
+        </div>
+        <div class="mb-3 mt-2"><h4 class="text-sm font-semibold text-slate-700">Available slots</h4></div>
+        <div data-slots class="grid grid-cols-3 gap-2.5 sm:grid-cols-4" role="radiogroup" aria-label="Available slots"></div>`;
+      const strip = host.querySelector('[data-strip]'), slotsBox = host.querySelector('[data-slots]'), dateInput = host.querySelector('[data-date]');
+      const earliestWrap = host.querySelector('.earliest');
+      const skeleton = (n, cls) => Array.from({ length: n }, () => `<div class="${cls} animate-pulse rounded-xl bg-slate-100 motion-reduce:animate-none"></div>`).join('');
+      strip.innerHTML = skeleton(5, 'h-[76px] w-[76px] shrink-0');
+      slotsBox.innerHTML = skeleton(6, 'h-12');
+      let seq = 0, chosen = null, selectedDate = '', earliest = null;
+
+      const day = (body, doctorId, dateStr) => {
+        const d = body && body.data && body.data[dateStr];
+        if (!d) return null;
+        const nowIst = new Date(Date.now() + 330 * 60000).toISOString();
+        const cutoff = dateStr === nowIst.slice(0, 10) ? nowIst.slice(11, 16) : null;
+        const times = (id) => { const e = d[id]; return e ? { times: e.times.filter((t) => !cutoff || t > cutoff), reason: e.reason } : { times: [], reason: '' }; };
+        if (doctorId !== 'any') { const r = times(doctorId); return { slots: r.times.map((t) => ({ time24: t, display: to12(t) })), reason: r.times.length ? '' : r.reason }; }
+        const merged = new Map();
+        ALL_DOCTORS.forEach((id) => times(id).times.forEach((t) => { if (!merged.has(t)) merged.set(t, []); merged.get(t).push(id); }));
+        const slots = Array.from(merged.keys()).sort().map((t) => ({ time24: t, display: to12(t), doctorIds: merged.get(t) }));
+        return { slots, reason: slots.length ? '' : 'No sessions scheduled with any doctor on the selected date.' };
+      };
+      async function fetchDay(dateStr) {
+        const doctorId = opts.doctorId();
+        const store = window.__slotRange;
+        let body = store && store.data;
+        if (!body && store) { try { body = await store.load(); } catch { body = null; } }
+        const inRange = day(body, doctorId, dateStr);
+        if (inRange) return inRange;
+        const doctorParam = doctorId === 'any' ? '' : `&doctorId=${encodeURIComponent(doctorId)}`;
+        const r = await fetch(`/.netlify/functions/public-available-slots?date=${encodeURIComponent(dateStr)}${doctorParam}&appointmentType=review`);
+        const data = await r.json();
+        if (!r.ok || data.error) throw new Error(data.error || 'Could not load availability.');
+        return { slots: data.slots || [], reason: data.reason || '' };
+      }
+
+      function highlight(dateStr) {
+        const more = host.querySelector('[data-more]');
+        if (more) {
+          const outside = Boolean(dateStr) && !strip.querySelector(`[data-date="${dateStr}"]`);
+          more.classList.toggle('bg-brand-600', outside); more.classList.toggle('text-white', outside); more.classList.toggle('border-brand-600', outside);
+          more.classList.toggle('bg-white', !outside); more.classList.toggle('text-brand-800', !outside);
+          more.innerHTML = outside ? `<span class="block">${fmtDate(dateStr, { weekday: 'short' })}</span><span class="block">${fmtDate(dateStr, { day: 'numeric', month: 'short' })}</span>` : '<span class="block">More</span><span class="block">dates</span>';
+        }
+        strip.querySelectorAll('[data-date]').forEach((b) => {
+          const on = b.dataset.date === dateStr;
+          b.classList.toggle('bg-brand-600', on); b.classList.toggle('text-white', on); b.classList.toggle('border-brand-600', on);
+          b.classList.toggle('bg-white', !on); b.classList.toggle('hover:bg-brand-50', !on); b.setAttribute('aria-pressed', String(on));
+          const c = b.querySelector('[data-count]');
+          if (c) { c.classList.toggle('text-white', on); c.classList.toggle(c.dataset.count === 'open' ? 'text-green-700' : 'text-slate-500', !on); }
+        });
+      }
+      function clearChoice() { chosen = null; opts.onChoose(null, ''); }
+      function select(slot, button) {
+        slotsBox.querySelectorAll('.time-slot').forEach((b) => {
+          const on = b === button;
+          b.classList.toggle('bg-brand-600', on); b.classList.toggle('text-white', on); b.classList.toggle('border-brand-600', on);
+          b.classList.toggle('bg-white', !on); b.classList.toggle('text-brand-800', !on); b.classList.toggle('hover:bg-brand-50', !on);
+          b.setAttribute('aria-checked', String(on));
+        });
+        chosen = slot; opts.onChoose(slot, selectedDate);
+      }
+      function render(slots) {
+        clearChoice(); slotsBox.innerHTML = '';
+        let last = '';
+        const multiple = new Set(slots.map((s) => period(s.time24))).size > 1;
+        slots.forEach((slot) => {
+          const p = period(slot.time24);
+          if (multiple && p !== last) { const h = document.createElement('p'); h.className = 'col-span-full mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 first:mt-0'; h.textContent = p; slotsBox.appendChild(h); last = p; }
+          const b = document.createElement('button');
+          b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
+          b.className = 'time-slot min-h-[48px] rounded-lg border border-brand-200 bg-white py-2.5 font-medium text-brand-800 transition hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600';
+          b.textContent = slot.display; b.dataset.time = slot.display;
+          b.addEventListener('click', () => select(slot, b));
+          slotsBox.appendChild(b);
+        });
+      }
+      const message = (html) => { slotsBox.innerHTML = `<div class="col-span-full rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">${html}</div>`; };
+
+      async function load(dateStr) {
+        if (!dateStr) return;
+        const mine = ++seq; selectedDate = dateStr; dateInput.value = dateStr; clearChoice(); highlight(dateStr);
+        slotsBox.innerHTML = skeleton(6, 'h-12');
+        try {
+          const { slots, reason } = await fetchDay(dateStr);
+          if (mine !== seq) return;
+          if (!slots.length) { message(`<p class="font-semibold text-slate-800">No slots on this date</p><p class="mt-0.5">${esc(reason || 'Everything is booked.')} Try another day or <a class="font-semibold text-brand-700 underline" href="tel:${clinicTel}">call ${esc(clinic.phone)}</a>.</p>`); return; }
+          render(slots);
+        } catch (err) {
+          if (mine !== seq) return;
+          message(`<p class="font-semibold text-red-700">Could not load availability</p><p class="mt-0.5">Check your connection and try again.</p><button type="button" data-retry class="mt-3 inline-flex min-h-[40px] items-center rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Try again</button>`);
+          slotsBox.querySelector('[data-retry]')?.addEventListener('click', () => { if (window.__slotRange) window.__slotRange.data = null; load(dateStr); });
+        }
+      }
+      async function refresh() {
+        const today = clinicToday();
+        const days = Array.from({ length: 7 }, (_, i) => addDays(today, i));
+        const results = await Promise.all(days.map((d) => fetchDay(d).catch(() => null)));
+        strip.innerHTML = ''; earliest = null;
+        days.forEach((d, i) => {
+          const res = results[i], count = res ? res.slots.length : 0;
+          if (res && count && !earliest) earliest = { date: d, slot: res.slots[0] };
+          const chip = document.createElement('button');
+          chip.type = 'button'; chip.dataset.date = d; chip.disabled = !count; chip.setAttribute('aria-pressed', 'false');
+          chip.className = 'shrink-0 flex-1 min-w-[68px] min-h-[76px] whitespace-nowrap rounded-xl border border-brand-200 bg-white px-1.5 py-2 text-center text-sm transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400 disabled:hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600';
+          chip.innerHTML = `<span class="block font-semibold">${dayLabel(d)}</span><span class="block">${fmtDate(d, { day: 'numeric', month: 'short' })}</span><span data-count="${count ? 'open' : 'full'}" class="block text-xs ${count ? 'text-green-700' : 'text-slate-500'}">${count ? `${count} slot${count === 1 ? '' : 's'}` : 'Full'}</span>`;
+          chip.addEventListener('click', () => load(d));
+          strip.appendChild(chip);
+        });
+        const more = document.createElement('button');
+        more.type = 'button'; more.dataset.more = '1';
+        more.className = 'shrink-0 flex-1 min-w-[68px] min-h-[76px] whitespace-nowrap rounded-xl border border-dashed border-brand-300 bg-white px-1.5 py-2 text-center text-sm font-semibold text-brand-800 transition hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600';
+        more.innerHTML = '<span class="block">More</span><span class="block">dates</span>';
+        more.addEventListener('click', () => { try { dateInput.showPicker(); } catch { dateInput.focus(); dateInput.click(); } });
+        strip.appendChild(more);
+        dateInput.addEventListener('change', () => load(dateInput.value));
+        earliestWrap.classList.toggle('hidden', Boolean(earliest)); earliestWrap.classList.toggle('flex', !earliest);
+        if (!earliest) host.querySelector('[data-earliest-text]').innerHTML = `<span class="font-semibold">No slots in the next 7 days.</span> Pick a later date, or call <a class="font-semibold underline" href="tel:${clinicTel}">${esc(clinic.phone)}</a>.`;
+        const first = earliest ? earliest.date : today;
+        await load(first);
+      }
+      refresh();
+      return { reload: () => { if (window.__slotRange) window.__slotRange.data = null; refresh(); }, chosen: () => ({ slot: chosen, date: selectedDate }) };
+    }
+
+    // ---------------------------------------------------------------- WhatsApp verification (same as the booking page)
+    const openOtp = () => { otpPanel.classList.remove('hidden'); otpPanel.classList.add('flex'); document.body.classList.add('overflow-hidden'); };
+    const closeOtp = () => { otpPanel.classList.add('hidden'); otpPanel.classList.remove('flex'); document.body.classList.remove('overflow-hidden'); };
+    const setOtpStatus = (text, kind) => { otpStatus.textContent = text; otpStatus.className = `mt-3 min-h-[1.25rem] text-sm ${kind === 'error' ? 'text-red-700 font-semibold' : kind === 'ok' ? 'text-green-800 font-semibold' : 'text-slate-700'}`; };
+    function startResendTimer(seconds = 30) {
+      if (resendTimer) clearInterval(resendTimer);
+      let wait = seconds; resendBtn.disabled = true; resendBtn.textContent = `Resend OTP in ${wait}s`;
+      resendTimer = setInterval(() => { wait -= 1; if (wait <= 0) { clearInterval(resendTimer); resendTimer = null; resendBtn.disabled = false; resendBtn.textContent = 'Resend OTP'; } else resendBtn.textContent = `Resend OTP in ${wait}s`; }, 1000);
+    }
+    function setFieldError(msg) { const el = $('err-phone'); el.textContent = msg; el.classList.toggle('hidden', !msg); el.classList.toggle('flex', Boolean(msg)); }
+    function resetAll() {
+      otpToken = ''; verifiedPhone = ''; otpSentTo = ''; patients = []; current = null;
+      if (resendTimer) clearInterval(resendTimer); resendTimer = null;
+      otpInput.value = ''; closeOtp(); $('phoneVerified').classList.add('hidden');
+      ['rvPatient', 'rvWho', 'rvNotice', 'rvUpcoming', 'rvVisits', 'rvSlot'].forEach((id) => show(id, false));
+      show('rvVerify', true); phoneInput.disabled = false;
+    }
+    phoneInput.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/[^\d+\s-]/g, '');
+      const tick = $('phoneTick'); tick.classList.toggle('hidden', !validPhone()); tick.classList.toggle('inline-flex', validPhone());
+      setFieldError('');
+      if ((otpSentTo || verifiedPhone) && phoneDigits(phoneInput.value) !== (verifiedPhone || otpSentTo)) resetAll();
+    });
+    phoneInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendBtn.click(); } });
+    phoneInput.addEventListener('blur', () => { if (phoneInput.value.trim() && !validPhone()) setFieldError('Enter a valid 10-digit mobile number that uses WhatsApp.'); });
+
+    async function requestCode() {
+      clearError();
+      const digits = phoneDigits(phoneInput.value);
+      if (!/^[6-9]\d{9}$/.test(digits)) { setFieldError('Enter a valid 10-digit mobile number that uses WhatsApp.'); phoneInput.focus(); return false; }
+      if (sending) return false;
+      sending = true; sendBtn.disabled = true; sendBtn.textContent = 'Sending code…';
+      $('verifyTo').textContent = `Sending a code on WhatsApp to +91 ${digits.slice(0, 5)} ${digits.slice(5)}…`;
+      setOtpStatus(''); openOtp(); otpInput.value = ''; otpInput.classList.remove('border-red-500'); otpInput.focus();
+      try {
+        const { response, result } = await post('/.netlify/functions/send-booking-otp', { phone: phoneInput.value });
+        if (!response.ok || !result.success) throw new Error(result.error || 'Could not send the WhatsApp code.');
+        otpSentTo = digits;
+        $('verifyTo').textContent = `OTP sent on WhatsApp to +91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+        startResendTimer();
+        return true;
+      } catch (err) { closeOtp(); showError(err.message); return false; }
+      finally { sending = false; sendBtn.disabled = false; sendBtn.textContent = 'Send OTP'; }
+    }
+    sendBtn.addEventListener('click', () => { if (verifiedPhone) return; if (otpSentTo && phoneDigits(phoneInput.value) === otpSentTo) { openOtp(); otpInput.focus(); } else requestCode(); });
+    resendBtn.addEventListener('click', requestCode);
+    $('changeNumberBtn').addEventListener('click', () => { resetAll(); phoneInput.focus(); });
+    $('otpClose').addEventListener('click', () => { closeOtp(); sendBtn.focus(); });
+    otpPanel.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeOtp(); sendBtn.focus(); } });
+
+    async function verifyCode() {
+      if (verifyBusy) return;
+      const code = otpInput.value.replace(/\D/g, '');
+      if (code.length !== 6) return;
+      verifyBusy = true; setOtpStatus('Checking…');
+      try {
+        const { response, result } = await post('/.netlify/functions/verify-booking-otp', { phone: phoneInput.value, code });
+        if (!response.ok || !result.success || !result.token) throw new Error(result.error || 'Could not verify the code.');
+        otpToken = result.token; verifiedPhone = otpSentTo;
+        if (resendTimer) clearInterval(resendTimer); resendTimer = null;
+        closeOtp();
+        const pv = $('phoneVerified'); pv.textContent = `✓ +91 ${verifiedPhone} verified`; pv.classList.remove('hidden');
+        phoneInput.disabled = true; sendBtn.classList.add('hidden');
+        await loadPatients();
+      } catch (err) {
+        setOtpStatus(err.message, 'error'); otpInput.classList.add('border-red-500'); otpInput.value = ''; otpInput.focus();
+      } finally { verifyBusy = false; }
+    }
+    otpInput.addEventListener('input', () => { otpInput.classList.remove('border-red-500'); otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 6); if (otpInput.value.length === 6) verifyCode(); });
+
+    function expired() {
+      resetAll(); sendBtn.classList.remove('hidden');
+      showError('Your verification has expired. Please verify your WhatsApp number again.');
+    }
+
+    // ---------------------------------------------------------------- patients -> visits
+    const ctx = (extra = {}) => ({ phone: phoneInput.value, otpToken, ...extra });
+    async function loadPatients() {
+      const { response, result } = await post('/.netlify/functions/review-context', ctx());
+      if (response.status === 403) return expired();
+      if (!response.ok) return showError(result.error || 'Could not load your details.');
+      patients = result.patients || [];
+      if (!patients.length) {
+        show('rvPatient', false);
+        return showError(`We could not find a patient on this number. Please call us on ${clinic.phone} to book your review.`);
+      }
+      if (patients.length === 1) return choosePatient(patients[0].id);
+      const list = $('rvPatientList'); list.innerHTML = '';
+      patients.forEach((p) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'flex min-h-[56px] w-full items-center justify-between gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 text-left font-semibold text-brand-900 transition hover:border-brand-500 hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 active:scale-[0.99]';
+        b.innerHTML = `<span>${esc(p.name)}</span><svg class="h-5 w-5 shrink-0 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
+        b.addEventListener('click', () => choosePatient(p.id));
+        list.appendChild(b);
+      });
+      show('rvVerify', false); show('rvPatient', true); show('rvVisits', false); show('rvSlot', false);
+      $('rvPatient').scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+
+    async function choosePatient(id, notice) {
+      clearError();
+      const { response, result } = await post('/.netlify/functions/review-context', ctx({ patientId: id }));
+      if (response.status === 403) return expired();
+      if (!response.ok || !result.selected) return showError(result.error || 'Could not load your visits.');
+      current = result.selected;
+      renderVisits(notice);
+    }
+
+    const statusPill = (v) => {
+      const tone = v.upcoming ? 'bg-brand-100 text-brand-800' : v.status === 'cancelled' || v.status === 'no_show' ? 'bg-slate-100 text-slate-600' : 'bg-green-100 text-green-800';
+      return `<span class="rounded-full px-2.5 py-1 text-xs font-bold ${tone}">${esc(v.upcoming ? (v.status === 'arrived' ? 'Checked in' : 'Upcoming') : v.statusLabel)}</span>`;
+    };
+
+    function visitCard(v) {
+      const el = document.createElement('div');
+      el.className = `rounded-xl border p-4 ${v.upcoming ? 'border-brand-300 bg-brand-50/60' : 'border-slate-200 bg-white'}`;
+      el.innerHTML = `
+        <div class="flex flex-wrap items-start justify-between gap-2">
+          <div class="min-w-0">
+            <p class="font-bold text-brand-900">${esc(fmtDate(v.date, { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' }))} · ${esc(v.time)}</p>
+            <p class="text-sm text-slate-600">${v.doctorName ? `Dr. ${esc(plainDoctor(v.doctorName))} · ` : ''}${esc(v.type)}</p>
+          </div>
+          ${statusPill(v)}
+        </div>
+        ${v.upcoming ? (v.canChange ? `
+          <div class="mt-3 flex flex-wrap gap-2" data-actions>
+            <button type="button" data-reschedule class="min-h-[44px] rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700">Reschedule</button>
+            <button type="button" data-cancel class="min-h-[44px] rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50">Cancel appointment</button>
+          </div>
+          <div data-panel class="mt-4 hidden space-y-4 border-t border-slate-200 pt-4">
+            <p class="text-sm font-semibold text-slate-700">Choose a new date and time</p>
+            <div data-picker></div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" data-confirm disabled class="min-h-[44px] rounded-xl bg-brand-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-800 disabled:opacity-50">Confirm new time</button>
+              <button type="button" data-close class="min-h-[44px] rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">Close</button>
+            </div>
+          </div>` : `<p class="mt-3 text-sm text-slate-600">To change this appointment, please call <a class="font-semibold text-brand-700 underline" href="tel:${esc(clinicTel)}">${esc(clinic.phone)}</a>.</p>`) : ''}`;
+      return el;
+    }
+
+    // Top of the page: the upcoming appointment (reschedule / cancel) or the booking form. Previous visits go below it.
+    function renderVisits(notice) {
+      show('rvVerify', false); show('rvPatient', false); $('confirmationCard').classList.add('hidden'); show('rvForm', true);
+      show('rvWho', true);
+      $('rvVisitsFor').textContent = `${current.name} · +91 ${verifiedPhone}`;
+      $('rvSwitch').classList.toggle('hidden', patients.length < 2);
+      const n = $('rvNotice'); n.textContent = notice || ''; n.classList.toggle('hidden', !notice);
+
+      const body = $('rvUpcomingBody'); body.innerHTML = '';
+      if (current.upcoming) {
+        const el = visitCard(current.upcoming);
+        body.appendChild(el);
+        if (current.upcoming.canChange) wireUpcoming(el, current.upcoming);
+        show('rvUpcoming', true); show('rvSlot', false); // one upcoming appointment per patient: change or cancel it instead of booking another
+      } else {
+        show('rvUpcoming', false); showBooking();
+      }
+
+      const earlier = current.visits.filter((v) => !v.upcoming);
+      const list = $('rvVisitList'); list.innerHTML = '';
+      if (!earlier.length) list.innerHTML = '<li class="text-sm text-slate-600">No earlier visits found for this patient.</li>';
+      earlier.forEach((v) => { const li = document.createElement('li'); li.appendChild(visitCard(v)); list.appendChild(li); });
+      show('rvVisits', true);
+      $('rvWho').scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+    $('rvSwitch').addEventListener('click', () => { ['rvWho', 'rvNotice', 'rvUpcoming', 'rvVisits', 'rvSlot'].forEach((id) => show(id, false)); show('rvPatient', true); });
+
+    // ---------------------------------------------------------------- reschedule / cancel the upcoming appointment (manage-appointments)
+    const manage = (action, extra) => post('/.netlify/functions/manage-appointments', { action, phone: phoneInput.value, otpToken, ...extra });
+    function wireUpcoming(li, v) {
+      const panel = li.querySelector('[data-panel]'), confirmBtn = li.querySelector('[data-confirm]');
+      let picker = null;
+      li.querySelector('[data-reschedule]').addEventListener('click', () => {
+        panel.classList.toggle('hidden');
+        if (!panel.classList.contains('hidden') && !picker) {
+          picker = slotPicker(li.querySelector('[data-picker]'), { doctorId: () => v.doctorId, onChoose: (slot) => { confirmBtn.disabled = !slot; } });
+        }
+      });
+      li.querySelector('[data-close]').addEventListener('click', () => panel.classList.add('hidden'));
+      confirmBtn.addEventListener('click', async () => {
+        const { slot, date } = picker.chosen();
+        if (!slot) return;
+        clearError(); confirmBtn.disabled = true; confirmBtn.textContent = 'Moving…';
+        const { response, result } = await manage('reschedule', { appointmentId: v.id, date, time: slot.display, doctorId: v.doctorId });
+        confirmBtn.textContent = 'Confirm new time';
+        if (response.status === 403) return expired();
+        if (!response.ok || !result.success) { confirmBtn.disabled = false; return showError(result.error || 'Could not move the appointment.'); }
+        window.gtag?.('event', 'review_rescheduled', { event_category: 'engagement', event_label: 'review_page' });
+        await choosePatient(current.id, `Your appointment is moved from ${result.from} to ${result.to}. We have sent the new time on WhatsApp.`);
+      });
+      li.querySelector('[data-cancel]').addEventListener('click', async () => {
+        if (!window.confirm(`Cancel ${current.name}'s appointment on ${fmtDate(v.date, { day: 'numeric', month: 'long' })} at ${v.time}?`)) return;
+        clearError();
+        const { response, result } = await manage('cancel', { appointmentId: v.id });
+        if (response.status === 403) return expired();
+        if (!response.ok || !result.success) return showError(result.error || 'Could not cancel the appointment.');
+        window.gtag?.('event', 'review_cancelled', { event_category: 'engagement', event_label: 'review_page' });
+        await choosePatient(current.id, `Your appointment on ${fmtDate(v.date, { day: 'numeric', month: 'long' })} at ${v.time} is cancelled. You can book a new review below.`);
+      });
+    }
+
+    // ---------------------------------------------------------------- book a review
+    let bookPicker = null;
+    function showBooking() {
+      const sel = $('doctor'); sel.innerHTML = '';
+      const last = current.doctor;
+      const ordered = last ? [...doctors.filter((d) => d.id === last.id), ...doctors.filter((d) => d.id !== last.id)] : doctors;
+      ordered.forEach((d) => { const o = document.createElement('option'); o.value = d.id; o.textContent = `${d.name}${last && d.id === last.id ? ' (your doctor)' : ''}`; sel.appendChild(o); });
+      const any = document.createElement('option'); any.value = 'any'; any.textContent = 'No preference'; sel.appendChild(any);
+      sel.value = last ? last.id : 'any';
+      const note = $('doctorNote');
+      note.textContent = last ? `Selected automatically: the doctor you last saw.` : 'No earlier visit found, so any available doctor can see you.';
+      note.classList.remove('hidden');
+      $('bookBtn').disabled = true;
+      show('rvSlot', true);
+      bookPicker = slotPicker($('slotPicker'), { doctorId: () => $('doctor').value, onChoose: (slot) => { $('bookBtn').disabled = !slot; } });
+    }
+    $('doctor').addEventListener('change', () => { $('bookBtn').disabled = true; bookPicker?.reload(); });
+
+    $('bookBtn').addEventListener('click', async () => {
+      const { slot, date } = bookPicker.chosen();
+      if (!slot || !current) return;
+      clearError();
+      const btn = $('bookBtn'); btn.disabled = true; btn.textContent = 'Booking…';
+      const doctorId = $('doctor').value;
+      const { response, result } = await post('/.netlify/functions/review-book', ctx({
+        patientId: current.id, date, time: slot.display,
+        ...(doctorId === 'any' ? { candidateDoctorIds: slot.doctorIds || [] } : { doctorId }),
+      }));
+      btn.textContent = 'Confirm Review';
+      if (response.status === 403) return expired();
+      if (result.code === 'already_booked') { showError(result.error); return choosePatient(current.id); }
+      if (!response.ok || !result.success) { btn.disabled = false; showError(result.error || 'Could not book the review.'); if (response.status === 409) bookPicker.reload(); return; }
+      window.gtag?.('event', 'review_booked', { event_category: 'conversion', event_label: 'review_page' });
+      showConfirmation({ result, slot });
+    });
+
+    // ---------------------------------------------------------------- confirmation card (same as the booking page)
+    const utcStamp = (date, time24, addMinutes) => {
+      const [y, m, d] = date.split('-').map(Number); const [h, mi] = time24.split(':').map(Number);
+      return new Date(Date.UTC(y, m - 1, d, h, mi) - 330 * 60000 + addMinutes * 60000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    };
+    function buildIcs({ date, time24, minutes, summary, description, location }) {
+      const e = (s) => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+      return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//CRISPR Skin and Hair Clinic//Review//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+        `UID:${utcStamp(date, time24, 0)}-${phoneDigits(phoneInput.value)}@review`, `DTSTAMP:${utcStamp(date, time24, 0)}`, `DTSTART:${utcStamp(date, time24, 0)}`, `DTEND:${utcStamp(date, time24, minutes)}`,
+        `SUMMARY:${e(summary)}`, `DESCRIPTION:${e(description)}`, `LOCATION:${e(location)}`,
+        'BEGIN:VALARM', 'TRIGGER:-PT60M', 'ACTION:DISPLAY', `DESCRIPTION:${e(summary)}`, 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    }
+    function showConfirmation({ result, slot }) {
+      const date = result.date, time24 = slot.time24 || to24(result.time), minutes = 15;
+      const doctorText = result.doctor_name ? `Dr. ${plainDoctor(result.doctor_name)}` : 'Assigned by the clinic';
+      $('confirmSubtitle').textContent = `We have sent the details on WhatsApp to +91 ${verifiedPhone}.`;
+      $('confirmWhen').textContent = `${fmtDate(date, { weekday: 'short', day: 'numeric', month: 'short' })} · ${result.time}`;
+      $('confirmType').textContent = `Review · ${minutes} min`;
+      const rows = [['Patient', result.patient_name], ['Doctor', doctorText], ['Visit', 'Review'], ['Clinic', `${clinic.name}, ${clinic.address}`]];
+      const details = $('confirmDetails'); details.innerHTML = '';
+      rows.forEach(([k, v]) => {
+        const row = document.createElement('div'); row.className = 'flex flex-col gap-0.5 px-4 py-3 sm:flex-row sm:gap-4';
+        const dt = document.createElement('dt'); dt.className = 'w-24 shrink-0 font-semibold text-slate-500'; dt.textContent = k;
+        const dd = document.createElement('dd'); dd.className = 'text-slate-900'; dd.textContent = v;
+        row.append(dt, dd); details.appendChild(row);
+      });
+      const location = `${clinic.name}, ${clinic.address}`, summary = `Review at ${clinic.name}`;
+      const description = `Review with ${doctorText}. Please arrive 10 minutes early. Questions? Call ${clinic.phone}.`;
+      $('gcalLink').href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(summary)}&dates=${utcStamp(date, time24, 0)}/${utcStamp(date, time24, minutes)}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}`;
+      $('mapLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+      $('icsBtn').onclick = () => {
+        const blob = new Blob([buildIcs({ date, time24, minutes, summary, description, location })], { type: 'text/calendar;charset=utf-8' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'review.ics'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+      };
+      $('confirmArrival').textContent = `Please arrive about 10 minutes early. Clinic hours: ${clinic.hours}.`;
+      const call = $('callLink'); call.textContent = `Call ${clinic.phone}`; call.href = `tel:${clinicTel}`;
+      show('rvForm', false);
+      const card = $('confirmationCard'); card.classList.remove('hidden'); card.scrollIntoView({ block: 'start', behavior: 'smooth' }); $('confirmTitle').focus({ preventScroll: true });
+    }
+    $('viewVisitsBtn').addEventListener('click', () => choosePatient(current.id));
+  });
+</script>
